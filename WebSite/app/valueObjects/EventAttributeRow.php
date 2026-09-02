@@ -26,4 +26,19 @@ final readonly class EventAttributeRow
             color: $row['color'],
         );
     }
+
+    /**
+     * Bridges a raw row from the `Attribute` table (SELECT Id, Name, Detail, Color)
+     * as used e.g. for filter dropdowns in nextEvents/weekEvents.
+     * Expects a row shaped as {Id: int|string, Name: string, Detail: string, Color: string}.
+     */
+    public static function fromStdClass(\stdClass $row): self
+    {
+        return new self(
+            id: (string) $row->Id,
+            name: (string) $row->Name,
+            detail: (string) $row->Detail,
+            color: (string) $row->Color,
+        );
+    }
 }

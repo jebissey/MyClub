@@ -21,9 +21,19 @@ use app\models\EventDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\MessageDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\Event\viewModels\EventChatViewModel;
+use app\modules\Event\viewModels\EventCrosstabViewModel;
+use app\modules\Event\viewModels\EventDetailViewModel;
+use app\modules\Event\viewModels\EventManagerHomeViewModel;
+use app\modules\Event\viewModels\EventNextEventsViewModel;
+use app\modules\Event\viewModels\EventWeekEventsViewModel;
 use app\valueObjects\ContactTokenRow;
+use app\valueObjects\EventAttributeRow;
 use app\valueObjects\EventAudienceRow;
+use app\valueObjects\EventTypeRow;
 use app\valueObjects\IdRow;
+use app\valueObjects\NeedTypeRow;
 
 class EventController extends AbstractController
 {
@@ -50,11 +60,15 @@ class EventController extends AbstractController
             $content = $this->dataHelper->get('Languages', ['Name' => 'Help_NextEvents'], $lang)->$lang ?? '';
         }
 
-        $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $content,
-            'timer' => 0,
-            'btn_HistoryBack' => true,
-        ]));
+        $viewModel = new InfoViewModel(
+            content: $content,
+            timer: 0,
+            hasAuthorization: $this->application->getConnectedUser()->isRedactor(),
+            previousPage: true,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 
     public function nextEvents(): void
@@ -78,21 +92,31 @@ class EventController extends AbstractController
         $filterByPreferences = (($input['filterByPreferences'] ?? null) === 1);
         $connectedUser = $this->application->getConnectedUser();
 
-        $this->render('Event/views/nextEvents.latte', $this->getAllParams([
-            'events' => $this->eventDataHelper->getEvents($connectedUser->person, $mode, $offset, $filterByPreferences),
-            'person' => $connectedUser->person,
-            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
-            'needTypes' => $this->dataHelper->gets('NeedType', [], 'Id, Name'),
-            'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
-            'offset' => $offset,
-            'mode' => $mode,
-            'filterByPreferences' => $filterByPreferences,
-            'page' => $connectedUser->getPage(),
-            'duplicateModeToday' => Period::Today->value,
-            'duplicateModeTomorrow' => Period::Tomorrow->value,
-            'duplicateModeNextWeek' => Period::NextWeek->value,
-            'btn_HistoryBack' => true,
-        ]));
+        $viewModel = new EventNextEventsViewModel(
+            events: array_values($this->eventDataHelper->getEvents($connectedUser->person, $mode, $offset, $filterByPreferences)),
+            person: $connectedUser->person,
+            eventTypes: array_map(
+                static fn(\stdClass $row): EventTypeRow => EventTypeRow::fromStdClass($row),
+                array_values($this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name, Inactivated, IdGroup'))
+            ),
+            needTypes: array_map(
+                static fn(\stdClass $row): NeedTypeRow => NeedTypeRow::fromStdClass($row),
+                array_values($this->dataHelper->gets('NeedType', [], 'Id, Name'))
+            ),
+            eventAttributes: array_map(
+                static fn(\stdClass $row): EventAttributeRow => EventAttributeRow::fromStdClass($row),
+                array_values($this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'))
+            ),
+            offset: $offset,
+            mode: $mode,
+            filterByPreferences: $filterByPreferences,
+            duplicateModeToday: Period::Today->value,
+            duplicateModeTomorrow: Period::Tomorrow->value,
+            duplicateModeNextWeek: Period::NextWeek->value,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Event/views/nextEvents.latte', $viewModel->toArray());
     }
 
     public function weekEvents(): void
@@ -101,36 +125,47 @@ class EventController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Event/views/weekEvents.latte', $this->getAllParams([
-            'events' => $this->eventDataHelper->getNextWeekEvents(),
-            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name'),
-            'eventAttributes' => $this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'),
-            'attributes' => $this->eventDataHelper->getAttributesForNextWeekEvents(),
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-            'layout' => $this->getLayout(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-        ]));
+
+        $viewModel = new EventWeekEventsViewModel(
+            events: $this->eventDataHelper->getNextWeekEvents(),
+            eventTypes: array_map(
+                static fn(\stdClass $row): EventTypeRow => EventTypeRow::fromStdClass($row),
+                array_values($this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name, Inactivated, IdGroup'))
+            ),
+            eventAttributes: array_map(
+                static fn(\stdClass $row): EventAttributeRow => EventAttributeRow::fromStdClass($row),
+                array_values($this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'))
+            ),
+            attributes: $this->eventDataHelper->getAttributesForNextWeekEvents(),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Event/views/weekEvents.latte', $viewModel->toArray());
     }
 
     public function showEventCrosstab(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
-            $period = Period::from($this->flight->request()->query->period ?? 'month');
-            [$dateRange, $crosstabData] = $this->crosstabDataHelper->getevents($period);
-
-            $this->render('Common/views/crosstab.latte', $this->getAllParams([
-                'crosstabData' => $crosstabData,
-                'period' => $period->value,
-                'dateRange' => $dateRange,
-                'availablePeriods' => Period::gets($this->languagesDataHelper),
-                'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
-                'title' => "Animateurs vs type d'événement",
-                'totalLabels' => ['événements', 'participants'],
-                'page' => $this->application->getConnectedUser()->getPage(1),
-                'btn_HistoryBack' => true,
-            ]));
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
+            return;
         }
+
+        $period = Period::from($this->flight->request()->query->period ?? 'month');
+        [$dateRange, $crosstabData] = $this->crosstabDataHelper->getevents($period);
+
+        $viewModel = new EventCrosstabViewModel(
+            crosstabData: $crosstabData,
+            period: $period->value,
+            dateRange: $dateRange,
+            availablePeriods: Period::gets($this->languagesDataHelper),
+            navbarTemplate: '../../Webmaster/views/navbar/eventManager.latte',
+            title: "Animateurs vs type d'événement",
+            totalLabels: ['événements', 'participants'],
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(1),
+            ]),
+        );
+
+        $this->render('Common/views/crosstab.latte', $viewModel->toArray());
     }
 
     public function show(int $eventId, string $message = '', string $messageType = ''): void
@@ -140,7 +175,8 @@ class EventController extends AbstractController
             return;
         }
         $person = $this->application->getConnectedUser()->person ?? false;
-        $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData()) ?? false;
+        $rawToken = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData()) ?? false;
+        $token = is_string($rawToken) ? $rawToken : false;
         $event = $this->eventDataHelper->getEvent($eventId);
 
         if ($person === false && !$token && $event->Audience !== EventAudience::ForAll) {
@@ -154,28 +190,35 @@ class EventController extends AbstractController
         }
 
         $userEmail = $person->Email ?? '';
-        $this->render('Event/views/event_detail.latte', $this->getAllParams([
-            'eventId' => $eventId,
-            'event' => $event,
-            'attributes' => $this->eventDataHelper->getEventAttributes($eventId),
-            'participants' => $this->participantDataHelper->getEventParticipants($eventId),
-            'userEmail' => $userEmail,
-            'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
-            'navItems' => $this->getNavItems($person ?: null),
-            'countOfMessages' => count($this->dataHelper->gets('Message', [
+
+        $viewModel = new EventDetailViewModel(
+            eventId: $eventId,
+            event: $event,
+            attributes: array_map(
+                static fn(\stdClass $row): EventAttributeRow => new EventAttributeRow(
+                    id: (string) $row->AttributeId,
+                    name: $row->Name,
+                    detail: $row->Detail,
+                    color: $row->Color,
+                ),
+                array_values($this->eventDataHelper->getEventAttributes($eventId))
+            ),
+            participants: $this->participantDataHelper->getEventParticipants($eventId),
+            isRegistered: $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
+            countOfMessages: count($this->dataHelper->gets('Message', [
                 '"From"' => 'User',
                 'EventId' => $eventId
             ])),
-            'eventNeeds' => $this->eventDataHelper->getEventNeeds($eventId),
-            'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
-            'userSupplies' => $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
-            'token' => $token,
-            'message' => $message,
-            'messageType' => $messageType,
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent' => "/nextEvents",
-        ]));
+            eventNeeds: array_values($this->eventDataHelper->getEventNeeds($eventId)),
+            participantSupplies: array_values($this->eventDataHelper->getParticipantSupplies($eventId)),
+            userSupplies: array_values($this->eventDataHelper->getUserSupplies($eventId, $userEmail)),
+            token: $token,
+            message: $message,
+            messageType: $messageType,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Event/views/event_detail.latte', $viewModel->toArray());
     }
 
     public function registerSet(int $eventId, ?string $token = null): void
@@ -303,28 +346,37 @@ class EventController extends AbstractController
 
     public function help(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
-            $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_EventManager'], $lang)->$lang ?? '',
-                'timer' => 0,
-                'btn_HistoryBack' => true,
-            ]));
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
+            return;
         }
+
+        $lang = TranslationManager::getCurrentLanguage();
+
+        $viewModel = new InfoViewModel(
+            content: $this->dataHelper->get('Languages', ['Name' => 'Help_EventManager'], $lang)->$lang ?? '',
+            timer: 0,
+            hasAuthorization: $this->application->getConnectedUser()->isRedactor(),
+            previousPage: true,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 
     public function home(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
-            $_SESSION['navbar'] = 'eventManager';
-
-            $this->render('Event/views/eventManager.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'content' => ($this->t)('EventManager'),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/admin',
-            ]));
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
+            return;
         }
+
+        $_SESSION['navbar'] = 'eventManager';
+
+        $viewModel = new EventManagerHomeViewModel(
+            content: ($this->t)('EventManager'),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Event/views/eventManager.latte', $viewModel->toArray());
     }
 
     public function showEventChat(int $eventId): void
@@ -346,17 +398,18 @@ class EventController extends AbstractController
         $lastLogId = isset($_SESSION['last_log_id']) && is_int($_SESSION['last_log_id'])
             ? $_SESSION['last_log_id']
             : 0;
-        $this->render('Common/views/chat.latte', $this->getAllParams([
-            'article' => null,
-            'event' => $event,
-            'group' => null,
-            'messages' => $this->messageDataHelper->getEventMessages($eventId),
-            'person' => $person,
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/event/{$eventId}",
-            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
-        ]));
+
+        $viewModel = new EventChatViewModel(
+            article: null,
+            event: $event,
+            group: null,
+            messages: array_values($this->messageDataHelper->getEventMessages($eventId)),
+            person: $person,
+            newMessages: $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
+            eventId: $eventId,
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Common/views/chat.latte', $viewModel->toArray());
     }
 }

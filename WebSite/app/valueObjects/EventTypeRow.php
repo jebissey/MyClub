@@ -19,15 +19,15 @@ final class EventTypeRow
     }
 
     /**
-     * @param EventTypeRow $row
+     * Expects a row shaped as {Id: int, Name: string, Inactivated: int, IdGroup: int|null}.
      */
-    public static function fromStdClass(object $row): self
+    public static function fromStdClass(\stdClass $row): self
     {
         return new self(
-            Id: $row->Id,
-            Name: $row->Name,
-            Inactivated: $row->Inactivated,
-            IdGroup: $row->IdGroup,
+            Id: (int) $row->Id,
+            Name: (string) $row->Name,
+            Inactivated: (int) $row->Inactivated,
+            IdGroup: $row->IdGroup !== null ? (int) $row->IdGroup : null,
         );
     }
 
