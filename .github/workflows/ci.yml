@@ -140,7 +140,7 @@ jobs:
 
       # Cette requête sert aussi à déclencher Database::check(), qui copie
       # automatiquement data/MyClub.sqlite depuis le template s'il n'existe pas
-      # encore — nécessaire avant que route_tester.php ne tente de le sauvegarder.
+      # encore — nécessaire avant que FlightRouteTester.php ne tente de le sauvegarder.
       - name: Wait for server to be ready
         run: |
           for i in $(seq 1 20); do
@@ -164,7 +164,7 @@ jobs:
 
       - name: Run FlightRouteTester
         run: |
-          php test/route_tester.php \
+          php test/FlightRouteTester.php \
             --base-url=http://localhost:8000 \
             --stop \
             --export-json \
