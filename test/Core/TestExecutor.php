@@ -42,11 +42,11 @@ class TestExecutor
         foreach ($routes as $i => $route) {
             $routeNumber = $i + 1;
             if ($testFilter === null || $testFilter === $routeNumber) {
-                $this->reporter->diplayTest($routeNumber, $totalRoutes, $route->method, $route->originalPath);
+                $this->reporter->displayTest($routeNumber, $totalRoutes, $route->method, $route->originalPath);
                 $tests = $this->runRouteTests($route, $routeNumber, null, $stop);
                 $results = array_merge($results, $tests);
                 foreach ($tests as $test) {
-                    $this->reporter->diplayResult($test->route->testedPath, $test->response->httpCode, $test->response->responseTimeMs, []);
+                    $this->reporter->displayResult($test->route->testedPath, $test->response->httpCode, $test->response->responseTimeMs, []);
                 }
                 usleep($this->config->requestDelay);
             }
@@ -66,10 +66,14 @@ class TestExecutor
             if ($startFilter !== null) {
                 if ($simuNumber < $startFilter) continue;
             }
-            $this->reporter->diplayTest($simuNumber, $totalSimulations, $simulation->route->method, $simulation->route->originalPath);
+            $this->reporter->displayTest($simuNumber, $totalSimulations, $simulation->route->method, $simulation->route->originalPath);
             $tests = $this->runRouteTests($simulation->route, $simulation->number, $simulation, $stop);
             $results = array_merge($results, $tests);
-            $this->reporter->diplayResult($tests[0]->route->testedPath, $tests[0]->response->httpCode, $tests[0]->response->responseTimeMs, $simulation->postParams);
+            if ($tests === []) {
+                $this->reporter->error("No result produced for simulation {$simulation->number}: {$simulation->route->method} {$simulation->route->originalPath}");
+                continue;
+            }
+            $this->reporter->displayResult($tests[0]->route->testedPath, $tests[0]->response->httpCode, $tests[0]->response->responseTimeMs, $simulation->postParams);
         }
         return $results;
     }

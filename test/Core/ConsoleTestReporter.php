@@ -49,7 +49,7 @@ class ConsoleTestReporter implements TestReporterInterface
         return $formattedErrors;
     }
 
-    public function diplayTest(int $testNumber, int $totalTests, string $method, string $path): void
+    public function displayTest(int $testNumber, int $totalTests, string $method, string $path): void
     {
         echo sprintf(
             "[%d/%d] Testing %s %s ",
@@ -60,7 +60,7 @@ class ConsoleTestReporter implements TestReporterInterface
         );
     }
 
-    public function diplayResult(string $testedPath, int $httpCode, float $responseTimeMs, array $postParams): void
+    public function displayResult(string $testedPath, int $httpCode, float $responseTimeMs, array $postParams): void
     {
         $strPostParams = '';
         if ($postParams != []) $strPostParams = ' with ' . json_encode($postParams, JSON_UNESCAPED_UNICODE);

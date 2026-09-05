@@ -157,7 +157,13 @@ class MessageApi extends AbstractApi
 
             $messageId = To::int($data['messageId'] ?? 0);
             if ($messageId <= 0) {
-                throw new InvalidArgumentException("messageId invalide");
+                $this->renderJsonError(
+                    "messageId invalide",
+                    ApplicationError::BadRequest->value,
+                    __FILE__,
+                    __LINE__
+                );
+                return;
             }
 
             [$year, $month, $filename] = $this->messageDataHelper->getImageInfoFromMessage($messageId);

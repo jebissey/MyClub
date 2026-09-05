@@ -24,40 +24,34 @@ class VisitorInsights implements RouteInterface
      */
     public function get(): array
     {
-        $c = fn() => $this->controllerFactory->makeVisitorInsightsController();
+        $visitorInsightsController = fn() => $this->controllerFactory->makeVisitorInsightsController();
 
-        // Feature routes
-        $this->routes[] = new Route('GET /analytics', $c, 'analytics');
-        $this->routes[] = new Route('GET /crossTab', $c, 'crossTab');
-        $this->routes[] = new Route('GET /lastVisits', $c, 'showLastVisits');
-        $this->routes[] = new Route('GET /logs', $c, 'index');
-        $this->routes[] = new Route('GET /membersAlerts', $c, 'membersAlerts');
-        $this->routes[] = new Route('GET /referents', $c, 'referents');
-        $this->routes[] = new Route('GET /topPages', $c, 'topPagesByPeriod');
-        $this->routes[] = new Route('GET /visitorInsights', $c, 'visitorInsights');
-        $this->routes[] = new Route('GET /visitorsGraf', $c, 'visitorsGraf');
+        $this->routes[] = new Route('GET /analytics', $visitorInsightsController, 'analytics');
+        $this->routes[] = new Route('GET /analytics/help', $visitorInsightsController, 'helpPage', ['analytics']);
 
-        // Help routes — single controller method, section passed as argument
-        foreach (
-            [
-                'analytics',
-                'crossTab',
-                'lastVisits',
-                'logs',
-                'membersAlerts',
-                'referents',
-                'topPages',
-                'visitorInsights',
-                'visitorsGraf',
-            ] as $section
-        ) {
-            $this->routes[] = new Route(
-                "GET /{$section}/help",
-                $c,
-                'helpPage',
-                [$section]          // passed as argument to helpPage(string $section)
-            );
-        }
+        $this->routes[] = new Route('GET /crossTab', $visitorInsightsController, 'crossTab');
+        $this->routes[] = new Route('GET /crossTab/help', $visitorInsightsController, 'helpPage', ['crossTab']);
+
+        $this->routes[] = new Route('GET /lastVisits', $visitorInsightsController, 'showLastVisits');
+        $this->routes[] = new Route('GET /lastVisits/help', $visitorInsightsController, 'helpPage', ['lastVisits']);
+
+        $this->routes[] = new Route('GET /logs', $visitorInsightsController, 'index');
+        $this->routes[] = new Route('GET /logs/help', $visitorInsightsController, 'helpPage', ['logs']);
+
+        $this->routes[] = new Route('GET /membersAlerts', $visitorInsightsController, 'membersAlerts');
+        $this->routes[] = new Route('GET /membersAlerts/help', $visitorInsightsController, 'helpPage', ['membersAlerts']);
+
+        $this->routes[] = new Route('GET /referents', $visitorInsightsController, 'referents');
+        $this->routes[] = new Route('GET /referents/help', $visitorInsightsController, 'helpPage', ['referents']);
+
+        $this->routes[] = new Route('GET /topPages', $visitorInsightsController, 'topPagesByPeriod');
+        $this->routes[] = new Route('GET /topPages/help', $visitorInsightsController, 'helpPage', ['topPages']);
+
+        $this->routes[] = new Route('GET /visitorInsights', $visitorInsightsController, 'visitorInsights');
+        $this->routes[] = new Route('GET /visitorInsights/help', $visitorInsightsController, 'helpPage', ['visitorInsights']);
+
+        $this->routes[] = new Route('GET /visitorsGraf', $visitorInsightsController, 'visitorsGraf');
+        $this->routes[] = new Route('GET /visitorsGraf/help', $visitorInsightsController, 'helpPage', ['visitorsGraf']);
 
         return $this->routes;
     }
