@@ -36,7 +36,7 @@ class MediaApi extends AbstractApi
             } else {
                 $this->renderJsonError(
                     $result->message ?? '',
-                    ApplicationError::Error->value,
+                    ApplicationError::BadRequest->value,
                     $result->file ?? '',
                     $result->line ?? 0
                 );
@@ -55,7 +55,7 @@ class MediaApi extends AbstractApi
             if (!preg_match('#^[\w/-]+\.(jpg|jpeg|png|gif)$#i', $path)) {
                 $this->renderJsonError(
                     'Invalid path',
-                    ApplicationError::Error->value,
+                    ApplicationError::BadRequest->value,
                     __FILE__,
                     __LINE__
                 );
@@ -66,7 +66,7 @@ class MediaApi extends AbstractApi
             if (!file_exists($fullPath)) {
                 $this->renderJsonError(
                     'File not found',
-                    ApplicationError::Error->value,
+                    ApplicationError::BadRequest->value,
                     __FILE__,
                     __LINE__
                 );
@@ -76,7 +76,7 @@ class MediaApi extends AbstractApi
             if (!preg_match('#^data:image/(\w+);base64,#', $imageData, $m)) {
                 $this->renderJsonError(
                     'Invalid image data',
-                    ApplicationError::Error->value,
+                    ApplicationError::BadRequest->value,
                     __FILE__,
                     __LINE__
                 );
@@ -87,7 +87,7 @@ class MediaApi extends AbstractApi
             if (!$img) {
                 $this->renderJsonError(
                     'Cannot decode image',
-                    ApplicationError::Error->value,
+                    ApplicationError::BadRequest->value,
                     __FILE__,
                     __LINE__
                 );

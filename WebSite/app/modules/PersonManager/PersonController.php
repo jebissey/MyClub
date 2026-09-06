@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace app\modules\PersonManager;
 
+use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\enums\PersonStatus;
+use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 use app\helpers\TranslationManager;
@@ -46,6 +48,9 @@ class PersonController extends TableController
 
     public function delete(int $id): void
     {
+        if ($id === 1) {
+            throw new QueryException("Person (1) can't be inactivated", ApplicationError::BadRequest->value);
+        }
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
             $this->redirect('/persons');
