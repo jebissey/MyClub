@@ -141,7 +141,7 @@ class ConnectedUser
     public function isAdministrator(): bool
     {
         return $this->isCommunicationManager() || $this->isDesigner() || $this->isEditor() || $this->isEventManager()
-            || $this->isLoanManager() || $this->isPersonManager() || $this->isRedactor() || $this->isTranslator() 
+            || $this->isLoanManager() || $this->isPersonManager() || $this->isRedactor() || $this->isTranslator()
             || $this->isVisitorInsights() || $this->isWebmaster();
     }
 
