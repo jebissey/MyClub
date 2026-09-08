@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\models\database\migrators;
 
 use PDO;
-use app\interfaces\DatabaseMigratorInterface;
+use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 class V75ToV76Migrator implements DatabaseMigratorInterface
 {

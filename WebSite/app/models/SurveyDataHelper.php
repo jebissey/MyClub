@@ -9,7 +9,7 @@ use stdClass;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\interfaces\NewsProviderInterface;
+use app\modules\Common\interfaces\NewsProviderInterface;
 use app\valueObjects\ReplyRow;
 use app\valueObjects\SurveyWithCreatorRow;
 

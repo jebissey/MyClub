@@ -8,7 +8,7 @@ use PDO;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\interfaces\NewsProviderInterface;
+use app\modules\Common\interfaces\NewsProviderInterface;
 use app\valueObjects\ArticleAuthorRow;
 use app\valueObjects\ArticleRow;
 use app\valueObjects\ArticleSitemapRow;

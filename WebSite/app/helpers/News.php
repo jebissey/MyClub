@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
-use app\interfaces\NewsProviderInterface;
+use app\modules\Common\interfaces\NewsProviderInterface;
 
 class News
 {

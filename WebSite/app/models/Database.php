@@ -12,7 +12,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\File;
 use app\helpers\LogMessage;
-use app\interfaces\DatabaseMigratorInterface;
+use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 class Database
 {

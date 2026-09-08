@@ -20,7 +20,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\PersonPreferences;
 use app\helpers\TranslationManager;
 use app\helpers\To;
-use app\interfaces\NewsProviderInterface;
+use app\modules\Common\interfaces\NewsProviderInterface;
 use app\models\DataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
 use app\modules\Event\valueObjects\EventAttributeRow;

@@ -15,7 +15,7 @@ use app\helpers\GravatarHandler;
 use app\helpers\MyClubDateTime;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
-use app\interfaces\NewsProviderInterface;
+use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Event\valueObjects\EventParticipant;
 
 class MessageDataHelper extends Data implements NewsProviderInterface

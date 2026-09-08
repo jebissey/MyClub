@@ -14,7 +14,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
 use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
-use app\interfaces\NewsProviderInterface;
+use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Common\services\EmailService;
 use app\valueObjects\EmailMessage;
 use app\modules\User\valueObjects\EventRegistrationRow;

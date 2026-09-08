@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\config\routes;
 
 use app\config\ControllerFactory;
-use app\interfaces\RouteInterface;
+use app\modules\Common\interfaces\RouteInterface;
 use app\valueObjects\Route;
 
 class EventEmail implements RouteInterface

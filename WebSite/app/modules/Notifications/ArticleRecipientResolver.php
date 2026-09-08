@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Notifications;
 
-use app\interfaces\RecipientResolverInterface;
+use app\modules\Common\interfaces\RecipientResolverInterface;
 use app\valueObjects\MessageContext;
 
 class ArticleRecipientResolver implements RecipientResolverInterface

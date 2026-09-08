@@ -6,7 +6,7 @@ namespace app\models\database\migrators;
 
 use PDO;
 use app\helpers\TranslationManager;
-use app\interfaces\DatabaseMigratorInterface;
+use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 class V24ToV25Migrator implements DatabaseMigratorInterface
 {
