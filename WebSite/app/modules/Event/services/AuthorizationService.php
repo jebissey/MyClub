@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Event\services;
 
 use app\helpers\ConnectedUser;
-use app\interfaces\AuthorizationServiceInterface;
+use app\modules\Event\interfaces\AuthorizationServiceInterface;
 
 class AuthorizationService implements AuthorizationServiceInterface
 {

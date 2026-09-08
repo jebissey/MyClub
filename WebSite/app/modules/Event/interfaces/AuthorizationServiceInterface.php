@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\interfaces;
+namespace app\modules\Event\interfaces;
 
 interface AuthorizationServiceInterface
 {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Common\services;
 
 use RuntimeException;
-use app\interfaces\EmailQuotaTrackerInterface;
+use app\modules\Common\interfaces\EmailQuotaTrackerInterface;
 
 final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
 {

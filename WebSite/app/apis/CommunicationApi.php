@@ -12,7 +12,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\interfaces\EmailQuotaTrackerInterface;
+use app\modules\Common\interfaces\EmailQuotaTrackerInterface;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
