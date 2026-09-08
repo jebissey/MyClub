@@ -9,7 +9,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
-use app\valueObjects\ExerciseRow;
+use app\modules\Exercise\valueObjects\ExerciseRow;
 
 class ExerciseApi extends AbstractApi
 {

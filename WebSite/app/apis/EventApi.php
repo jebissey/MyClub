@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use DateTime;
-use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
 use app\enums\Period;

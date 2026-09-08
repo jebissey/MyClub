@@ -8,7 +8,7 @@ use PDO;
 use stdClass;
 use Throwable;
 use app\helpers\Application;
-use app\valueObjects\KaraokeSession;
+use app\modules\Games\Karaoke\valueObjects\KaraokeSession;
 
 class KaraokeDataHelper extends Data
 {

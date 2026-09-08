@@ -12,7 +12,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
-use app\valueObjects\PushSubscriptionRow;
+use app\modules\Notifications\valueObjects\PushSubscriptionRow;
 
 class NotificationApi extends AbstractApi
 {
