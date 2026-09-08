@@ -312,7 +312,7 @@ class Routes
 
             // --- Root static files ---
             '/robots.txt' => ['dir' => 'root', 'file' => 'robots.txt',        'type' => 'text/plain; charset=UTF-8'],
-            '/webCard'    => ['dir' => 'root', 'file' => 'businessCard.html', 'type' => 'text/html; charset=UTF-8'],
+            '/webCard'    => ['dir' => 'static_html', 'file' => 'businessCard.html', 'type' => 'text/html; charset=UTF-8'],
 
             // --- Service worker (no cache, scope header required) ---
             '/service-worker.js' => [
