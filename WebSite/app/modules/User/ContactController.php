@@ -14,7 +14,7 @@ use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
-use app\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\User\valueObjects\EventRegistrationRow;
 
 class ContactController extends AbstractController

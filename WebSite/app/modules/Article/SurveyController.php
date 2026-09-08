@@ -15,8 +15,8 @@ use app\modules\Common\AbstractController;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\ArticleTitleRow;
 use app\modules\Article\valueObjects\PersonNameRow;
-use app\valueObjects\ArticleRow;
-use app\valueObjects\IdRow;
+use app\modules\Article\valueObjects\ArticleRow;
+use app\modules\Common\valueObjects\IdRow;
 
 class SurveyController extends AbstractController
 {

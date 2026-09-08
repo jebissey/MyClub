@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Event\valueObjects;
 
-use app\valueObjects\AbstractValueObject;
+use app\modules\Common\valueObjects\AbstractValueObject;
 
 /**
  * Ligne minimale de la table EventType (Name + IdGroup uniquement),

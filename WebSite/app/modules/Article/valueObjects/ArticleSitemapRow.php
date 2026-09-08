@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Article\valueObjects;
+
+use app\modules\Common\valueObjects\AbstractValueObject;
 
 final readonly class ArticleSitemapRow extends AbstractValueObject
 {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 class AuthResult
 {

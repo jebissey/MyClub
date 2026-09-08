@@ -6,7 +6,7 @@ namespace app\models;
 
 use PDO;
 use app\helpers\Application;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 class PersonStatisticsDataHelper extends Data
 {

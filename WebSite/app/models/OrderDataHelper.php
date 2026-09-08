@@ -10,7 +10,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
-use app\valueObjects\OrderWithCreatorRow;
+use app\modules\Article\valueObjects\OrderWithCreatorRow;
 
 /**
  * @phpstan-type PendingOrderResponse object{

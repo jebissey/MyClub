@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Article\valueObjects;
 
-use app\valueObjects\AbstractValueObject;
+use app\modules\Common\valueObjects\AbstractValueObject;
 
 /**
  * Représentation fortement typée d'une réponse à une commande groupée (table OrderReply).

@@ -27,7 +27,7 @@ use app\modules\Event\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\EventDetailRow;
 use app\valueObjects\EventExternalRow;
 use app\valueObjects\EventFullRow;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 /**
  * @phpstan-import-type EventArrayShape from \app\valueObjects\EventRow

@@ -29,7 +29,7 @@ use app\modules\Common\TableController;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
-use app\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\EmailMessage;
 
 class ArticleController extends TableController
 {

@@ -18,7 +18,7 @@ use app\models\DataHelper;
 use app\models\LogDataCompactHelper;
 use app\models\LogDataWriterHelper;
 use app\modules\Common\services\AuthenticationService;
-use app\valueObjects\CompactSettingsRow;
+use app\modules\Common\valueObjects\CompactSettingsRow;
 
 class Application
 {

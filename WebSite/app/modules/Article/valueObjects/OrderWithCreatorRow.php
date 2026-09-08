@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Article\valueObjects;
 
-use app\enums\SurveyVisibility;
+use app\modules\Common\valueObjects\AbstractValueObject;
+use app\enums\OrderVisibility;
 
 /**
- * Ligne Survey enrichie du créateur de l'article associé,
- * telle que retournée par SurveyDataHelper::getWithCreator().
+ * Ligne Order enrichie du créateur de l'article associé,
+ * telle que retournée par OrderDataHelper::getWithCreator().
  *
- * @phpstan-type SurveyWithCreatorRowShape object{
+ * @phpstan-type OrderWithCreatorRowShape object{
  *     Id: int|string,
  *     Question: string,
  *     Options: string,
@@ -20,7 +21,7 @@ use app\enums\SurveyVisibility;
  *     CreatedBy: int|string
  * }
  */
-final readonly class SurveyWithCreatorRow extends AbstractValueObject
+final readonly class OrderWithCreatorRow extends AbstractValueObject
 {
     public function __construct(
         public int $Id,
@@ -28,12 +29,12 @@ final readonly class SurveyWithCreatorRow extends AbstractValueObject
         public string $Options,
         public int $IdArticle,
         public string $ClosingDate,
-        public SurveyVisibility $Visibility,
+        public OrderVisibility $Visibility,
         public int $CreatedBy,
     ) {
     }
 
-    /** @param SurveyWithCreatorRowShape $row */
+    /** @param OrderWithCreatorRowShape $row */
     public static function fromStdClass(object $row): self
     {
         return new self(
@@ -42,7 +43,7 @@ final readonly class SurveyWithCreatorRow extends AbstractValueObject
             Options: $row->Options,
             IdArticle: (int) $row->IdArticle,
             ClosingDate: $row->ClosingDate,
-            Visibility: SurveyVisibility::from($row->Visibility),
+            Visibility: OrderVisibility::from($row->Visibility),
             CreatedBy: (int) $row->CreatedBy,
         );
     }

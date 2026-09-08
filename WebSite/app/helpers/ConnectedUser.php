@@ -11,7 +11,7 @@ use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\MetadataDataHelper;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 /**
  * @phpstan-import-type PersonRow from Person

@@ -11,7 +11,7 @@ use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
-use app\valueObjects\ArticleRow;
+use app\modules\Article\valueObjects\ArticleRow;
 use app\valueObjects\EventRow;
 
 /**

@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Common\valueObjects;
 
-final readonly class GroupNameRow
+final readonly class MessageOwnerRow
 {
     public function __construct(
-        public string $Name,
+        public int $PersonId,
     ) {
     }
 
     /**
-     * @param object{Name:string} $row
+     * @param object{PersonId:int|string} $row
      */
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Name: $row->Name,
+            PersonId: (int) $row->PersonId,
         );
     }
 }

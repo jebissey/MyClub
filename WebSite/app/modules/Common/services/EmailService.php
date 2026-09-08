@@ -18,7 +18,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use app\modules\Common\interfaces\SmtpConfigProviderInterface;
 use app\modules\Common\interfaces\EmailQuotaTrackerInterface;
-use app\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\valueObjects\SmtpConfig;
 use app\exceptions\EmailException;
 use InvalidArgumentException;

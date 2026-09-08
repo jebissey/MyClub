@@ -9,7 +9,7 @@ use app\models\DataHelper;
 use app\modules\Notifications\ArticleRecipientResolver;
 use app\modules\Notifications\EventRecipientResolver;
 use app\modules\Notifications\GroupRecipientResolver;
-use app\valueObjects\MessageContext;
+use app\modules\Common\valueObjects\MessageContext;
 
 class MessageRecipientService
 {

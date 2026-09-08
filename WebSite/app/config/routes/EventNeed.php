@@ -6,7 +6,7 @@ namespace app\config\routes;
 
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
-use app\valueObjects\Route;
+use app\modules\Common\valueObjects\Route;
 
 class EventNeed implements RouteInterface
 {

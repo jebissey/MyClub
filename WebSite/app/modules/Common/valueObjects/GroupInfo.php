@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Common\valueObjects;
 
 final readonly class GroupInfo
 {

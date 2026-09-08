@@ -32,7 +32,7 @@ use app\modules\Event\valueObjects\ContactTokenRow;
 use app\modules\Event\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\EventAudienceRow;
 use app\valueObjects\EventTypeRow;
-use app\valueObjects\IdRow;
+use app\modules\Common\valueObjects\IdRow;
 use app\modules\Event\valueObjects\NeedTypeRow;
 
 class EventController extends AbstractController

@@ -9,12 +9,12 @@ use stdClass;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\SharedFileDataHelper;
-use app\valueObjects\MediaOperationResult;
-use app\valueObjects\ShareFileInfo;
-use app\valueObjects\ShareStatus;
+use app\modules\Common\valueObjects\MediaOperationResult;
+use app\modules\Common\valueObjects\ShareFileInfo;
+use app\modules\Common\valueObjects\ShareStatus;
 use app\modules\Common\valueObjects\UploadedFileInput;
-use app\valueObjects\UploadedMedia;
-use app\valueObjects\UploadMediaResult;
+use app\modules\Common\valueObjects\UploadedMedia;
+use app\modules\Common\valueObjects\UploadMediaResult;
 
 class MediaManager
 {

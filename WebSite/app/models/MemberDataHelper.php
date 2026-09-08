@@ -13,11 +13,11 @@ use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Common\services\EmailService;
-use app\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\User\valueObjects\EventRegistrationRow;
-use app\valueObjects\IdRow;
-use app\valueObjects\MemberGroupRow;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\IdRow;
+use app\modules\Common\valueObjects\MemberGroupRow;
+use app\modules\Common\valueObjects\Person;
 use app\modules\Article\valueObjects\PersonNameRow;
 
 /**

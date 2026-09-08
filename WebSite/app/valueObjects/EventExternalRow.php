@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace app\valueObjects;
 
+namespace app\valueObjects;
+
+use app\modules\Common\valueObjects\AbstractValueObject;
+
 /**
  * Représentation fortement typée d'un événement accessible en externe (invité),
  * telle que retournée par EventDataHelper::getEventExternal().

@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use Latte\Engine as LatteEngine;
 use Latte\Loaders\StringLoader;
 use app\enums\FilterInputRule;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 class WebApp
 {

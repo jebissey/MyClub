@@ -16,8 +16,8 @@ use app\modules\Article\valueObjects\ArticleTitleRow;
 use app\modules\Article\valueObjects\OrderReplyRow;
 use app\modules\Article\valueObjects\PersonNameRow;
 use app\modules\Common\AbstractController;
-use app\valueObjects\ArticleRow;
-use app\valueObjects\IdRow;
+use app\modules\Article\valueObjects\ArticleRow;
+use app\modules\Common\valueObjects\IdRow;
 
 class OrderController extends AbstractController
 {

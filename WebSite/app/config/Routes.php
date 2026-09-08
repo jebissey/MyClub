@@ -133,7 +133,7 @@ use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
-use app\valueObjects\Route;
+use app\modules\Common\valueObjects\Route;
 
 class Routes
 {

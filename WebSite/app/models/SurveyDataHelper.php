@@ -10,8 +10,8 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\modules\Common\interfaces\NewsProviderInterface;
-use app\valueObjects\ReplyRow;
-use app\valueObjects\SurveyWithCreatorRow;
+use app\modules\Article\valueObjects\ReplyRow;
+use app\modules\Article\valueObjects\SurveyWithCreatorRow;
 
 class SurveyDataHelper extends Data implements NewsProviderInterface
 {

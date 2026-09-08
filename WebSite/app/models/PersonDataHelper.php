@@ -16,7 +16,7 @@ use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Common\services\EmailService;
-use app\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\User\valueObjects\EventRegistrationRow;
 
 /**

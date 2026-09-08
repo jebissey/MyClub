@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Article\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\valueObjects\ArticleRow;
+use app\modules\Article\valueObjects\ArticleRow;
 use stdClass;
 
 /**

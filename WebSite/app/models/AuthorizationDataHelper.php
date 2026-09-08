@@ -11,8 +11,8 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
-use app\valueObjects\ArticleRow;
-use app\valueObjects\ClosingVisibilityRow;
+use app\modules\Article\valueObjects\ArticleRow;
+use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 /**
  * @phpstan-import-type ArticleAuthorizationRowShape from ArticleAuthorizationRow

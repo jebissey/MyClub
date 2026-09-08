@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Common\valueObjects;
 
 /**
  * Objet d'identité minimal pour l'utilisateur (ConnectedUser::$person, AuthResult::getUser()).

@@ -12,7 +12,7 @@ use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserEditPresentationViewModel;
 use app\modules\User\viewModels\UserPresentationViewModel;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 /**
  * @phpstan-import-type PersonRow from Person

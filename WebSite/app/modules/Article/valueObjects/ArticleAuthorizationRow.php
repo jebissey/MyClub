@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace app\modules\Article\valueObjects;
 
-use app\valueObjects\ArticleRow;
-
 /**
  * @phpstan-type ArticleAuthorizationRowShape object{
  *     Id?: int|string,

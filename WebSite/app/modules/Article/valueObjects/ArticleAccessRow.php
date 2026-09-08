@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Article\valueObjects;
 
-use app\valueObjects\AbstractValueObject;
+use app\modules\Common\valueObjects\AbstractValueObject;
 
 final readonly class ArticleAccessRow extends AbstractValueObject
 {

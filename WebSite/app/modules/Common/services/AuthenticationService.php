@@ -15,8 +15,8 @@ use app\helpers\WebApp;
 use app\models\AuthResult;
 use app\models\DataHelper;
 use app\modules\Common\services\EmailService;
-use app\valueObjects\EmailMessage;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\Person;
 
 /**
  * @phpstan-import-type PersonRow from Person

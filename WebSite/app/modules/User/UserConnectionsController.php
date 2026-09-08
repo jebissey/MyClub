@@ -9,7 +9,7 @@ use app\helpers\WebApp;
 use app\models\ParticipantDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserConnectionsViewModel;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 /**
  * @phpstan-import-type PersonRow from Person

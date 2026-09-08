@@ -14,7 +14,7 @@ use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserDirectoryViewModel;
 use app\modules\User\viewModels\UsersMapViewModel;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 /**
  * @phpstan-import-type PersonRow from Person

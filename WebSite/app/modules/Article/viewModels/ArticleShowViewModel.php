@@ -6,7 +6,7 @@ namespace app\modules\Article\viewModels;
 
 use stdClass;
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\valueObjects\ArticleRow;
+use app\modules\Article\valueObjects\ArticleRow;
 
 final readonly class ArticleShowViewModel extends LayoutViewModel
 {

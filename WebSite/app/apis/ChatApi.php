@@ -15,7 +15,7 @@ use app\models\DataHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 class ChatApi extends AbstractApi
 {

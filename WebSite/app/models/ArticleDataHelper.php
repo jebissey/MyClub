@@ -9,10 +9,10 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\modules\Common\interfaces\NewsProviderInterface;
-use app\valueObjects\ArticleAuthorRow;
-use app\valueObjects\ArticleRow;
-use app\valueObjects\ArticleSitemapRow;
-use app\valueObjects\ArticleSummaryRow;
+use app\modules\Article\valueObjects\ArticleAuthorRow;
+use app\modules\Article\valueObjects\ArticleRow;
+use app\modules\Article\valueObjects\ArticleSitemapRow;
+use app\modules\Article\valueObjects\ArticleSummaryRow;
 
 /**
  * @phpstan-import-type ArticleRowShape from ArticleRow

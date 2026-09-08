@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Article\valueObjects;
 
 /** Ligne OrderReply ou Reply (réponses en JSON) */
 final readonly class AnswersRow

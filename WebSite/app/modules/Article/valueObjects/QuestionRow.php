@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Article\valueObjects;
 
 /** Ligne Order ou Survey (Id, Question, Options en JSON) */
 final readonly class QuestionRow

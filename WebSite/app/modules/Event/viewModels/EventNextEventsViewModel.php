@@ -8,7 +8,7 @@ use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Event\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\NeedTypeRow;
 use app\valueObjects\EventTypeRow;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 final readonly class EventNextEventsViewModel extends LayoutViewModel
 {

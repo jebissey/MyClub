@@ -17,7 +17,7 @@ use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
-use app\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\EmailMessage;
 
 class CommunicationApi extends AbstractApi
 {

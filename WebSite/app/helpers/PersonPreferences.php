@@ -6,7 +6,7 @@ namespace app\helpers;
 
 use DateTime;
 use app\models\DataHelper;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 class PersonPreferences
 {

@@ -14,7 +14,7 @@ use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
 use app\modules\Event\valueObjects\ContactRow;
-use app\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\EmailMessage;
 
 class EventGuestController extends AbstractController
 {

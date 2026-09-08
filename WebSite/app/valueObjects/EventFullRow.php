@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace app\valueObjects;
 
+namespace app\valueObjects;
+
+use app\modules\Common\valueObjects\AbstractValueObject;
+
 /**
  * Représentation fortement typée d'une ligne brute de la table Event
  * (colonnes SQL en PascalCase, sans jointure).

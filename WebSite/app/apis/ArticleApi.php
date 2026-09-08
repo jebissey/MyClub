@@ -16,8 +16,8 @@ use app\models\DesignDataHelper;
 use app\models\OrderReplyDataHelper;
 use app\models\PersonDataHelper;
 use app\models\ReplyDataHelper;
-use app\valueObjects\AnswersRow;
-use app\valueObjects\QuestionRow;
+use app\modules\Article\valueObjects\AnswersRow;
+use app\modules\Article\valueObjects\QuestionRow;
 
 class ArticleApi extends AbstractApi
 {

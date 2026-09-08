@@ -24,10 +24,10 @@ use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
 use app\helpers\PersonPreferences;
 use app\modules\Common\valueObjects\ApiResponse;
-use app\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Event\valueObjects\EventDetailRow;
 use app\modules\Event\valueObjects\EventParticipant;
-use app\valueObjects\PersonEmailRow;
+use app\modules\Common\valueObjects\PersonEmailRow;
 
 /**
  * @phpstan-import-type EventParticipantShape from EventParticipant

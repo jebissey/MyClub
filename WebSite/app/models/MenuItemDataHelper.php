@@ -8,9 +8,9 @@ use InvalidArgumentException;
 use PDO;
 use Throwable;
 use app\helpers\Application;
-use app\valueObjects\MaxPositionRow;
+use app\modules\Common\valueObjects\MaxPositionRow;
 use app\valueObjects\MenuItemAuthorizationRow;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 class MenuItemDataHelper extends Data
 {

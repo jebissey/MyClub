@@ -17,7 +17,7 @@ use app\models\ParticipantDataHelper;
 use app\models\PersonStatisticsDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserStatisticsViewModel;
-use app\valueObjects\Person;
+use app\modules\Common\valueObjects\Person;
 
 class UserStatisticsController extends AbstractController
 {
