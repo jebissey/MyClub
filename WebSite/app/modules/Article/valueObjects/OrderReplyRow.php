@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Article\valueObjects;
+
+use app\valueObjects\AbstractValueObject;
 
 /**
  * Représentation fortement typée d'une réponse à une commande groupée (table OrderReply).

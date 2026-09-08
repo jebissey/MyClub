@@ -17,8 +17,7 @@ use app\helpers\WebApp;
 use app\interfaces\NewsProviderInterface;
 use app\modules\Common\services\EmailService;
 use app\valueObjects\EmailMessage;
-use app\valueObjects\EventRegistrationRow;
-use app\valueObjects\Person;
+use app\modules\User\valueObjects\EventRegistrationRow;
 
 /**
  * @phpstan-type PersonGroupRow object{

@@ -7,7 +7,7 @@ namespace app\modules\Common\services;
 use app\enums\Period;
 use app\modules\Common\interfaces\EventServiceInterface;
 use app\models\EventDataHelper;
-use app\valueObjects\ApiResponse;
+use app\modules\Common\valueObjects\ApiResponse;
 
 class EventService implements EventServiceInterface
 {

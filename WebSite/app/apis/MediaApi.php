@@ -12,7 +12,7 @@ use app\helpers\MediaManager;
 use app\helpers\To;
 use app\models\DataHelper;
 use app\models\PersonDataHelper;
-use app\valueObjects\UploadedFileInput;
+use app\modules\Common\valueObjects\UploadedFileInput;
 
 class MediaApi extends AbstractApi
 {

@@ -13,7 +13,7 @@ use app\helpers\WebApp;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
-use app\valueObjects\ContactRow;
+use app\modules\Event\valueObjects\ContactRow;
 use app\valueObjects\EmailMessage;
 
 class EventGuestController extends AbstractController

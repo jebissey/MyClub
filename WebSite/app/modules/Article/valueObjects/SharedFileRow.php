@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Article\valueObjects;
+
+use app\valueObjects\AbstractValueObject;
 
 final readonly class SharedFileRow extends AbstractValueObject
 {

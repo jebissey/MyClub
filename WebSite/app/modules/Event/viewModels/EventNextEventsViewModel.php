@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace app\modules\Event\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\valueObjects\EventAttributeRow;
+use app\modules\Event\valueObjects\EventAttributeRow;
+use app\modules\Event\valueObjects\NeedTypeRow;
 use app\valueObjects\EventTypeRow;
-use app\valueObjects\NeedTypeRow;
 use app\valueObjects\Person;
 
 final readonly class EventNextEventsViewModel extends LayoutViewModel

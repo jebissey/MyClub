@@ -10,7 +10,7 @@ use app\enums\EventAudience;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\valueObjects\ArticleAuthorizationRow;
+use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\valueObjects\ArticleRow;
 use app\valueObjects\ClosingVisibilityRow;
 

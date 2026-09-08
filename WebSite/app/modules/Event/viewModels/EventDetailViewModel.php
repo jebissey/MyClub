@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace app\modules\Event\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\valueObjects\EventAttributeRow;
-use app\valueObjects\EventDetailRow;
+use app\modules\Event\valueObjects\EventAttributeRow;
+use app\modules\Event\valueObjects\EventDetailRow;
 
 final readonly class EventDetailViewModel extends LayoutViewModel
 {
@@ -18,7 +18,7 @@ final readonly class EventDetailViewModel extends LayoutViewModel
      *
      * NOTE: participants stays untyped — ParticipantDataHelper::getEventParticipants()
      * returns raw rows with Email/NickName/FirstName/LastName/PersonId/
-     * InPresentationDirectory/ContactId, while app\valueObjects\EventParticipant only
+     * InPresentationDirectory/ContactId, while app\modules\Event\valueObjects\EventParticipant only
      * models PersonId+Email (and drops rows with no Email). Mapping through it here
      * would silently discard fields the template likely needs for display.
      *

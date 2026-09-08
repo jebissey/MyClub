@@ -28,12 +28,12 @@ use app\modules\Event\viewModels\EventDetailViewModel;
 use app\modules\Event\viewModels\EventManagerHomeViewModel;
 use app\modules\Event\viewModels\EventNextEventsViewModel;
 use app\modules\Event\viewModels\EventWeekEventsViewModel;
-use app\valueObjects\ContactTokenRow;
-use app\valueObjects\EventAttributeRow;
-use app\valueObjects\EventAudienceRow;
+use app\modules\Event\valueObjects\ContactTokenRow;
+use app\modules\Event\valueObjects\EventAttributeRow;
+use app\modules\Event\valueObjects\EventAudienceRow;
 use app\valueObjects\EventTypeRow;
 use app\valueObjects\IdRow;
-use app\valueObjects\NeedTypeRow;
+use app\modules\Event\valueObjects\NeedTypeRow;
 
 class EventController extends AbstractController
 {

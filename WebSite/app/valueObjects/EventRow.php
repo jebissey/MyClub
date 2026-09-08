@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\valueObjects;
 
+use app\modules\Event\valueObjects\EventAttributeRow;
+
 /**
  * Représentation fortement typée d'un événement.
  *

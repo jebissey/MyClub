@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Article\valueObjects;
+
+use app\valueObjects\AbstractValueObject;
 
 /**
  * Ligne minimale de la table Article (Id + Title uniquement).

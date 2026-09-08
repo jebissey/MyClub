@@ -7,8 +7,8 @@ namespace app\modules\Article\services;
 use app\helpers\ConnectedUser;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
-use app\valueObjects\ArticleAccessRow;
-use app\valueObjects\ArticleOwnershipRow;
+use app\modules\Article\valueObjects\ArticleAccessRow;
+use app\modules\Article\valueObjects\ArticleOwnershipRow;
 
 class ArticleAuthorizationService
 {

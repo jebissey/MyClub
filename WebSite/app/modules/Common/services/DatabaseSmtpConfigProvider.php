@@ -6,7 +6,7 @@ namespace app\modules\Common\services;
 
 use app\modules\Common\interfaces\SmtpConfigProviderInterface;
 use app\modules\Common\services\CredentialService;
-use app\valueObjects\SmtpConfig;
+use app\modules\Common\valueObjects\SmtpConfig;
 
 final class DatabaseSmtpConfigProvider implements SmtpConfigProviderInterface
 {

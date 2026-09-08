@@ -11,7 +11,7 @@ use app\helpers\WebApp;
 use app\models\EventTypeDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
-use app\valueObjects\EventTypeNameGroupRow;
+use app\modules\Event\valueObjects\EventTypeNameGroupRow;
 
 class EventTypeController extends TableController
 {

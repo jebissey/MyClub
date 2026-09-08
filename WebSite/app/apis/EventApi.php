@@ -24,10 +24,10 @@ use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
 use app\helpers\PersonPreferences;
-use app\valueObjects\ApiResponse;
+use app\modules\Common\valueObjects\ApiResponse;
 use app\valueObjects\EmailMessage;
-use app\valueObjects\EventDetailRow;
-use app\valueObjects\EventParticipant;
+use app\modules\Event\valueObjects\EventDetailRow;
+use app\modules\Event\valueObjects\EventParticipant;
 use app\valueObjects\PersonEmailRow;
 
 /**

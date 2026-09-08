@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Event\valueObjects;
 
+use app\valueObjects\AbstractValueObject;
 use app\enums\EventAudience;
 
 /**

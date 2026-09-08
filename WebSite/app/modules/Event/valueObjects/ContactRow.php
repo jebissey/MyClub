@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Event\valueObjects;
+
+use app\valueObjects\AbstractValueObject;
 
 /**
  * Représentation fortement typée d'un contact (table Contact).

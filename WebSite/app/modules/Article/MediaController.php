@@ -14,7 +14,7 @@ use app\models\MessageDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\models\SharedFileDataHelper;
 use app\modules\Common\AbstractController;
-use app\valueObjects\SharedFileRow;
+use app\modules\Article\valueObjects\SharedFileRow;
 
 class MediaController extends AbstractController
 {

@@ -9,7 +9,7 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\interfaces\NewsProviderInterface;
-use app\valueObjects\ArticleAuthorizationRow;
+use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\valueObjects\OrderWithCreatorRow;
 
 /**

@@ -7,7 +7,7 @@ namespace app\modules\Common\services;
 use app\helpers\MediaManager;
 use app\models\CarouselDataHelper;
 use app\models\DataHelper;
-use app\valueObjects\UploadedFileInput;
+use app\modules\Common\valueObjects\UploadedFileInput;
 use RuntimeException;
 
 class ArticleService

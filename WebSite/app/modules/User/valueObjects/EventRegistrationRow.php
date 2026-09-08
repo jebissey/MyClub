@@ -2,24 +2,21 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\User\valueObjects;
 
-final readonly class NeedTypeRow extends AbstractValueObject
+final readonly class EventRegistrationRow
 {
     public function __construct(
         public int $Id,
-        public string $Name,
+        public string $Summary,
     ) {
     }
 
-    /**
-     * Expects a row shaped as {Id: int|string, Name: string}.
-     */
     public static function fromStdClass(\stdClass $row): self
     {
         return new self(
             Id: (int) $row->Id,
-            Name: (string) $row->Name,
+            Summary: (string) $row->Summary,
         );
     }
 }

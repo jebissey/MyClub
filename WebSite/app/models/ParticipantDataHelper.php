@@ -7,7 +7,7 @@ namespace app\models;
 use PDO;
 use stdClass;
 use app\helpers\Application;
-use app\valueObjects\EventParticipant;
+use app\modules\Event\valueObjects\EventParticipant;
 
 /**
  * @phpstan-type EventParticipantRow object{

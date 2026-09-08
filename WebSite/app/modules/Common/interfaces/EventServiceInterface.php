@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Common\interfaces;
 
 use app\enums\Period;
-use app\valueObjects\ApiResponse;
+use app\modules\Common\valueObjects\ApiResponse;
 
 interface EventServiceInterface
 {

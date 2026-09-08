@@ -20,13 +20,13 @@ use app\models\DataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\MessageRecipientService;
-use app\valueObjects\ApiResponse;
+use app\modules\Common\valueObjects\ApiResponse;
 use app\valueObjects\ArticleCreatorTitleRow;
 use app\valueObjects\EventCreatorSummaryRow;
 use app\valueObjects\GroupNameRow;
 use app\valueObjects\MessageContext;
 use app\valueObjects\MessageOwnerRow;
-use app\valueObjects\UploadedFileInput;
+use app\modules\Common\valueObjects\UploadedFileInput;
 
 use function imagecreatefromstring;
 use function imagesx;

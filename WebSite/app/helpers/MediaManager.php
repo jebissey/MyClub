@@ -12,7 +12,7 @@ use app\models\SharedFileDataHelper;
 use app\valueObjects\MediaOperationResult;
 use app\valueObjects\ShareFileInfo;
 use app\valueObjects\ShareStatus;
-use app\valueObjects\UploadedFileInput;
+use app\modules\Common\valueObjects\UploadedFileInput;
 use app\valueObjects\UploadedMedia;
 use app\valueObjects\UploadMediaResult;
 

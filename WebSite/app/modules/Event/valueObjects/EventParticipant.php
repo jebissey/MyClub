@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
+namespace app\modules\Event\valueObjects;
+
+use app\valueObjects\AbstractValueObject;
 
 /**
  * @phpstan-type EventParticipantShape object{PersonId: int|string, Email: string|null}

@@ -11,13 +11,13 @@ use app\exceptions\IntegrityException;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\OrderDataHelper;
+use app\modules\Article\valueObjects\ArticleAuthorizationRow;
+use app\modules\Article\valueObjects\ArticleTitleRow;
+use app\modules\Article\valueObjects\OrderReplyRow;
+use app\modules\Article\valueObjects\PersonNameRow;
 use app\modules\Common\AbstractController;
-use app\valueObjects\ArticleAuthorizationRow;
 use app\valueObjects\ArticleRow;
-use app\valueObjects\ArticleTitleRow;
 use app\valueObjects\IdRow;
-use app\valueObjects\OrderReplyRow;
-use app\valueObjects\PersonNameRow;
 
 class OrderController extends AbstractController
 {

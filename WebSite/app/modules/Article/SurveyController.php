@@ -12,11 +12,11 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
-use app\valueObjects\ArticleAuthorizationRow;
+use app\modules\Article\valueObjects\ArticleAuthorizationRow;
+use app\modules\Article\valueObjects\ArticleTitleRow;
+use app\modules\Article\valueObjects\PersonNameRow;
 use app\valueObjects\ArticleRow;
-use app\valueObjects\ArticleTitleRow;
 use app\valueObjects\IdRow;
-use app\valueObjects\PersonNameRow;
 
 class SurveyController extends AbstractController
 {

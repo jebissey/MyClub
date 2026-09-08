@@ -15,7 +15,7 @@ use app\modules\Common\AbstractController;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\valueObjects\EmailMessage;
-use app\valueObjects\EventRegistrationRow;
+use app\modules\User\valueObjects\EventRegistrationRow;
 
 class ContactController extends AbstractController
 {

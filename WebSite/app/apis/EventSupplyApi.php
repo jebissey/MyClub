@@ -18,7 +18,7 @@ use app\exceptions\UnauthorizedAccessException;
 use app\models\DataHelper;
 use app\models\EventDataHelper;
 use app\models\PersonDataHelper;
-use app\valueObjects\ApiResponse;
+use app\modules\Common\valueObjects\ApiResponse;
 
 class EventSupplyApi extends AbstractApi
 {
