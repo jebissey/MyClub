@@ -6,7 +6,7 @@ namespace app\modules\PersonManager\viewModels;
 
 use stdClass;
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Common\valueObjects\Person;
 
 final readonly class GroupChatViewModel extends LayoutViewModel

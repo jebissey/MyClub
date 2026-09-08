@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use PDOException;
-use InvalidArgumentException;
 use Throwable;
 use finfo;
 use app\enums\ApplicationError;
@@ -22,7 +21,7 @@ use app\models\PersonDataHelper;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Common\valueObjects\ApiResponse;
 use app\modules\Article\valueObjects\ArticleCreatorTitleRow;
-use app\valueObjects\EventCreatorSummaryRow;
+use app\modules\Event\valueObjects\EventCreatorSummaryRow;
 use app\modules\Common\valueObjects\GroupNameRow;
 use app\modules\Common\valueObjects\MessageContext;
 use app\modules\Common\valueObjects\MessageOwnerRow;

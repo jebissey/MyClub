@@ -7,7 +7,7 @@ namespace app\models;
 use PDO;
 use Throwable;
 use app\helpers\Application;
-use app\valueObjects\EventTypeRow;
+use app\modules\Event\valueObjects\EventTypeRow;
 
 class EventTypeDataHelper extends Data
 {

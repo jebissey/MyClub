@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\VisitorInsights\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemRow;
 
 final readonly class LastVisitsViewModel extends LayoutViewModel
 {

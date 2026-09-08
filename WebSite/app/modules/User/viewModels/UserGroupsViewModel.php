@@ -6,7 +6,7 @@ namespace app\modules\User\viewModels;
 
 use stdClass;
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemRow;
 
 final readonly class UserGroupsViewModel extends LayoutViewModel
 {

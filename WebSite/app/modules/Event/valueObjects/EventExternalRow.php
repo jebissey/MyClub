@@ -2,8 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\valueObjects;
-namespace app\valueObjects;
+namespace app\modules\Event\valueObjects;
 
 use app\modules\Common\valueObjects\AbstractValueObject;
 

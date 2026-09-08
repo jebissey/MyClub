@@ -12,7 +12,7 @@ use app\models\ArticleDataHelper;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Article\valueObjects\ArticleRow;
-use app\valueObjects\EventRow;
+use app\modules\Event\valueObjects\EventRow;
 
 /**
  * @phpstan-import-type WeekData from EventDataHelper

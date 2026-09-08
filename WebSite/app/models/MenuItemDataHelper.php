@@ -9,7 +9,7 @@ use PDO;
 use Throwable;
 use app\helpers\Application;
 use app\modules\Common\valueObjects\MaxPositionRow;
-use app\valueObjects\MenuItemAuthorizationRow;
+use app\modules\Common\valueObjects\MenuItemAuthorizationRow;
 use app\modules\Common\valueObjects\Person;
 
 class MenuItemDataHelper extends Data

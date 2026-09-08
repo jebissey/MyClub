@@ -21,7 +21,7 @@ use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MetadataDataHelper;
-use app\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Common\valueObjects\Person;
 
 abstract class AbstractController

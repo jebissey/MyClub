@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\User\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\valueObjects\EventTypeRow;
+use app\modules\Event\valueObjects\EventTypeRow;
 
 final readonly class UserPreferencesViewModel extends LayoutViewModel
 {

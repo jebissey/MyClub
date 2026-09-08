@@ -6,7 +6,7 @@ namespace app\modules\Event\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Event\valueObjects\EventAttributeRow;
-use app\valueObjects\EventTypeRow;
+use app\modules\Event\valueObjects\EventTypeRow;
 
 /**
  * @phpstan-import-type WeekData from \app\models\EventDataHelper
