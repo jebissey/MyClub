@@ -1,6 +1,9 @@
 */vendor/*
 WebSite/var/*
 WebSite/data/*
+!WebSite/data/statics/
+!WebSite/data/statics/html/
+!WebSite/data/statics/html/businessCard.html
 WebSite/backup/*
 doc/*.pdf
 test/Database/MyClub.sqlite
