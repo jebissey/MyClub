@@ -208,6 +208,9 @@ class Routes
     private function splitMethodAndPath(string $methodAndPath): array
     {
         $parts = preg_split('/\s+/', trim($methodAndPath), 2);
+        if ($parts === false) {
+            $parts = [$methodAndPath];
+        }
         $methods = explode('|', $parts[0]);
         return [$methods, $parts[1] ?? '/'];
     }
