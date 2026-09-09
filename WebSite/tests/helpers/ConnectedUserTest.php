@@ -68,7 +68,6 @@ final class ConnectedUserTest extends TestCase
     {
         $ref  = new ReflectionClass($user);
         $prop = $ref->getProperty('authorizations');
-        $prop->setAccessible(true);
         $prop->setValue($user, $authorizations);
     }
 
