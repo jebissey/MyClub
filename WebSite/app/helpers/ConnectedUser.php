@@ -24,12 +24,19 @@ class ConnectedUser
     private AuthorizationDataHelper $authorizationDataHelper;
     public ?Person $person = null;
     private MetadataDataHelper $metadataDataHelper;
+    private GravatarHandler $gravatarHandler;
 
-    public function __construct(private Application $application)
-    {
-        $this->dataHelper = new DataHelper($this->application);
-        $this->authorizationDataHelper = new AuthorizationDataHelper($this->application);
-        $this->metadataDataHelper = new MetadataDataHelper($application);
+    public function __construct(
+        private Application $application,
+        ?DataHelper $dataHelper = null,
+        ?AuthorizationDataHelper $authorizationDataHelper = null,
+        ?MetadataDataHelper $metadataDataHelper = null,
+        ?GravatarHandler $gravatarHandler = null,
+    ) {
+        $this->dataHelper = $dataHelper ?? new DataHelper($this->application);
+        $this->authorizationDataHelper = $authorizationDataHelper ?? new AuthorizationDataHelper($this->application);
+        $this->metadataDataHelper = $metadataDataHelper ?? new MetadataDataHelper($application);
+        $this->gravatarHandler = $gravatarHandler ?? new GravatarHandler();
     }
 
     public function get(): void
@@ -72,7 +79,7 @@ class ConnectedUser
                     $this->person->UseGravatar ?? false,
                     $this->person->Email ?? null,
                     $this->person->Avatar ?? null,
-                    new GravatarHandler()
+                    $this->gravatarHandler
                 ),
                 'userEmail' => $this->person->Email,
                 'isAdmin' => $this->isAdministrator(),
