@@ -52,7 +52,7 @@ class RouteTestFactory
                 new SessionAuthenticator($httpClient, '/user/sign/in'),
                 $httpClient,
                 new ResponseValidator(),
-                new UrlBuilder($config),
+                new UrlBuilder(),
                 new TestDataValidator(),
                 $reporter,
                 $config

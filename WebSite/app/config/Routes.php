@@ -161,13 +161,35 @@ class Routes
 
     public function add(ErrorManager $errorManager): void
     {
-        foreach ($this->get() as $route) {
+        $routes = $this->get();
+        $methodsByPath = [];
+
+        foreach ($routes as $route) {
             $this->mapRoute(
                 $this->flight,
                 $route->methodAndPath,
                 $route->controllerFactory,
                 $route->function,
                 $route->args
+            );
+
+            [$methods, $path] = $this->splitMethodAndPath($route->methodAndPath);
+            foreach ($methods as $method) {
+                $methodsByPath[$path][$method] = true;
+            }
+        }
+
+        foreach ($methodsByPath as $path => $methods) {
+            $allowed = array_keys($methods);
+            $this->flight->route(
+                'GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS ' . $path,
+                function (...$args) use ($errorManager, $allowed) {
+                    header('Allow: ' . implode(', ', $allowed));
+                    $errorManager->raise(
+                        ApplicationError::MethodNotAllowed,
+                        'Method ' . WebApp::getRequestMethod() . ' not allowed for this route in file ' . __FILE__ . ' at line ' . __LINE__
+                    );
+                }
             );
         }
 
@@ -179,6 +201,17 @@ class Routes
     }
 
     #region Private methods
+
+    /**
+     * @return array{0: array<int, string>, 1: string}
+     */
+    private function splitMethodAndPath(string $methodAndPath): array
+    {
+        $parts = preg_split('/\s+/', trim($methodAndPath), 2);
+        $methods = explode('|', $parts[0]);
+        return [$methods, $parts[1] ?? '/'];
+    }
+
     /**
      * @return array<int, Route>
      */
