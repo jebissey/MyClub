@@ -19,10 +19,10 @@ class KaraokeDataHelper extends Data
 
     public function cleanup(): void
     {
-        $stmt = $this->pdo->prepare('TRUNCATE TABLE "KaraokeClient"');
+        $stmt = $this->pdo->prepare('DELETE FROM "KaraokeClient"');
         $stmt->execute();
 
-        $stmt = $this->pdo->prepare('TRUNCATE TABLE "KaraokeSession"');
+        $stmt = $this->pdo->prepare('DELETE FROM "KaraokeSession"');
         $stmt->execute();
     }
 
@@ -66,7 +66,7 @@ class KaraokeDataHelper extends Data
         }
 
         $stmt = $this->pdo->prepare('
-            INSERT INTO "KaraokeSession" ("SessionId", "SongId", "Status", "CreatedAt", "UpdatedAt")
+            INSERT INTO "KaraokeSession" ("SessionId", "SongName", "Status", "CreatedAt", "UpdatedAt")
             VALUES (?, ?, "waiting", datetime("now"), datetime("now"))
         ');
         $stmt->execute([$sessionId, $songName]);
