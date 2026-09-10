@@ -8,7 +8,7 @@ class ArticleCrosstabDataHelperTest extends DataHelperTestCase
 {
     public function testQueriedColumnsExistInDatabaseSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
 
         $this->assertColumnsExist($pdo, 'Person', [
             'Id',
@@ -33,7 +33,7 @@ class ArticleCrosstabDataHelperTest extends DataHelperTestCase
 
     public function testGetItemsSqlIsValidAgainstTemplateSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
         $sql = $this->getExpectedSql();
 
         // Ensures the query is syntactically valid and that all referenced

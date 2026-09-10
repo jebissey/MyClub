@@ -54,7 +54,7 @@ class CarouselDataHelper extends Data
         $used = [];
         foreach ($paths as $path) {
             foreach ($items as $item) {
-                if ($item !== null && str_contains($item, $path)) {
+                if (str_contains($item, $path)) {
                     $used[$path] = true;
                     break;
                 }

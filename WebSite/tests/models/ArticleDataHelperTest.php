@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace tests\models;
 
-use Closure;
 use PDO;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 use app\helpers\Application;
@@ -30,40 +28,20 @@ use app\modules\Article\valueObjects\ArticleSummaryRow;
  * Everything else either has no DB dependency (calculateTotals) or only
  * touches $this->pdo / the injected AuthorizationDataHelper. ArticleDataHelper
  * isn't built for DI (unlike ConnectedUser), so instances here are built via
- * newInstanceWithoutConstructor() + direct property injection (pdo,
- * application, authorizationDataHelper), bypassing Data's real constructor
- * entirely rather than guessing its internals.
+ * DataHelperTestCase::makeHelper(), which uses newInstanceWithoutConstructor()
+ * + direct property injection (pdo, tables, application,
+ * authorizationDataHelper), bypassing Data's real constructor entirely
+ * rather than guessing its internals.
  *
  * Each DB-touching method is exercised two ways:
  *  - against a small in-memory SQLite fixture with a controlled schema and
  *    seeded rows, for deterministic behavioural assertions;
- *  - against the real shipped MyClub.sqlite template, to confirm every
- *    referenced table/column actually exists and the raw SQL is valid.
+ *  - against a fresh copy of the shipped MyClub.sqlite template, to confirm
+ *    every referenced table/column actually exists and the raw SQL is valid.
  */
-final class ArticleDataHelperTest extends TestCase
+final class ArticleDataHelperTest extends DataHelperTestCase
 {
-    private const DB_PATH = __DIR__ . '/../../app/models/database/MyClub.sqlite';
-
     // --- test doubles / wiring helpers ---
-
-    private function makeHelper(
-        PDO $pdo,
-        ?AuthorizationDataHelper $authorizationDataHelper = null,
-        ?Application $application = null,
-    ): ArticleDataHelper {
-        /** @var ArticleDataHelper $helper */
-        $helper = (new ReflectionClass(ArticleDataHelper::class))->newInstanceWithoutConstructor();
-
-        $this->setProperty($helper, 'pdo', $pdo);
-        $this->setProperty($helper, 'application', $application ?? $this->createStub(Application::class));
-        $this->setProperty(
-            $helper,
-            'authorizationDataHelper',
-            $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelper::class),
-        );
-
-        return $helper;
-    }
 
     private function makeHelperWithoutDb(): ArticleDataHelper
     {
@@ -73,11 +51,22 @@ final class ArticleDataHelperTest extends TestCase
         return $helper;
     }
 
-    private function setProperty(object $object, string $property, mixed $value): void
-    {
-        Closure::bind(function () use ($property, $value): void {
-            $this->$property = $value;
-        }, $object, ArticleDataHelper::class)();
+    private function makeArticleHelper(
+        PDO $pdo,
+        ?AuthorizationDataHelper $authorizationDataHelper = null,
+    ): ArticleDataHelper {
+        /** @var ArticleDataHelper $helper */
+        $helper = $this->makeHelper(ArticleDataHelper::class, $pdo, [
+            'application' => Application::class,
+        ]);
+
+        $this->setProperty(
+            $helper,
+            'authorizationDataHelper',
+            $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelper::class),
+        );
+
+        return $helper;
     }
 
     /** @param array<int, mixed> $args */
@@ -235,7 +224,7 @@ final class ArticleDataHelperTest extends TestCase
         $this->insertArticle($pdo, ['Id' => 3, 'PublishedBy' => 1, 'IdGroup' => 5, 'OnlyForMembers' => 0]);
         $this->insertArticle($pdo, ['Id' => 4, 'PublishedBy' => 1, 'IdGroup' => null, 'OnlyForMembers' => 1]);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
 
         $this->assertSame([1], $this->invokePrivate($helper, 'getNoGroupArticleIds'));
     }
@@ -246,7 +235,7 @@ final class ArticleDataHelperTest extends TestCase
         $this->insertArticle($pdo, ['Id' => 1, 'PublishedBy' => 1, 'IdGroup' => null, 'OnlyForMembers' => 1]);
         $this->insertArticle($pdo, ['Id' => 2, 'PublishedBy' => 1, 'IdGroup' => null, 'OnlyForMembers' => 0]);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
 
         $this->assertSame([1], $this->invokePrivate($helper, 'getArticleIdsForMembers'));
     }
@@ -258,7 +247,7 @@ final class ArticleDataHelperTest extends TestCase
         $this->insertArticle($pdo, ['Id' => 2, 'PublishedBy' => 1, 'IdGroup' => 6]);
         $this->insertArticle($pdo, ['Id' => 3, 'PublishedBy' => null, 'IdGroup' => 5]);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
 
         $this->assertSame([1], $this->invokePrivate($helper, 'getArticleIdsByGroups', [[5]]));
         $this->assertSame([], $this->invokePrivate($helper, 'getArticleIdsByGroups', [[]]));
@@ -269,7 +258,7 @@ final class ArticleDataHelperTest extends TestCase
         $pdo = $this->createFixtureDatabase();
         $this->insertArticle($pdo, ['Id' => 1, 'PublishedBy' => 1, 'IdGroup' => null, 'OnlyForMembers' => 0]);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
 
         $this->assertSame([1], $this->invokePrivate($helper, 'getArticleIdsBasedOnAccess', [null]));
     }
@@ -289,7 +278,7 @@ final class ArticleDataHelperTest extends TestCase
             ->with('member@example.com')
             ->willReturn([5]);
 
-        $helper = $this->makeHelper($pdo, $authorizationDataHelper);
+        $helper = $this->makeArticleHelper($pdo, $authorizationDataHelper);
 
         $result = $this->invokePrivate($helper, 'getArticleIdsBasedOnAccess', ['member@example.com']);
         sort($result);
@@ -302,7 +291,7 @@ final class ArticleDataHelperTest extends TestCase
         $pdo = $this->createFixtureDatabase();
         $this->insertArticle($pdo, ['Id' => 1, 'PublishedBy' => 1, 'IdGroup' => null, 'OnlyForMembers' => 0]);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
 
         $this->assertTrue($helper->isUserAllowedToReadArticle('', 1));
         $this->assertFalse($helper->isUserAllowedToReadArticle('', 999));
@@ -316,7 +305,7 @@ final class ArticleDataHelperTest extends TestCase
         $this->insertPerson($pdo, 7, 'Jean', 'Dupont');
         $this->insertArticle($pdo, ['Id' => 1, 'CreatedBy' => 7, 'Title' => 'Test']);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
         $article = $helper->getWithAuthor(1);
 
         $this->assertInstanceOf(ArticleRow::class, $article);
@@ -326,7 +315,7 @@ final class ArticleDataHelperTest extends TestCase
 
     public function testGetWithAuthorReturnsFalseWhenArticleDoesNotExist(): void
     {
-        $helper = $this->makeHelper($this->createFixtureDatabase());
+        $helper = $this->makeArticleHelper($this->createFixtureDatabase());
 
         $this->assertFalse($helper->getWithAuthor(999));
     }
@@ -339,7 +328,7 @@ final class ArticleDataHelperTest extends TestCase
         $this->insertArticle($pdo, ['Id' => 1, 'CreatedBy' => 1, 'IdGroup' => 5, 'LastUpdate' => '2026-01-01 00:00:00']);
         $this->insertArticle($pdo, ['Id' => 2, 'CreatedBy' => 1, 'IdGroup' => 5, 'LastUpdate' => '2026-06-01 00:00:00']);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
         $latest = $helper->getLatestArticle([1, 2]);
 
         $this->assertInstanceOf(ArticleRow::class, $latest);
@@ -348,7 +337,7 @@ final class ArticleDataHelperTest extends TestCase
 
     public function testGetLatestArticleReturnsNullForEmptyIdList(): void
     {
-        $helper = $this->makeHelper($this->createFixtureDatabase());
+        $helper = $this->makeArticleHelper($this->createFixtureDatabase());
 
         $this->assertNull($helper->getLatestArticle([]));
     }
@@ -361,7 +350,7 @@ final class ArticleDataHelperTest extends TestCase
         $this->insertArticle($pdo, ['Id' => 10, 'CreatedBy' => 1, 'Title' => 'A']);
         $this->insertArticle($pdo, ['Id' => 20, 'CreatedBy' => 2, 'Title' => 'B']);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
         $result = $helper->getAuthorsByArticleIds([10, 20]);
 
         $this->assertContainsOnlyInstancesOf(ArticleAuthorRow::class, $result);
@@ -371,7 +360,7 @@ final class ArticleDataHelperTest extends TestCase
 
     public function testGetAuthorsByArticleIdsReturnsEmptyArrayForEmptyInput(): void
     {
-        $helper = $this->makeHelper($this->createFixtureDatabase());
+        $helper = $this->makeArticleHelper($this->createFixtureDatabase());
 
         $this->assertSame([], $helper->getAuthorsByArticleIds([]));
     }
@@ -393,7 +382,7 @@ final class ArticleDataHelperTest extends TestCase
         ]);
         $this->insertArticle($pdo, ['Id' => 3, 'PublishedBy' => null, 'LastUpdate' => '2026-12-01 00:00:00']);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
         $result = $helper->getArticlesForRss();
 
         $this->assertContainsOnlyInstancesOf(ArticleRssRow::class, $result);
@@ -416,7 +405,7 @@ final class ArticleDataHelperTest extends TestCase
 
         $this->insertArticle($pdo, ['Id' => 4, 'PublishedBy' => 1, 'IdGroup' => null, 'OnlyForMembers' => 0]);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
 
         $byId = [];
         foreach ($helper->getArticlesForAll() as $row) {
@@ -436,7 +425,7 @@ final class ArticleDataHelperTest extends TestCase
         $this->insertArticle($pdo, ['Id' => 2, 'Content' => 'Nothing relevant']);
         $pdo->exec("INSERT INTO Carousel (IdArticle, Item) VALUES (2, '/media/photo.jpg')");
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
 
         $ids = array_map(static fn(object $row): int => (int) $row->Id, $helper->inArticles('/media/photo.jpg'));
         sort($ids);
@@ -450,7 +439,7 @@ final class ArticleDataHelperTest extends TestCase
         $this->insertArticle($pdo, ['Id' => 1, 'Content' => 'uses data/media/2026/01/photo.jpg inline']);
         $this->insertArticle($pdo, ['Id' => 2, 'Content' => 'no matches here']);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
 
         $this->assertSame(
             ['data/media/2026/01/photo.jpg' => true],
@@ -460,7 +449,7 @@ final class ArticleDataHelperTest extends TestCase
 
     public function testGetPathsUsedInArticlesReturnsEmptyArrayForEmptyInput(): void
     {
-        $helper = $this->makeHelper($this->createFixtureDatabase());
+        $helper = $this->makeArticleHelper($this->createFixtureDatabase());
 
         $this->assertSame([], $helper->getPathsUsedInArticles([]));
     }
@@ -472,7 +461,7 @@ final class ArticleDataHelperTest extends TestCase
         $this->insertArticle($pdo, ['Id' => 1, 'CreatedBy' => 1, 'PublishedBy' => 1, 'LastUpdate' => '2026-01-01 00:00:00']);
         $this->insertArticle($pdo, ['Id' => 2, 'CreatedBy' => 1, 'PublishedBy' => 1, 'LastUpdate' => '2026-06-01 00:00:00']);
 
-        $helper = $this->makeHelper($pdo);
+        $helper = $this->makeArticleHelper($pdo);
         $result = $helper->getLatestArticles(null, 5);
 
         $this->assertInstanceOf(ArticleRow::class, $result['latestArticle']);
@@ -483,7 +472,7 @@ final class ArticleDataHelperTest extends TestCase
 
     public function testGetLatestArticlesReturnsEmptyShapeWhenNoAccessibleArticles(): void
     {
-        $helper = $this->makeHelper($this->createFixtureDatabase());
+        $helper = $this->makeArticleHelper($this->createFixtureDatabase());
 
         $this->assertSame(
             ['latestArticle' => null, 'latestArticles' => []],
@@ -491,11 +480,11 @@ final class ArticleDataHelperTest extends TestCase
         );
     }
 
-    // --- schema validation against the real shipped template ---
+    // --- schema validation against a copy of the real shipped template ---
 
     public function testQueriedColumnsExistInDatabaseSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
 
         $this->assertColumnsExist($pdo, 'Article', [
             'Id',
@@ -517,8 +506,8 @@ final class ArticleDataHelperTest extends TestCase
 
     public function testRawSqlMethodsExecuteAgainstTemplateSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
-        $helper = $this->makeHelper($pdo);
+        $pdo = $this->openDatabaseCopyOrSkip();
+        $helper = $this->makeArticleHelper($pdo);
 
         $this->assertIsArray($helper->getArticlesForAll());
         $this->assertIsArray($helper->getArticlesForRss());
@@ -536,35 +525,5 @@ final class ArticleDataHelperTest extends TestCase
         $this->assertIsArray($this->invokePrivate($helper, 'getArticleIdsForMembers'));
         $this->assertIsArray($this->invokePrivate($helper, 'getArticleIdsByGroups', [[1, 2]]));
         $this->assertIsArray($this->invokePrivate($helper, 'doGetLatestArticles', [[1, 2, 3], 5]));
-    }
-
-    /** @param array<int, string> $expectedColumns */
-    private function assertColumnsExist(PDO $pdo, string $table, array $expectedColumns): void
-    {
-        $stmt = $pdo->query(sprintf('PRAGMA table_info("%s")', $table));
-        $this->assertNotFalse($stmt, "Could not read schema for table '{$table}'.");
-
-        $actualColumns = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'name');
-        $this->assertNotEmpty($actualColumns, "Table '{$table}' does not exist in the template database.");
-
-        foreach ($expectedColumns as $column) {
-            $this->assertContains(
-                $column,
-                $actualColumns,
-                "Expected column '{$table}.{$column}' not found in the template database schema.",
-            );
-        }
-    }
-
-    private function openTemplateDatabaseOrSkip(): PDO
-    {
-        if (!file_exists(self::DB_PATH)) {
-            $this->markTestSkipped('Template database not found at ' . self::DB_PATH);
-        }
-
-        $pdo = new PDO('sqlite:' . self::DB_PATH);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        return $pdo;
     }
 }

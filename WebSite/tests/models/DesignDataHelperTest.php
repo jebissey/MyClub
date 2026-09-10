@@ -10,7 +10,7 @@ class DesignDataHelperTest extends DataHelperTestCase
 {
     public function testQueriedColumnsExistInDatabaseSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
 
         $this->assertColumnsExist($pdo, 'Design', [
             'Id',
@@ -43,7 +43,7 @@ class DesignDataHelperTest extends DataHelperTestCase
 
     public function testGetUsersVotesSqlIsValidAgainstTemplateSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
         $sql = $this->getUsersVotesSql();
 
         $stmt = $pdo->prepare($sql);
@@ -58,7 +58,7 @@ class DesignDataHelperTest extends DataHelperTestCase
 
     public function testGetPendingDesignResponsesSqlIsValidAgainstTemplateSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
         $sql = $this->getPendingDesignResponsesSql();
 
         $stmt = $pdo->prepare($sql);

@@ -10,7 +10,7 @@ class EventDataHelperTest extends DataHelperTestCase
 {
     public function testQueriedColumnsExistInDatabaseSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
 
         $this->assertColumnsExist($pdo, 'Event', [
             'Id',
@@ -100,7 +100,7 @@ class EventDataHelperTest extends DataHelperTestCase
 
     public function testDuplicateSqlIsValidAgainstTemplateSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
         $sql = $this->getDuplicateSql();
 
         $stmt = $pdo->prepare($sql);
@@ -112,7 +112,7 @@ class EventDataHelperTest extends DataHelperTestCase
 
     public function testGetEventSqlIsValidAgainstTemplateSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
         $sql = $this->getEventSql();
 
         $stmt = $pdo->prepare($sql);
@@ -124,7 +124,7 @@ class EventDataHelperTest extends DataHelperTestCase
 
     public function testGetNextWeekEventsSqlIsValidAgainstTemplateSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
         $sql = $this->getNextWeekEventsSql();
 
         $stmt = $pdo->prepare($sql);
@@ -138,7 +138,7 @@ class EventDataHelperTest extends DataHelperTestCase
 
     public function testGetEventNeedsSqlIsValidAgainstTemplateSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
         $sql = $this->getEventNeedsSql();
 
         $stmt = $pdo->prepare($sql);
@@ -151,7 +151,7 @@ class EventDataHelperTest extends DataHelperTestCase
 
     public function testGetNewsSqlIsValidAgainstTemplateSchema(): void
     {
-        $pdo = $this->openTemplateDatabaseOrSkip();
+        $pdo = $this->openDatabaseCopyOrSkip();
         $sql = $this->getNewsSql();
 
         $stmt = $pdo->prepare($sql);
