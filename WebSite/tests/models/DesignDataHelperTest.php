@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tests\models;
 
-use PDO;
+use PDOStatement;
 
 class DesignDataHelperTest extends DataHelperTestCase
 {
@@ -47,7 +47,7 @@ class DesignDataHelperTest extends DataHelperTestCase
         $sql = $this->getUsersVotesSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('NameOfDesigner', $sql);
         $this->assertStringContainsString('Votes', $sql);
@@ -62,7 +62,7 @@ class DesignDataHelperTest extends DataHelperTestCase
         $sql = $this->getPendingDesignResponsesSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('CROSS JOIN Design', $sql);
         $this->assertStringContainsString('d.Status = \'UnderReview\'', $sql);

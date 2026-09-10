@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace tests\models;
 
+use PDOStatement;
+
 class ArticleCrosstabDataHelperTest extends DataHelperTestCase
 {
     public function testQueriedColumnsExistInDatabaseSchema(): void
@@ -39,7 +41,7 @@ class ArticleCrosstabDataHelperTest extends DataHelperTestCase
         // Ensures the query is syntactically valid and that all referenced
         // tables/columns actually exist in the template database.
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         // Structural checks on critical parts of the query
         $this->assertStringContainsString('columnForCrosstab', $sql);

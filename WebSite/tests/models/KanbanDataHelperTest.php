@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tests\models;
 
-use PDO;
+use PDOStatement;
 
 class KanbanDataHelperTest extends DataHelperTestCase
 {
@@ -49,7 +49,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getCreateKanbanCardSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('INSERT INTO KanbanCard', $sql);
         $this->assertStringContainsString('IdKanbanCardType', $sql);
@@ -64,8 +64,8 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $deleteStatusSql = $this->getDeleteKanbanCardStatusSql();
         $deleteCardSql = $this->getDeleteKanbanCardSql();
 
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($deleteStatusSql));
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($deleteCardSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($deleteStatusSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($deleteCardSql));
 
         $this->assertStringContainsString('DELETE FROM KanbanCardStatus', $deleteStatusSql);
         $this->assertStringContainsString('IdKanbanCard', $deleteStatusSql);
@@ -81,7 +81,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getGetKanbanProjectSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('FROM KanbanProject', $sql);
         $this->assertStringContainsString('Id, Title, Detail', preg_replace('/\s+/', ' ', $sql) ?? $sql);
@@ -94,7 +94,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getGetKanbanProjectsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('FROM KanbanProject', $sql);
         $this->assertStringContainsString('ORDER BY Title', $sql);
@@ -106,7 +106,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getMoveKanbanCardSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('INSERT INTO KanbanCardStatus', $sql);
         $this->assertStringContainsString('IdKanbanCard', $sql);
@@ -121,7 +121,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getUpdateKanbanCardSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('UPDATE KanbanCard', $sql);
         $this->assertStringContainsString('SET Title = :title, Detail = :detail', $sql);
@@ -136,7 +136,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getUpdateKanbanCardStatusSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('UPDATE KanbanCardStatus', $sql);
         $this->assertStringContainsString('SET Remark = :remark, LastUpdate = :lastUpdate', $sql);
@@ -152,7 +152,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getGetKanbanHistorySql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('FROM KanbanCardStatus', $sql);
         $this->assertStringContainsString('WHEN What = \'Created\'', $sql);
@@ -170,7 +170,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getCreateKanbanProjectSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('INSERT INTO KanbanProject', $sql);
         $this->assertStringContainsString('IdPerson', $sql);
@@ -184,7 +184,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getDeleteKanbanProjectSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('DELETE FROM KanbanProject', $sql);
         $this->assertStringContainsString('Id = :id', $sql);
@@ -197,7 +197,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getGetProjectCardsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('WITH LastStatus AS', $sql);
         $this->assertStringContainsString('ROW_NUMBER() OVER', $sql);
@@ -216,7 +216,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getUpdateKanbanProjectSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('UPDATE KanbanProject', $sql);
         $this->assertStringContainsString('SET Title = :title, Detail = :detail', $sql);
@@ -229,7 +229,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getUserHasAccessToProjectSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('SELECT COUNT(*) as Count', $sql);
         $this->assertStringContainsString('FROM KanbanProject', $sql);
@@ -242,7 +242,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getCreateKanbanCardTypeSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('INSERT INTO KanbanCardType', $sql);
         $this->assertStringContainsString('IdKanbanProject', $sql);
@@ -257,7 +257,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getDeleteKanbanCardTypeSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('DELETE FROM KanbanCardType', $sql);
         $this->assertStringContainsString('WHERE Id = :id', $sql);
@@ -269,7 +269,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getGetProjectCardTypesSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('FROM KanbanCardType', $sql);
         $this->assertStringContainsString('IdKanbanProject = :idProject', $sql);
@@ -282,7 +282,7 @@ class KanbanDataHelperTest extends DataHelperTestCase
         $sql = $this->getUpdateKanbanCardTypeSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('UPDATE KanbanCardType', $sql);
         $this->assertStringContainsString('SET Label = :label, Detail = :detail, Color = :color', $sql);

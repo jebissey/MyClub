@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tests\models;
 
-use PDO;
+use PDOStatement;
 
 class KaraokeDataHelperTest extends DataHelperTestCase
 {
@@ -41,8 +41,8 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $deleteClient = 'DELETE FROM "KaraokeClient"';
         $deleteSession = 'DELETE FROM "KaraokeSession"';
 
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($deleteClient));
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($deleteSession));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($deleteClient));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($deleteSession));
     }
 
     public function testCleanupOldClientsSqlIsValidAgainstTemplateSchema(): void
@@ -51,7 +51,7 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $sql = $this->getCleanupOldClientsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('DELETE FROM "KaraokeClient"', $sql);
         $this->assertStringContainsString('"LastHeartbeat" < ?', $sql);
@@ -63,7 +63,7 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $sql = $this->getCountActiveClientsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('SELECT COUNT(*)', $sql);
         $this->assertStringContainsString('FROM "KaraokeClient"', $sql);
@@ -76,7 +76,7 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $sql = $this->getDeleteSessionSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('DELETE FROM "KaraokeSession"', $sql);
         $this->assertStringContainsString('"Id" = ?', $sql);
@@ -88,7 +88,7 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $sql = $this->getDisconnectClientSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('DELETE FROM "KaraokeClient"', $sql);
         $this->assertStringContainsString('"ClientId" = ?', $sql);
@@ -101,8 +101,8 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $selectSql = $this->getSelectSessionBySessionIdSql();
         $insertSql = $this->getInsertSessionSql();
 
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($selectSql));
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($insertSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($selectSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($insertSql));
 
         $this->assertStringContainsString('SELECT "Id" FROM "KaraokeSession"', $selectSql);
         $this->assertStringContainsString('"SessionId" = ?', $selectSql);
@@ -118,7 +118,7 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $sql = $this->getGetSessionByIdSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('SELECT * FROM "KaraokeSession"', $sql);
         $this->assertStringContainsString('"Id" = ?', $sql);
@@ -130,7 +130,7 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $sql = $this->getGetSessionBySessionIdSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('SELECT * FROM "KaraokeSession"', $sql);
         $this->assertStringContainsString('"SessionId" = ?', $sql);
@@ -142,7 +142,7 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $sql = $this->getIsClientHostSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('SELECT "IsHost" FROM "KaraokeClient"', $sql);
         $this->assertStringContainsString('"ClientId" = ?', $sql);
@@ -156,8 +156,8 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $selectHostSql = $this->getSelectExistingHostSql();
         $upsertSql = $this->getRegisterClientUpsertSql();
 
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($selectHostSql));
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($upsertSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($selectHostSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($upsertSql));
 
         $this->assertStringContainsString('SELECT "ClientId" FROM "KaraokeClient"', $selectHostSql);
         $this->assertStringContainsString('"IsHost" = 1', $selectHostSql);
@@ -174,7 +174,7 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $sql = $this->getStartCountdownSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('UPDATE "KaraokeSession"', $sql);
         $this->assertStringContainsString('"Status" = "countdown"', $sql);
@@ -190,7 +190,7 @@ class KaraokeDataHelperTest extends DataHelperTestCase
         $sql = $this->getUpdateHeartbeatSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('UPDATE "KaraokeClient"', $sql);
         $this->assertStringContainsString('"LastHeartbeat" = datetime("now")', $sql);

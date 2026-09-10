@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tests\models;
 
-use PDO;
+use PDOStatement;
 
 class EventNeedDataHelperTest extends DataHelperTestCase
 {
@@ -38,7 +38,7 @@ class EventNeedDataHelperTest extends DataHelperTestCase
         $sql = $this->getNeedsForEventSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('EventNeed.*', $sql);
         $this->assertStringContainsString('Need.Label', $sql);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tests\models;
 
-use PDO;
+use PDOStatement;
 
 class EventTypeDataHelperTest extends DataHelperTestCase
 {
@@ -40,7 +40,7 @@ class EventTypeDataHelperTest extends DataHelperTestCase
         $sql = $this->getGetsForSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('et.Id, et.Name, et.Inactivated, et.IdGroup', $sql);
         $this->assertStringContainsString('LEFT JOIN `Group`', $sql);
@@ -58,9 +58,9 @@ class EventTypeDataHelperTest extends DataHelperTestCase
         $deleteSql = $this->getDeleteEventTypeAttributeSql();
         $insertSql = $this->getInsertEventTypeAttributeSql();
 
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($updateSql));
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($deleteSql));
-        $this->assertInstanceOf(\PDOStatement::class, $pdo->prepare($insertSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($updateSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($deleteSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($insertSql));
 
         $this->assertStringContainsString('UPDATE EventType SET Name = ?, IdGroup = ? WHERE Id = ?', $updateSql);
         $this->assertStringContainsString('DELETE FROM EventTypeAttribute WHERE IdEventType = ?', $deleteSql);

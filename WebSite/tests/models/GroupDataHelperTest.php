@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tests\models;
 
-use PDO;
+use PDOStatement;
 
 class GroupDataHelperTest extends DataHelperTestCase
 {
@@ -48,7 +48,7 @@ class GroupDataHelperTest extends DataHelperTestCase
         $sql = $this->getAvailableGroupsCurrentGroupsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('GROUP_CONCAT(a.Name) AS Authorizations', $sql);
         $this->assertStringContainsString('INNER JOIN PersonGroup', $sql);
@@ -66,7 +66,7 @@ class GroupDataHelperTest extends DataHelperTestCase
         $sql = $this->getAvailableGroupsLeftSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('WHERE ag.Id NOT IN', $sql);
         $this->assertStringContainsString('INNER JOIN PersonGroup', $sql);
@@ -79,7 +79,7 @@ class GroupDataHelperTest extends DataHelperTestCase
         $sql = $this->getCurrentGroupsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('CASE WHEN pg.Id IS NOT NULL THEN 1 ELSE 0 END as isMember', $sql);
         $this->assertStringContainsString('g.SelfRegistration as canToggle', $sql);
@@ -94,7 +94,7 @@ class GroupDataHelperTest extends DataHelperTestCase
         $sql = $this->getGroupsWithAuthorizationsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('g.SelfRegistration', $sql);
         $this->assertStringContainsString('Authorizations', $sql);
@@ -111,7 +111,7 @@ class GroupDataHelperTest extends DataHelperTestCase
         $sql = $this->getGroupsWithTypeSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString("'joined'", $sql);
         $this->assertStringContainsString("'subscribed'", $sql);
@@ -126,7 +126,7 @@ class GroupDataHelperTest extends DataHelperTestCase
         $sql = $this->getGroupCountSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('COUNT(DISTINCT pg.IdPerson) as Total', $sql);
         $this->assertStringContainsString('WithPresentation', $sql);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tests\models;
 
-use PDO;
+use PDOStatement;
 
 class EventDataHelperTest extends DataHelperTestCase
 {
@@ -104,7 +104,7 @@ class EventDataHelperTest extends DataHelperTestCase
         $sql = $this->getDuplicateSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('FROM Event', $sql);
         $this->assertStringContainsString('WHERE Id = :id', $sql);
@@ -116,7 +116,7 @@ class EventDataHelperTest extends DataHelperTestCase
         $sql = $this->getEventSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('EventTypeName', $sql);
         $this->assertStringContainsString('INNER JOIN EventType', $sql);
@@ -128,7 +128,7 @@ class EventDataHelperTest extends DataHelperTestCase
         $sql = $this->getNextWeekEventsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('AttributeIds', $sql);
         $this->assertStringContainsString('GROUP_CONCAT', $sql);
@@ -142,7 +142,7 @@ class EventDataHelperTest extends DataHelperTestCase
         $sql = $this->getEventNeedsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('RequiredQuantity', $sql);
         $this->assertStringContainsString('ProvidedQuantity', $sql);
@@ -155,7 +155,7 @@ class EventDataHelperTest extends DataHelperTestCase
         $sql = $this->getNewsSql();
 
         $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(\PDOStatement::class, $stmt);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('LEFT JOIN PersonGroup', $sql);
         $this->assertStringContainsString('e.LastUpdate >= :searchFrom', $sql);
