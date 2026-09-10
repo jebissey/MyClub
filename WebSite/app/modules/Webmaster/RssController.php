@@ -11,7 +11,7 @@ use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\Article\valueObjects\ArticleRow;
+use app\modules\Article\valueObjects\ArticleRssRow;
 use app\modules\Event\valueObjects\EventRow;
 
 /**
@@ -84,7 +84,7 @@ class RssController extends AbstractController
     }
 
     /**
-     * @param list<ArticleRow> $articles
+     * @param list<ArticleRssRow> $articles
      */
     private function generateArticlesRSS(
         array $articles,

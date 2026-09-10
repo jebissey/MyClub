@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\helpers;
+namespace tests\helpers;
 
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

@@ -8,27 +8,30 @@ use PDO;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Article\valueObjects\ArticleAuthorRow;
 use app\modules\Article\valueObjects\ArticleRow;
+use app\modules\Article\valueObjects\ArticleRssRow;
 use app\modules\Article\valueObjects\ArticleSitemapRow;
 use app\modules\Article\valueObjects\ArticleSummaryRow;
+use app\modules\Common\interfaces\NewsProviderInterface;
 
 /**
  * @phpstan-import-type ArticleRowShape from ArticleRow
  */
 class ArticleDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
-    {
+    public function __construct(
+        Application $application,
+        private AuthorizationDataHelper $authorizationDataHelper
+    ) {
         parent::__construct($application);
     }
 
     /**
      * @param array{
-     *     authors:list<object{Id:int}>,
-     *     audiences:list<array{id:int}>,
-     *     data:array<int, array<int, int>>
+     *     authors: list<object{Id:int}>,
+     *     audiences: list<array{id:int}>,
+     *     data: array<int, array<int, int>>
      * } $crosstabData
      *
      * @return array{
@@ -136,7 +139,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
-     * @return list<ArticleRow>
+     * @return list<ArticleRssRow>
      */
     public function getArticlesForRss(): array
     {
@@ -156,7 +159,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt->execute();
 
         return array_values(array_map(
-            ArticleRow::fromStdClass(...),
+            ArticleRssRow::fromStdClass(...),
             $stmt->fetchAll(PDO::FETCH_OBJ)
         ));
     }
@@ -206,11 +209,12 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
      *
      * @return ArticleRow|null
      */
-    public function getLatestArticle(array $articleIds): ?object
+    public function getLatestArticle(array $articleIds): ?ArticleRow
     {
         if (empty($articleIds)) {
             return null;
         }
+
         $placeholders = [];
         $params = [];
         foreach ($articleIds as $index => $id) {
@@ -218,6 +222,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             $placeholders[] = $key;
             $params[$key] = $id;
         }
+
         $sql = "
             SELECT Article.*, 
                 Person.FirstName, 
@@ -233,8 +238,10 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+
         /** @var ArticleRowShape|false $article */
         $article = $stmt->fetch(PDO::FETCH_OBJ);
+
         return $article ? ArticleRow::fromStdClass($article) : null;
     }
 
@@ -253,6 +260,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
                 'latestArticles' => []
             ];
         }
+
         return [
             'latestArticle' => $this->getLatestArticle($articleIds),
             'latestArticles' => $this->doGetLatestArticles($articleIds, $latestArticlesCount)
@@ -261,11 +269,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
     /**
      * @return list<array{
-     *     type:string,
-     *     id:int,
-     *     title:string,
-     *     date:string,
-     *     url:string
+     *     type: string,
+     *     id: int,
+     *     title: string,
+     *     date: string,
+     *     url: string
      * }>
      */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
@@ -280,10 +288,10 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
         $articles = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $authHelper = new AuthorizationDataHelper($this->application);
+
         $news = [];
         foreach ($articles as $article) {
-            if ($authHelper->getArticle($article->Id, $connectedUser)) {
+            if ($this->authorizationDataHelper->getArticle($article->Id, $connectedUser)) {
                 $news[] = [
                     'type'  => 'article',
                     'id'    => $article->Id,
@@ -293,13 +301,14 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
                 ];
             }
         }
+
         return $news;
     }
 
     /**
      * @param list<string> $paths
      *
-     * @return array<string,bool>
+     * @return array<string, bool>
      */
     public function getPathsUsedInArticles(array $paths): array
     {
@@ -322,11 +331,12 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
                 }
             }
         }
-        return $used; // ['data/media/2024/01/photo.jpg' => true, ...]
+
+        return $used;
     }
 
     /**
-     * @return array<string,mixed>|null
+     * @return array<string, mixed>|null
      */
     public function getSpotlightArticle(): mixed
     {
@@ -335,15 +345,16 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             return null;
         }
         $spotlightArticleJson = To::str($settingsRow->Value ?? '');
-        /** @var array<string,mixed>|null $decoded */
+        /** @var array<string, mixed>|null $decoded */
         $decoded = json_decode($spotlightArticleJson, true);
+
         return $decoded;
     }
 
     /**
      * @return ArticleRow|false
      */
-    public function getWithAuthor(int $id): object|false
+    public function getWithAuthor(int $id): ArticleRow|false
     {
         $sql = "
             SELECT a.*, p.FirstName, p.LastName, p.NickName
@@ -354,8 +365,10 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
+
         /** @var ArticleRowShape|false $row */
         $row = $stmt->fetch(PDO::FETCH_OBJ);
+
         return $row ? ArticleRow::fromStdClass($row) : false;
     }
 
@@ -378,6 +391,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':path' => '%' . $path . '%']);
+
         return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
     }
 
@@ -389,12 +403,13 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         }
         $now = date('Y-m-d H:i:s');
         $spotlightUntil = To::str($spotlight['spotlightUntil'] ?? '');
+
         return strtotime($now) < strtotime($spotlightUntil);
     }
 
     public function isUserAllowedToReadArticle(string $userEmail, int $id): bool
     {
-        return in_array($id, $this->getArticleIdsBasedOnAccess($userEmail));
+        return in_array($id, $this->getArticleIdsBasedOnAccess($userEmail), true);
     }
 
     public function setSpotlightArticle(int $articleId, string $spotlightUntil): void
@@ -406,7 +421,8 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         $this->set('Settings', ['Value' => json_encode($data)], ['Name' => 'SpotlightArticle']);
     }
 
-    #region Private funcions
+    #region Private functions
+
     /**
      * @param string|null $userEmail
      *
@@ -418,17 +434,19 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         if (empty($userEmail)) {
             return $noGroupArticleIds;
         }
+
         $forMembersOnlyArticleIds = $this->getArticleIdsForMembers();
-        if (empty($forMembersOnlyArticleIds)) {
-            $articleIds = $noGroupArticleIds;
-        } else {
-            $articleIds = array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
-        }
+        $articleIds = empty($forMembersOnlyArticleIds)
+            ? $noGroupArticleIds
+            : array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
+
         $userGroups = array_values($this->authorizationDataHelper->getUserGroups($userEmail));
         if (empty($userGroups)) {
             return $articleIds;
         }
+
         $groupArticleIds = $this->getArticleIdsByGroups($userGroups);
+
         return array_values(array_unique(array_merge($articleIds, $groupArticleIds)));
     }
 
@@ -442,12 +460,16 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         if (empty($groupIds)) {
             return [];
         }
+
         $groups = implode(',', array_fill(0, count($groupIds), '?'));
         $query = $this->pdo->prepare("
-            SELECT DISTINCT Article.Id FROM Article 
-            WHERE Article.publishedBy IS NOT NULL
-            AND Article.IdGroup IN ($groups)");
+            SELECT DISTINCT Article.Id 
+            FROM Article 
+            WHERE Article.PublishedBy IS NOT NULL
+            AND Article.IdGroup IN ($groups)
+        ");
         $query->execute($groupIds);
+
         return array_values($query->fetchAll(PDO::FETCH_COLUMN));
     }
 
@@ -457,9 +479,14 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     private function getArticleIdsForMembers(): array
     {
         $query = $this->pdo->prepare("
-            SELECT Article.Id FROM Article 
-            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 1");
+            SELECT Article.Id 
+            FROM Article 
+            WHERE Article.PublishedBy IS NOT NULL 
+              AND Article.IdGroup IS NULL 
+              AND Article.OnlyForMembers = 1
+        ");
         $query->execute();
+
         return array_values($query->fetchAll(PDO::FETCH_COLUMN));
     }
 
@@ -481,6 +508,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             $placeholders[] = $key;
             $params[$key] = $id;
         }
+
         $sql = "
             SELECT Id, Title, Timestamp, LastUpdate
             FROM Article
@@ -488,9 +516,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             AND PublishedBy IS NOT NULL
             ORDER BY LastUpdate DESC
             LIMIT " . $latestArticlesCount;
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ) ?: [];
+
         return array_values(array_map(ArticleSummaryRow::fromStdClass(...), $rows));
     }
 
@@ -500,9 +530,16 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     private function getNoGroupArticleIds(): array
     {
         $query = $this->pdo->prepare("
-            SELECT Article.Id FROM Article 
-            WHERE Article.publishedBy IS NOT NULL AND Article.IdGroup IS NULL AND Article.OnlyForMembers = 0");
+            SELECT Article.Id 
+            FROM Article 
+            WHERE Article.PublishedBy IS NOT NULL 
+              AND Article.IdGroup IS NULL 
+              AND Article.OnlyForMembers = 0
+        ");
         $query->execute();
+
         return array_values($query->fetchAll(PDO::FETCH_COLUMN));
     }
+
+    #endregion
 }

@@ -67,19 +67,19 @@ final readonly class ArticleRow
     public function toArray(): array
     {
         return [
-            'Id' => $this->Id,
-            'Title' => $this->Title,
-            'Content' => $this->Content,
-            'CreatedBy' => $this->CreatedBy,
-            'PublishedBy' => $this->PublishedBy,
-            'IdGroup' => $this->IdGroup,
+            'Id'             => $this->Id,
+            'Title'          => $this->Title,
+            'Content'        => $this->Content,
+            'CreatedBy'      => $this->CreatedBy,
+            'PublishedBy'    => $this->PublishedBy,
+            'IdGroup'        => $this->IdGroup,
             'OnlyForMembers' => $this->OnlyForMembers,
-            'LastUpdate' => $this->LastUpdate,
-            'Timestamp' => $this->Timestamp,
-            'FirstName' => $this->Author?->FirstName,
-            'LastName' => $this->Author?->LastName,
-            'NickName' => $this->Author?->NickName,
-            'GroupName' => $this->Group?->Name,
+            'LastUpdate'     => $this->LastUpdate,
+            'Timestamp'      => $this->Timestamp,
+            'FirstName'      => $this->Author?->FirstName,
+            'LastName'       => $this->Author?->LastName,
+            'NickName'       => $this->Author?->NickName,
+            'GroupName'      => $this->Group?->Name,
         ];
     }
 }
