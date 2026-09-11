@@ -7,19 +7,19 @@ namespace app\helpers;
 use app\enums\ApplicationError;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
-use app\models\LogDataWriterHelper;
+use app\models\LogWriterDataHelper;
 use app\modules\Common\EmptyController;
 
 class ErrorManager
 {
     private DataHelper $dataHelper;
     private LanguagesDataHelper $languagesDataHelper;
-    private LogDataWriterHelper $logDataWriterHelper;
+    private LogWriterDataHelper $logWriterDataHelper;
     private EmptyController $emptyController;
 
     public function __construct(private Application $application)
     {
-        $this->logDataWriterHelper = new LogDataWriterHelper($application);
+        $this->logWriterDataHelper = new LogWriterDataHelper($application);
         $this->dataHelper = new DataHelper($application);
         $this->languagesDataHelper = new LanguagesDataHelper($application);
         $this->emptyController = new EmptyController($application);
@@ -32,7 +32,7 @@ class ErrorManager
         bool $displayCode = true,
         bool $isWebmaster = false
     ): void {
-        $this->logDataWriterHelper->add((string)$code->value, $message);
+        $this->logWriterDataHelper->add((string)$code->value, $message);
         if ($this->isJsonExpected()) {
             http_response_code($code->value);
             header('Content-Type: application/json; charset=utf-8');

@@ -15,8 +15,8 @@ use Throwable;
 use app\exceptions\DatabaseException;
 use app\models\Database;
 use app\models\DataHelper;
-use app\models\LogDataCompactHelper;
-use app\models\LogDataWriterHelper;
+use app\models\LogCompactDataHelper;
+use app\models\LogWriterDataHelper;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\valueObjects\CompactSettingsRow;
 
@@ -85,7 +85,7 @@ class Application
         }
         /** @var stdClass $row */
         $metadata = CompactSettingsRow::fromStdClass($row);
-        new LogDataCompactHelper(
+        new LogCompactDataHelper(
             self::$instance
         )->compactLog($metadata->Compact_removeOlderThanXmonths, $metadata->Compact_compactOlderThanXmonths);
         return self::$instance;
@@ -157,7 +157,7 @@ class Application
             }
         }
         if ($log) {
-            new logDataWriterHelper(self::init())->add('UNREACHABLE', $msg);
+            new LogWriterDataHelper(self::init())->add('UNREACHABLE', $msg);
         }
         throw new LogicException($msg);
     }

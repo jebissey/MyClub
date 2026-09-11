@@ -13,13 +13,13 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
 use app\models\DataHelper;
-use app\models\LogDataWriterHelper;
+use app\models\LogWriterDataHelper;
 use app\models\PersonDataHelper;
 
 abstract class AbstractApi
 {
     protected LatteEngine $latte;
-    private LogDataWriterHelper $logDataWriterHelper;
+    private LogWriterDataHelper $logWriterDataHelper;
 
     public function __construct(
         protected Application $application,
@@ -28,7 +28,7 @@ abstract class AbstractApi
         protected PersonDataHelper $personDataHelper
     ) {
         $this->latte = $application->getLatte();
-        $this->logDataWriterHelper = new LogDataWriterHelper($application);
+        $this->logWriterDataHelper = new LogWriterDataHelper($application);
     }
 
     /**
@@ -76,7 +76,7 @@ abstract class AbstractApi
         $flightResponse->write($json);
         $flightResponse->send();
 
-        $this->logDataWriterHelper->add((string) $statusCode, $message);
+        $this->logWriterDataHelper->add((string) $statusCode, $message);
         exit;
     }
 

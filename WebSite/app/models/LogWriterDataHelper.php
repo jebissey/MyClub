@@ -9,7 +9,7 @@ use Throwable;
 use app\helpers\Application;
 use app\helpers\Client;
 
-class LogDataWriterHelper extends Data
+class LogWriterDataHelper extends Data
 {
     public function __construct(Application $application)
     {

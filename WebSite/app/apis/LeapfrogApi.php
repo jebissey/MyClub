@@ -11,7 +11,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
-use app\models\LogDataWriterHelper;
+use app\models\LogWriterDataHelper;
 use app\models\PersonDataHelper;
 
 class LeapfrogApi extends AbstractApi
@@ -21,7 +21,7 @@ class LeapfrogApi extends AbstractApi
         ConnectedUser $connectedUser,
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
-        private LogDataWriterHelper $logDataWriterHelper,
+        private LogWriterDataHelper $logWriterDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
     }
@@ -38,7 +38,7 @@ class LeapfrogApi extends AbstractApi
             $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
             return;
         }
-        $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, To::str($data['message'] ?? ''));
+        $this->logWriterDataHelper->add((string)ApplicationError::Ok->value, To::str($data['message'] ?? ''));
         $this->renderJsonOk();
     }
 }

@@ -12,7 +12,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
 use app\models\DataHelper;
-use app\models\LogDataWriterHelper;
+use app\models\LogWriterDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\CredentialService;
 
@@ -28,7 +28,7 @@ class WebmasterApi extends AbstractApi
         ConnectedUser $connectedUser,
         DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
-        private LogDataWriterHelper $logDataWriterHelper,
+        private LogWriterDataHelper $logWriterDataHelper,
         private CredentialService $credentials
     ) {
         parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
@@ -48,7 +48,7 @@ class WebmasterApi extends AbstractApi
         }
         $userAgentRaw = $_SERVER['HTTP_USER_AGENT'] ?? null;
         $userAgent = is_string($userAgentRaw) ? $userAgentRaw : 'HTTP_USER_AGENT not defined';
-        $this->logDataWriterHelper->add((string)ApplicationError::Ok->value, $userAgent);
+        $this->logWriterDataHelper->add((string)ApplicationError::Ok->value, $userAgent);
         $this->renderJsonOk(['lastVersion' => Application::VERSION]);
     }
 

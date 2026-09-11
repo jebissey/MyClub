@@ -110,7 +110,7 @@ use app\models\KaraokeDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
-use app\models\LogDataWriterHelper;
+use app\models\LogWriterDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
@@ -695,7 +695,7 @@ class Routes
             $dataHelpers['languagesDataHelper'],
             $dataHelpers['loanDataHelper'],
             $dataHelpers['logDataHelper'],
-            new LogDataWriterHelper($this->application),
+            new LogWriterDataHelper($this->application),
             $services['mediaManager'],
             $dataHelpers['membershipDataHelper'],
             new MenuItemDataHelper($this->application, $dataHelpers['authorizationDataHelper']),

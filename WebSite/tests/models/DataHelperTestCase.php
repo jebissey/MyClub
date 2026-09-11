@@ -92,15 +92,22 @@ abstract class DataHelperTestCase extends TestCase
      * Ouvre une copie temporaire jetable du template, jamais le template
      * lui-même : celui-ci est versionné et sert à initialiser
      * WebSite/data lors du premier lancement de l'application.
+     *
+     * @param string|null $dbPath Chemin du template à copier. Par défaut
+     *                            self::DB_PATH (base principale MyClub) ;
+     *                            passer un autre chemin pour tester une
+     *                            base séparée (ex. le journal des logs).
      */
-    protected function openDatabaseCopyOrSkip(): PDO
+    protected function openDatabaseCopyOrSkip(?string $dbPath = null): PDO
     {
-        if (!file_exists(self::DB_PATH)) {
-            $this->markTestSkipped('Template database not found at ' . self::DB_PATH);
+        $dbPath ??= self::DB_PATH;
+
+        if (!file_exists($dbPath)) {
+            $this->markTestSkipped('Template database not found at ' . $dbPath);
         }
 
         $tmpPath = tempnam(sys_get_temp_dir(), 'myclub_test_') . '.sqlite';
-        copy(self::DB_PATH, $tmpPath);
+        copy($dbPath, $tmpPath);
         $this->tmpDbPaths[] = $tmpPath;
 
         $pdo = new PDO('sqlite:' . $tmpPath);

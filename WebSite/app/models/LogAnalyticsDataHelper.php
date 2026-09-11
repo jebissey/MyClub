@@ -10,7 +10,7 @@ use stdClass;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 
-class LogDataAnalyticsHelper extends Data
+class LogAnalyticsDataHelper extends Data
 {
     private const PERIOD_TO_SHOW = 13;
 

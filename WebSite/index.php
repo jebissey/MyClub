@@ -24,7 +24,7 @@ use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\helpers\LogMessage;
 use app\helpers\WebApp;
-use app\models\LogDataWriterHelper;
+use app\models\LogWriterDataHelper;
 use app\modules\Webmaster\MaintenanceController;
 
 $startTime = microtime(true);
@@ -55,7 +55,7 @@ $flight->before('start', function () use ($maintenanceController, $connectedUser
 $webapp = new WebApp();
 new Routes($application, $flight)->add($errorManager);
 
-$logWriterDataHelper = new LogDataWriterHelper($application);
+$logWriterDataHelper = new LogWriterDataHelper($application);
 $flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $errorManager, $startTime) {
     $appFrames = array_filter(
         $ex->getTrace(),

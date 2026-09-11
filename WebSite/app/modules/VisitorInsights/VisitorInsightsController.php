@@ -12,8 +12,8 @@ use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
 use app\models\LogDataHelper;
-use app\models\LogDataAnalyticsHelper;
-use app\models\LogDataStatisticsHelper;
+use app\models\LogAnalyticsDataHelper;
+use app\models\LogStatisticsDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\TableController;
 use app\modules\Common\viewModels\InfoViewModel;
@@ -53,8 +53,8 @@ class VisitorInsightsController extends TableController
         private PersonDataHelper $personDataHelper,
         private LogDataHelper $logDataHelper,
         private CrosstabDataHelper $crosstabDataHelper,
-        private LogDataAnalyticsHelper $logDataAnalyticsHelper,
-        private LogDataStatisticsHelper $logDataStatisticsHelper,
+        private LogAnalyticsDataHelper $logDataAnalyticsHelper,
+        private LogStatisticsDataHelper $logDataStatisticsHelper,
     ) {
         parent::__construct($application);
     }

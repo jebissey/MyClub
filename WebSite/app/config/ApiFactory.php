@@ -46,7 +46,7 @@ use app\models\KaraokeDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
-use app\models\LogDataWriterHelper;
+use app\models\LogWriterDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
@@ -81,7 +81,7 @@ class ApiFactory
         private LanguagesDataHelper $languagesDataHelper,
         private LoanDataHelper $loanDataHelper,
         private LogDataHelper $logDataHelper,
-        private LogDataWriterHelper $logDataWriterHelper,
+        private LogWriterDataHelper $logWriterDataHelper,
         private MediaManager $mediaManager,
         private MembershipDataHelper $membershipDataHelper,
         private MenuItemDataHelper $menuItemDataHelper,
@@ -278,7 +278,7 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper,
-            $this->logDataWriterHelper
+            $this->logWriterDataHelper
         );
     }
 
@@ -368,7 +368,7 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper,
-            $this->logDataWriterHelper,
+            $this->logWriterDataHelper,
             CredentialService::getInstance()
         );
     }

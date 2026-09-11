@@ -11,7 +11,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\To;
 
-class LogDataCompactHelper extends Data
+class LogCompactDataHelper extends Data
 {
     public function __construct(Application $application)
     {
@@ -94,7 +94,7 @@ class LogDataCompactHelper extends Data
             $this->pdoForLog->commit();
             $this->pdoForLog->exec("VACUUM");
 
-            (new LogDataWriterHelper($this->application))->add(
+            (new LogWriterDataHelper($this->application))->add(
                 (string)ApplicationError::Ok->value,
                 "Compact log: {$deletedRows} old deleted, {$compactedInserted} compacted, {$compactedDeleted} compacted deleted"
             );
@@ -103,7 +103,7 @@ class LogDataCompactHelper extends Data
                 $this->pdoForLog->rollBack();
             }
 
-            (new LogDataWriterHelper($this->application))->add(
+            (new LogWriterDataHelper($this->application))->add(
                 (string)ApplicationError::Error->value,
                 "Compact log FAILED: " . $e->getMessage()
             );
@@ -129,7 +129,7 @@ class LogDataCompactHelper extends Data
         }
         $countAfter = To::int($this->fetchColumnOrFail($this->pdoForLog->query("SELECT COUNT(*) FROM Log")));
         if ($countAfter < $countBefore) {
-            (new LogDataWriterHelper($this->application))->add(
+            (new LogWriterDataHelper($this->application))->add(
                 (string)ApplicationError::Ok->value,
                 "Compact log from $countBefore to $countAfter"
             );

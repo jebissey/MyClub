@@ -8,7 +8,7 @@ use DateTime;
 use PDO;
 use app\helpers\MyClubDateTime;
 
-class LogDataStatisticsHelper extends Data
+class LogStatisticsDataHelper extends Data
 {
     /** @return array{labels: array<int, string>, data: array<int, int>} */
     public function getOsDistribution(string $period, string $currentDate): array

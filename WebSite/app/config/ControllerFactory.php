@@ -24,9 +24,9 @@ use app\models\ExerciseTableDataHelper;
 use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\LogDataHelper;
-use app\models\LogDataAnalyticsHelper;
+use app\models\LogAnalyticsDataHelper;
 use app\models\LoanDataHelper;
-use app\models\LogDataStatisticsHelper;
+use app\models\LogStatisticsDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MessageDataHelper;
 use app\models\MetadataDataHelper;
@@ -522,8 +522,8 @@ class ControllerFactory
             $this->personDataHelper,
             $this->logDataHelper,
             $this->crosstabDataHelper,
-            new LogDataAnalyticsHelper($this->application),
-            new LogDataStatisticsHelper($this->application),
+            new LogAnalyticsDataHelper($this->application),
+            new LogStatisticsDataHelper($this->application),
         );
     }
 
