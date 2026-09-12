@@ -8,8 +8,6 @@ use PDOStatement;
 
 class LogStatisticsDataHelperTest extends DataHelperTestCase
 {
-    private const LOG_DB_PATH = __DIR__ . '/../../app/models/database/LogMyClub.sqlite';
-
     public function testQueriedColumnsExistInDatabaseSchema(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip(self::LOG_DB_PATH);

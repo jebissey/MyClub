@@ -11,6 +11,7 @@ use ReflectionClass;
 abstract class DataHelperTestCase extends TestCase
 {
     protected const DB_PATH = __DIR__ . '/../../app/models/database/MyClub.sqlite';
+    protected const LOG_DB_PATH = __DIR__ . '/../../app/models/database/LogMyClub.sqlite';
 
     /** @var list<string> */
     protected array $tmpDbPaths = [];
@@ -95,8 +96,9 @@ abstract class DataHelperTestCase extends TestCase
      *
      * @param string|null $dbPath Chemin du template à copier. Par défaut
      *                            self::DB_PATH (base principale MyClub) ;
-     *                            passer un autre chemin pour tester une
-     *                            base séparée (ex. le journal des logs).
+     *                            passer self::LOG_DB_PATH pour tester la
+     *                            base des logs (table Log), interrogée via
+     *                            $pdoForLog dans les DataHelper concernés.
      */
     protected function openDatabaseCopyOrSkip(?string $dbPath = null): PDO
     {
