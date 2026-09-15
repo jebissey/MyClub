@@ -51,25 +51,34 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         private PersonPreferences $personPreferences,
         private EmailService $emailService
     ) {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     public function create(): int
     {
-        $query = $this->pdo->prepare("SELECT Id FROM Person WHERE Email = ''");
+        // On crée d'abord un Individual "vide", puis le Member associé
+        $query = $this->pdo->prepare("SELECT Id FROM Individual WHERE Email = '' AND Type = 'Member'");
         $query->execute();
         /** @var object{Id: int}|false $row */
         $row = $query->fetch(PDO::FETCH_OBJ);
         $id = $row !== false ? $row->Id : null;
-        if ($id == null) {
-            $query = $this->pdo->prepare("
-                INSERT INTO Person (Email, FirstName, LastName, Imported) 
-                VALUES ('', '', '', 0)
+
+        if ($id === null) {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO Individual (Type, Email, FirstName, LastName)
+                VALUES ('Member', '', '', '')
             ");
-            $query->execute([]);
-            $id = $this->pdo->lastInsertId();
+            $stmt->execute([]);
+            $id = (int) $this->pdo->lastInsertId();
+
+            $stmt = $this->pdo->prepare("
+                INSERT INTO Member (Id, Imported)
+                VALUES (:id, 0)
+            ");
+            $stmt->execute([':id' => $id]);
         }
-        return (int)$id;
+
+        return $id;
     }
 
     /**
@@ -78,7 +87,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     public function getAllPersons(): array
     {
         $query = $this->pdo->query(
-            "SELECT Id, LOWER(Email) AS EmailKey FROM Person"
+            "SELECT i.Id, LOWER(i.Email) AS EmailKey
+             FROM Individual i
+             INNER JOIN Member m ON m.Id = i.Id"
         );
 
         if ($query === false) {
@@ -139,28 +150,29 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     {
         $query = "
             SELECT 
-                p.FirstName || ' ' || p.LastName || 
+                i.FirstName || ' ' || i.LastName || 
                 CASE 
-                    WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                    WHEN i.NickName IS NOT NULL AND i.NickName != '' THEN ' (' || i.NickName || ')'
                     ELSE ''
                 END AS clubMember,
                 CASE 
-                    WHEN p.Preferences LIKE '%noAlerts%' THEN 'X'
+                    WHEN m.Preferences LIKE '%noAlerts%' THEN 'X'
                     ELSE ''
                 END AS NoAlert,
                 CASE 
-                    WHEN p.Preferences LIKE '%newEvent%' THEN 'X'
+                    WHEN m.Preferences LIKE '%newEvent%' THEN 'X'
                     ELSE ''
                 END AS NewEvent,
                 CASE 
-                    WHEN p.Preferences LIKE '%newArticle%' THEN 'X'
+                    WHEN m.Preferences LIKE '%newArticle%' THEN 'X'
                     ELSE ''
                 END AS NewArticle
-            FROM Person AS p
-            WHERE (p.Preferences LIKE '%noAlerts%' 
-            OR p.Preferences LIKE '%newEvent%' 
-            OR p.Preferences LIKE '%newArticle%')
-            AND p.Inactivated = 0
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            WHERE (m.Preferences LIKE '%noAlerts%' 
+               OR m.Preferences LIKE '%newEvent%' 
+               OR m.Preferences LIKE '%newArticle%')
+              AND m.Inactivated = 0
             ORDER BY clubMember
         ";
         $stmt = $this->pdo->query($query);
@@ -179,32 +191,36 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         if (!($connectedUser->person ?? false)) {
             return $news;
         }
+
         $sql = "
-            SELECT Id, Email, FirstName, LastName, PresentationLastUpdate
-            FROM Person
-            WHERE InPresentationDirectory = 1
-            AND PresentationLastUpdate >= :searchFrom
-            AND Email != :email
-            ORDER BY PresentationLastUpdate DESC
+            SELECT i.Id, i.Email, i.FirstName, i.LastName, m.PresentationLastUpdate
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            WHERE m.InPresentationDirectory = 1
+              AND m.PresentationLastUpdate >= :searchFrom
+              AND i.Email != :email
+            ORDER BY m.PresentationLastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             ':searchFrom' => $searchFrom,
-            ':email' => $connectedUser->person->Email
+            ':email'      => $connectedUser->person->Email
         ]);
+
         /** @var array<int, object{Id: int, Email: string, FirstName: string, LastName: string, PresentationLastUpdate: string}> $presentations */
         $presentations = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         foreach ($presentations as $presentation) {
             $fullName = trim($presentation->FirstName . ' ' . $presentation->LastName);
             if (empty($fullName)) {
                 $fullName = $presentation->Email;
             }
             $news[] = [
-                'type' => 'presentation',
-                'id' => $presentation->Id,
+                'type'  => 'presentation',
+                'id'    => $presentation->Id,
                 'title' => 'Présentation de ' . $fullName,
-                'date' => $presentation->PresentationLastUpdate,
-                'url' => '/user/presentation/' . $presentation->Id
+                'date'  => $presentation->PresentationLastUpdate,
+                'url'   => '/user/presentation/' . $presentation->Id
             ];
         }
         return $news;
@@ -221,46 +237,48 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         ?bool $desactivated = null
     ): array {
         $joins  = '';
-        $wheres = ["p.Email != ''"];
+        $wheres = ["i.Email != ''"];
         $params = [];
 
         if ($groupId !== null) {
-            $joins     = 'INNER JOIN PersonGroup pg ON pg.IdPerson = p.Id';
-            $wheres[]  = 'pg.IdGroup = :groupId';
+            $joins    = 'INNER JOIN MemberGroup mg ON mg.IdMember = m.Id';
+            $wheres[] = 'mg.IdGroup = :groupId';
             $params[':groupId'] = $groupId;
         }
 
         if ($presentation === true) {
-            $wheres[] = 'p.InPresentationDirectory = 1';
+            $wheres[] = 'm.InPresentationDirectory = 1';
         } elseif ($presentation === false) {
-            $wheres[] = 'p.InPresentationDirectory = 0';
+            $wheres[] = 'm.InPresentationDirectory = 0';
         }
 
         if ($password === true) {
-            $wheres[] = "(p.Password IS NOT NULL AND p.Password != '')";
+            $wheres[] = "(m.Password IS NOT NULL AND m.Password != '')";
         } elseif ($password === false) {
-            $wheres[] = "(p.Password IS NULL OR p.Password = '')";
+            $wheres[] = "(m.Password IS NULL OR m.Password = '')";
         }
 
         if ($inPublicMap === true) {
-            $wheres[] = "(p.MyPublicDataInPresentationDirectory IS NOT NULL AND p.MyPublicDataInPresentationDirectory <> '')";
+            $wheres[] = "(m.MyPublicDataInPresentationDirectory IS NOT NULL AND m.MyPublicDataInPresentationDirectory <> '')";
         } elseif ($inPublicMap === false) {
-            $wheres[] = "(p.MyPublicDataInPresentationDirectory IS NULL OR p.MyPublicDataInPresentationDirectory = '')";
+            $wheres[] = "(m.MyPublicDataInPresentationDirectory IS NULL OR m.MyPublicDataInPresentationDirectory = '')";
         }
 
         if ($desactivated === true) {
-            $wheres[] = "p.Inactivated = 1";
+            $wheres[] = "m.Inactivated = 1";
         } elseif ($desactivated === null) {
-            $wheres[] = "p.Inactivated = 0";
+            $wheres[] = "m.Inactivated = 0";
         }
 
         $where = implode(' AND ', $wheres);
         $sql = "
-            SELECT DISTINCT p.Id, p.FirstName, p.LastName, p.Email
-            FROM Person p
+            SELECT DISTINCT i.Id, i.FirstName, i.LastName, i.Email
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
             $joins
             WHERE $where
-            ORDER BY p.FirstName, p.LastName";
+            ORDER BY i.FirstName, i.LastName
+        ";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
@@ -275,26 +293,27 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $innerJoin = $and = '';
 
         if ($idGroup !== null) {
-            $innerJoin = 'INNER JOIN PersonGroup ON PersonGroup.IdPerson = Person.Id';
-            $and = 'AND PersonGroup.IdGroup = ' . $idGroup;
+            $innerJoin = 'INNER JOIN MemberGroup mg ON mg.IdMember = m.Id';
+            $and = 'AND mg.IdGroup = ' . (int) $idGroup;
         }
 
         $query = $this->pdo->query("
             SELECT
-                Person.Id AS PersonId,
-                Person.Id AS Id,
-                FirstName,
-                LastName,
-                Email,
-                Preferences,
-                Availabilities,
-                InPresentationDirectory,
-                ShowPhoneInPresentationDirectory,
-                ShowEmailInPresentationDirectory
-            FROM Person
+                i.Id AS PersonId,
+                i.Id AS Id,
+                i.FirstName,
+                i.LastName,
+                i.Email,
+                m.Preferences,
+                m.Availabilities,
+                m.InPresentationDirectory,
+                m.ShowPhoneInPresentationDirectory,
+                m.ShowEmailInPresentationDirectory
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
             $innerJoin
-            WHERE Person.Inactivated = 0 $and
-            ORDER BY FirstName, LastName
+            WHERE m.Inactivated = 0 $and
+            ORDER BY i.FirstName, i.LastName
         ");
 
         if ($query === false) {
@@ -314,17 +333,20 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     {
         $stmt = $this->pdo->prepare("
             SELECT DISTINCT 
-                p.Id,
-                P.UseGravatar, 
-                p.Email,
-                p.Avatar,
-                p.FirstName,
-                p.LastName,
-                p.NickName
-            FROM Person p
-            JOIN PersonGroup pg ON p.Id = pg.IdPerson
-            WHERE pg.IdGroup = ? AND p.InPresentationDirectory = 1 AND p.Inactivated = 0
-            ORDER BY p.FirstName, p.LastName
+                i.Id,
+                m.UseGravatar, 
+                i.Email,
+                i.Avatar,
+                i.FirstName,
+                i.LastName,
+                i.NickName
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
+            WHERE mg.IdGroup = ?
+              AND m.InPresentationDirectory = 1
+              AND m.Inactivated = 0
+            ORDER BY i.FirstName, i.LastName
         ");
         $stmt->execute([$groupId]);
         $persons = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -397,7 +419,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                     'EventId'  => null,
                     'PersonId' => $person->PersonId,
                     'Text'     => "Nouvel article publié\n\n/article/{$idArticle} (->{$person->Email})",
-                    'From'    => 'Webapp'
+                    'From'     => 'Webapp'
                 ]);
             }
         }
@@ -409,12 +431,12 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         if ($idPerson === null) {
             return null;
         }
-        $person = $this->get('Person', ['Id' => $idPerson], 'FirstName, LastName');
+        $person = $this->get('Individual', ['Id' => $idPerson], 'FirstName, LastName');
         if ($person === false) {
             return "publié par ?";
         }
         /** @var object{FirstName: string|null, LastName: string|null} $person */
-        $name = trim($person->FirstName . ' ' . $person->LastName);
+        $name = trim(($person->FirstName ?? '') . ' ' . ($person->LastName ?? ''));
         return "publié par " . $name;
     }
 
@@ -424,14 +446,15 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     public function getRedactors(): array
     {
         $query = $this->pdo->query("
-            SELECT Person.Id AS PersonId, FirstName, LastName, NickName, Email
-            FROM Person
-            INNER JOIN PersonGroup        ON PersonGroup.IdPerson        = Person.Id
-            INNER JOIN GroupAuthorization ON GroupAuthorization.IdGroup = PersonGroup.IdGroup
-            WHERE Person.Inactivated = 0
-            AND GroupAuthorization.IdAuthorization = 4
-            GROUP BY Person.Id
-            ORDER BY FirstName, LastName
+            SELECT i.Id AS PersonId, i.FirstName, i.LastName, i.NickName, i.Email
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
+            INNER JOIN GroupAuthorization ga ON ga.IdGroup = mg.IdGroup
+            WHERE m.Inactivated = 0
+              AND ga.IdAuthorization = 4
+            GROUP BY i.Id
+            ORDER BY i.FirstName, i.LastName
         ");
         if ($query === false) {
             Application::unreachable("Query failed", __FILE__, __LINE__);
@@ -441,15 +464,16 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
     public function getWebmasterEmail(): string
     {
-        $query = $this->pdo->query(
-            '
-            SELECT Email FROM Person
-            INNER JOIN PersonGroup on Person.Id = PersonGroup.IdPerson
-            INNER JOIN "Group" on "Group".Id = PersonGroup.IdGroup
-            INNER JOIN GroupAuthorization on "Group".Id = GroupAuthorization.IdGroup
-            INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id
-            WHERE Authorization.Name = "Webmaster"'
-        );
+        $query = $this->pdo->query('
+            SELECT i.Email
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
+            INNER JOIN "Group" g ON g.Id = mg.IdGroup
+            INNER JOIN GroupAuthorization ga ON ga.IdGroup = g.Id
+            INNER JOIN Authorization a ON a.Id = ga.IdAuthorization
+            WHERE a.Name = "Webmaster"
+        ');
         if ($query === false) {
             Application::unreachable("Query failed", __FILE__, __LINE__);
         }
@@ -462,16 +486,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
     /**
      * Imports persons from a CSV file.
-     *
-     * @param  string               $filePath        Absolute path to the CSV file (validated upstream by the controller)
-     * @param  int                  $headerRow       Last header line number (lines <= this value are skipped)
-     * @param  array<string,int>    $mapping         Column mapping : ['email' => 0, 'firstName' => 1, ...]
-     * @param  array<string,int>    $existingPersons Existing persons map : ['lowercase_email' => id, ...]
-     *
-     * @return array{created: int, updated: int, deactivated: int, errors: int, processedEmails: string[], messages: string[]}
-     *
-     * @throws InvalidArgumentException If a mapping key is missing
-     * @throws RuntimeException         If the file is unreadable
+     * ...
      */
     public function importFromCsvFile(
         string $filePath,
@@ -479,7 +494,6 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         array $mapping,
         array $existingPersons
     ): array {
-
         foreach (['email', 'firstName', 'lastName', 'phone'] as $key) {
             if (!array_key_exists($key, $mapping)) {
                 throw new InvalidArgumentException("Clé de mapping manquante : {$key}");
@@ -505,13 +519,20 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $this->pdo->beginTransaction();
 
         try {
-            $stmtUpsert = $this->pdo->prepare("
-                INSERT INTO Person (Email, FirstName, LastName, Phone, Imported, Inactivated)
-                VALUES (:email, :firstName, :lastName, :phone, 1, 0)
+            // Upsert Individual + Member
+            $stmtUpsertIndividual = $this->pdo->prepare("
+                INSERT INTO Individual (Type, Email, FirstName, LastName, Phone)
+                VALUES ('Member', :email, :firstName, :lastName, :phone)
                 ON CONFLICT(Email) DO UPDATE SET
-                    FirstName   = excluded.FirstName,
-                    LastName    = excluded.LastName,
-                    Phone       = excluded.Phone,
+                    FirstName = excluded.FirstName,
+                    LastName  = excluded.LastName,
+                    Phone     = excluded.Phone
+            ");
+
+            $stmtUpsertMember = $this->pdo->prepare("
+                INSERT INTO Member (Id, Imported, Inactivated)
+                VALUES (:id, 1, 0)
+                ON CONFLICT(Id) DO UPDATE SET
                     Imported    = 1,
                     Inactivated = 0
             ");
@@ -540,25 +561,40 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 $emailKey   = strtolower($personData['email']);
                 $existingId = $existingPersons[$emailKey] ?? null;
 
-                $stmtUpsert->execute([
+                $stmtUpsertIndividual->execute([
                     ':email'     => $personData['email'],
                     ':firstName' => $personData['firstName'],
                     ':lastName'  => $personData['lastName'],
                     ':phone'     => $personData['phone'],
                 ]);
 
+                // Récupérer l'Id (nouveau ou existant)
+                $id = $existingId;
+                if ($id === null) {
+                    $id = (int) $this->pdo->lastInsertId();
+                    // Si ON CONFLICT a fait un UPDATE, lastInsertId peut être 0 → on relit
+                    if ($id === 0) {
+                        $stmt = $this->pdo->prepare("SELECT Id FROM Individual WHERE Email = :email");
+                        $stmt->execute([':email' => $personData['email']]);
+                        $id = (int) $stmt->fetchColumn();
+                    }
+                }
+
+                $stmtUpsertMember->execute([':id' => $id]);
+
                 if ($existingId !== null) {
                     $results['updated']++;
                 } else {
                     $results['created']++;
-                    $results['messages'][]     = '(+) ' . $personData['email'];
-                    $existingPersons[$emailKey] = (int) $this->pdo->lastInsertId();
+                    $results['messages'][] = '(+) ' . $personData['email'];
+                    $existingPersons[$emailKey] = $id;
                 }
 
                 $processedEmailKeys[$emailKey] = true;
                 $results['processedEmails'][]  = $personData['email'];
             }
 
+            // Désactivation des membres non présents dans le CSV
             $idsToDeactivate = [];
             foreach ($existingPersons as $emailKey => $id) {
                 if (!isset($processedEmailKeys[$emailKey]) && $id !== 1) {
@@ -568,7 +604,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             if (!empty($idsToDeactivate)) {
                 $placeholders = implode(',', array_fill(0, count($idsToDeactivate), '?'));
                 $stmtDeactivate = $this->pdo->prepare("
-                    UPDATE Person
+                    UPDATE Member
                     SET Inactivated = 1
                     WHERE Id IN ($placeholders)
                 ");
@@ -592,40 +628,42 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         string $emailContact,
         EventRegistrationRow $event
     ): bool {
-        /** @var object{Id: int}|false $contact */
-        $contact = $this->get('Contact', ['Email' => $emailContact]);
-        if ($contact === false) {
-            $contactData = [
-                'Email' => $emailContact,
-                'NickName' => $name,
-                'Token' => bin2hex(random_bytes(32)),
-                'TokenCreatedAt' => date('Y-m-d H:i:s')
-            ];
-            $contactId = $this->set('Contact', $contactData);
-        } else {
+        // Contact est maintenant un sous-type d'Individual
+        /** @var object{Id: int}|false $individual */
+        $individual = $this->get('Individual', ['Email' => $emailContact]);
+
+        if ($individual === false) {
+            // Créer Individual + Contact
+            $this->set('Individual', [
+                'Type'      => 'Contact',
+                'Email'     => $emailContact,
+                'FirstName' => $name,
+                'LastName'  => '',
+                'NickName'  => $name,
+            ]);
+            $individualId = (int) $this->pdo->lastInsertId();
+
             $token = bin2hex(random_bytes(32));
+            $this->set('Contact', [
+                'Id'             => $individualId,
+                'Token'          => $token,
+                'TokenCreatedAt' => date('Y-m-d H:i:s'),
+            ]);
+        } else {
+            $individualId = $individual->Id;
+            $token = bin2hex(random_bytes(32));
+            // Mettre à jour le token du Contact
             $this->set(
                 'Contact',
                 [
-                    'Token' => $token,
-                    'TokenCreatedAt' => date('Y-m-d H:i:s')
+                    'Token'          => $token,
+                    'TokenCreatedAt' => date('Y-m-d H:i:s'),
                 ],
-                ['Id' => $contact->Id]
+                ['Id' => $individualId]
             );
-            $contactId = $contact->Id;
         }
 
-        if ($contactId === false) {
-            Application::unreachable("contact must exist", __FILE__, __LINE__);
-        }
-
-        /** @var object{Token: string}|false $refreshedContact */
-        $refreshedContact = $this->get('Contact', ['Id' => $contactId]);
-        if ($refreshedContact === false) {
-            Application::unreachable("contact must exist", __FILE__, __LINE__);
-        }
-
-        $registrationLink = Webapp::getBaseUrl() . "event/{$event->Id}/{$refreshedContact->Token}";
+        $registrationLink = WebApp::getBaseUrl() . "event/{$event->Id}/{$token}";
         $subject = "Lien d'inscription pour " . $event->Summary;
         $body = $registrationLink;
 
@@ -653,9 +691,11 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
         if ($lastActivity) {
             $stmt = $this->pdo->prepare("
-                UPDATE Person 
+                UPDATE Member
                 SET LastSignOut = :lastActivity
-                WHERE Email = :email COLLATE NOCASE
+                WHERE Id = (
+                    SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE
+                )
             ");
             $stmt->execute([
                 ':lastActivity' => $lastActivity,
@@ -664,9 +704,11 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         }
 
         $stmt = $this->pdo->prepare("
-            UPDATE Person 
+            UPDATE Member
             SET LastSignIn = :now
-            WHERE Email = :email COLLATE NOCASE
+            WHERE Id = (
+                SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE
+            )
         ");
         $stmt->execute([
             ':now'   => date('Y-m-d H:i:s'),

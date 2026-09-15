@@ -24,14 +24,18 @@ class MessageDataHelperTest extends DataHelperTestCase
             'LastUpdate',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'FirstName',
             'LastName',
             'NickName',
             'Avatar',
-            'UseGravatar',
             'Email',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Member', [
+            'Id',
+            'UseGravatar',
         ]);
 
         $this->assertColumnsExist($pdo, 'Event', [
@@ -62,15 +66,15 @@ class MessageDataHelperTest extends DataHelperTestCase
             'Inactivated',
         ]);
 
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
             'Id',
             'IdGroup',
-            'IdPerson',
+            'IdMember',
         ]);
 
         $this->assertColumnsExist($pdo, 'Participant', [
             'IdEvent',
-            'IdPerson',
+            'IdIndividual',
         ]);
 
         $logPdo = $this->openDatabaseCopyOrSkip(self::LOG_DB_PATH);
@@ -91,10 +95,11 @@ class MessageDataHelperTest extends DataHelperTestCase
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('Message.*,', $sql);
-        $this->assertStringContainsString('Person.FirstName,', $sql);
-        $this->assertStringContainsString('Person.Email', $sql);
+        $this->assertStringContainsString('Individual.FirstName,', $sql);
+        $this->assertStringContainsString('Individual.Email', $sql);
         $this->assertStringContainsString('FROM Message', $sql);
-        $this->assertStringContainsString('LEFT JOIN Person ON Message.PersonId = Person.Id', $sql);
+        $this->assertStringContainsString('LEFT JOIN Member     ON Message.PersonId = Member.Id', $sql);
+        $this->assertStringContainsString('LEFT JOIN Individual ON Member.Id = Individual.Id', $sql);
         $this->assertStringContainsString('WHERE Message.ArticleId = :articleId', $sql);
         $this->assertStringContainsString('ORDER BY Message.Id ASC', $sql);
     }
@@ -109,8 +114,9 @@ class MessageDataHelperTest extends DataHelperTestCase
 
         $this->assertStringContainsString('Message.*,', $sql);
         $this->assertStringContainsString('FROM Message', $sql);
-        $this->assertStringContainsString('LEFT JOIN Person ON Message.PersonId = Person.Id', $sql);
-        $this->assertStringContainsString("WHERE Message.EventId = :eventId AND Message.'From' = 'User'", $sql);
+        $this->assertStringContainsString('LEFT JOIN Member     ON Message.PersonId = Member.Id', $sql);
+        $this->assertStringContainsString('LEFT JOIN Individual ON Member.Id = Individual.Id', $sql);
+        $this->assertStringContainsString('WHERE Message.EventId = :eventId AND Message."From" = \'User\'', $sql);
         $this->assertStringContainsString('ORDER BY Message.Id ASC', $sql);
     }
 
@@ -128,7 +134,8 @@ class MessageDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('Message.ImagePath,', $sql);
         $this->assertStringContainsString('Message.LastUpdate,', $sql);
         $this->assertStringContainsString('FROM Message', $sql);
-        $this->assertStringContainsString('LEFT JOIN Person ON Message.PersonId = Person.Id', $sql);
+        $this->assertStringContainsString('LEFT JOIN Member     ON Message.PersonId = Member.Id', $sql);
+        $this->assertStringContainsString('LEFT JOIN Individual ON Member.Id = Individual.Id', $sql);
         $this->assertStringContainsString('WHERE Message.GroupId = :groupId', $sql);
         $this->assertStringContainsString('ORDER BY Message.Id ASC', $sql);
     }
@@ -141,11 +148,12 @@ class MessageDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT LOWER(p.Email) AS Email, COUNT(m.Id) AS MessageCount', $sql);
+        $this->assertStringContainsString('SELECT LOWER(i.Email) AS Email, COUNT(m.Id) AS MessageCount', $sql);
         $this->assertStringContainsString('FROM Message m', $sql);
-        $this->assertStringContainsString('JOIN Person p ON p.Id = m.PersonId', $sql);
+        $this->assertStringContainsString('JOIN Member     mb ON mb.Id = m.PersonId', $sql);
+        $this->assertStringContainsString('JOIN Individual i  ON i.Id  = mb.Id', $sql);
         $this->assertStringContainsString('WHERE m.LastUpdate BETWEEN :start AND :end', $sql);
-        $this->assertStringContainsString('GROUP BY p.Email', $sql);
+        $this->assertStringContainsString('GROUP BY i.Email', $sql);
     }
 
     public function testGetMessageUsesEventsSqlIsValidAgainstTemplateSchema(): void
@@ -199,17 +207,22 @@ class MessageDataHelperTest extends DataHelperTestCase
     public function testGetNewsSqlIsValidAgainstTemplateSchema(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $sql = $this->getNewsSql(42);
+        $sql = $this->getNewsSql();
 
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT m.Id, m.Text, m.LastUpdate, m.EventId, p.FirstName, p.LastName, p.NickName, e.Summary, e.StartTime', $sql);
-        $this->assertStringContainsString('From Message m', $sql);
-        $this->assertStringContainsString('JOIN Person p ON p.Id = m.PersonId', $sql);
-        $this->assertStringContainsString('JOIN Event e ON e.Id = m.EventId', $sql);
-        $this->assertStringContainsString("WHERE m.LastUpdate > :searchFrom AND m.'From' = 'User'", $sql);
-        $this->assertStringContainsString('AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = 42)', $sql);
+        $this->assertStringContainsString('SELECT m.Id, m.Text, m.LastUpdate, m.EventId,', $sql);
+        $this->assertStringContainsString('i.FirstName, i.LastName, i.NickName,', $sql);
+        $this->assertStringContainsString('e.Summary, e.StartTime', $sql);
+        $this->assertStringContainsString('FROM Message m', $sql);
+        $this->assertStringContainsString('JOIN Member     mb ON mb.Id = m.PersonId', $sql);
+        $this->assertStringContainsString('JOIN Individual i  ON i.Id  = mb.Id', $sql);
+        $this->assertStringContainsString('JOIN Event      e  ON e.Id  = m.EventId', $sql);
+        $this->assertStringContainsString('WHERE m.LastUpdate > :searchFrom', $sql);
+        $this->assertStringContainsString('AND m."From" = \'User\'', $sql);
+        $this->assertStringContainsString('AND m.EventId IN (', $sql);
+        $this->assertStringContainsString('SELECT IdEvent FROM Participant WHERE IdIndividual = :personId', $sql);
         $this->assertStringContainsString('ORDER BY m.LastUpdate DESC', $sql);
     }
 
@@ -251,7 +264,7 @@ class MessageDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('FROM Article a', $sql);
         $this->assertStringContainsString('INNER JOIN Message m ON m.ArticleId = a.Id AND m."From" = \'User\'', $sql);
         $this->assertStringContainsString('FROM `Group` g', $sql);
-        $this->assertStringContainsString('LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?', $sql);
+        $this->assertStringContainsString('LEFT JOIN MemberGroup mg ON mg.IdGroup = g.Id AND mg.IdMember = ?', $sql);
         $this->assertStringContainsString('INNER JOIN Message m ON m.GroupId = g.Id AND m."From" = \'User\'', $sql);
         $this->assertStringContainsString('AND m.LastUpdate >= ?', $sql);
         $this->assertStringContainsString('UNION ALL', $sql);
@@ -289,14 +302,15 @@ class MessageDataHelperTest extends DataHelperTestCase
         return "
             SELECT 
                 Message.*,
-                Person.FirstName,
-                Person.LastName,
-                Person.NickName,
-                Person.Avatar,
-                Person.UseGravatar,
-                Person.Email
+                Individual.FirstName,
+                Individual.LastName,
+                Individual.NickName,
+                Individual.Avatar,
+                Member.UseGravatar,
+                Individual.Email
             FROM Message
-            LEFT JOIN Person ON Message.PersonId = Person.Id
+            LEFT JOIN Member     ON Message.PersonId = Member.Id
+            LEFT JOIN Individual ON Member.Id = Individual.Id
             WHERE Message.ArticleId = :articleId
             ORDER BY Message.Id ASC
         ";
@@ -307,15 +321,16 @@ class MessageDataHelperTest extends DataHelperTestCase
         return "
             SELECT 
                 Message.*,
-                Person.FirstName,
-                Person.LastName,
-                Person.NickName,
-                Person.Avatar,
-                Person.UseGravatar,
-                Person.Email
+                Individual.FirstName,
+                Individual.LastName,
+                Individual.NickName,
+                Individual.Avatar,
+                Member.UseGravatar,
+                Individual.Email
             FROM Message
-            LEFT JOIN Person ON Message.PersonId = Person.Id
-            WHERE Message.EventId = :eventId AND Message.'From' = 'User'
+            LEFT JOIN Member     ON Message.PersonId = Member.Id
+            LEFT JOIN Individual ON Member.Id = Individual.Id
+            WHERE Message.EventId = :eventId AND Message.\"From\" = 'User'
             ORDER BY Message.Id ASC
         ";
     }
@@ -329,14 +344,15 @@ class MessageDataHelperTest extends DataHelperTestCase
                 Message.Text,
                 Message.ImagePath,
                 Message.LastUpdate,
-                Person.FirstName,
-                Person.LastName,
-                Person.NickName,
-                Person.Avatar,
-                Person.UseGravatar,
-                Person.Email
+                Individual.FirstName,
+                Individual.LastName,
+                Individual.NickName,
+                Individual.Avatar,
+                Member.UseGravatar,
+                Individual.Email
             FROM Message
-            LEFT JOIN Person ON Message.PersonId = Person.Id
+            LEFT JOIN Member     ON Message.PersonId = Member.Id
+            LEFT JOIN Individual ON Member.Id = Individual.Id
             WHERE Message.GroupId = :groupId
             ORDER BY Message.Id ASC
         ";
@@ -345,11 +361,12 @@ class MessageDataHelperTest extends DataHelperTestCase
     private function getMessagesSql(): string
     {
         return "
-            SELECT LOWER(p.Email) AS Email, COUNT(m.Id) AS MessageCount
+            SELECT LOWER(i.Email) AS Email, COUNT(m.Id) AS MessageCount
             FROM Message m
-            JOIN Person p ON p.Id = m.PersonId
+            JOIN Member     mb ON mb.Id = m.PersonId
+            JOIN Individual i  ON i.Id  = mb.Id
             WHERE m.LastUpdate BETWEEN :start AND :end
-            GROUP BY p.Email
+            GROUP BY i.Email
         ";
     }
 
@@ -389,15 +406,21 @@ class MessageDataHelperTest extends DataHelperTestCase
         ";
     }
 
-    private function getNewsSql(int $connectedPersonId): string
+    private function getNewsSql(): string
     {
         return "
-            SELECT m.Id, m.Text, m.LastUpdate, m.EventId, p.FirstName, p.LastName, p.NickName, e.Summary, e.StartTime
-            From Message m
-            JOIN Person p ON p.Id = m.PersonId
-            JOIN Event e ON e.Id = m.EventId
-            WHERE m.LastUpdate > :searchFrom AND m.'From' = 'User' 
-            AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = " . $connectedPersonId . ")
+            SELECT m.Id, m.Text, m.LastUpdate, m.EventId,
+                   i.FirstName, i.LastName, i.NickName,
+                   e.Summary, e.StartTime
+            FROM Message m
+            JOIN Member     mb ON mb.Id = m.PersonId
+            JOIN Individual i  ON i.Id  = mb.Id
+            JOIN Event      e  ON e.Id  = m.EventId
+            WHERE m.LastUpdate > :searchFrom
+              AND m.\"From\" = 'User'
+              AND m.EventId IN (
+                  SELECT IdEvent FROM Participant WHERE IdIndividual = :personId
+              )
             ORDER BY m.LastUpdate DESC
         ";
     }
@@ -425,28 +448,29 @@ class MessageDataHelperTest extends DataHelperTestCase
         INNER JOIN EventType et ON e.IdEventType = et.Id
         INNER JOIN Message m ON m.EventId = e.Id AND m.\"From\" = 'User'
         LEFT JOIN (
-            SELECT m2.EventId, p.Avatar, p.UseGravatar, p.Email
+            SELECT m2.EventId, i.Avatar, mb.UseGravatar, i.Email
             FROM Message m2
-            INNER JOIN Person p ON p.Id = m2.PersonId
-            WHERE m2.`From` = 'User'
-            AND m2.LastUpdate = (
-                SELECT MAX(m3.LastUpdate)
-                FROM Message m3
-                WHERE m3.EventId = m2.EventId
-                    AND m3.`From` = 'User'
-            )
+            INNER JOIN Member     mb ON mb.Id = m2.PersonId
+            INNER JOIN Individual i  ON i.Id  = mb.Id
+            WHERE m2.\"From\" = 'User'
+              AND m2.LastUpdate = (
+                  SELECT MAX(m3.LastUpdate)
+                  FROM Message m3
+                  WHERE m3.EventId = m2.EventId
+                    AND m3.\"From\" = 'User'
+              )
         ) lp_e ON lp_e.EventId = e.Id
         WHERE et.Inactivated = 0
-        AND (
-            et.IdGroup IS NULL 
-            OR et.IdGroup IN (
-                SELECT IdGroup 
-                FROM PersonGroup 
-                WHERE IdPerson = ?
-            )
-        )
-        $whereClause
-        GROUP BY e.Id, e.Summary, lp_e.Avatar, lp_e.UseGravatar
+          AND (
+              et.IdGroup IS NULL 
+              OR et.IdGroup IN (
+                  SELECT IdGroup 
+                  FROM MemberGroup 
+                  WHERE IdMember = ?
+              )
+          )
+          $whereClause
+        GROUP BY e.Id, e.Summary, lp_e.Avatar, lp_e.UseGravatar, lp_e.Email
         HAVING message_count > 0";
 
         $articlesQuery = "
@@ -462,29 +486,30 @@ class MessageDataHelperTest extends DataHelperTestCase
         FROM Article a
         INNER JOIN Message m ON m.ArticleId = a.Id AND m.\"From\" = 'User'
         LEFT JOIN (
-            SELECT m2.ArticleId, p.Avatar, p.UseGravatar, p.Email
+            SELECT m2.ArticleId, i.Avatar, mb.UseGravatar, i.Email
             FROM Message m2
-            INNER JOIN Person p ON p.Id = m2.PersonId
-            WHERE m2.`From` = 'User'
-            AND m2.LastUpdate = (
-                SELECT MAX(m3.LastUpdate)
-                FROM Message m3
-                WHERE m3.ArticleId = m2.ArticleId
-                    AND m3.`From` = 'User'
-            )
+            INNER JOIN Member     mb ON mb.Id = m2.PersonId
+            INNER JOIN Individual i  ON i.Id  = mb.Id
+            WHERE m2.\"From\" = 'User'
+              AND m2.LastUpdate = (
+                  SELECT MAX(m3.LastUpdate)
+                  FROM Message m3
+                  WHERE m3.ArticleId = m2.ArticleId
+                    AND m3.\"From\" = 'User'
+              )
         ) lp_a ON lp_a.ArticleId = a.Id
         WHERE a.PublishedBy IS NOT NULL
-        AND (
-            a.CreatedBy = ?
-            OR a.IdGroup IS NULL
-            OR a.IdGroup IN (
-                SELECT IdGroup 
-                FROM PersonGroup 
-                WHERE IdPerson = ?
-            )
-        )
-        $whereClause
-        GROUP BY a.Id, a.Title, lp_a.Avatar, lp_a.UseGravatar
+          AND (
+              a.CreatedBy = ?
+              OR a.IdGroup IS NULL
+              OR a.IdGroup IN (
+                  SELECT IdGroup 
+                  FROM MemberGroup 
+                  WHERE IdMember = ?
+              )
+          )
+          $whereClause
+        GROUP BY a.Id, a.Title, lp_a.Avatar, lp_a.UseGravatar, lp_a.Email
         HAVING message_count > 0";
 
         $groupsQuery = "
@@ -498,24 +523,25 @@ class MessageDataHelperTest extends DataHelperTestCase
             lp_g.UseGravatar,
             lp_g.Email
         FROM `Group` g
-        LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?
+        LEFT JOIN MemberGroup mg ON mg.IdGroup = g.Id AND mg.IdMember = ?
         INNER JOIN Message m ON m.GroupId = g.Id AND m.\"From\" = 'User'
         LEFT JOIN (
-            SELECT m2.GroupId, p.Avatar, p.UseGravatar, p.Email
+            SELECT m2.GroupId, i.Avatar, mb.UseGravatar, i.Email
             FROM Message m2
-            INNER JOIN Person p ON p.Id = m2.PersonId
-            WHERE m2.`From` = 'User'
-            AND m2.LastUpdate = (
-                SELECT MAX(m3.LastUpdate)
-                FROM Message m3
-                WHERE m3.GroupId = m2.GroupId
-                    AND m3.`From` = 'User'
-            )
+            INNER JOIN Member     mb ON mb.Id = m2.PersonId
+            INNER JOIN Individual i  ON i.Id  = mb.Id
+            WHERE m2.\"From\" = 'User'
+              AND m2.LastUpdate = (
+                  SELECT MAX(m3.LastUpdate)
+                  FROM Message m3
+                  WHERE m3.GroupId = m2.GroupId
+                    AND m3.\"From\" = 'User'
+              )
         ) lp_g ON lp_g.GroupId = g.Id
         WHERE g.Inactivated = 0
-        AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
-        $whereClause
-        GROUP BY g.Id, g.Name, lp_g.Avatar, lp_g.UseGravatar
+          AND (g.SelfRegistration = 1 OR mg.Id IS NOT NULL)
+          $whereClause
+        GROUP BY g.Id, g.Name, lp_g.Avatar, lp_g.UseGravatar, lp_g.Email
         HAVING message_count > 0";
 
         return "

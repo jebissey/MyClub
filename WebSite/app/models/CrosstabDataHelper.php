@@ -22,7 +22,7 @@ class CrosstabDataHelper extends Data
 {
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     /**
@@ -84,21 +84,21 @@ class CrosstabDataHelper extends Data
     {
         $sql = "
             SELECT 
-                p.FirstName || ' ' || p.LastName || 
+                i.FirstName || ' ' || i.LastName || 
                 CASE 
-                    WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                    WHEN i.NickName IS NOT NULL AND i.NickName != '' THEN ' (' || i.NickName || ')'
                     ELSE ''
                 END AS columnForCrosstab,
                 et.Name AS rowForCrosstab,
                 COUNT(DISTINCT e.Id) AS countForCrosstab,
                 COUNT(part.Id) AS count2ForCrosstab
-            FROM Person p
-            JOIN Event e ON p.Id = e.CreatedBy
+            FROM Individual i
+            JOIN Event e ON i.Id = e.CreatedBy
             JOIN EventType et ON e.IdEventType = et.Id
             LEFT JOIN Participant part ON part.IdEvent = e.Id
             WHERE e.LastUpdate BETWEEN :start AND :end
-            GROUP BY p.Id, et.Id
-            ORDER BY p.LastName, p.FirstName
+            GROUP BY i.Id, et.Id
+            ORDER BY i.LastName, i.FirstName
         ";
 
         /** @var array{start: string, end: string} $dateRange */

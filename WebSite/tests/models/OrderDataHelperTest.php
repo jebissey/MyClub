@@ -29,11 +29,15 @@ class OrderDataHelperTest extends DataHelperTestCase
             'IdGroup',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'Email',
             'FirstName',
             'LastName',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Member', [
+            'Id',
             'Inactivated',
         ]);
 
@@ -44,8 +48,8 @@ class OrderDataHelperTest extends DataHelperTestCase
             'LastUpdate',
         ]);
 
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
-            'IdPerson',
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
+            'IdMember',
             'IdGroup',
         ]);
     }
@@ -88,13 +92,14 @@ class OrderDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('FROM Person p', $sql);
+        $this->assertStringContainsString('FROM Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
         $this->assertStringContainsString('CROSS JOIN "Order" o', $sql);
         $this->assertStringContainsString('JOIN Article a ON o.IdArticle = a.Id', $sql);
-        $this->assertStringContainsString('LEFT JOIN OrderReply r ON r.IdOrder = o.Id AND r.IdPerson = p.Id', $sql);
-        $this->assertStringContainsString('LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id AND pg.IdGroup = a.IdGroup', $sql);
+        $this->assertStringContainsString('LEFT JOIN OrderReply r ON r.IdOrder = o.Id AND r.IdPerson = i.Id', $sql);
+        $this->assertStringContainsString('LEFT JOIN MemberGroup mg ON mg.IdMember = i.Id AND mg.IdGroup = a.IdGroup', $sql);
         $this->assertStringContainsString('a.PublishedBy IS NOT NULL', $sql);
-        $this->assertStringContainsString('p.Inactivated = 0', $sql);
+        $this->assertStringContainsString('m.Inactivated = 0', $sql);
         $this->assertStringContainsString("o.ClosingDate > date('now')", $sql);
         $this->assertStringContainsString('r.Id IS NULL', $sql);
     }
@@ -110,8 +115,8 @@ class OrderDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('FROM OrderReply r', $sql);
         $this->assertStringContainsString('JOIN "Order" o ON o.Id = r.IdOrder', $sql);
         $this->assertStringContainsString('JOIN Article a ON a.Id = o.IdArticle', $sql);
-        $this->assertStringContainsString('JOIN Person p ON p.Id = a.CreatedBy', $sql);
-        $this->assertStringContainsString('JOIN Person v ON v.Id = r.IdPerson', $sql);
+        $this->assertStringContainsString('JOIN Individual p ON p.Id = a.CreatedBy', $sql);
+        $this->assertStringContainsString('JOIN Individual v ON v.Id = r.IdPerson', $sql);
         $this->assertStringContainsString('WHERE r.LastUpdate >= :searchFrom', $sql);
         $this->assertStringContainsString('GROUP BY o.Id', $sql);
         $this->assertStringContainsString('ORDER BY LastActivity DESC', $sql);
@@ -143,28 +148,29 @@ class OrderDataHelperTest extends DataHelperTestCase
     {
         return "
         SELECT 
-            p.Id AS PersonId, 
-            p.Email, 
+            i.Id AS PersonId, 
+            i.Email, 
             a.Id AS ArticleId, 
             a.Title AS ArticleTitle, 
             o.Id AS OrderId, 
             o.Question AS OrderQuestion, 
             o.ClosingDate
-        FROM Person p
+        FROM Individual i
+        INNER JOIN Member m ON m.Id = i.Id
         CROSS JOIN \"Order\" o
         JOIN Article a ON o.IdArticle = a.Id
-        LEFT JOIN OrderReply r ON r.IdOrder = o.Id AND r.IdPerson = p.Id
-        LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id AND pg.IdGroup = a.IdGroup
+        LEFT JOIN OrderReply r ON r.IdOrder = o.Id AND r.IdPerson = i.Id
+        LEFT JOIN MemberGroup mg ON mg.IdMember = i.Id AND mg.IdGroup = a.IdGroup
         WHERE 
             a.PublishedBy IS NOT NULL
-            AND p.Inactivated = 0
+            AND m.Inactivated = 0
             AND o.ClosingDate > date('now')
             AND (
                 a.IdGroup IS NULL
-                OR pg.IdGroup IS NOT NULL 
+                OR mg.IdGroup IS NOT NULL 
             )
             AND r.Id IS NULL
-        ORDER BY o.ClosingDate, p.LastName, p.FirstName";
+        ORDER BY o.ClosingDate, i.LastName, i.FirstName";
     }
 
     private function getGetNewsSql(): string
@@ -186,8 +192,8 @@ class OrderDataHelperTest extends DataHelperTestCase
             FROM OrderReply r
             JOIN \"Order\" o ON o.Id = r.IdOrder
             JOIN Article a ON a.Id = o.IdArticle
-            JOIN Person p ON p.Id = a.CreatedBy
-            JOIN Person v ON v.Id = r.IdPerson
+            JOIN Individual p ON p.Id = a.CreatedBy
+            JOIN Individual v ON v.Id = r.IdPerson
             WHERE r.LastUpdate >= :searchFrom
             GROUP BY o.Id
             ORDER BY LastActivity DESC

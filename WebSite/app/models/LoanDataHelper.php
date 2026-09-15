@@ -12,7 +12,7 @@ class LoanDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -157,9 +157,9 @@ class LoanDataHelper extends Data
 				       rt.FirstName || ' ' || rt.LastName AS ReturnedToName
 				FROM   LoanRecord lr
 				JOIN   LoanItem   li ON li.Id = lr.ItemId
-				JOIN   Person     b  ON b.Id  = lr.BorrowerId
-				JOIN   Person     l  ON l.Id  = lr.LenderId
-				LEFT JOIN Person  rt ON rt.Id = lr.ReturnedToId";
+				JOIN   Individual b  ON b.Id  = lr.BorrowerId
+				JOIN   Individual l  ON l.Id  = lr.LenderId
+				LEFT JOIN Individual rt ON rt.Id = lr.ReturnedToId";
     }
 
     /** @return array<int, array<string, mixed>> */
@@ -347,7 +347,7 @@ class LoanDataHelper extends Data
 				       p.FirstName || ' ' || p.LastName AS UserName
 				FROM   LoanReservation res
 				JOIN   LoanItem li ON li.Id = res.ItemId
-				JOIN   Person   p  ON p.Id  = res.UserId";
+				JOIN   Individual p  ON p.Id  = res.UserId";
     }
 
     /** @return array<int, array<string, mixed>> */
@@ -523,7 +523,7 @@ class LoanDataHelper extends Data
 			        b.FirstName || ' ' || b.LastName AS BorrowerName
 			 FROM   LoanRecord lr
 			 JOIN   LoanItem li ON li.Id = lr.ItemId
-			 JOIN   Person   b  ON b.Id  = lr.BorrowerId
+			 JOIN   Individual b  ON b.Id  = lr.BorrowerId
 			 WHERE  lr.Status IN ('active','returned','overdue')
 			   AND  lr.LoanDate <= :end
 			   AND  lr.DueDate  >= :start"
@@ -564,7 +564,7 @@ class LoanDataHelper extends Data
 			        p.FirstName || ' ' || p.LastName AS UserName
 			 FROM   LoanReservation res
 			 JOIN   LoanItem li ON li.Id = res.ItemId
-			 JOIN   Person   p  ON p.Id  = res.UserId
+			 JOIN   Individual p  ON p.Id  = res.UserId
 			 WHERE  res.Status = 'active'
 			   AND  res.ReservationDate BETWEEN :start AND :end"
         );
@@ -598,8 +598,10 @@ class LoanDataHelper extends Data
     public function getAllPersons(): array
     {
         $stmt = $this->pdo->query(
-            "SELECT Id, FirstName || ' ' || LastName AS FullName
-			 FROM Person ORDER BY LastName ASC, FirstName ASC"
+            "SELECT i.Id, i.FirstName || ' ' || i.LastName AS FullName
+			 FROM Individual i
+			 INNER JOIN Member m ON m.Id = i.Id
+			 ORDER BY i.LastName ASC, i.FirstName ASC"
         );
         return $this->fetchAllOrFail($stmt);
     }

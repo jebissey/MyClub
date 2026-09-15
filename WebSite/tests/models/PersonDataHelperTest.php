@@ -12,34 +12,61 @@ class PersonDataHelperTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        // Individual (données communes)
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
+            'Type',
             'Email',
             'FirstName',
             'LastName',
             'NickName',
-            'Phone',
-            'Imported',
-            'Inactivated',
-            'Password',
-            'Preferences',
-            'Availabilities',
-            'InPresentationDirectory',
-            'ShowPhoneInPresentationDirectory',
-            'ShowEmailInPresentationDirectory',
-            'MyPublicDataInPresentationDirectory',
-            'UseGravatar',
             'Avatar',
-            'PresentationLastUpdate',
-            'LastSignIn',
-            'LastSignOut',
+            'Phone',
+            'CreatedAt',
         ]);
 
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
-            'IdPerson',
+        // Member (données spécifiques aux membres)
+        $this->assertColumnsExist($pdo, 'Member', [
+            'Id',
+            'Password',
+            'Token',
+            'TokenCreatedAt',
+            'UseGravatar',
+            'Availabilities',
+            'Preferences',
+            'Notifications',
+            'Imported',
+            'Inactivated',
+            'Presentation',
+            'PresentationLastUpdate',
+            'InPresentationDirectory',
+            'Location',
+            'LastSignIn',
+            'LastSignOut',
+            'Notepad',
+            'Alert',
+            'ShowPhoneInPresentationDirectory',
+            'ShowEmailInPresentationDirectory',
+            'MemberInfo',
+            'MyPublicDataInPresentationDirectory',
+            'LastPageView',
+        ]);
+
+        // MemberGroup (remplace PersonGroup)
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
+            'Id',
+            'IdMember',
             'IdGroup',
         ]);
 
+        // Contact (sous-type)
+        $this->assertColumnsExist($pdo, 'Contact', [
+            'Id',
+            'Token',
+            'TokenCreatedAt',
+        ]);
+
+        // Tables encore utilisées
         $this->assertColumnsExist($pdo, 'Article', [
             'Id',
             'IdGroup',
@@ -62,14 +89,6 @@ class PersonDataHelperTest extends DataHelperTestCase
             'From',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Contact', [
-            'Id',
-            'Email',
-            'NickName',
-            'Token',
-            'TokenCreatedAt',
-        ]);
-
         $this->assertColumnsExist($pdo, 'GroupAuthorization', [
             'IdGroup',
             'IdAuthorization',
@@ -90,15 +109,17 @@ class PersonDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
 
         $selectSql = $this->getSelectEmptyEmailPersonSql();
-        $insertSql = $this->getInsertEmptyPersonSql();
+        $insertIndividualSql = $this->getInsertEmptyIndividualSql();
+        $insertMemberSql = $this->getInsertEmptyMemberSql();
 
         $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($selectSql));
-        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($insertSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($insertIndividualSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($insertMemberSql));
 
-        $this->assertStringContainsString('SELECT Id FROM Person', $selectSql);
+        $this->assertStringContainsString('SELECT Id FROM Individual', $selectSql);
         $this->assertStringContainsString("Email = ''", $selectSql);
-        $this->assertStringContainsString('INSERT INTO Person', $insertSql);
-        $this->assertStringContainsString('(Email, FirstName, LastName, Imported)', $insertSql);
+        $this->assertStringContainsString('INSERT INTO Individual', $insertIndividualSql);
+        $this->assertStringContainsString('INSERT INTO Member', $insertMemberSql);
     }
 
     public function testGetAllPersonsSqlIsValidAgainstTemplateSchema(): void
@@ -109,7 +130,9 @@ class PersonDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT Id, LOWER(Email) AS EmailKey FROM Person', $sql);
+        $this->assertStringContainsString('FROM Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN Member m', $sql);
+        $this->assertStringContainsString('LOWER(i.Email) AS EmailKey', $sql);
     }
 
     public function testGetMembersAlertsSqlIsValidAgainstTemplateSchema(): void
@@ -120,11 +143,12 @@ class PersonDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('FROM Person AS p', $sql);
-        $this->assertStringContainsString('p.Inactivated = 0', $sql);
-        $this->assertStringContainsString("p.Preferences LIKE '%noAlerts%'", $sql);
-        $this->assertStringContainsString("p.Preferences LIKE '%newEvent%'", $sql);
-        $this->assertStringContainsString("p.Preferences LIKE '%newArticle%'", $sql);
+        $this->assertStringContainsString('FROM Member m', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual i', $sql);
+        $this->assertStringContainsString('m.Inactivated = 0', $sql);
+        $this->assertStringContainsString("m.Preferences LIKE '%noAlerts%'", $sql);
+        $this->assertStringContainsString("m.Preferences LIKE '%newEvent%'", $sql);
+        $this->assertStringContainsString("m.Preferences LIKE '%newArticle%'", $sql);
     }
 
     public function testGetNewsSqlIsValidAgainstTemplateSchema(): void
@@ -135,11 +159,11 @@ class PersonDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT Id, Email, FirstName, LastName, PresentationLastUpdate', $sql);
-        $this->assertStringContainsString('FROM Person', $sql);
-        $this->assertStringContainsString('InPresentationDirectory = 1', $sql);
-        $this->assertStringContainsString('PresentationLastUpdate >= :searchFrom', $sql);
-        $this->assertStringContainsString('Email != :email', $sql);
+        $this->assertStringContainsString('FROM Member m', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual i', $sql);
+        $this->assertStringContainsString('m.InPresentationDirectory = 1', $sql);
+        $this->assertStringContainsString('m.PresentationLastUpdate >= :searchFrom', $sql);
+        $this->assertStringContainsString('i.Email != :email', $sql);
     }
 
     public function testGetPersonsForCommunicationSqlIsValidAgainstTemplateSchema(): void
@@ -150,9 +174,10 @@ class PersonDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT DISTINCT p.Id, p.FirstName, p.LastName, p.Email', $sql);
-        $this->assertStringContainsString('FROM Person p', $sql);
-        $this->assertStringContainsString("p.Email != ''", $sql);
+        $this->assertStringContainsString('FROM Member m', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual i', $sql);
+        $this->assertStringContainsString("i.Email != ''", $sql);
+        $this->assertStringContainsString('m.Inactivated = 0', $sql);
     }
 
     public function testGetPersonsInGroupSqlIsValidAgainstTemplateSchema(): void
@@ -163,9 +188,10 @@ class PersonDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('Person.Id AS PersonId', $sql);
-        $this->assertStringContainsString('FROM Person', $sql);
-        $this->assertStringContainsString('Person.Inactivated = 0', $sql);
+        $this->assertStringContainsString('i.Id AS PersonId', $sql);
+        $this->assertStringContainsString('FROM Member m', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual i', $sql);
+        $this->assertStringContainsString('m.Inactivated = 0', $sql);
     }
 
     public function testGetPersonsInGroupForDirectorySqlIsValidAgainstTemplateSchema(): void
@@ -176,11 +202,12 @@ class PersonDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('FROM Person p', $sql);
-        $this->assertStringContainsString('JOIN PersonGroup pg ON p.Id = pg.IdPerson', $sql);
-        $this->assertStringContainsString('pg.IdGroup = ?', $sql);
-        $this->assertStringContainsString('p.InPresentationDirectory = 1', $sql);
-        $this->assertStringContainsString('p.Inactivated = 0', $sql);
+        $this->assertStringContainsString('FROM Member m', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN MemberGroup mg', $sql);
+        $this->assertStringContainsString('mg.IdGroup = ?', $sql);
+        $this->assertStringContainsString('m.InPresentationDirectory = 1', $sql);
+        $this->assertStringContainsString('m.Inactivated = 0', $sql);
     }
 
     public function testGetRedactorsSqlIsValidAgainstTemplateSchema(): void
@@ -191,11 +218,12 @@ class PersonDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('FROM Person', $sql);
-        $this->assertStringContainsString('INNER JOIN PersonGroup', $sql);
+        $this->assertStringContainsString('FROM Member m', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN MemberGroup mg', $sql);
         $this->assertStringContainsString('INNER JOIN GroupAuthorization', $sql);
-        $this->assertStringContainsString('GroupAuthorization.IdAuthorization = 4', $sql);
-        $this->assertStringContainsString('Person.Inactivated = 0', $sql);
+        $this->assertStringContainsString('ga.IdAuthorization = 4', $sql);
+        $this->assertStringContainsString('m.Inactivated = 0', $sql);
     }
 
     public function testGetWebmasterEmailSqlIsValidAgainstTemplateSchema(): void
@@ -206,27 +234,31 @@ class PersonDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT Email FROM Person', $sql);
-        $this->assertStringContainsString('INNER JOIN PersonGroup', $sql);
+        $this->assertStringContainsString('SELECT i.Email', $sql);
+        $this->assertStringContainsString('FROM Member m', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN MemberGroup mg', $sql);
         $this->assertStringContainsString('INNER JOIN "Group"', $sql);
         $this->assertStringContainsString('INNER JOIN GroupAuthorization', $sql);
         $this->assertStringContainsString('INNER JOIN Authorization', $sql);
-        $this->assertStringContainsString('Authorization.Name = "Webmaster"', $sql);
+        $this->assertStringContainsString('a.Name = "Webmaster"', $sql);
     }
 
     public function testImportFromCsvUpsertSqlIsValidAgainstTemplateSchema(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $sql = $this->getImportUpsertSql();
 
-        $stmt = $pdo->prepare($sql);
-        $this->assertInstanceOf(PDOStatement::class, $stmt);
+        $upsertIndividualSql = $this->getImportUpsertIndividualSql();
+        $upsertMemberSql     = $this->getImportUpsertMemberSql();
 
-        $this->assertStringContainsString('INSERT INTO Person', $sql);
-        $this->assertStringContainsString('(Email, FirstName, LastName, Phone, Imported, Inactivated)', $sql);
-        $this->assertStringContainsString('ON CONFLICT(Email) DO UPDATE SET', $sql);
-        $this->assertStringContainsString('FirstName   = excluded.FirstName', $sql);
-        $this->assertStringContainsString('Inactivated = 0', $sql);
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($upsertIndividualSql));
+        $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($upsertMemberSql));
+
+        $this->assertStringContainsString('INSERT INTO Individual', $upsertIndividualSql);
+        $this->assertStringContainsString('ON CONFLICT(Email) DO UPDATE SET', $upsertIndividualSql);
+        $this->assertStringContainsString('INSERT INTO Member', $upsertMemberSql);
+        $this->assertStringContainsString('ON CONFLICT(Id) DO UPDATE SET', $upsertMemberSql);
+        $this->assertStringContainsString('Inactivated = 0', $upsertMemberSql);
     }
 
     public function testImportDeactivateSqlIsValidAgainstTemplateSchema(): void
@@ -237,7 +269,7 @@ class PersonDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('UPDATE Person', $sql);
+        $this->assertStringContainsString('UPDATE Member', $sql);
         $this->assertStringContainsString('SET Inactivated = 1', $sql);
         $this->assertStringContainsString('WHERE Id IN (', $sql);
     }
@@ -252,193 +284,225 @@ class PersonDataHelperTest extends DataHelperTestCase
         $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($updateLastSignOutSql));
         $this->assertInstanceOf(PDOStatement::class, $pdo->prepare($updateLastSignInSql));
 
-        $this->assertStringContainsString('UPDATE Person', $updateLastSignOutSql);
+        $this->assertStringContainsString('UPDATE Member', $updateLastSignOutSql);
         $this->assertStringContainsString('SET LastSignOut = :lastActivity', $updateLastSignOutSql);
-        $this->assertStringContainsString('WHERE Email = :email COLLATE NOCASE', $updateLastSignOutSql);
+        $this->assertStringContainsString('SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE', $updateLastSignOutSql);
 
-        $this->assertStringContainsString('UPDATE Person', $updateLastSignInSql);
+        $this->assertStringContainsString('UPDATE Member', $updateLastSignInSql);
         $this->assertStringContainsString('SET LastSignIn = :now', $updateLastSignInSql);
-        $this->assertStringContainsString('WHERE Email = :email COLLATE NOCASE', $updateLastSignInSql);
+        $this->assertStringContainsString('SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE', $updateLastSignInSql);
     }
 
     // -------------------------------------------------------------------------
-    // Private SQL extractors (mirrored from PersonDataHelper)
+    // Private SQL extractors (mirrored from the new PersonDataHelper)
     // -------------------------------------------------------------------------
 
     private function getSelectEmptyEmailPersonSql(): string
     {
-        return "SELECT Id FROM Person WHERE Email = ''";
+        return "SELECT Id FROM Individual WHERE Email = '' AND Type = 'Member'";
     }
 
-    private function getInsertEmptyPersonSql(): string
+    private function getInsertEmptyIndividualSql(): string
     {
         return "
-                INSERT INTO Person (Email, FirstName, LastName, Imported) 
-                VALUES ('', '', '', 0)
-        ";
+                INSERT INTO Individual (Type, Email, FirstName, LastName)
+                VALUES ('Member', '', '', '')
+";
+    }
+
+    private function getInsertEmptyMemberSql(): string
+    {
+        return "
+                INSERT INTO Member (Id, Imported)
+                VALUES (:id, 0)
+";
     }
 
     private function getGetAllPersonsSql(): string
     {
-        return "SELECT Id, LOWER(Email) AS EmailKey FROM Person";
+        return "SELECT i.Id, LOWER(i.Email) AS EmailKey
+             FROM Individual i
+             INNER JOIN Member m ON m.Id = i.Id";
     }
 
     private function getGetMembersAlertsSql(): string
     {
         return "
             SELECT 
-                p.FirstName || ' ' || p.LastName || 
+                i.FirstName || ' ' || i.LastName || 
                 CASE 
-                    WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                    WHEN i.NickName IS NOT NULL AND i.NickName != '' THEN ' (' || i.NickName || ')'
                     ELSE ''
                 END AS clubMember,
                 CASE 
-                    WHEN p.Preferences LIKE '%noAlerts%' THEN 'X'
+                    WHEN m.Preferences LIKE '%noAlerts%' THEN 'X'
                     ELSE ''
                 END AS NoAlert,
                 CASE 
-                    WHEN p.Preferences LIKE '%newEvent%' THEN 'X'
+                    WHEN m.Preferences LIKE '%newEvent%' THEN 'X'
                     ELSE ''
                 END AS NewEvent,
                 CASE 
-                    WHEN p.Preferences LIKE '%newArticle%' THEN 'X'
+                    WHEN m.Preferences LIKE '%newArticle%' THEN 'X'
                     ELSE ''
                 END AS NewArticle
-            FROM Person AS p
-            WHERE (p.Preferences LIKE '%noAlerts%' 
-            OR p.Preferences LIKE '%newEvent%' 
-            OR p.Preferences LIKE '%newArticle%')
-            AND p.Inactivated = 0
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            WHERE (m.Preferences LIKE '%noAlerts%' 
+               OR m.Preferences LIKE '%newEvent%' 
+               OR m.Preferences LIKE '%newArticle%')
+              AND m.Inactivated = 0
             ORDER BY clubMember
-        ";
+";
     }
 
     private function getGetNewsSql(): string
     {
         return "
-            SELECT Id, Email, FirstName, LastName, PresentationLastUpdate
-            FROM Person
-            WHERE InPresentationDirectory = 1
-            AND PresentationLastUpdate >= :searchFrom
-            AND Email != :email
-            ORDER BY PresentationLastUpdate DESC
-        ";
+            SELECT i.Id, i.Email, i.FirstName, i.LastName, m.PresentationLastUpdate
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            WHERE m.InPresentationDirectory = 1
+              AND m.PresentationLastUpdate >= :searchFrom
+              AND i.Email != :email
+            ORDER BY m.PresentationLastUpdate DESC
+";
     }
 
     private function getGetPersonsForCommunicationSql(): string
     {
-        // Représentation minimale / typique (sans jointure dynamique)
         return "
-            SELECT DISTINCT p.Id, p.FirstName, p.LastName, p.Email
-            FROM Person p
-            WHERE p.Email != ''
-            AND p.Inactivated = 0
-            ORDER BY p.FirstName, p.LastName
-        ";
+            SELECT DISTINCT i.Id, i.FirstName, i.LastName, i.Email
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            WHERE i.Email != ''
+              AND m.Inactivated = 0
+            ORDER BY i.FirstName, i.LastName
+";
     }
 
     private function getGetPersonsInGroupSql(): string
     {
         return "
             SELECT
-                Person.Id AS PersonId,
-                Person.Id AS Id,
-                FirstName,
-                LastName,
-                Email,
-                Preferences,
-                Availabilities,
-                InPresentationDirectory,
-                ShowPhoneInPresentationDirectory,
-                ShowEmailInPresentationDirectory
-            FROM Person
-            WHERE Person.Inactivated = 0
-            ORDER BY FirstName, LastName
-        ";
+                i.Id AS PersonId,
+                i.Id AS Id,
+                i.FirstName,
+                i.LastName,
+                i.Email,
+                m.Preferences,
+                m.Availabilities,
+                m.InPresentationDirectory,
+                m.ShowPhoneInPresentationDirectory,
+                m.ShowEmailInPresentationDirectory
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            WHERE m.Inactivated = 0
+            ORDER BY i.FirstName, i.LastName
+";
     }
 
     private function getGetPersonsInGroupForDirectorySql(): string
     {
         return "
             SELECT DISTINCT 
-                p.Id,
-                P.UseGravatar, 
-                p.Email,
-                p.Avatar,
-                p.FirstName,
-                p.LastName,
-                p.NickName
-            FROM Person p
-            JOIN PersonGroup pg ON p.Id = pg.IdPerson
-            WHERE pg.IdGroup = ? AND p.InPresentationDirectory = 1 AND p.Inactivated = 0
-            ORDER BY p.FirstName, p.LastName
-        ";
+                i.Id,
+                m.UseGravatar, 
+                i.Email,
+                i.Avatar,
+                i.FirstName,
+                i.LastName,
+                i.NickName
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
+            WHERE mg.IdGroup = ?
+              AND m.InPresentationDirectory = 1
+              AND m.Inactivated = 0
+            ORDER BY i.FirstName, i.LastName
+";
     }
 
     private function getGetRedactorsSql(): string
     {
         return "
-            SELECT Person.Id AS PersonId, FirstName, LastName, NickName, Email
-            FROM Person
-            INNER JOIN PersonGroup        ON PersonGroup.IdPerson        = Person.Id
-            INNER JOIN GroupAuthorization ON GroupAuthorization.IdGroup = PersonGroup.IdGroup
-            WHERE Person.Inactivated = 0
-            AND GroupAuthorization.IdAuthorization = 4
-            GROUP BY Person.Id
-            ORDER BY FirstName, LastName
-        ";
+            SELECT i.Id AS PersonId, i.FirstName, i.LastName, i.NickName, i.Email
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
+            INNER JOIN GroupAuthorization ga ON ga.IdGroup = mg.IdGroup
+            WHERE m.Inactivated = 0
+              AND ga.IdAuthorization = 4
+            GROUP BY i.Id
+            ORDER BY i.FirstName, i.LastName
+";
     }
 
     private function getGetWebmasterEmailSql(): string
     {
         return '
-            SELECT Email FROM Person
-            INNER JOIN PersonGroup on Person.Id = PersonGroup.IdPerson
-            INNER JOIN "Group" on "Group".Id = PersonGroup.IdGroup
-            INNER JOIN GroupAuthorization on "Group".Id = GroupAuthorization.IdGroup
-            INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id
-            WHERE Authorization.Name = "Webmaster"
-        ';
+            SELECT i.Email
+            FROM Member m
+            INNER JOIN Individual i ON i.Id = m.Id
+            INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
+            INNER JOIN "Group" g ON g.Id = mg.IdGroup
+            INNER JOIN GroupAuthorization ga ON ga.IdGroup = g.Id
+            INNER JOIN Authorization a ON a.Id = ga.IdAuthorization
+            WHERE a.Name = "Webmaster"
+';
     }
 
-    private function getImportUpsertSql(): string
+    private function getImportUpsertIndividualSql(): string
     {
         return "
-                INSERT INTO Person (Email, FirstName, LastName, Phone, Imported, Inactivated)
-                VALUES (:email, :firstName, :lastName, :phone, 1, 0)
+                INSERT INTO Individual (Type, Email, FirstName, LastName, Phone)
+                VALUES ('Member', :email, :firstName, :lastName, :phone)
                 ON CONFLICT(Email) DO UPDATE SET
-                    FirstName   = excluded.FirstName,
-                    LastName    = excluded.LastName,
-                    Phone       = excluded.Phone,
+                    FirstName = excluded.FirstName,
+                    LastName  = excluded.LastName,
+                    Phone     = excluded.Phone
+";
+    }
+
+    private function getImportUpsertMemberSql(): string
+    {
+        return "
+                INSERT INTO Member (Id, Imported, Inactivated)
+                VALUES (:id, 1, 0)
+                ON CONFLICT(Id) DO UPDATE SET
                     Imported    = 1,
                     Inactivated = 0
-        ";
+";
     }
 
     private function getImportDeactivateSql(): string
     {
         return "
-                    UPDATE Person
+                    UPDATE Member
                     SET Inactivated = 1
                     WHERE Id IN (?,?)
-        ";
+";
     }
 
     private function getUpdateLastSignOutSql(): string
     {
         return "
-                UPDATE Person 
+                UPDATE Member
                 SET LastSignOut = :lastActivity
-                WHERE Email = :email COLLATE NOCASE
-        ";
+                WHERE Id = (
+                    SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE
+                )
+";
     }
 
     private function getUpdateLastSignInSql(): string
     {
         return "
-            UPDATE Person 
+            UPDATE Member
             SET LastSignIn = :now
-            WHERE Email = :email COLLATE NOCASE
-        ";
+            WHERE Id = (
+                SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE
+            )
+";
     }
 }

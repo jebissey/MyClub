@@ -37,17 +37,21 @@ class SurveyDataHelperTest extends DataHelperTestCase
             'LastUpdate',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'Email',
-            'Inactivated',
             'FirstName',
             'LastName',
         ]);
 
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
+        $this->assertColumnsExist($pdo, 'Member', [
             'Id',
-            'IdPerson',
+            'Inactivated',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
+            'Id',
+            'IdMember',
             'IdGroup',
         ]);
     }
@@ -98,7 +102,7 @@ class SurveyDataHelperTest extends DataHelperTestCase
             'LastUpdate',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Member', [
             'Id',
             'Inactivated',
         ]);
@@ -112,13 +116,14 @@ class SurveyDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('FROM Person p', $sql);
+        $this->assertStringContainsString('FROM Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
         $this->assertStringContainsString('CROSS JOIN Survey s', $sql);
         $this->assertStringContainsString('JOIN Article a ON s.IdArticle = a.Id', $sql);
-        $this->assertStringContainsString('LEFT JOIN Reply r ON r.IdSurvey = s.Id AND r.IdPerson = p.Id', $sql);
-        $this->assertStringContainsString('LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id AND pg.IdGroup = a.IdGroup', $sql);
+        $this->assertStringContainsString('LEFT JOIN Reply r ON r.IdSurvey = s.Id AND r.IdPerson = i.Id', $sql);
+        $this->assertStringContainsString('LEFT JOIN MemberGroup mg ON mg.IdMember = i.Id AND mg.IdGroup = a.IdGroup', $sql);
         $this->assertStringContainsString('a.PublishedBy IS NOT NULL', $sql);
-        $this->assertStringContainsString('p.Inactivated = 0', $sql);
+        $this->assertStringContainsString('m.Inactivated = 0', $sql);
         $this->assertStringContainsString("s.ClosingDate > date('now')", $sql);
         $this->assertStringContainsString('r.Id IS NULL', $sql);
     }
@@ -134,8 +139,8 @@ class SurveyDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('FROM Reply r', $sql);
         $this->assertStringContainsString('JOIN Survey s ON s.Id = r.IdSurvey', $sql);
         $this->assertStringContainsString('JOIN Article a ON a.Id = s.IdArticle', $sql);
-        $this->assertStringContainsString('JOIN Person p ON p.Id = a.CreatedBy', $sql);
-        $this->assertStringContainsString('JOIN Person v ON v.Id = r.IdPerson', $sql);
+        $this->assertStringContainsString('JOIN Individual p ON p.Id = a.CreatedBy', $sql);
+        $this->assertStringContainsString('JOIN Individual v ON v.Id = r.IdPerson', $sql);
         $this->assertStringContainsString('WHERE r.LastUpdate >= :searchFrom', $sql);
         $this->assertStringContainsString('GROUP BY s.Id', $sql);
     }
@@ -177,8 +182,9 @@ class SurveyDataHelperTest extends DataHelperTestCase
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('FROM Reply r', $sql);
-        $this->assertStringContainsString('JOIN Person p ON r.IdPerson = p.Id', $sql);
-        $this->assertStringContainsString('WHERE r.IdSurvey = :surveyId and p.Inactivated = 0', $sql);
+        $this->assertStringContainsString('JOIN Individual i ON r.IdPerson = i.Id', $sql);
+        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
+        $this->assertStringContainsString('WHERE r.IdSurvey = :surveyId and m.Inactivated = 0', $sql);
     }
 
     // -------------------------------------------------------------------------
@@ -212,8 +218,9 @@ class SurveyDataHelperTest extends DataHelperTestCase
         return "
             SELECT r.Id, r.IdPerson, r.IdSurvey, r.Answers, r.LastUpdate
             FROM Reply r
-            JOIN Person p ON r.IdPerson = p.Id
-            WHERE r.IdSurvey = :surveyId and p.Inactivated = 0
+            JOIN Individual i ON r.IdPerson = i.Id
+            INNER JOIN Member m ON m.Id = i.Id
+            WHERE r.IdSurvey = :surveyId and m.Inactivated = 0
 ";
     }
 
@@ -221,28 +228,29 @@ class SurveyDataHelperTest extends DataHelperTestCase
     {
         return "
             SELECT 
-                p.Id AS PersonId, 
-                p.Email, 
+                i.Id AS PersonId, 
+                i.Email, 
                 a.Id AS ArticleId, 
                 a.Title AS ArticleTitle, 
                 s.Id AS SurveyId, 
                 s.Question AS SurveyQuestion, 
                 s.ClosingDate
-            FROM Person p
+            FROM Individual i
+            INNER JOIN Member m ON m.Id = i.Id
             CROSS JOIN Survey s
             JOIN Article a ON s.IdArticle = a.Id
-            LEFT JOIN Reply r ON r.IdSurvey = s.Id AND r.IdPerson = p.Id
-            LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id AND pg.IdGroup = a.IdGroup
+            LEFT JOIN Reply r ON r.IdSurvey = s.Id AND r.IdPerson = i.Id
+            LEFT JOIN MemberGroup mg ON mg.IdMember = i.Id AND mg.IdGroup = a.IdGroup
             WHERE 
                 a.PublishedBy IS NOT NULL
-                AND p.Inactivated = 0
+                AND m.Inactivated = 0
                 AND s.ClosingDate > date('now')
                 AND (
                     a.IdGroup IS NULL
-                    OR pg.IdGroup IS NOT NULL 
+                    OR mg.IdGroup IS NOT NULL 
                 )
                 AND r.Id IS NULL
-            ORDER BY s.ClosingDate, p.LastName, p.FirstName";
+            ORDER BY s.ClosingDate, i.LastName, i.FirstName";
     }
 
     private function getNewsSql(): string
@@ -264,8 +272,8 @@ class SurveyDataHelperTest extends DataHelperTestCase
             FROM Reply r
             JOIN Survey s ON s.Id = r.IdSurvey
             JOIN Article a ON a.Id = s.IdArticle
-            JOIN Person p ON p.Id = a.CreatedBy
-            JOIN Person v ON v.Id = r.IdPerson
+            JOIN Individual p ON p.Id = a.CreatedBy
+            JOIN Individual v ON v.Id = r.IdPerson
             WHERE r.LastUpdate >= :searchFrom
             GROUP BY s.Id
             ORDER BY LastActivity DESC

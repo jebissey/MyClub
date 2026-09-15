@@ -13,7 +13,7 @@ class ArwardsDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     /**
@@ -31,7 +31,7 @@ class ArwardsDataHelper extends Data
                 c.Name as CounterName, 
                 SUM(c.Value) as CounterValue, 
                 (SELECT SUM(Value) FROM Counter WHERE IdPerson = p.Id) as Total
-            FROM Person p
+            FROM Individual p
             LEFT JOIN Counter c ON p.Id = c.IdPerson
             GROUP BY p.Id, p.FirstName, p.LastName, p.NickName, c.Name
             HAVING Total > 0

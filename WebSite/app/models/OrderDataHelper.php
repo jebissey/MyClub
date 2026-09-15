@@ -34,19 +34,22 @@ use app\modules\Article\valueObjects\OrderWithCreatorRow;
  */
 class OrderDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application, private ArticleDataHelper $articleDataHelper)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        private ArticleDataHelper $articleDataHelper,
+        private authorizationDataHelper $authorizationDataHelper
+    ) {
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     public function articleHasOrderNotClosed(int $articleId): object|bool
     {
         $sql = "
-            SELECT Order.*
-            FROM Order
-            JOIN Article ON Order.IdArticle = Article.Id
-            WHERE Order.IdArticle = :articleId
-            AND Order.ClosingDate >= datetime('now')
+            SELECT \"Order\".*
+            FROM \"Order\"
+            JOIN Article ON \"Order\".IdArticle = Article.Id
+            WHERE \"Order\".IdArticle = :articleId
+            AND \"Order\".ClosingDate >= datetime('now')
             LIMIT 1
         ";
         $stmt = $this->pdo->prepare($sql);
@@ -85,28 +88,29 @@ class OrderDataHelper extends Data implements NewsProviderInterface
     {
         $query = "
         SELECT 
-            p.Id AS PersonId, 
-            p.Email, 
+            i.Id AS PersonId, 
+            i.Email, 
             a.Id AS ArticleId, 
             a.Title AS ArticleTitle, 
             o.Id AS OrderId, 
             o.Question AS OrderQuestion, 
             o.ClosingDate
-        FROM Person p
-        CROSS JOIN Order o
+        FROM Individual i
+        INNER JOIN Member m ON m.Id = i.Id
+        CROSS JOIN \"Order\" o
         JOIN Article a ON o.IdArticle = a.Id
-        LEFT JOIN OrderReply r ON r.IdOrder = o.Id AND r.IdPerson = p.Id
-        LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id AND pg.IdGroup = a.IdGroup
+        LEFT JOIN OrderReply r ON r.IdOrder = o.Id AND r.IdPerson = i.Id
+        LEFT JOIN MemberGroup mg ON mg.IdMember = i.Id AND mg.IdGroup = a.IdGroup
         WHERE 
             a.PublishedBy IS NOT NULL
-            AND p.Inactivated = 0
+            AND m.Inactivated = 0
             AND o.ClosingDate > date('now')
             AND (
                 a.IdGroup IS NULL
-                OR pg.IdGroup IS NOT NULL 
+                OR mg.IdGroup IS NOT NULL 
             )
             AND r.Id IS NULL
-        ORDER BY o.ClosingDate, p.LastName, p.FirstName";
+        ORDER BY o.ClosingDate, i.LastName, i.FirstName";
         $stmt = $this->pdo->query($query);
         if ($stmt === false) {
             throw new QueryException("Failed to execute query in getPendingOrderResponses");
@@ -140,10 +144,10 @@ class OrderDataHelper extends Data implements NewsProviderInterface
                     ', '
                 ) AS Orderers
             FROM OrderReply r
-            JOIN Order o ON o.Id = r.IdOrder
+            JOIN \"Order\" o ON o.Id = r.IdOrder
             JOIN Article a ON a.Id = o.IdArticle
-            JOIN Person p ON p.Id = a.CreatedBy
-            JOIN Person v ON v.Id = r.IdPerson
+            JOIN Individual p ON p.Id = a.CreatedBy
+            JOIN Individual v ON v.Id = r.IdPerson
             WHERE r.LastUpdate >= :searchFrom
             GROUP BY o.Id
             ORDER BY LastActivity DESC
@@ -153,15 +157,14 @@ class OrderDataHelper extends Data implements NewsProviderInterface
         /** @var array<int, object{FirstName: string, LastName: string, Question: string, ClosingDate: string, Visibility: mixed, IdArticle: int, LastActivity: string, Orderers: string}> $orders */
         $orders = $stmt->fetchAll(PDO::FETCH_OBJ);
         $news = [];
-        $authorizationDataHelper = new AuthorizationDataHelper($this->application);
         foreach ($orders as $order) {
             $articleRow = $this->articleDataHelper->getWithAuthor($order->IdArticle);
             if ($articleRow === false) {
                 continue;
             }
             if (
-                $authorizationDataHelper->getArticle($order->IdArticle, $connectedUser)
-                && $authorizationDataHelper->canPersonReadOrderResults(
+                $this->authorizationDataHelper->getArticle($order->IdArticle, $connectedUser)
+                && $this->authorizationDataHelper->canPersonReadOrderResults(
                     ArticleAuthorizationRow::fromArticleRow($articleRow),
                     $connectedUser
                 )

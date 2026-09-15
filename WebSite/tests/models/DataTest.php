@@ -15,10 +15,10 @@ class DataTest extends DataHelperTestCase
 {
     private function makeDataHelper(PDO $pdo): DataHelper
     {
-        /** @var DataHelper $helper */
-        $helper = $this->makeHelper(DataHelper::class, $pdo);
-
-        return $helper;
+        return new DataHelper(
+            $pdo,
+            $this->createStub(ErrorManager::class)
+        );
     }
 
     /**
@@ -50,10 +50,10 @@ class DataTest extends DataHelperTestCase
     public function testGetReturnsMatchingRow(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Jean', 'Dupont', 'jean.dupont@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Jean', 'Dupont', 'jean.dupont@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $record = $helper->get('Person', ['LastName' => 'Dupont']);
+        $record = $helper->get('Individual', ['LastName' => 'Dupont']);
 
         $this->assertIsObject($record);
         $this->assertSame('Jean', $record->FirstName);
@@ -64,16 +64,16 @@ class DataTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDataHelper($pdo);
 
-        $this->assertFalse($helper->get('Person', ['LastName' => 'NoSuchLastName']));
+        $this->assertFalse($helper->get('Individual', ['LastName' => 'NoSuchLastName']));
     }
 
     public function testGetEmailWhereIsCaseInsensitive(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('John', 'Doe', 'John.Doe@Example.com')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'John', 'Doe', 'John.Doe@Example.com')");
         $helper = $this->makeDataHelper($pdo);
 
-        $record = $helper->get('Person', ['Email' => 'john.doe@example.com']);
+        $record = $helper->get('Individual', ['Email' => 'john.doe@example.com']);
 
         $this->assertIsObject($record);
         $this->assertSame('John', $record->FirstName);
@@ -86,11 +86,11 @@ class DataTest extends DataHelperTestCase
     public function testGetsReturnsAllRowsMatchingWhere(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('A', 'SameLastName', 'a@test.local')");
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('B', 'SameLastName', 'b@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'A', 'SameLastName', 'a@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'B', 'SameLastName', 'b@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $rows = $helper->gets('Person', ['LastName' => 'SameLastName']);
+        $rows = $helper->gets('Individual', ['LastName' => 'SameLastName']);
 
         $this->assertCount(2, $rows);
     }
@@ -98,13 +98,13 @@ class DataTest extends DataHelperTestCase
     public function testGetsAppliesOrderBy(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('X', 'Zed', 'x@test.local')");
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Y', 'Abel', 'y@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'X', 'Zed', 'x@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Y', 'Abel', 'y@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
         // ORDER BY doit produire un résultat trié sur l'ensemble des lignes,
         // quel que soit le contenu déjà présent dans le template.
-        $rows = $helper->gets('Person', [], 'LastName', 'LastName');
+        $rows = $helper->gets('Individual', [], 'LastName', 'LastName');
 
         $lastNames = array_column($rows, 'LastName');
         $sorted = $lastNames;
@@ -115,11 +115,11 @@ class DataTest extends DataHelperTestCase
     public function testGetsWithKeyPairReturnsArrayKeyedByFirstField(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Kim', 'Keyed', 'kim@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Kim', 'Keyed', 'kim@test.local')");
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDataHelper($pdo);
 
-        $rows = $helper->gets('Person', ['LastName' => 'Keyed'], 'Id, FirstName', '', true);
+        $rows = $helper->gets('Individual', ['LastName' => 'Keyed'], 'Id, FirstName', '', true);
 
         $this->assertArrayHasKey($id, $rows);
         $this->assertSame('Kim', $rows[$id]->FirstName);
@@ -131,7 +131,7 @@ class DataTest extends DataHelperTestCase
         $helper = $this->makeDataHelper($pdo);
 
         $this->expectException(InvalidArgumentException::class);
-        $helper->gets('Person', [], '*', '', true);
+        $helper->gets('Individual', [], '*', '', true);
     }
 
     // -------------------------------------------------------------------------
@@ -143,14 +143,15 @@ class DataTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDataHelper($pdo);
 
-        $newId = $helper->set('Person', [
+        $newId = $helper->set('Individual', [
+            'Type'      => 'Member',
             'FirstName' => 'Ines',
             'LastName'  => 'Inserted',
             'Email'     => 'ines.inserted@test.local',
         ]);
 
         $this->assertIsInt($newId);
-        $stmt = $pdo->prepare('SELECT FirstName FROM Person WHERE Id = :id');
+        $stmt = $pdo->prepare('SELECT FirstName FROM Individual WHERE Id = :id');
         $stmt->execute([':id' => $newId]);
         $this->assertSame('Ines', $stmt->fetchColumn());
     }
@@ -158,14 +159,14 @@ class DataTest extends DataHelperTestCase
     public function testSetWithWhereUpdatesExistingRow(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Old', 'Name', 'old.name@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Old', 'Name', 'old.name@test.local')");
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDataHelper($pdo);
 
-        $result = $helper->set('Person', ['FirstName' => 'New'], ['Id' => $id]);
+        $result = $helper->set('Individual', ['FirstName' => 'New'], ['Id' => $id]);
 
         $this->assertNotFalse($result);
-        $stmt = $pdo->prepare('SELECT FirstName FROM Person WHERE Id = :id');
+        $stmt = $pdo->prepare('SELECT FirstName FROM Individual WHERE Id = :id');
         $stmt->execute([':id' => $id]);
         $this->assertSame('New', $stmt->fetchColumn());
     }
@@ -177,11 +178,11 @@ class DataTest extends DataHelperTestCase
     public function testLastReturnsMostRecentlyInsertedMatchingRow(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('First', 'Chrono', 'first.chrono@test.local')");
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Second', 'Chrono', 'second.chrono@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'First', 'Chrono', 'first.chrono@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Second', 'Chrono', 'second.chrono@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $record = $helper->last('Person', ['LastName' => 'Chrono']);
+        $record = $helper->last('Individual', ['LastName' => 'Chrono']);
 
         $this->assertIsObject($record);
         $this->assertSame('Second', $record->FirstName);
@@ -194,14 +195,14 @@ class DataTest extends DataHelperTestCase
     public function testDeleteWithWhereRemovesMatchingRowsAndReturnsCount(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('ToDelete', 'A', 'todelete.a@test.local')");
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('ToDelete', 'B', 'todelete.b@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'ToDelete', 'A', 'todelete.a@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'ToDelete', 'B', 'todelete.b@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $deleted = $helper->delete('Person', ['FirstName' => 'ToDelete']);
+        $deleted = $helper->delete('Individual', ['FirstName' => 'ToDelete']);
 
         $this->assertSame(2, $deleted);
-        $stmt = $pdo->query("SELECT COUNT(*) FROM Person WHERE FirstName = 'ToDelete'");
+        $stmt = $pdo->query("SELECT COUNT(*) FROM Individual WHERE FirstName = 'ToDelete'");
         $this->assertSame(0, (int) $stmt->fetchColumn());
     }
 
@@ -216,7 +217,7 @@ class DataTest extends DataHelperTestCase
         $helper = $this->makeDataHelperWithStubbedErrorManager($pdo);
 
         $this->expectException(PDOException::class);
-        $helper->delete('Person', []);
+        $helper->delete('Individual', []);
     }
 
     public function testGetWithUnknownWhereColumnThrowsAndReportsPDOException(): void
@@ -225,7 +226,7 @@ class DataTest extends DataHelperTestCase
         $helper = $this->makeDataHelperWithStubbedErrorManager($pdo);
 
         $this->expectException(PDOException::class);
-        $helper->get('Person', ['ThisColumnDoesNotExist' => 'x']);
+        $helper->get('Individual', ['ThisColumnDoesNotExist' => 'x']);
     }
 
     // -------------------------------------------------------------------------
@@ -235,10 +236,10 @@ class DataTest extends DataHelperTestCase
     public function testQueryExecutesRawSelectAndReturnsObjects(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Raw', 'Query', 'raw.query@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Raw', 'Query', 'raw.query@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $result = $helper->query('SELECT FirstName FROM Person WHERE LastName = ?', ['Query']);
+        $result = $helper->query('SELECT FirstName FROM Individual WHERE LastName = ?', ['Query']);
 
         $this->assertIsArray($result);
         $this->assertSame('Raw', $result[0]->FirstName);
@@ -320,6 +321,6 @@ class DataTest extends DataHelperTestCase
 
         $tables = $helper->getTables();
 
-        $this->assertContains('Person', $tables);
+        $this->assertContains('Individual', $tables);
     }
 }

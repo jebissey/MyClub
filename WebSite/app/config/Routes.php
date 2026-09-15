@@ -135,7 +135,7 @@ use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Common\valueObjects\Route;
 
-class Routes
+final class Routes
 {
     /**
      * @var array<int, Route>
@@ -152,7 +152,11 @@ class Routes
     public function __construct(private Application $application, private Engine $flight)
     {
         $this->quotaTracker = new JsonEmailQuotaTracker(dirname(__DIR__, 2) . '/data/email_quota.json');
-        $this->dataHelper = new DataHelper($application);
+        $this->dataHelper = new DataHelper(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
 
         $dataHelpers = $this->buildDataHelpers();
         $services = $this->buildServices($dataHelpers);
@@ -531,9 +535,9 @@ class Routes
             'logDataHelper' => new LogDataHelper($this->application, $this->dataHelper),
             'messageDataHelper' => new MessageDataHelper($this->application, new LanguagesDataHelper($this->application)),
             'needDataHelper' => new NeedDataHelper($this->application),
-            'orderDataHelper' => new OrderDataHelper($this->application, $articleDataHelper),
+            'orderDataHelper' => new OrderDataHelper($this->application, $articleDataHelper, $authorizationDataHelper),
             'participantDataHelper' => new ParticipantDataHelper($this->application),
-            'surveyDataHelper' => new SurveyDataHelper($this->application),
+            'surveyDataHelper' => new SurveyDataHelper($this->application, $authorizationDataHelper),
             'sharedFileDataHelper' => new SharedFileDataHelper($this->application),
             'loanDataHelper' => new LoanDataHelper($this->application),
             'languagesDataHelper' => new LanguagesDataHelper($this->application),
@@ -587,7 +591,7 @@ class Routes
             $dataHelpers['surveyDataHelper'],
         ];
 
-        $authenticationService = new AuthenticationService($this->dataHelper, $emailService);
+        $authenticationService = new AuthenticationService($this->dataHelper, Application::$root);
         $this->application->setAuthenticationService($authenticationService);
 
         $notificationSender = new NotificationSender($this->dataHelper, CredentialService::getInstance());

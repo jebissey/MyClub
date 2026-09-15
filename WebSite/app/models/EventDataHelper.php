@@ -42,11 +42,13 @@ class EventDataHelper extends Data implements NewsProviderInterface
 {
     private PersonPreferences $personPreferences;
 
+
     public function __construct(Application $application, DataHelper $dataHelper)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
         $this->personPreferences = new PersonPreferences($dataHelper);
     }
+
 
     /** @return array<int, mixed> */
     public function removeParticipant(int $id, int $personId): array
@@ -75,6 +77,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+
     public function duplicate(int $id, int $personId, Period $mode): ApiResponse
     {
         try {
@@ -99,21 +102,21 @@ class EventDataHelper extends Data implements NewsProviderInterface
 
             $newStartTime = $this->calculateNewStartTime($eventRow->StartTime, $mode);
             $newEvent = [
-                'Summary' => $eventRow->Summary,
-                'Description' => $eventRow->Description,
-                'Location' => $eventRow->Location,
-                'StartTime' => $newStartTime,
-                'Duration' => $eventRow->Duration,
-                'IdEventType' => $eventRow->IdEventType,
-                'CreatedBy' => $personId,
+                'Summary'         => $eventRow->Summary,
+                'Description'     => $eventRow->Description,
+                'Location'        => $eventRow->Location,
+                'StartTime'       => $newStartTime,
+                'Duration'        => $eventRow->Duration,
+                'IdEventType'     => $eventRow->IdEventType,
+                'CreatedBy'       => $personId,
                 'MaxParticipants' => $eventRow->MaxParticipants,
-                'Audience' => $eventRow->Audience
+                'Audience'        => $eventRow->Audience
             ];
             $newEventId = $this->set('Event', $newEvent);
             $attributes = $this->gets('EventAttribute', ['IdEvent' => $id]);
             foreach ($attributes as $attr) {
                 $this->set('EventAttribute', [
-                    'IdEvent' => $newEventId,
+                    'IdEvent'     => $newEventId,
                     'IdAttribute' => $attr->IdAttribute,
                 ]);
             }
@@ -125,6 +128,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+
     public function eventExists(int $eventId): bool
     {
         $sql = "SELECT Id FROM Event WHERE Id = :eventId";
@@ -132,6 +136,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $stmt->execute([':eventId' => $eventId]);
         return $stmt->fetch(PDO::FETCH_OBJ) !== false;
     }
+
 
     /** @return array<int, stdClass> */
     public function getAttributesForNextWeekEvents(): array
@@ -148,8 +153,8 @@ class EventDataHelper extends Data implements NewsProviderInterface
             LEFT JOIN EventAttribute ea ON e.Id = ea.IdEvent
             LEFT JOIN Attribute a ON ea.IdAttribute = a.Id
             WHERE datetime(e.StartTime) >= :startOfWeek
-            AND datetime(e.StartTime) < :endOfWeek
-            AND a.Id IS NOT NULL
+              AND datetime(e.StartTime) < :endOfWeek
+              AND a.Id IS NOT NULL
             ORDER BY e.StartTime, a.Id;
         ";
         $stmt = $this->pdo->prepare($sql);
@@ -160,6 +165,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+
     /** @return array<int, stdClass> */
     public function getEventsForDay(string $date, string $userEmail): array
     {
@@ -167,18 +173,29 @@ class EventDataHelper extends Data implements NewsProviderInterface
             SELECT DISTINCT e.*, et.Name as EventTypeName
             FROM Event e
             JOIN EventType et ON e.IdEventType = et.Id
-            LEFT JOIN Person p ON p.Email = :userEmail
-            LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id
+            LEFT JOIN Individual i ON i.Email COLLATE NOCASE = :userEmail
+            LEFT JOIN Member m ON m.Id = i.Id
+            LEFT JOIN MemberGroup mg ON mg.IdMember = m.Id
             WHERE DATE(e.StartTime) = :date
-            AND (  et.IdGroup IN (SELECT pg.IdGroup FROM PersonGroup pg WHERE pg.IdPerson = ? AND pg.IdGroup = et.IdGroup)
-                OR et.IdGroup is NULL)
-            ORDER BY e.StartTime");
+              AND (
+                  et.IdGroup IS NULL
+                  OR et.IdGroup IN (
+                      SELECT mg2.IdGroup
+                      FROM MemberGroup mg2
+                      INNER JOIN Member m2 ON m2.Id = mg2.IdMember
+                      INNER JOIN Individual i2 ON i2.Id = m2.Id
+                      WHERE i2.Email COLLATE NOCASE = :userEmail
+                  )
+              )
+            ORDER BY e.StartTime
+        ");
         $query->execute([
-            'date' => $date,
-            'userEmail' => $userEmail
+            ':date'      => $date,
+            ':userEmail' => $userEmail,
         ]);
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
+
 
     public function getEvent(int $eventId): EventDetailRow
     {
@@ -205,6 +222,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
+
     /** @return array<int, stdClass> */
     public function getEventAttributes(int $eventId): array
     {
@@ -227,14 +245,15 @@ class EventDataHelper extends Data implements NewsProviderInterface
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
 
+
     public function getEventExternal(int $eventId): ?EventExternalRow
     {
         $sql = "
             SELECT Id, Summary, Description, Location, StartTime, Audience
             FROM Event
             WHERE Id = :eventId
-            AND (Audience = 'All' OR Audience = 'Guest')
-            AND StartTime > :today
+              AND (Audience = 'All' OR Audience = 'Guest')
+              AND StartTime > :today
             LIMIT 1
         ";
         $stmt = $this->pdo->prepare($sql);
@@ -250,6 +269,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return EventExternalRow::fromStdClass($result);
     }
 
+
     /** @return array<int, stdClass> */
     public function getEventsForAllOrGuest(): array
     {
@@ -259,20 +279,22 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 e.Summary, 
                 e.StartTime,
                 CASE 
-                    WHEN p.NickName != '' 
-                    THEN p.FirstName || ' ' || p.LastName || ' (' || p.NickName || ')' 
-                    ELSE p.FirstName || ' ' || p.LastName 
+                    WHEN i.NickName != '' AND i.NickName IS NOT NULL
+                    THEN i.FirstName || ' ' || i.LastName || ' (' || i.NickName || ')' 
+                    ELSE i.FirstName || ' ' || i.LastName 
                 END AS PersonName
             FROM Event e
-            INNER JOIN Person p ON p.Id = e.CreatedBy
+            INNER JOIN Member     mb ON mb.Id = e.CreatedBy
+            INNER JOIN Individual i  ON i.Id  = mb.Id
             WHERE e.StartTime > :today
-            AND (e.Audience = 'All' OR e.Audience = 'Guest')
+              AND (e.Audience = 'All' OR e.Audience = 'Guest')
             ORDER BY e.StartTime ASC
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':today' => (new DateTime())->format('Y-m-d\TH:i:s')]);
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
+
 
     public function getEventGroup(int $eventId): ?int
     {
@@ -295,6 +317,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
+
 
     /** @return array<int, stdClass> */
     public function getEventNeeds(int $eventId): array
@@ -328,6 +351,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+
     /** @return array<int, array<string, mixed>> */
     public function getEvents(?Person $person, string $mode, int $offset, bool $filterByPreferences = false): array
     {
@@ -339,6 +363,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             Application::unreachable("Invalide mode ({$mode})", __FILE__, __LINE__);
         }
     }
+
 
     /** @return array<string, WeekData> */
     public function getNextWeekEvents(): array
@@ -367,8 +392,8 @@ class EventDataHelper extends Data implements NewsProviderInterface
             LEFT JOIN Attribute a ON ea.IdAttribute = a.Id
             LEFT JOIN \"Group\" g ON et.IdGroup = g.Id
             WHERE datetime(replace(e.StartTime, 'T', ' ')) >= :start
-            AND datetime(replace(e.StartTime, 'T', ' ')) < :end
-            AND et.Inactivated = 0
+              AND datetime(replace(e.StartTime, 'T', ' ')) < :end
+              AND et.Inactivated = 0
             GROUP BY e.Id
             ORDER BY datetime(replace(e.StartTime, 'T', ' '))
         ";
@@ -380,11 +405,11 @@ class EventDataHelper extends Data implements NewsProviderInterface
         ]);
         $events = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        $weeklyEvents = []; // ← déclaration explicite avant la boucle
+        $weeklyEvents = [];
 
         for ($weekOffset = 0; $weekOffset < 3; $weekOffset++) {
             $weekStart = clone $startOfCurrentWeek;
-            $weekStart->modify('+' . ($weekOffset * 7) . ' days'); // plus lisible que DateInterval
+            $weekStart->modify('+' . ($weekOffset * 7) . ' days');
             $weekEnd = clone $weekStart;
             $weekEnd->modify('+6 days');
             $weekKey = $weekStart->format('Y-W');
@@ -413,6 +438,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $weeklyEvents;
     }
 
+
     /** @return array<int, array{type: string, id: int, title: string, date: string, url: string}> */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
@@ -424,14 +450,14 @@ class EventDataHelper extends Data implements NewsProviderInterface
             SELECT e.Id, e.Summary, e.LastUpdate
             FROM Event e
             JOIN EventType et ON e.IdEventType = et.Id
-            LEFT JOIN PersonGroup pg 
-                ON et.IdGroup = pg.IdGroup 
-                AND pg.IdPerson = :personId
+            LEFT JOIN MemberGroup mg 
+                ON et.IdGroup = mg.IdGroup 
+               AND mg.IdMember = :personId
             WHERE e.LastUpdate >= :searchFrom
-            AND (
-                et.IdGroup IS NULL
-                OR pg.IdPerson IS NOT NULL
-            )
+              AND (
+                  et.IdGroup IS NULL
+                  OR mg.IdMember IS NOT NULL
+              )
             ORDER BY e.LastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
@@ -442,39 +468,41 @@ class EventDataHelper extends Data implements NewsProviderInterface
         $events = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($events as $event) {
             $news[] = [
-                'type' => 'event',
-                'id' => $event->Id,
+                'type'  => 'event',
+                'id'    => $event->Id,
                 'title' => $event->Summary,
-                'date' => $event->LastUpdate,
-                'url' => '/event/' . $event->Id
+                'date'  => $event->LastUpdate,
+                'url'   => '/event/' . $event->Id
             ];
         }
         return $news;
     }
+
 
     /** @return array<int, stdClass> */
     public function getParticipantSupplies(int $eventId): array
     {
         $sql = "
             SELECT 
-                p.FirstName,
-                p.LastName,
-                p.NickName,
+                i.FirstName,
+                i.LastName,
+                i.NickName,
                 n.Label AS NeedLabel,
                 n.Name AS NeedName,
                 ps.Supply
             FROM ParticipantSupply ps
             INNER JOIN Participant part ON ps.IdParticipant = part.Id
-            INNER JOIN Person p ON part.IdPerson = p.Id
+            INNER JOIN Individual i ON part.IdIndividual = i.Id
             INNER JOIN Need n ON ps.IdNeed = n.Id
             INNER JOIN EventNeed en ON ps.IdNeed = en.IdNeed AND en.IdEvent = part.IdEvent
             WHERE part.IdEvent = :eventId AND ps.Supply > 0
-            ORDER BY p.FirstName, p.LastName, n.Label
+            ORDER BY i.FirstName, i.LastName, n.Label
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
+
 
     /** @return array<int, stdClass> */
     public function getUserSupplies(int $eventId, string $userEmail): array
@@ -483,10 +511,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
             SELECT ps.Id, ps.IdNeed, ps.Supply, n.Label, n.Name
             FROM ParticipantSupply ps
             INNER JOIN Participant part ON ps.IdParticipant = part.Id
-            INNER JOIN Person p ON part.IdPerson = p.Id
+            INNER JOIN Individual i ON part.IdIndividual = i.Id
             INNER JOIN Need n ON ps.IdNeed = n.Id
             WHERE part.IdEvent = :eventId
-            AND p.Email COLLATE NOCASE = :userEmail
+              AND i.Email COLLATE NOCASE = :userEmail
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
@@ -496,20 +524,21 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+
     public function isUserRegistered(int $eventId, string $userEmail): bool
     {
         if ($this->eventExists($eventId)) {
             $sql = "
-                SELECT pe.Email
+                SELECT i.Email
                 FROM Participant pa
-                JOIN Person pe ON pa.IdPerson = pe.Id
+                JOIN Individual i ON pa.IdIndividual = i.Id
                 WHERE pa.IdEvent = :eventId
-                AND pe.Email = :userEmail COLLATE NOCASE
+                  AND i.Email = :userEmail COLLATE NOCASE
                 LIMIT 1
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
-                ':eventId' => $eventId,
+                ':eventId'   => $eventId,
                 ':userEmail' => $userEmail
             ]);
             $result = $stmt->fetch(PDO::FETCH_OBJ);
@@ -517,6 +546,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
+
 
     /** @param array<string, mixed> $data */
     public function update(array $data, int $personId): void
@@ -561,14 +591,15 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+
     public function updateUserSupply(int $eventId, string $userEmail, int $needId, int $supply): bool
     {
         try {
             $participant = $this->fluent->from('Participant part')
                 ->select('part.Id')
-                ->innerJoin('Person p ON part.IdPerson = p.Id')
+                ->innerJoin('Individual i ON part.IdIndividual = i.Id')
                 ->where('part.IdEvent', $eventId)
-                ->where('p.Email COLLATE NOCASE', $userEmail)
+                ->where('i.Email COLLATE NOCASE', $userEmail)
                 ->fetch();
             if (!$participant) {
                 return false;
@@ -607,6 +638,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+
     #region Private functions
     private function calculateNewStartTime(string|DateTimeImmutable $originalStartTime, Period $mode): string
     {
@@ -618,6 +650,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
         return $mode->next($from)->format('Y-m-d H:i:s');
     }
+
 
     /**
      * @param array<int, stdClass> $events
@@ -647,38 +680,39 @@ class EventDataHelper extends Data implements NewsProviderInterface
 
             foreach ($rows as $row) {
                 $attributes[$row->IdEvent][] = [
-                    'id' => $row->Id,
-                    'name' => $row->Name,
+                    'id'     => $row->Id,
+                    'name'   => $row->Name,
                     'detail' => $row->Detail,
-                    'color' => $row->Color
+                    'color'  => $row->Color
                 ];
             }
         }
         return array_map(function ($event) use ($attributes) {
             return [
-                'id' => $event->Id,
-                'idEventType' => $event->IdEventType,
-                'eventTypeName' => $event->EventTypeName,
-                'groupName' => $event->EventTypeIdGroup ? $this->fluent->from("'Group'")->where(
+                'id'              => $event->Id,
+                'idEventType'     => $event->IdEventType,
+                'eventTypeName'   => $event->EventTypeName,
+                'groupName'       => $event->EventTypeIdGroup ? $this->fluent->from("'Group'")->where(
                     'Id',
                     $event->EventTypeIdGroup
                 )->fetch('Name') : '',
-                'summary' => $event->Summary,
-                'location' => $event->Location,
-                'startTime' => $event->StartTime,
-                'duration' => TranslationManager::getReadableDuration($event->Duration),
-                'attributes' => $attributes[$event->Id] ?? [],
-                'participants' => $this->fluent->from('Participant')->where('IdEvent', $event->Id)->count(),
+                'summary'         => $event->Summary,
+                'location'        => $event->Location,
+                'startTime'       => $event->StartTime,
+                'duration'        => TranslationManager::getReadableDuration($event->Duration),
+                'attributes'      => $attributes[$event->Id] ?? [],
+                'participants'    => $this->fluent->from('Participant')->where('IdEvent', $event->Id)->count(),
                 'maxParticipants' => $event->MaxParticipants,
-                'booked' => $event->Booked,
-                'audience' => $event->Audience,
-                'createdBy' => $event->CreatedBy,
-                'messages' => $event->MessageCount,
-                'webappMessages' => $this->getEventMessagesCount($event->Id, 'Webapp'),
-                'canceled' => $event->Canceled,
+                'booked'          => $event->Booked,
+                'audience'        => $event->Audience,
+                'createdBy'       => $event->CreatedBy,
+                'messages'        => $event->MessageCount,
+                'webappMessages'  => $this->getEventMessagesCount($event->Id, 'Webapp'),
+                'canceled'        => $event->Canceled,
             ];
         }, $events);
     }
+
 
     private function getEventMessagesCount(int $eventId, string $from): int|false
     {
@@ -692,10 +726,11 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $result === false ? false : (int)$result;
     }
 
+
     /** @return array<int, array<string, mixed>> */
     private function getNextEvents(?Person $person, bool $filterByPreferences = false): array
     {
-        $params = [':personId' => $person->Id ?? 0,];
+        $params = [':personId' => $person->Id ?? 0];
         $sql = "
             SELECT 
                 e.*,
@@ -707,22 +742,22 @@ class EventDataHelper extends Data implements NewsProviderInterface
             LEFT JOIN EventType et ON e.IdEventType = et.Id
             LEFT JOIN Participant p 
                 ON e.Id = p.IdEvent 
-            AND p.IdPerson = :personId
+               AND p.IdIndividual = :personId
             LEFT JOIN Message m 
                 ON m.EventId = e.Id 
-            AND m.\"From\" = 'User'
+               AND m.\"From\" = 'User'
             WHERE datetime(replace(e.StartTime, 'T', ' ')) > DATETIME('now')
-            AND et.Inactivated = 0
+              AND et.Inactivated = 0
         ";
         if ($person === null) {
             $sql .= " AND e.Audience = :audience AND et.IdGroup IS NULL";
             $params[':audience'] = EventAudience::ForAll->value;
         } else {
             $sql .= " AND (et.IdGroup IS NULL OR et.IdGroup IN (
-                        SELECT IdGroup 
-                        FROM PersonGroup 
-                        WHERE IdPerson = :personId
-                     ))";
+                SELECT IdGroup 
+                FROM MemberGroup 
+                WHERE IdMember = :personId
+            ))";
         }
         $sql .= " GROUP BY e.Id ORDER BY datetime(replace(e.StartTime, 'T', ' '))";
         $stmt = $this->pdo->prepare($sql);
@@ -734,6 +769,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
         return $events;
     }
+
 
     /** @return array<int, array<string, mixed>> */
     private function getPassedEvents(?Person $person, int $offset): array
@@ -747,12 +783,12 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 COUNT(m.Id) AS MessageCount
             FROM Event e
             LEFT JOIN EventType et   ON et.Id = e.IdEventType
-            LEFT JOIN Participant p  ON p.IdEvent = e.Id AND p.IdPerson = :idperson
+            LEFT JOIN Participant p  ON p.IdEvent = e.Id AND p.IdIndividual = :idperson
             LEFT JOIN Message m      ON m.EventId = e.Id AND m.\"From\" = 'User'
-            LEFT JOIN PersonGroup pg ON pg.IdGroup = et.IdGroup AND pg.IdPerson = :idperson
+            LEFT JOIN MemberGroup mg ON mg.IdGroup = et.IdGroup AND mg.IdMember = :idperson
             WHERE et.Inactivated = 0
-            AND (et.IdGroup IS NULL OR pg.IdPerson IS NOT NULL)
-            AND e.StartTime < :now
+              AND (et.IdGroup IS NULL OR mg.IdMember IS NOT NULL)
+              AND e.StartTime < :now
             GROUP BY e.Id
             ORDER BY e.StartTime DESC
             LIMIT :limit 
@@ -768,6 +804,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $this->events($stmt->fetchAll(PDO::FETCH_OBJ));
     }
 
+
     /** @return array{0: DateTime, 1: DateTime} */
     private function getDatesOfThreeWeeks(): array
     {
@@ -782,6 +819,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return [$startOfCurrentWeek, $endOfThirdWeek];
     }
 
+
     /** @param array<int, int> $attributes */
     private function insertEventAttributes(int $eventId, array $attributes): void
     {
@@ -794,6 +832,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
             }
         }
     }
+
 
     /** @param array<int, array{id: int, counter: int}> $needs */
     private function insertEventNeeds(int $eventId, array $needs): void
@@ -809,6 +848,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+
     /** @return array<int, int> */
     private function normalizeAttributeIds(mixed $attributes): array
     {
@@ -823,6 +863,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
         }
         return $result;
     }
+
 
     /** @return array<int, array{id: int, counter: int}> */
     private function normalizeNeeds(mixed $needs): array
@@ -844,24 +885,26 @@ class EventDataHelper extends Data implements NewsProviderInterface
         return $result;
     }
 
+
     /** @return EventArrayShape */
     private function buildEventArray(stdClass $event, DateTime $startTime): array
     {
         return [
-            'id'          => $event->Id,
-            'summary'     => $event->Summary,
-            'description' => $event->Description,
-            'location'    => $event->Location,
-            'startTime'   => $startTime->format('H:i'),
-            'duration'    => $this->formatDuration((int)($event->Duration ?? 0)),
-            'eventType'   => $event->EventTypeName,
-            'audience'    => $event->Audience,
-            'attributes'  => $this->parseAttributes($event),
+            'id'           => $event->Id,
+            'summary'      => $event->Summary,
+            'description'  => $event->Description,
+            'location'     => $event->Location,
+            'startTime'    => $startTime->format('H:i'),
+            'duration'     => $this->formatDuration((int)($event->Duration ?? 0)),
+            'eventType'    => $event->EventTypeName,
+            'audience'     => $event->Audience,
+            'attributes'   => $this->parseAttributes($event),
             'fullDateTime' => $event->StartTime,
-            'groupName'   => $event->GroupName,
-            'date'        => $startTime->format('Y-m-d'),
+            'groupName'    => $event->GroupName,
+            'date'         => $startTime->format('Y-m-d'),
         ];
     }
+
 
     private function formatDuration(int $durationSeconds): string
     {

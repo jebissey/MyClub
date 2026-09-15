@@ -28,7 +28,7 @@ class UserAvailabilitiesController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Availabilities');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Availabilities');
         /** @var object{Availabilities: string|null}|false $row */
         $availabilitiesJson = $row !== false ? ($row->Availabilities ?? '') : '';
 
@@ -60,7 +60,7 @@ class UserAvailabilitiesController extends AbstractController
             $this->flight->request()->data->getData()
         ) ?? '';
         if ($availabilities != '') {
-            $this->dataHelper->set('Person', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
+            $this->dataHelper->set('Member', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
         }
         $this->redirect('/user');
     }

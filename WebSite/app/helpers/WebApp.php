@@ -10,7 +10,7 @@ use Latte\Loaders\StringLoader;
 use app\enums\FilterInputRule;
 use app\modules\Common\valueObjects\Person;
 
-class WebApp
+final class WebApp
 {
     public const MYCLUB_WEBAPP = "https://myclub.ovh/";
 
@@ -198,8 +198,8 @@ class WebApp
         }
 
         return match ($rule) {
-            FilterInputRule::Bool->value => self::filterBool($value),
-            FilterInputRule::Int->value => self::filterInt($value),
+            FilterInputRule::Bool->value  => self::filterBool($value),
+            FilterInputRule::Int->value   => self::filterInt($value),
             FilterInputRule::Float->value => self::filterFloat($value),
             default => $value !== '' ? $value : null,
         };

@@ -24,7 +24,7 @@ class ParticipantDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     /** @return list<EventParticipantRow> */
@@ -32,20 +32,20 @@ class ParticipantDataHelper extends Data
     {
         $sql = "
             SELECT
-                COALESCE(pe.Email, c.Email) AS Email,
-                COALESCE(pe.NickName, c.NickName) AS NickName,
-                pe.FirstName,
-                pe.LastName,
-                pe.Id AS PersonId,
-                pe.InPresentationDirectory,
-                c.Id AS ContactId
+                i.Email,
+                i.NickName,
+                i.FirstName,
+                i.LastName,
+                CASE WHEN i.Type = 'Member' THEN i.Id ELSE NULL END AS PersonId,
+                m.InPresentationDirectory,
+                CASE WHEN i.Type = 'Contact' THEN i.Id ELSE NULL END AS ContactId
             FROM Participant pa
-            LEFT JOIN Person pe ON pa.IdPerson = pe.Id
-            LEFT JOIN Contact c ON pa.IdContact = c.Id
+            INNER JOIN Individual i ON pa.IdIndividual = i.Id
+            LEFT JOIN Member m ON m.Id = i.Id
             INNER JOIN Event e ON pa.IdEvent = e.Id
             WHERE pa.IdEvent = :eventId
                 AND e.Canceled = 0
-            ORDER BY pe.FirstName, pe.LastName, c.NickName
+            ORDER BY i.FirstName, i.LastName, i.NickName
         ";
 
         $stmt = $this->pdo->prepare($sql);
@@ -63,14 +63,14 @@ class ParticipantDataHelper extends Data
     public function getParticipations(array $season): array
     {
         $query = $this->pdo->prepare("
-            SELECT LOWER(p.Email) as Email, COUNT(pa.Id) as ParticipationCount
+            SELECT LOWER(i.Email) as Email, COUNT(pa.Id) as ParticipationCount
             FROM Participant pa
-            JOIN Person p ON p.Id = pa.IdPerson
+            JOIN Individual i ON i.Id = pa.IdIndividual
+            INNER JOIN Member m ON m.Id = i.Id
             JOIN Event e ON e.Id = pa.IdEvent
             WHERE e.StartTime BETWEEN :start AND :end
             AND e.Canceled = 0
-            AND pa.IdPerson IS NOT NULL
-            GROUP BY p.Email
+            GROUP BY i.Email
         ");
 
         $query->execute([
@@ -86,9 +86,9 @@ class ParticipantDataHelper extends Data
     {
         $stmt = $this->pdo->prepare("
             SELECT 
-                common.IdPerson AS OtherPerson,
+                common.IdIndividual AS OtherPerson,
                 CASE 
-                    WHEN person.InPresentationDirectory = 1 THEN common.IdPerson 
+                    WHEN member.InPresentationDirectory = 1 THEN common.IdIndividual 
                     ELSE 0 
                 END AS OtherPersonInPresentationDirectory,
                 GROUP_CONCAT(
@@ -99,15 +99,16 @@ class ParticipantDataHelper extends Data
             FROM (
                 SELECT 
                     p1.IdEvent,
-                    p2.IdPerson
+                    p2.IdIndividual
                 FROM Participant p1
                 JOIN Participant p2 ON p1.IdEvent = p2.IdEvent
-                WHERE p1.IdPerson = :idPerson
-                AND p2.IdPerson != :idPerson
+                WHERE p1.IdIndividual = :idPerson
+                AND p2.IdIndividual != :idPerson
             ) AS common
             JOIN Event e ON e.Id = common.IdEvent
-            JOIN Person person ON person.Id = common.IdPerson
-            GROUP BY common.IdPerson
+            JOIN Individual individual ON individual.Id = common.IdIndividual
+            INNER JOIN Member member ON member.Id = individual.Id
+            GROUP BY common.IdIndividual
             ORDER BY CommonEvents DESC;
         ");
 
@@ -135,13 +136,14 @@ class ParticipantDataHelper extends Data
 
         $personsStmt = $this->pdo->query("
             SELECT 
-                Id,     
-                FirstName || ' ' || LastName || 
+                i.Id,     
+                i.FirstName || ' ' || i.LastName || 
                     CASE 
-                        WHEN NickName != '' THEN ' (' || NickName || ')' 
+                        WHEN i.NickName != '' THEN ' (' || i.NickName || ')' 
                         ELSE '' 
                     END AS Name
-            FROM Person
+            FROM Individual i
+            INNER JOIN Member m ON m.Id = i.Id
         ");
 
         if ($personsStmt === false) {

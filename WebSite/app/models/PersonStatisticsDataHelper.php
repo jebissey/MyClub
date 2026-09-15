@@ -12,7 +12,7 @@ class PersonStatisticsDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     /**
@@ -37,18 +37,18 @@ class PersonStatisticsDataHelper extends Data
     public function getStats(Person $person, string $seasonStart, string $seasonEnd): array
     {
         $stats = [
-            'person' => $person,
-            'seasonStart' => $seasonStart,
-            'seasonEnd' => $seasonEnd,
-            'articles' => $this->getArticleStats($person->Id, $seasonStart, $seasonEnd),
-            'surveys' => $this->getSurveyStats($person->Id, $seasonStart, $seasonEnd),
-            'surveyReplies' => $this->getSurveyRepliesStats($person->Id, $seasonStart, $seasonEnd),
-            'designs' => $this->getDesignStats($person->Id, $seasonStart, $seasonEnd),
-            'designVotes' => $this->getDesignVoteStats($person->Id, $seasonStart, $seasonEnd),
-            'events' => $this->getEventStats($person->Id, $seasonStart, $seasonEnd),
-            'eventParticipations' => $this->getEventParticipationStats($person->Id, $seasonStart, $seasonEnd),
-            'participantSupplies' => $this->getParticipantSupplyStats($person->Id, $seasonStart, $seasonEnd),
-            'participantMessages' => $this->getParticipantMessageStats($person->Id, $seasonStart, $seasonEnd),
+            'person'               => $person,
+            'seasonStart'          => $seasonStart,
+            'seasonEnd'            => $seasonEnd,
+            'articles'             => $this->getArticleStats($person->Id, $seasonStart, $seasonEnd),
+            'surveys'              => $this->getSurveyStats($person->Id, $seasonStart, $seasonEnd),
+            'surveyReplies'        => $this->getSurveyRepliesStats($person->Id, $seasonStart, $seasonEnd),
+            'designs'              => $this->getDesignStats($person->Id, $seasonStart, $seasonEnd),
+            'designVotes'          => $this->getDesignVoteStats($person->Id, $seasonStart, $seasonEnd),
+            'events'               => $this->getEventStats($person->Id, $seasonStart, $seasonEnd),
+            'eventParticipations'  => $this->getEventParticipationStats($person->Id, $seasonStart, $seasonEnd),
+            'participantSupplies'  => $this->getParticipantSupplyStats($person->Id, $seasonStart, $seasonEnd),
+            'participantMessages'  => $this->getParticipantMessageStats($person->Id, $seasonStart, $seasonEnd),
         ];
 
         return $stats;
@@ -89,7 +89,7 @@ class PersonStatisticsDataHelper extends Data
             $seasons[] = [
                 'label' => 'Saison ' . ($year - 1) . '-' . $year,
                 'start' => $seasonStart,
-                'end' => $seasonEnd
+                'end'   => $seasonEnd
             ];
         }
 
@@ -97,6 +97,7 @@ class PersonStatisticsDataHelper extends Data
     }
 
     #region Private functions
+
     private function getArticleCount(?int $personId, string $seasonStart, string $seasonEnd): int
     {
         $sql = "
@@ -174,8 +175,8 @@ class PersonStatisticsDataHelper extends Data
         $totalSurveysCount = (int) $totalSurveysRow->count;
 
         return [
-            'user' => $userSurveysCount,
-            'total' => $totalSurveysCount,
+            'user'       => $userSurveysCount,
+            'total'      => $totalSurveysCount,
             'percentage' => $totalSurveysCount > 0 ? round(($userSurveysCount / $totalSurveysCount) * 100, 2) : 0
         ];
     }
@@ -194,7 +195,8 @@ class PersonStatisticsDataHelper extends Data
                 JOIN Survey s ON r.IdSurvey = s.Id
                 JOIN Article a ON s.IdArticle = a.Id
                 WHERE a.LastUpdate BETWEEN ? AND ?
-            )";
+            )
+        ";
         $userReplies = $this->pdo->prepare($query);
         $userReplies->execute([$personId, $seasonStart, $seasonEnd]);
         /** @var object{count: int} $userRepliesRow */
@@ -209,7 +211,8 @@ class PersonStatisticsDataHelper extends Data
                 JOIN Survey s ON r.IdSurvey = s.Id
                 JOIN Article a ON s.IdArticle = a.Id
                 WHERE a.LastUpdate BETWEEN ? AND ?
-            )";
+            )
+        ";
         $totalReplies = $this->pdo->prepare($query);
         $totalReplies->execute([$seasonStart, $seasonEnd]);
         /** @var object{count: int} $totalRepliesRow */
@@ -314,6 +317,7 @@ class PersonStatisticsDataHelper extends Data
     private function getEventStats(int $personId, string $seasonStart, string $seasonEnd): array
     {
         $stats = [];
+
         $stmt = $this->pdo->prepare("
             SELECT 
                 et.Id,
@@ -366,13 +370,15 @@ class PersonStatisticsDataHelper extends Data
                 : 0
         ];
 
+        // Invitations (stockées dans Participant.InvitedBy depuis la migration V81)
         $stmt = $this->pdo->prepare("
             SELECT 
                 COUNT(*) AS total,
-                SUM(CASE WHEN g.InvitedBy = ? THEN 1 ELSE 0 END) AS user
-            FROM Guest g
-            INNER JOIN Event e ON e.Id = g.IdEvent
-            WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
+                SUM(CASE WHEN p.InvitedBy = ? THEN 1 ELSE 0 END) AS user
+            FROM Participant p
+            INNER JOIN Event e ON e.Id = p.IdEvent
+            WHERE p.InvitedBy IS NOT NULL
+              AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
         ");
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
         /** @var object{total: int|string, user: int|string|null} $invitations */
@@ -391,6 +397,7 @@ class PersonStatisticsDataHelper extends Data
                     : 0
             ];
         }
+
         return $stats;
     }
 
@@ -401,23 +408,23 @@ class PersonStatisticsDataHelper extends Data
     {
         $stats = [];
 
-        $stmt = $this->pdo->query(
-            'SELECT Id, Name FROM EventType'
-        );
+        $stmt = $this->pdo->query('SELECT Id, Name FROM EventType');
         /** @var list<array{Id: int, Name: string}> $eventTypes */
         $eventTypes = $this->fetchAllOrFail($stmt);
 
-        $sql = "SELECT 
-            e.IdEventType,
-            et.Name AS typeName,
-            COUNT(CASE WHEN p.IdPerson = ? THEN 1 END) AS user_count,
-            COUNT(*) AS total_users_count,
-            COUNT(DISTINCT e.Id) AS event_count
-        FROM Participant p
-        INNER JOIN Event e ON p.IdEvent = e.Id
-        INNER JOIN EventType et ON e.IdEventType = et.Id
-        WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-        GROUP BY e.IdEventType, et.Name";
+        $sql = "
+            SELECT 
+                e.IdEventType,
+                et.Name AS typeName,
+                COUNT(CASE WHEN p.IdIndividual = ? THEN 1 END) AS user_count,
+                COUNT(*) AS total_users_count,
+                COUNT(DISTINCT e.Id) AS event_count
+            FROM Participant p
+            INNER JOIN Event e ON p.IdEvent = e.Id
+            INNER JOIN EventType et ON e.IdEventType = et.Id
+            WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
+            GROUP BY e.IdEventType, et.Name
+        ";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
@@ -465,7 +472,6 @@ class PersonStatisticsDataHelper extends Data
         return $stats;
     }
 
-
     private function getParticipantSupplyCount(?int $personId, string $seasonStart, string $seasonEnd): int
     {
         $sql = "
@@ -482,7 +488,7 @@ class PersonStatisticsDataHelper extends Data
         ];
 
         if ($personId !== null) {
-            $sql .= ' AND p.IdPerson = :personId';
+            $sql .= ' AND p.IdIndividual = :personId';
             $params[':personId'] = $personId;
         }
 
@@ -550,12 +556,12 @@ class PersonStatisticsDataHelper extends Data
         $totalWebappMessagesCount = $this->getParticipantMessageCount(null, $seasonStart, $seasonEnd, 'Webapp');
 
         return [
-            'user'       => $userMessagesCount,
-            'totalUsers'      => $totalUsersMessagesCount,
-            'percentage' => $totalUsersMessagesCount > 0
+            'user'             => $userMessagesCount,
+            'totalUsers'       => $totalUsersMessagesCount,
+            'percentage'       => $totalUsersMessagesCount > 0
                 ? round(($userMessagesCount / $totalUsersMessagesCount) * 100, 2)
                 : 0,
-            'webapp'       => $webappMessagesCount,
+            'webapp'           => $webappMessagesCount,
             'totalWebapp'      => $totalWebappMessagesCount,
             'percentageWebapp' => $totalWebappMessagesCount > 0
                 ? round(($webappMessagesCount / $totalWebappMessagesCount) * 100, 2)

@@ -31,12 +31,16 @@ class DesignDataHelperTest extends DataHelperTestCase
             'Vote',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'FirstName',
             'LastName',
             'NickName',
             'Email',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Member', [
+            'Id',
             'Inactivated',
         ]);
     }
@@ -52,7 +56,7 @@ class DesignDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('NameOfDesigner', $sql);
         $this->assertStringContainsString('Votes', $sql);
         $this->assertStringContainsString('LEFT JOIN DesignVote', $sql);
-        $this->assertStringContainsString('JOIN Person', $sql);
+        $this->assertStringContainsString('JOIN Individual', $sql);
         $this->assertStringContainsString('GROUP BY d.Id', $sql);
     }
 
@@ -64,10 +68,12 @@ class DesignDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
+        $this->assertStringContainsString('FROM Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
         $this->assertStringContainsString('CROSS JOIN Design', $sql);
         $this->assertStringContainsString('d.Status = \'UnderReview\'', $sql);
         $this->assertStringContainsString('dv.Id IS NULL', $sql);
-        $this->assertStringContainsString('p.Inactivated = 0', $sql);
+        $this->assertStringContainsString('m.Inactivated = 0', $sql);
         $this->assertStringContainsString('ORDER BY d.LastUpdate', $sql);
     }
 
@@ -75,8 +81,8 @@ class DesignDataHelperTest extends DataHelperTestCase
     {
         return "
             SELECT d.Id, d.Name, d.Detail, d.NavBar, d.Status, d.OnlyForMembers, d.IdGroup, 
-                p.FirstName || ' ' || p.LastName || CASE WHEN p.NickName IS NOT NULL AND p.NickName != '' 
-                THEN ' (' || p.NickName || ')' 
+                i.FirstName || ' ' || i.LastName || CASE WHEN i.NickName IS NOT NULL AND i.NickName != '' 
+                THEN ' (' || i.NickName || ')' 
                 ELSE '' 
                 END AS NameOfDesigner,
                 CASE WHEN COUNT(CASE WHEN dv.Vote = 'voteUp' THEN 1 END) = 0 
@@ -93,27 +99,28 @@ class DesignDataHelperTest extends DataHelperTestCase
                 END AS Votes
             FROM Design d
             LEFT JOIN DesignVote dv ON d.Id = dv.IdDesign
-            JOIN Person p ON d.IdPerson = p.Id
+            JOIN Individual i ON d.IdPerson = i.Id
             GROUP BY d.Id
-        ";
+";
     }
 
     private function getPendingDesignResponsesSql(): string
     {
         return "
             SELECT 
-                p.Id AS PersonId, 
-                p.Email, 
+                i.Id AS PersonId, 
+                i.Email, 
                 d.Id AS DesignId, 
                 d.Name AS DesignName,
                 d.Detail AS DesignDetail
-            FROM Person p
+            FROM Individual i
+            INNER JOIN Member m ON m.Id = i.Id
             CROSS JOIN Design d
-            LEFT JOIN DesignVote dv ON dv.IdDesign = d.Id AND dv.IdPerson = p.Id
-            WHERE p.Inactivated = 0
+            LEFT JOIN DesignVote dv ON dv.IdDesign = d.Id AND dv.IdPerson = i.Id
+            WHERE m.Inactivated = 0
                 AND d.Status = 'UnderReview'
                 AND dv.Id IS NULL
             ORDER BY d.LastUpdate
-        ";
+";
     }
 }

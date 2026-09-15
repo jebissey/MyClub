@@ -6,8 +6,9 @@ namespace tests\helpers;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use app\helpers\Application;
+use PDO;
 use app\helpers\ConnectedUser;
+use app\helpers\ErrorManager;
 use app\helpers\GravatarHandler;
 use app\enums\Authorization;
 use app\enums\ApplicationError;
@@ -43,20 +44,61 @@ final class ConnectedUserTest extends TestCase
     }
 
     /**
-     * Builds a ConnectedUser without ever touching a real database.
-     * All four collaborators are mocked or stubbed so the constructor never
-     * executes "new DataHelper(...)" etc.
+     * Crée un DataHelper réel et très léger (SQLite en mémoire).
+     * Parfait pour les tests qui n’ont pas besoin de contrôler
+     * finement le comportement de get()/set()/…
+     */
+    private function makeRealDataHelper(): DataHelper
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Schéma minimal nécessaire pour les tests qui touchent vraiment la DB
+        $pdo->exec("
+            CREATE TABLE Individual (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Type TEXT,
+                FirstName TEXT,
+                LastName TEXT,
+                Email TEXT,
+                NickName TEXT,
+                Avatar TEXT
+            );
+            CREATE TABLE Member (
+                Id INTEGER PRIMARY KEY,
+                Alert TEXT,
+                UseGravatar INTEGER DEFAULT 0,
+                LastSignIn TEXT,
+                LastSignOut TEXT
+            );
+            CREATE TABLE Settings (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Name TEXT UNIQUE,
+                Value TEXT
+            );
+        ");
+
+        return new DataHelper(
+            $pdo,
+            $this->createStub(ErrorManager::class)
+        );
+    }
+
+    /**
+     * Construit un ConnectedUser.
+     * DataHelper est toujours un vrai objet (car final).
+     * Les autres collaborateurs restent mockables tant qu’ils ne sont pas final.
      */
     private function makeConnectedUser(
         ?DataHelper $dataHelper = null,
         ?AuthorizationDataHelper $authorizationDataHelper = null,
         ?MetadataDataHelper $metadataDataHelper = null,
         ?GravatarHandler $gravatarHandler = null,
-        ?Application $application = null,
+        ?ErrorManager $errorManager = null,
     ): ConnectedUser {
         return new ConnectedUser(
-            $application              ?? $this->createStub(Application::class),
-            $dataHelper              ?? $this->createStub(DataHelper::class),
+            $errorManager            ?? $this->createStub(ErrorManager::class),
+            $dataHelper              ?? $this->makeRealDataHelper(),
             $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelper::class),
             $metadataDataHelper      ?? $this->createStub(MetadataDataHelper::class),
             $gravatarHandler         ?? $this->createStub(GravatarHandler::class),
@@ -71,7 +113,9 @@ final class ConnectedUserTest extends TestCase
         $prop->setValue($user, $authorizations);
     }
 
-    // --- isXxx() unit tests ---
+    // -------------------------------------------------------------------------
+    // isXxx() unit tests
+    // -------------------------------------------------------------------------
 
     public function testIsEditorTrueWhenAuthorizationPresent(): void
     {
@@ -154,7 +198,9 @@ final class ConnectedUserTest extends TestCase
         $this->assertTrue($user->isLoan());
     }
 
-    // --- hasAutorization() / hasOnlyOneAutorization() ---
+    // -------------------------------------------------------------------------
+    // hasAutorization() / hasOnlyOneAutorization()
+    // -------------------------------------------------------------------------
 
     public function testHasAutorizationFalseWhenEmpty(): void
     {
@@ -186,7 +232,9 @@ final class ConnectedUserTest extends TestCase
         $this->assertFalse($user->hasOnlyOneAutorization());
     }
 
-    // --- isConnected() ---
+    // -------------------------------------------------------------------------
+    // isConnected()
+    // -------------------------------------------------------------------------
 
     public function testIsConnectedFalseByDefault(): void
     {
@@ -200,15 +248,15 @@ final class ConnectedUserTest extends TestCase
         $user = $this->makeConnectedUser();
 
         // Person is final readonly → cannot be mocked.
-        // newInstanceWithoutConstructor is safe here because isConnected()
-        // only checks "!== null".
         $person = (new ReflectionClass(Person::class))->newInstanceWithoutConstructor();
         $user->person = $person;
 
         $this->assertTrue($user->isConnected());
     }
 
-    // --- getPage() ---
+    // -------------------------------------------------------------------------
+    // getPage()
+    // -------------------------------------------------------------------------
 
     public function testGetPageReturnsEmptyStringWhenNoUri(): void
     {
@@ -216,7 +264,7 @@ final class ConnectedUserTest extends TestCase
         $user = $this->makeConnectedUser();
 
         $this->assertSame('', $user->getPage());
-        $this->assertNull($user->getPage(1)); // segment out of bounds → null
+        $this->assertNull($user->getPage(1));
     }
 
     public function testGetPageReturnsFirstSegmentByDefault(): void
@@ -238,7 +286,9 @@ final class ConnectedUserTest extends TestCase
         $this->assertSame('kanban', $user->getPage());
     }
 
-    // --- getLastSignIn() / getLastSignOut() when not connected ---
+    // -------------------------------------------------------------------------
+    // getLastSignIn() / getLastSignOut() when not connected
+    // -------------------------------------------------------------------------
 
     public function testGetLastSignInReturnsNullWhenNotConnected(): void
     {
@@ -248,7 +298,9 @@ final class ConnectedUserTest extends TestCase
         $this->assertNull($user->getLastSignOut());
     }
 
-    // --- get() : isolable guard branches ---
+    // -------------------------------------------------------------------------
+    // get() : isolable guard branches
+    // -------------------------------------------------------------------------
 
     public function testGetEarlyReturnWhenNoSessionUser(): void
     {
@@ -265,17 +317,7 @@ final class ConnectedUserTest extends TestCase
     {
         $_SESSION['user'] = 'unknown@example.com';
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->once())
-            ->method('get')
-            ->with(
-                'Person',
-                ['Email' => 'unknown@example.com'],
-                'Id, Email, Alert, FirstName, LastName, NickName, UseGravatar, Avatar'
-            )
-            ->willReturn(false);
-
-        $errorManager = $this->createMock(\app\helpers\ErrorManager::class); // adjust namespace if needed
+        $errorManager = $this->createMock(ErrorManager::class);
         $errorManager->expects($this->once())
             ->method('raise')
             ->with(
@@ -283,12 +325,10 @@ final class ConnectedUserTest extends TestCase
                 $this->stringContains('Unknown user with this email address unknown@example.com')
             );
 
-        $application = $this->createStub(Application::class);
-        $application->method('getErrorManager')->willReturn($errorManager);
-
+        // DataHelper réel + base vide → get() retourne false
         $user = $this->makeConnectedUser(
-            dataHelper: $dataHelper,
-            application: $application,
+            dataHelper: $this->makeRealDataHelper(),
+            errorManager: $errorManager,
         );
 
         $user->get();
@@ -298,41 +338,27 @@ final class ConnectedUserTest extends TestCase
         $this->assertFalse($user->hasAutorization());
     }
 
-    // --- get() success path (partial) ---
-    // Static helpers (Person::fromRow, Params::*, TranslationManager::*,
-    // WebApp::*) still run. Only the injectable collaborators are mocked.
+    // -------------------------------------------------------------------------
+    // get() success path (partial)
+    // -------------------------------------------------------------------------
 
     public function testGetSuccessPathSetsPersonAndAuthorizations(): void
     {
         $_SESSION['user'] = 'known@example.com';
 
-        $personRow = (object) [
-            'Id'          => 42,
-            'Email'       => 'known@example.com',
-            'Alert'       => null,
-            'FirstName'   => 'Jean',
-            'LastName'    => 'Dupont',
-            'NickName'    => null,
-            'UseGravatar' => false,
-            'Avatar'      => null,
-        ];
+        $dataHelper = $this->makeRealDataHelper();
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->once())
-            ->method('get')
-            ->with(
-                'Person',
-                ['Email' => 'known@example.com'],
-                'Id, Email, Alert, FirstName, LastName, NickName, UseGravatar, Avatar'
-            )
-            ->willReturn($personRow);
-
-        $dataHelper->method('getDefaultColors')
-            ->willReturn([
-                'navbarBgColor'   => '#000',
-                'navbarInkColor'  => '#fff',
-                'navbarIconColor' => '#ccc',
-            ]);
+        // On insère les données nécessaires
+        $pdo = (new ReflectionClass($dataHelper))->getProperty('pdo')->getValue($dataHelper);
+        $pdo->exec("
+            INSERT INTO Individual (Type, FirstName, LastName, Email, NickName, Avatar)
+            VALUES ('Member', 'Jean', 'Dupont', 'known@example.com', NULL, NULL)
+        ");
+        $id = (int) $pdo->lastInsertId();
+        $pdo->exec("
+            INSERT INTO Member (Id, Alert, UseGravatar)
+            VALUES ($id, NULL, 0)
+        ");
 
         $authorizationDataHelper = $this->createMock(AuthorizationDataHelper::class);
         $authorizationDataHelper->expects($this->once())

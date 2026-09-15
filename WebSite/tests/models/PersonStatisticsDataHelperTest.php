@@ -52,15 +52,12 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
             'Name',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Guest', [
-            'IdEvent',
-            'InvitedBy',
-        ]);
-
         $this->assertColumnsExist($pdo, 'Participant', [
             'Id',
             'IdEvent',
-            'IdPerson',
+            'IdIndividual',
+            'InvitedBy',
+            'InvitedAt',
         ]);
 
         $this->assertColumnsExist($pdo, 'ParticipantSupply', [
@@ -187,9 +184,10 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('FROM Event', $totalSql);
         $this->assertStringContainsString('WHERE datetime(StartTime) BETWEEN datetime(?) AND datetime(?)', $totalSql);
 
-        $this->assertStringContainsString('FROM Guest g', $invitationSql);
-        $this->assertStringContainsString('INNER JOIN Event e ON e.Id = g.IdEvent', $invitationSql);
-        $this->assertStringContainsString('SUM(CASE WHEN g.InvitedBy = ? THEN 1 ELSE 0 END) AS user', $invitationSql);
+        $this->assertStringContainsString('FROM Participant p', $invitationSql);
+        $this->assertStringContainsString('INNER JOIN Event e ON e.Id = p.IdEvent', $invitationSql);
+        $this->assertStringContainsString('p.InvitedBy IS NOT NULL', $invitationSql);
+        $this->assertStringContainsString('SUM(CASE WHEN p.InvitedBy = ? THEN 1 ELSE 0 END) AS user', $invitationSql);
     }
 
     public function testGetEventParticipationStatsSqlIsValidAgainstTemplateSchema(): void
@@ -208,6 +206,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('INNER JOIN Event e ON p.IdEvent = e.Id', $participationSql);
         $this->assertStringContainsString('INNER JOIN EventType et ON e.IdEventType = et.Id', $participationSql);
         $this->assertStringContainsString('WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)', $participationSql);
+        $this->assertStringContainsString('p.IdIndividual = ?', $participationSql);
     }
 
     public function testGetParticipantSupplyCountSqlIsValidAgainstTemplateSchema(): void
@@ -223,7 +222,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('INNER JOIN Participant p ON ps.IdParticipant = p.Id', $sql);
         $this->assertStringContainsString('INNER JOIN Event e ON p.IdEvent = e.Id', $sql);
         $this->assertStringContainsString('WHERE datetime(e.StartTime) BETWEEN datetime(:seasonStart) AND datetime(:seasonEnd)', $sql);
-        $this->assertStringContainsString('AND p.IdPerson = :personId', $sql);
+        $this->assertStringContainsString('AND p.IdIndividual = :personId', $sql);
     }
 
     public function testGetParticipantMessageCountSqlIsValidAgainstTemplateSchema(): void
@@ -242,6 +241,10 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('AND m.PersonId = :personId', $sql);
     }
 
+    // -------------------------------------------------------------------------
+    // Private SQL extractors
+    // -------------------------------------------------------------------------
+
     private function getAvailableSeasonsSql(): string
     {
         return "
@@ -250,7 +253,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
                 UNION
                 SELECT MIN(StartTime) as LastUpdate FROM Event
             )
-        ";
+";
     }
 
     private function getArticleCountSql(): string
@@ -260,7 +263,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
             FROM Article
             WHERE LastUpdate BETWEEN :seasonStart AND :seasonEnd
             AND CreatedBy = :personId
-        ";
+";
     }
 
     private function getUserSurveyStatsSql(): string
@@ -275,7 +278,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
                     SELECT Id FROM Article WHERE LastUpdate BETWEEN ? AND ?
                 )
             )
-        ";
+";
     }
 
     private function getTotalSurveyStatsSql(): string
@@ -286,7 +289,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
             WHERE IdArticle IN (
                 SELECT Id FROM Article WHERE LastUpdate BETWEEN ? AND ?
             )
-        ";
+";
     }
 
     private function getUserSurveyRepliesStatsSql(): string
@@ -301,7 +304,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
                 JOIN Article a ON s.IdArticle = a.Id
                 WHERE a.LastUpdate BETWEEN ? AND ?
             )
-        ";
+";
     }
 
     private function getTotalSurveyRepliesStatsSql(): string
@@ -315,7 +318,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
                 JOIN Article a ON s.IdArticle = a.Id
                 WHERE a.LastUpdate BETWEEN ? AND ?
             )
-        ";
+";
     }
 
     private function getDesignCountSql(): string
@@ -325,7 +328,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
             FROM Design
             WHERE datetime(LastUpdate) BETWEEN datetime(:seasonStart) AND datetime(:seasonEnd)
             AND IdPerson = :personId
-        ";
+";
     }
 
     private function getDesignVoteCountSql(): string
@@ -336,7 +339,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
             INNER JOIN Design d ON dv.IdDesign = d.Id
             WHERE datetime(d.LastUpdate) BETWEEN datetime(:seasonStart) AND datetime(:seasonEnd)
             AND dv.IdPerson = :personId
-        ";
+";
     }
 
     private function getEventStatsByTypeSql(): string
@@ -351,7 +354,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
             LEFT JOIN Event e ON e.IdEventType = et.Id 
                 AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
             GROUP BY et.Id, et.Name
-        ";
+";
     }
 
     private function getEventStatsTotalSql(): string
@@ -362,7 +365,7 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
                 SUM(CASE WHEN CreatedBy = ? THEN 1 ELSE 0 END) AS user
             FROM Event 
             WHERE datetime(StartTime) BETWEEN datetime(?) AND datetime(?)
-        ";
+";
     }
 
     private function getEventStatsInvitationSql(): string
@@ -370,11 +373,12 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
         return "
             SELECT 
                 COUNT(*) AS total,
-                SUM(CASE WHEN g.InvitedBy = ? THEN 1 ELSE 0 END) AS user
-            FROM Guest g
-            INNER JOIN Event e ON e.Id = g.IdEvent
-            WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-        ";
+                SUM(CASE WHEN p.InvitedBy = ? THEN 1 ELSE 0 END) AS user
+            FROM Participant p
+            INNER JOIN Event e ON e.Id = p.IdEvent
+            WHERE p.InvitedBy IS NOT NULL
+              AND datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
+";
     }
 
     private function getEventTypesSql(): string
@@ -388,14 +392,15 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
             SELECT 
                 e.IdEventType,
                 et.Name AS typeName,
-                COUNT(CASE WHEN p.IdPerson = ? THEN 1 END) AS user_count,
+                COUNT(CASE WHEN p.IdIndividual = ? THEN 1 END) AS user_count,
                 COUNT(*) AS total_users_count,
                 COUNT(DISTINCT e.Id) AS event_count
             FROM Participant p
             INNER JOIN Event e ON p.IdEvent = e.Id
             INNER JOIN EventType et ON e.IdEventType = et.Id
             WHERE datetime(e.StartTime) BETWEEN datetime(?) AND datetime(?)
-            GROUP BY e.IdEventType, et.Name";
+            GROUP BY e.IdEventType, et.Name
+";
     }
 
     private function getParticipantSupplyCountSql(): string
@@ -406,8 +411,8 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
             INNER JOIN Participant p ON ps.IdParticipant = p.Id
             INNER JOIN Event e ON p.IdEvent = e.Id
             WHERE datetime(e.StartTime) BETWEEN datetime(:seasonStart) AND datetime(:seasonEnd)
-            AND p.IdPerson = :personId
-        ";
+            AND p.IdIndividual = :personId
+";
     }
 
     private function getParticipantMessageCountSql(): string
@@ -419,6 +424,6 @@ class PersonStatisticsDataHelperTest extends DataHelperTestCase
             WHERE datetime(e.StartTime) BETWEEN datetime(:seasonStart) AND datetime(:seasonEnd)
             AND \"From\" = :from
             AND m.PersonId = :personId
-        ";
+";
     }
 }

@@ -24,7 +24,7 @@ class PersonPreferences
             return $events;
         }
 
-        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Preferences, Availabilities');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Preferences, Availabilities');
         /** @var object{Preferences: string|null, Availabilities: string|null}|false $row */
         if ($row === false) {
             return $events;

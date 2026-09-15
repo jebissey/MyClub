@@ -12,13 +12,17 @@ class AuthorizationDataHelperTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Member', [
+            'Id',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'Email',
         ]);
 
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
-            'IdPerson',
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
+            'IdMember',
             'IdGroup',
         ]);
 
@@ -88,12 +92,13 @@ class AuthorizationDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT DISTINCT Authorization.Name FROM Person', $sql);
-        $this->assertStringContainsString('INNER JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson', $sql);
-        $this->assertStringContainsString('INNER JOIN `Group` ON PersonGroup.IdGroup = `Group`.Id', $sql);
-        $this->assertStringContainsString('INNER JOIN GroupAuthorization on `Group`.Id = GroupAuthorization.IdGroup', $sql);
-        $this->assertStringContainsString('INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id', $sql);
-        $this->assertStringContainsString('WHERE Person.Id = ?', $sql);
+        $this->assertStringContainsString('SELECT DISTINCT Authorization.Name', $sql);
+        $this->assertStringContainsString('FROM Member', $sql);
+        $this->assertStringContainsString('INNER JOIN MemberGroup       ON Member.Id = MemberGroup.IdMember', $sql);
+        $this->assertStringContainsString('INNER JOIN `Group`           ON MemberGroup.IdGroup = `Group`.Id', $sql);
+        $this->assertStringContainsString('INNER JOIN GroupAuthorization ON `Group`.Id = GroupAuthorization.IdGroup', $sql);
+        $this->assertStringContainsString('INNER JOIN Authorization     ON GroupAuthorization.IdAuthorization = Authorization.Id', $sql);
+        $this->assertStringContainsString('WHERE Member.Id = ?', $sql);
     }
 
     public function testPersonCanReadMediaFileArticlesSqlIsValidAgainstTemplateSchema(): void
@@ -155,10 +160,11 @@ class AuthorizationDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT PersonGroup.IdGroup AS IdGroup', $sql);
-        $this->assertStringContainsString('FROM PersonGroup', $sql);
-        $this->assertStringContainsString('LEFT JOIN Person ON Person.Id = PersonGroup.IdPerson', $sql);
-        $this->assertStringContainsString('WHERE Person.Email COLLATE NOCASE = :email', $sql);
+        $this->assertStringContainsString('SELECT MemberGroup.IdGroup AS IdGroup', $sql);
+        $this->assertStringContainsString('FROM MemberGroup', $sql);
+        $this->assertStringContainsString('INNER JOIN Member     ON Member.Id = MemberGroup.IdMember', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual ON Individual.Id = Member.Id', $sql);
+        $this->assertStringContainsString('WHERE Individual.Email COLLATE NOCASE = :email', $sql);
     }
 
     public function testCanReadEventByIdAnonymousSqlIsValidAgainstTemplateSchema(): void
@@ -191,18 +197,20 @@ class AuthorizationDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('AND et.Inactivated = 0', $sql);
         $this->assertStringContainsString('et.IdGroup IS NULL', $sql);
         $this->assertStringContainsString('OR et.IdGroup IN (', $sql);
-        $this->assertStringContainsString('SELECT IdGroup FROM PersonGroup WHERE IdPerson = :personId', $sql);
+        $this->assertStringContainsString('SELECT IdGroup FROM MemberGroup WHERE IdMember = :personId', $sql);
     }
 
     private function getsForSql(): string
     {
         return "
-            SELECT DISTINCT Authorization.Name FROM Person 
-            INNER JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson
-            INNER JOIN `Group` ON PersonGroup.IdGroup = `Group`.Id
-            INNER JOIN GroupAuthorization on `Group`.Id = GroupAuthorization.IdGroup
-            INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id 
-            WHERE Person.Id = ?";
+            SELECT DISTINCT Authorization.Name
+            FROM Member
+            INNER JOIN MemberGroup       ON Member.Id = MemberGroup.IdMember
+            INNER JOIN `Group`           ON MemberGroup.IdGroup = `Group`.Id
+            INNER JOIN GroupAuthorization ON `Group`.Id = GroupAuthorization.IdGroup
+            INNER JOIN Authorization     ON GroupAuthorization.IdAuthorization = Authorization.Id
+            WHERE Member.Id = ?
+        ";
     }
 
     private function getPersonCanReadMediaFileArticlesSql(): string
@@ -241,10 +249,11 @@ class AuthorizationDataHelperTest extends DataHelperTestCase
     private function getUserGroupsSql(): string
     {
         return '
-            SELECT PersonGroup.IdGroup AS IdGroup
-            FROM PersonGroup
-            LEFT JOIN Person ON Person.Id = PersonGroup.IdPerson
-            WHERE Person.Email COLLATE NOCASE = :email
+            SELECT MemberGroup.IdGroup AS IdGroup
+            FROM MemberGroup
+            INNER JOIN Member     ON Member.Id = MemberGroup.IdMember
+            INNER JOIN Individual ON Individual.Id = Member.Id
+            WHERE Individual.Email COLLATE NOCASE = :email
         ';
     }
 
@@ -270,7 +279,7 @@ class AuthorizationDataHelperTest extends DataHelperTestCase
                   AND (
                       et.IdGroup IS NULL
                       OR et.IdGroup IN (
-                          SELECT IdGroup FROM PersonGroup WHERE IdPerson = :personId
+                          SELECT IdGroup FROM MemberGroup WHERE IdMember = :personId
                       )
                   )
             ";

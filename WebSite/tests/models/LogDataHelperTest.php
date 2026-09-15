@@ -32,10 +32,14 @@ class LogDataHelperTest extends DataHelperTestCase
 
         $mainPdo = $this->openDatabaseCopyOrSkip();
 
-        $this->assertColumnsExist($mainPdo, 'Person', [
+        $this->assertColumnsExist($mainPdo, 'Individual', [
             'Email',
             'FirstName',
             'LastName',
+        ]);
+
+        $this->assertColumnsExist($mainPdo, 'Member', [
+            'Id',
         ]);
     }
 
@@ -74,7 +78,9 @@ class LogDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT LOWER(Email) AS Email, FirstName, LastName FROM Person', $sql);
+        $this->assertStringContainsString('SELECT LOWER(i.Email) AS Email, i.FirstName, i.LastName', $sql);
+        $this->assertStringContainsString('FROM Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
     }
 
     public function testGetPersonsFilteredSqlIsValidAgainstTemplateSchema(): void
@@ -85,8 +91,10 @@ class LogDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT LOWER(Email) AS Email, FirstName, LastName FROM Person', $sql);
-        $this->assertStringContainsString('WHERE LOWER(Email) IN (?,?)', $sql);
+        $this->assertStringContainsString('SELECT LOWER(i.Email) AS Email, i.FirstName, i.LastName', $sql);
+        $this->assertStringContainsString('FROM Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
+        $this->assertStringContainsString('WHERE LOWER(i.Email) IN (?,?)', $sql);
     }
 
     public function testGetTopArticlesSqlIsValidAgainstTemplateSchema(): void
@@ -219,14 +227,16 @@ class LogDataHelperTest extends DataHelperTestCase
 
     private function getPersonsBaseSql(): string
     {
-        return 'SELECT LOWER(Email) AS Email, FirstName, LastName FROM Person';
+        return 'SELECT LOWER(i.Email) AS Email, i.FirstName, i.LastName
+                FROM Individual i
+                INNER JOIN Member m ON m.Id = i.Id';
     }
 
     private function getPersonsFilteredSql(int $emailCount): string
     {
         $placeholders = implode(',', array_fill(0, $emailCount, '?'));
 
-        return $this->getPersonsBaseSql() . " WHERE LOWER(Email) IN ($placeholders)";
+        return $this->getPersonsBaseSql() . " WHERE LOWER(i.Email) IN ($placeholders)";
     }
 
     private function getTopArticlesSql(string $dateCondition): string

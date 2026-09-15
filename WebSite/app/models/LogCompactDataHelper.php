@@ -13,9 +13,9 @@ use app\helpers\To;
 
 class LogCompactDataHelper extends Data
 {
-    public function __construct(Application $application)
+    public function __construct(private Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     public function compactLog(int $removeOlderThanXmonths, int $compactOlderThanXmonths): void

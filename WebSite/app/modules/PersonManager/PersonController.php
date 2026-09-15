@@ -34,7 +34,7 @@ class PersonController extends TableController
     public function activate(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $this->dataHelper->set('Person', ['Inactivated' => 0], ['Id' => $id]);
+            $this->dataHelper->set('Member', ['Inactivated' => 0], ['Id' => $id]);
             $this->redirect('/persons');
         }
     }
@@ -52,7 +52,7 @@ class PersonController extends TableController
             throw new QueryException("Person (1) can't be inactivated", ApplicationError::BadRequest->value);
         }
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $this->dataHelper->set('Person', ['Inactivated' => 1], ['Id' => $id]);
+            $this->dataHelper->set('Member', ['Inactivated' => 1], ['Id' => $id]);
             $this->redirect('/persons');
         }
     }
@@ -60,7 +60,7 @@ class PersonController extends TableController
     public function edit(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $row = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert, MemberInfo');
+            $row = $this->dataHelper->get('Member', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert, MemberInfo');
             if (!$row) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
@@ -96,7 +96,7 @@ class PersonController extends TableController
     public function editSave(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $row = $this->dataHelper->get('Person', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
+            $row = $this->dataHelper->get('Member', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
             if (!$row) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
@@ -124,7 +124,7 @@ class PersonController extends TableController
                 return;
             }
             $existingRow = $this->dataHelper->get(
-                'Person',
+                'Member',
                 ['Email' => $email],
                 'Id, FirstName, LastName, Inactivated'
             );
@@ -174,7 +174,7 @@ class PersonController extends TableController
             }
 
             $this->dataHelper->set(
-                'Person',
+                'Member',
                 [
                     'FirstName' => $input['firstName'] ?? '???',
                     'LastName'  => $input['lastName'] ?? '???',
@@ -184,12 +184,12 @@ class PersonController extends TableController
 
             // Email is the sync key for imported records — never update it
             if (!$personImported) {
-                $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $personId]);
+                $this->dataHelper->set('Individual', ['Email' => $email], ['Id' => $personId]);
             }
 
             if ($this->application->getConnectedUser()->isPersonManager()) {
                 $this->dataHelper->set(
-                    'Person',
+                    'Member',
                     [
                         'Alert' => $input['alert'] ?? '',
                         'MemberInfo' => $input['memberInfo'] ?? ''

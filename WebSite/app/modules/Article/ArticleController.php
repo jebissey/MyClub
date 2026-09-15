@@ -280,7 +280,7 @@ class ArticleController extends TableController
             return;
         }
         /** @var object{CreatedBy: int} $article */
-        $articleCreator = $this->dataHelper->get('Person', ['Id' => $article->CreatedBy], 'Email');
+        $articleCreator = $this->dataHelper->get('Individual', ['Id' => $article->CreatedBy], 'Email');
         /** @var object{Email: string}|false $articleCreator */
         if ($articleCreator === false) {
             $msg = str_replace(

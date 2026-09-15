@@ -7,13 +7,13 @@ CREATE TABLE IF NOT EXISTS "Article" (
 	"Timestamp"	TEXT NOT NULL DEFAULT current_timestamp,
 	"PublishedBy"	INTEGER DEFAULT NULL,
 	"IdGroup"	INTEGER DEFAULT NULL,
-	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
+	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
 	"Language"	TEXT NOT NULL DEFAULT 'fr_FR',
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
+	FOREIGN KEY("CreatedBy") REFERENCES "Member"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
-	FOREIGN KEY("PublishedBy") REFERENCES "Person"("Id")
+	FOREIGN KEY("PublishedBy") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Attribute" (
 	"Id"	INTEGER,
@@ -36,11 +36,10 @@ CREATE TABLE IF NOT EXISTS "Carousel" (
 );
 CREATE TABLE IF NOT EXISTS "Contact" (
 	"Id"	INTEGER,
-	"Email"	TEXT NOT NULL,
-	"NickName"	TEXT,
 	"Token"	TEXT,
 	"TokenCreatedAt"	TEXT,
-	PRIMARY KEY("Id")
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("Id") REFERENCES "Individual"("Id") ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "ContactRateLimit" (
 	"ip_hash"	TEXT NOT NULL,
@@ -58,12 +57,12 @@ CREATE TABLE IF NOT EXISTS "Counter" (
 	"Timestamp"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+	FOREIGN KEY("IdPerson") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Design" (
 	"Id"	INTEGER,
 	"IdPerson"	INTEGER NOT NULL,
-	"IdGroup"	INTEGER,
+	"IdGroup"	INTEGER DEFAULT NULL,
 	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
 	"Name"	TEXT,
 	"Detail"	TEXT,
@@ -72,7 +71,7 @@ CREATE TABLE IF NOT EXISTS "Design" (
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+	FOREIGN KEY("IdPerson") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "DesignVote" (
 	"Id"	INTEGER,
@@ -82,7 +81,7 @@ CREATE TABLE IF NOT EXISTS "DesignVote" (
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdDesign") REFERENCES "Design"("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+	FOREIGN KEY("IdPerson") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Event" (
 	"Id"	INTEGER,
@@ -98,7 +97,7 @@ CREATE TABLE IF NOT EXISTS "Event" (
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	"Canceled"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
+	FOREIGN KEY("CreatedBy") REFERENCES "Member"("Id"),
 	FOREIGN KEY("IdEventType") REFERENCES "EventType"("Id")
 );
 CREATE TABLE IF NOT EXISTS "EventAttribute" (
@@ -144,7 +143,7 @@ CREATE TABLE IF NOT EXISTS "Exercise" (
 	"IdGroup"	INTEGER,
 	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("CreatedBy") REFERENCES "Person"("Id"),
+	FOREIGN KEY("CreatedBy") REFERENCES "Member"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Group" (
@@ -162,15 +161,17 @@ CREATE TABLE IF NOT EXISTS "GroupAuthorization" (
 	FOREIGN KEY("IdAuthorization") REFERENCES "Authorization"("Id"),
 	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
 );
-CREATE TABLE IF NOT EXISTS "Guest" (
+CREATE TABLE IF NOT EXISTS "Individual" (
 	"Id"	INTEGER,
-	"IdContact"	INTEGER NOT NULL,
-	"IdEvent"	INTEGER NOT NULL,
-	"InvitedBy"	INTEGER NOT NULL,
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdContact") REFERENCES "Contact"("Id"),
-	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
-	FOREIGN KEY("InvitedBy") REFERENCES "Person"("Id")
+	"Type"	TEXT NOT NULL CHECK("Type" IN ('Member', 'Contact')),
+	"Email"	TEXT NOT NULL UNIQUE,
+	"FirstName"	TEXT NOT NULL,
+	"LastName"	TEXT NOT NULL DEFAULT '',
+	"NickName"	TEXT,
+	"Avatar"	TEXT,
+	"Phone"	TEXT,
+	"CreatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
+	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "KanbanCard" (
 	"Id"	INTEGER,
@@ -204,7 +205,7 @@ CREATE TABLE IF NOT EXISTS "KanbanProject" (
 	"Detail"	TEXT NOT NULL,
 	"IdPerson"	INTEGER NOT NULL,
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+	FOREIGN KEY("IdPerson") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "KaraokeClient" (
 	"Id"	INTEGER,
@@ -260,11 +261,11 @@ CREATE TABLE IF NOT EXISTS "LoanRecord" (
 	"Notes"	TEXT NOT NULL DEFAULT '',
 	"Status"	TEXT NOT NULL DEFAULT 'active' CHECK("Status" IN ('active', 'returned', 'overdue', 'cancelled')),
 	"CreatedAt"	TEXT NOT NULL DEFAULT (datetime('now')),
-	PRIMARY KEY("Id" AUTOINCREMENT),
-	FOREIGN KEY("BorrowerId") REFERENCES "Person"("Id"),
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("BorrowerId") REFERENCES "Member"("Id"),
 	FOREIGN KEY("ItemId") REFERENCES "LoanItem"("Id"),
-	FOREIGN KEY("LenderId") REFERENCES "Person"("Id"),
-	FOREIGN KEY("ReturnedToId") REFERENCES "Person"("Id")
+	FOREIGN KEY("LenderId") REFERENCES "Member"("Id"),
+	FOREIGN KEY("ReturnedToId") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "LoanReservation" (
 	"Id"	INTEGER,
@@ -277,9 +278,45 @@ CREATE TABLE IF NOT EXISTS "LoanReservation" (
 	"Notes"	TEXT NOT NULL DEFAULT '',
 	"Status"	TEXT NOT NULL DEFAULT 'active' CHECK("Status" IN ('active', 'cancelled')),
 	"CreatedAt"	TEXT NOT NULL DEFAULT (datetime('now')),
-	PRIMARY KEY("Id" AUTOINCREMENT),
+	PRIMARY KEY("Id"),
 	FOREIGN KEY("ItemId") REFERENCES "LoanItem"("Id"),
-	FOREIGN KEY("UserId") REFERENCES "Person"("Id")
+	FOREIGN KEY("UserId") REFERENCES "Member"("Id")
+);
+CREATE TABLE IF NOT EXISTS "Member" (
+	"Id"	INTEGER,
+	"Password"	TEXT,
+	"Token"	TEXT,
+	"TokenCreatedAt"	TEXT,
+	"UseGravatar"	TEXT NOT NULL DEFAULT 'no',
+	"Availabilities"	NUMERIC,
+	"Preferences"	TEXT,
+	"Notifications"	TEXT,
+	"Imported"	INTEGER NOT NULL DEFAULT 0 CHECK("Imported" IN (0, 1)),
+	"Inactivated"	INTEGER NOT NULL DEFAULT 0 CHECK("Inactivated" IN (0, 1)),
+	"Presentation"	TEXT,
+	"PresentationLastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
+	"InPresentationDirectory"	INTEGER NOT NULL DEFAULT 0 CHECK("InPresentationDirectory" IN (0, 1)),
+	"Location"	TEXT,
+	"LastSignIn"	TEXT,
+	"LastSignOut"	TEXT,
+	"Notepad"	TEXT,
+	"Alert"	TEXT,
+	"ShowPhoneInPresentationDirectory"	INTEGER NOT NULL DEFAULT 0 CHECK("ShowPhoneInPresentationDirectory" IN (0, 1)),
+	"ShowEmailInPresentationDirectory"	INTEGER NOT NULL DEFAULT 0 CHECK("ShowEmailInPresentationDirectory" IN (0, 1)),
+	"MemberInfo"	TEXT DEFAULT '',
+	"MyPublicDataInPresentationDirectory"	TEXT,
+	"LastPageView"	TEXT,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("Id") REFERENCES "Individual"("Id") ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "MemberGroup" (
+	"Id"	INTEGER,
+	"IdMember"	INTEGER NOT NULL,
+	"IdGroup"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
+	UNIQUE("IdMember","IdGroup"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
+	FOREIGN KEY("IdMember") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Membership" (
 	"Id"	INTEGER,
@@ -292,8 +329,8 @@ CREATE TABLE IF NOT EXISTS "Membership" (
 	"PaidAt"	TEXT,
 	"CreatedAt"	TEXT NOT NULL DEFAULT (datetime('now')),
 	"UpdatedAt"	TEXT NOT NULL DEFAULT (datetime('now')),
-	PRIMARY KEY("Id" AUTOINCREMENT),
-	FOREIGN KEY("PersonId") REFERENCES "Person"("Id")
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("PersonId") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "MenuItem" (
 	"Id"	INTEGER,
@@ -326,7 +363,7 @@ CREATE TABLE IF NOT EXISTS "Message" (
 	FOREIGN KEY("ArticleId") REFERENCES "Article"("Id"),
 	FOREIGN KEY("EventId") REFERENCES "Event"("Id"),
 	FOREIGN KEY("GroupId") REFERENCES "Group"("Id"),
-	FOREIGN KEY("PersonId") REFERENCES "Person"("Id")
+	FOREIGN KEY("PersonId") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Metadata" (
 	"Id"	INTEGER,
@@ -375,17 +412,19 @@ CREATE TABLE IF NOT EXISTS "OrderReply" (
 	"LastUpdate"	TEXT NOT NULL,
 	PRIMARY KEY("Id"),
 	FOREIGN KEY("IdOrder") REFERENCES "Order"("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+	FOREIGN KEY("IdPerson") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Participant" (
 	"Id"	INTEGER,
 	"IdEvent"	INTEGER NOT NULL,
-	"IdPerson"	INTEGER,
-	"IdContact"	INTEGER,
+	"IdIndividual"	INTEGER NOT NULL,
+	"InvitedBy"	INTEGER DEFAULT NULL,
+	"InvitedAt"	TEXT DEFAULT NULL,
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdContact") REFERENCES "Contact"("Id"),
+	UNIQUE("IdEvent","IdIndividual"),
 	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+	FOREIGN KEY("IdIndividual") REFERENCES "Individual"("Id"),
+	FOREIGN KEY("InvitedBy") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "ParticipantSupply" (
 	"Id"	INTEGER,
@@ -396,54 +435,15 @@ CREATE TABLE IF NOT EXISTS "ParticipantSupply" (
 	FOREIGN KEY("IdNeed") REFERENCES "Need"("Id"),
 	FOREIGN KEY("IdParticipant") REFERENCES "Participant"("Id")
 );
-CREATE TABLE IF NOT EXISTS "Person" (
-	"Id"	INTEGER,
-	"Email"	TEXT NOT NULL UNIQUE,
-	"Password"	TEXT,
-	"FirstName"	TEXT NOT NULL,
-	"LastName"	TEXT NOT NULL,
-	"NickName"	TEXT,
-	"Avatar"	TEXT,
-	"UseGravatar"	TEXT NOT NULL DEFAULT 'no',
-	"Token"	TEXT,
-	"TokenCreatedAt"	TEXT,
-	"Availabilities"	TEXT,
-	"Preferences"	TEXT,
-	"Notifications"	TEXT,
-	"Imported"	INTEGER NOT NULL DEFAULT 0,
-	"Inactivated"	INTEGER NOT NULL DEFAULT 0,
-	"Phone"	TEXT,
-	"Presentation"	TEXT,
-	"PresentationLastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
-	"InPresentationDirectory"	INTEGER NOT NULL DEFAULT 0,
-	"ShowPhoneInPresentationDirectory"	INTEGER NOT NULL DEFAULT 0 CHECK("ShowPhoneInPresentationDirectory" IN (0, 1)),
-	"ShowEmailInPresentationDirectory"	INTEGER NOT NULL DEFAULT 0 CHECK("ShowEmailInPresentationDirectory" IN (0, 1)),
-	"MyPublicDataInPresentationDirectory"	TEXT,
-	"Location"	TEXT,
-	"LastSignIn"	TEXT,
-	"LastSignOut"	TEXT,
-	"Notepad"	TEXT,
-	"Alert"	TEXT,
-	"MemberInfo"	TEXT DEFAULT '',
-	PRIMARY KEY("Id")
-);
-CREATE TABLE IF NOT EXISTS "PersonGroup" (
-	"Id"	INTEGER,
-	"IdPerson"	INTEGER NOT NULL,
-	"IdGroup"	INTEGER NOT NULL,
-	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
-);
 CREATE TABLE IF NOT EXISTS "PushSubscription" (
 	"Id"	INTEGER,
 	"IdPerson"	INTEGER NOT NULL,
 	"EndPoint"	TEXT NOT NULL UNIQUE,
 	"Auth"	TEXT NOT NULL,
-	"P256dh"	TEXT NOT NULL,
 	"CreatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
+	"P256dh"	TEXT NOT NULL DEFAULT '',
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id")
+	FOREIGN KEY("IdPerson") REFERENCES "Member"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Reply" (
 	"Id"	INTEGER,
@@ -452,7 +452,7 @@ CREATE TABLE IF NOT EXISTS "Reply" (
 	"Answers"	TEXT NOT NULL,
 	"LastUpdate"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id"),
-	FOREIGN KEY("IdPerson") REFERENCES "Person"("Id"),
+	FOREIGN KEY("IdPerson") REFERENCES "Member"("Id"),
 	FOREIGN KEY("IdSurvey") REFERENCES "Survey"("Id")
 );
 CREATE TABLE IF NOT EXISTS "Settings" (
@@ -497,6 +497,7 @@ INSERT INTO "Authorization" VALUES (14,'LoanManager');
 INSERT INTO "Authorization" VALUES (15,'ExerciseDesigner');
 INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
+INSERT INTO "Individual" VALUES (1,'Member','webmaster@myclub.foo','my first name','my last name','my nick name or nothing',NULL,NULL,'2026-09-14 13:04:32');
 INSERT INTO "Languages" VALUES (1,'select_language','Select language','Sélectionner la langue','Wybierz język');
 INSERT INTO "Languages" VALUES (2,'language','Language','Langue','Język');
 INSERT INTO "Languages" VALUES (3,'my_data','My ddata','Mes données','Moje dane');
@@ -8251,9 +8252,9 @@ INSERT INTO "Languages" VALUES (1087,'Help_Media_list','<div class="container my
     </div>
   </section>
 </div>');
-INSERT INTO "Metadata" VALUES (1,'MyClub',80,0,1000000,NULL,10,36,6,NULL,0,NULL);
-INSERT INTO "Person" VALUES (1,'webmaster@myclub.foo','e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7','my first name','my last name','my nick name or nothing',NULL,'0',NULL,NULL,NULL,NULL,NULL,0,0,NULL,NULL,'2025-01-01',0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,'');
-INSERT INTO "PersonGroup" VALUES (1,1,1);
+INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'0',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL);
+INSERT INTO "MemberGroup" VALUES (1,1,1);
+INSERT INTO "Metadata" VALUES (1,'MyClub',81,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');
 INSERT INTO "Settings" VALUES (3,'SpotlightArticle','');
@@ -8264,132 +8265,134 @@ INSERT INTO "Settings" VALUES (5,'Home_footer','<div style="text-align:center; f
 🚧👷‍♀️🔧👷‍♂️🚧
 </div>');
 CREATE VIEW article_list_view AS
-            SELECT 
-                Article.Id,
-                Article.CreatedBy,
-                Article.Title,
-                Article.LastUpdate,
-                Article.PublishedBy,
-                Article.OnlyForMembers,
-                Article.IdGroup,
-                Article.Content,
+    SELECT 
+        Article.Id,
+        Article.CreatedBy,
+        Article.Title,
+        Article.LastUpdate,
+        Article.PublishedBy,
+        Article.OnlyForMembers,
+        Article.IdGroup,
+        Article.Content,
+        (
+            SELECT COUNT(*)
+            FROM Message
+            WHERE Message.ArticleId = Article.Id
+        ) AS Messages,
+        CASE 
+            WHEN Article.PublishedBy IS NULL THEN 'non' 
+            ELSE 'oui'
+        END AS Published,
+        CASE 
+            WHEN Article.OnlyForMembers = 1 THEN 'oui' 
+            ELSE 'non' 
+        END AS ForMembers,
+        CASE 
+            WHEN Survey.IdArticle IS NULL THEN 'non' 
+            ELSE 'oui' 
+        END AS Pool,
+        CASE 
+            WHEN Survey.IdArticle IS NULL THEN ''
+            ELSE 
                 (
-                    SELECT COUNT(*)
-                    FROM Message
-                    WHERE Message.ArticleId = Article.Id
-                ) AS Messages,
-                CASE 
-                    WHEN Article.PublishedBy IS NULL THEN 'non' 
-                    ELSE 'oui'
-                END AS Published,
-                CASE 
-                    WHEN Article.OnlyForMembers = 1 THEN 'oui' 
-                    ELSE 'non' 
-                END AS ForMembers,
-                CASE 
-                    WHEN Survey.IdArticle IS NULL THEN 'non' 
-                    ELSE 'oui' 
-                END AS Pool,
-                CASE 
-                    WHEN Survey.IdArticle IS NULL THEN ''
-                    ELSE 
-                        (
-                            CASE 
-                                WHEN Survey.ClosingDate < CURRENT_DATE THEN 'clos'
-                                ELSE strftime('%d/%m/%Y', Survey.ClosingDate)
-                            END
-                            || ' (' || COALESCE((SELECT COUNT(*) FROM Reply WHERE Reply.IdSurvey = Survey.Id), 0) || ') '
-                            || CASE Survey.Visibility
-                                WHEN 'all' THEN '👁️‍🗨️👥'
-                                WHEN 'allAfterClosing' THEN '👁️‍🗨️👥📅'
-                                WHEN 'voters' THEN '👁️‍🗨️🗳️'
-                                WHEN 'votersAfterClosing' THEN '👁️‍🗨️🗳️📅'
-                                WHEN 'redactor' THEN '👁️‍🗨️📝'
-                                ELSE ''
-                            END
-                        )
-                END AS PoolDetail,
-                CASE 
-                    WHEN Person.NickName != '' THEN Person.FirstName || ' ' || Person.LastName || ' (' || Person.NickName || ')' 
-                    ELSE Person.FirstName || ' ' || Person.LastName 
-                END AS PersonName,
-                'Group'.Name AS GroupName,
-                CASE 
-                    WHEN EXISTS (
-                        SELECT 1 FROM MenuItem
-                        WHERE MenuItem.Url = '/menu/show/article/' || Article.Id
-                    ) THEN 'oui'
-                    ELSE 'non'
-                END AS Menu
-            FROM Article
-            INNER JOIN Person ON Article.CreatedBy = Person.Id
-            LEFT JOIN Survey ON Article.Id = Survey.IdArticle
-            LEFT JOIN 'Group' ON 'Group'.Id = Article.IdGroup;
-CREATE VIEW exercise_list_view AS
-            SELECT 
-                Exercise.Id,
-                Exercise.CreatedBy,
-                Exercise.Title,
-                Exercise.Detail,
-				Exercise.LastUpdate,
-                Exercise.CreatedBy,
-                Exercise.OnlyForMembers,
-                Exercise.IdGroup,               
-                CASE 
-                    WHEN Exercise.OnlyForMembers = 1 THEN 'oui' 
-                    ELSE 'non' 
-                END AS ForMembers,
-                CASE 
-                    WHEN Person.NickName != '' THEN Person.FirstName || ' ' || Person.LastName || ' (' || Person.NickName || ')' 
-                    ELSE Person.FirstName || ' ' || Person.LastName 
-                END AS PersonName,
-                'Group'.Name AS GroupName
-            FROM Exercise
-            INNER JOIN Person ON Exercise.CreatedBy = Person.Id           
-            LEFT JOIN 'Group' ON 'Group'.Id = Exercise.IdGroup;
-CREATE VIEW public_article_list_view AS            
-			SELECT
-                Id,
-                LastUpdate,
-                Title,
-                CASE
-                    WHEN Id IN (
-                        SELECT CAST(Value AS INTEGER)
-                        FROM Settings
-                        WHERE Name = 'Home_FeaturedArticleId' AND Value != '0'
-                    ) THEN 'Home_Featured'
-
-                    WHEN Id IN (
-                        SELECT CAST(Value AS INTEGER)
-                        FROM Settings
-                        WHERE Name = 'Home_FooterArticleId' AND Value != '0'
-                    ) THEN 'Home_Footer'
-
-                    WHEN Id IN (
-                        SELECT CAST(REPLACE(Url, '/menu/show/article/', '') AS INTEGER)
-                        FROM MenuItem
-                        WHERE ForAnonymous = 1
-                        AND Url LIKE '/menu/show/article/%'
-                    ) THEN 'Menu'
-
-                    ELSE 'Public'
-                END AS ReferenceSource
-            FROM Article
-            WHERE
-                (
-                    (IdGroup IS NULL AND OnlyForMembers = 0 AND PublishedBy IS NOT NULL)
-                    OR Id IN (
-                        SELECT CAST(REPLACE(Url, '/menu/show/article/', '') AS INTEGER)
-                        FROM MenuItem
-                        WHERE ForAnonymous = 1
-                        AND Url LIKE '/menu/show/article/%'
-                    )
-                    OR Id IN (
-                        SELECT CAST(Value AS INTEGER)
-                        FROM Settings
-                        WHERE Name IN ('Home_FeaturedArticleId', 'Home_FooterArticleId')
-                        AND Value != '0'
-                    )
+                    CASE 
+                        WHEN Survey.ClosingDate < CURRENT_DATE THEN 'clos'
+                        ELSE strftime('%d/%m/%Y', Survey.ClosingDate)
+                    END
+                    || ' (' || COALESCE((SELECT COUNT(*) FROM Reply WHERE Reply.IdSurvey = Survey.Id), 0) || ') '
+                    || CASE Survey.Visibility
+                        WHEN 'all' THEN '👁️‍🗨️👥'
+                        WHEN 'allAfterClosing' THEN '👁️‍🗨️👥📅'
+                        WHEN 'voters' THEN '👁️‍🗨️🗳️'
+                        WHEN 'votersAfterClosing' THEN '👁️‍🗨️🗳️📅'
+                        WHEN 'redactor' THEN '👁️‍🗨️📝'
+                        ELSE ''
+                    END
                 )
-            ORDER BY LastUpdate DESC;
+        END AS PoolDetail,
+        CASE 
+            WHEN Individual.NickName != '' AND Individual.NickName IS NOT NULL THEN Individual.FirstName || ' ' || Individual.LastName || ' (' || Individual.NickName || ')' 
+            ELSE Individual.FirstName || ' ' || Individual.LastName 
+        END AS PersonName,
+        "Group".Name AS GroupName,
+        CASE 
+            WHEN EXISTS (
+                SELECT 1 FROM MenuItem
+                WHERE MenuItem.Url = '/menu/show/article/' || Article.Id
+            ) THEN 'oui'
+            ELSE 'non'
+        END AS Menu
+    FROM Article
+    INNER JOIN Member ON Article.CreatedBy = Member.Id
+    INNER JOIN Individual ON Member.Id = Individual.Id
+    LEFT JOIN Survey ON Article.Id = Survey.IdArticle
+    LEFT JOIN "Group" ON "Group".Id = Article.IdGroup;
+CREATE VIEW exercise_list_view AS
+    SELECT 
+        Exercise.Id,
+        Exercise.CreatedBy,
+        Exercise.Title,
+        Exercise.Detail,
+        Exercise.LastUpdate,
+        Exercise.CreatedBy,
+        Exercise.OnlyForMembers,
+        Exercise.IdGroup,               
+        CASE 
+            WHEN Exercise.OnlyForMembers = 1 THEN 'oui' 
+            ELSE 'non' 
+        END AS ForMembers,
+        CASE 
+            WHEN Individual.NickName != '' AND Individual.NickName IS NOT NULL THEN Individual.FirstName || ' ' || Individual.LastName || ' (' || Individual.NickName || ')' 
+            ELSE Individual.FirstName || ' ' || Individual.LastName 
+        END AS PersonName,
+        "Group".Name AS GroupName
+    FROM Exercise
+    INNER JOIN Member ON Exercise.CreatedBy = Member.Id
+    INNER JOIN Individual ON Member.Id = Individual.Id
+    LEFT JOIN "Group" ON "Group".Id = Exercise.IdGroup;
+CREATE VIEW public_article_list_view AS            
+    SELECT
+        Id,
+        LastUpdate,
+        Title,
+        CASE
+            WHEN Id IN (
+                SELECT CAST(Value AS INTEGER)
+                FROM Settings
+                WHERE Name = 'Home_FeaturedArticleId' AND Value != '0'
+            ) THEN 'Home_Featured'
+
+            WHEN Id IN (
+                SELECT CAST(Value AS INTEGER)
+                FROM Settings
+                WHERE Name = 'Home_FooterArticleId' AND Value != '0'
+            ) THEN 'Home_Footer'
+
+            WHEN Id IN (
+                SELECT CAST(REPLACE(Url, '/menu/show/article/', '') AS INTEGER)
+                FROM MenuItem
+                WHERE ForAnonymous = 1
+                AND Url LIKE '/menu/show/article/%'
+            ) THEN 'Menu'
+
+            ELSE 'Public'
+        END AS ReferenceSource
+    FROM Article
+    WHERE
+        (
+            (IdGroup IS NULL AND OnlyForMembers = 0 AND PublishedBy IS NOT NULL)
+            OR Id IN (
+                SELECT CAST(REPLACE(Url, '/menu/show/article/', '') AS INTEGER)
+                FROM MenuItem
+                WHERE ForAnonymous = 1
+                AND Url LIKE '/menu/show/article/%'
+            )
+            OR Id IN (
+                SELECT CAST(Value AS INTEGER)
+                FROM Settings
+                WHERE Name IN ('Home_FeaturedArticleId', 'Home_FooterArticleId')
+                AND Value != '0'
+            )
+        )
+    ORDER BY LastUpdate DESC;
 COMMIT;

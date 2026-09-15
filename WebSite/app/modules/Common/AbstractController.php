@@ -43,7 +43,7 @@ abstract class AbstractController
         $this->flight = $application->getFlight();
         $this->latte = $application->getLatte();
         $this->addLatteFilters();
-        $this->dataHelper = new DataHelper($application);
+        $this->dataHelper = new DataHelper($application->getPdo(), $application->getErrorManager(), $application->getPdoForLog());
         $this->languagesDataHelper = new LanguagesDataHelper($application);
         $this->authorizationDataHelper = new AuthorizationDataHelper($application);
         $this->menuItemDataHelper = new MenuItemDataHelper($application, $this->authorizationDataHelper);

@@ -49,7 +49,7 @@ class UserNotificationsController extends AbstractController
             $notification = "🚀 Notification de test envoyée à l'utilisateur #{$person->Id}.";
         }
 
-        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Notifications');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Notifications');
         /** @var object{Notifications: string|null}|false $row */
         $notificationsJson = $row !== false ? ($row->Notifications ?? '{}') : '{}';
 
@@ -92,7 +92,7 @@ class UserNotificationsController extends AbstractController
             $notifications['messageOnGroupSubscribed'],
             $notifications['messageOnGroupJoined']
         );
-        $this->dataHelper->set('Person', ['notifications' => json_encode($notifications)], ['Id' => $person->Id]);
+        $this->dataHelper->set('Member', ['notifications' => json_encode($notifications)], ['Id' => $person->Id]);
         $this->redirect('/user');
     }
 }

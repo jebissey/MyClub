@@ -15,23 +15,21 @@ class ParticipantDataHelperTest extends DataHelperTestCase
         $this->assertColumnsExist($pdo, 'Participant', [
             'Id',
             'IdEvent',
-            'IdPerson',
-            'IdContact',
+            'IdIndividual',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
+            'Type',
             'Email',
             'NickName',
             'FirstName',
             'LastName',
-            'InPresentationDirectory',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Contact', [
+        $this->assertColumnsExist($pdo, 'Member', [
             'Id',
-            'Email',
-            'NickName',
+            'InPresentationDirectory',
         ]);
 
         $this->assertColumnsExist($pdo, 'Event', [
@@ -51,8 +49,8 @@ class ParticipantDataHelperTest extends DataHelperTestCase
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
         $this->assertStringContainsString('FROM Participant pa', $sql);
-        $this->assertStringContainsString('LEFT JOIN Person pe ON pa.IdPerson = pe.Id', $sql);
-        $this->assertStringContainsString('LEFT JOIN Contact c ON pa.IdContact = c.Id', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual i ON pa.IdIndividual = i.Id', $sql);
+        $this->assertStringContainsString('LEFT JOIN Member m ON m.Id = i.Id', $sql);
         $this->assertStringContainsString('INNER JOIN Event e ON pa.IdEvent = e.Id', $sql);
         $this->assertStringContainsString('WHERE pa.IdEvent = :eventId', $sql);
         $this->assertStringContainsString('AND e.Canceled = 0', $sql);
@@ -66,14 +64,14 @@ class ParticipantDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT LOWER(p.Email) as Email, COUNT(pa.Id) as ParticipationCount', $sql);
+        $this->assertStringContainsString('SELECT LOWER(i.Email) as Email, COUNT(pa.Id) as ParticipationCount', $sql);
         $this->assertStringContainsString('FROM Participant pa', $sql);
-        $this->assertStringContainsString('JOIN Person p ON p.Id = pa.IdPerson', $sql);
+        $this->assertStringContainsString('JOIN Individual i ON i.Id = pa.IdIndividual', $sql);
+        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
         $this->assertStringContainsString('JOIN Event e ON e.Id = pa.IdEvent', $sql);
         $this->assertStringContainsString('WHERE e.StartTime BETWEEN :start AND :end', $sql);
         $this->assertStringContainsString('AND e.Canceled = 0', $sql);
-        $this->assertStringContainsString('AND pa.IdPerson IS NOT NULL', $sql);
-        $this->assertStringContainsString('GROUP BY p.Email', $sql);
+        $this->assertStringContainsString('GROUP BY i.Email', $sql);
     }
 
     public function testGetConnectionsSqlIsValidAgainstTemplateSchema(): void
@@ -89,49 +87,51 @@ class ParticipantDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('FROM (', $connectionsSql);
         $this->assertStringContainsString('FROM Participant p1', $connectionsSql);
         $this->assertStringContainsString('JOIN Participant p2 ON p1.IdEvent = p2.IdEvent', $connectionsSql);
-        $this->assertStringContainsString('WHERE p1.IdPerson = :idPerson', $connectionsSql);
-        $this->assertStringContainsString('AND p2.IdPerson != :idPerson', $connectionsSql);
+        $this->assertStringContainsString('WHERE p1.IdIndividual = :idPerson', $connectionsSql);
+        $this->assertStringContainsString('AND p2.IdIndividual != :idPerson', $connectionsSql);
         $this->assertStringContainsString('JOIN Event e ON e.Id = common.IdEvent', $connectionsSql);
-        $this->assertStringContainsString('JOIN Person person ON person.Id = common.IdPerson', $connectionsSql);
-        $this->assertStringContainsString('GROUP BY common.IdPerson', $connectionsSql);
+        $this->assertStringContainsString('JOIN Individual individual ON individual.Id = common.IdIndividual', $connectionsSql);
+        $this->assertStringContainsString('INNER JOIN Member member ON member.Id = individual.Id', $connectionsSql);
+        $this->assertStringContainsString('GROUP BY common.IdIndividual', $connectionsSql);
         $this->assertStringContainsString('ORDER BY CommonEvents DESC', $connectionsSql);
 
         $this->assertStringContainsString('SELECT', $personsSql);
-        $this->assertStringContainsString('FROM Person', $personsSql);
+        $this->assertStringContainsString('FROM Individual i', $personsSql);
+        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $personsSql);
     }
 
     private function getGetEventParticipantsSql(): string
     {
         return "
             SELECT
-                COALESCE(pe.Email, c.Email) AS Email,
-                COALESCE(pe.NickName, c.NickName) AS NickName,
-                pe.FirstName,
-                pe.LastName,
-                pe.Id AS PersonId,
-                pe.InPresentationDirectory,
-                c.Id AS ContactId
+                i.Email,
+                i.NickName,
+                i.FirstName,
+                i.LastName,
+                CASE WHEN i.Type = 'Member' THEN i.Id ELSE NULL END AS PersonId,
+                m.InPresentationDirectory,
+                CASE WHEN i.Type = 'Contact' THEN i.Id ELSE NULL END AS ContactId
             FROM Participant pa
-            LEFT JOIN Person pe ON pa.IdPerson = pe.Id
-            LEFT JOIN Contact c ON pa.IdContact = c.Id
+            INNER JOIN Individual i ON pa.IdIndividual = i.Id
+            LEFT JOIN Member m ON m.Id = i.Id
             INNER JOIN Event e ON pa.IdEvent = e.Id
             WHERE pa.IdEvent = :eventId
                 AND e.Canceled = 0
-            ORDER BY pe.FirstName, pe.LastName, c.NickName
+            ORDER BY i.FirstName, i.LastName, i.NickName
         ";
     }
 
     private function getGetParticipationsSql(): string
     {
         return "
-            SELECT LOWER(p.Email) as Email, COUNT(pa.Id) as ParticipationCount
+            SELECT LOWER(i.Email) as Email, COUNT(pa.Id) as ParticipationCount
             FROM Participant pa
-            JOIN Person p ON p.Id = pa.IdPerson
+            JOIN Individual i ON i.Id = pa.IdIndividual
+            INNER JOIN Member m ON m.Id = i.Id
             JOIN Event e ON e.Id = pa.IdEvent
             WHERE e.StartTime BETWEEN :start AND :end
             AND e.Canceled = 0
-            AND pa.IdPerson IS NOT NULL
-            GROUP BY p.Email
+            GROUP BY i.Email
         ";
     }
 
@@ -139,9 +139,9 @@ class ParticipantDataHelperTest extends DataHelperTestCase
     {
         return "
             SELECT 
-                common.IdPerson AS OtherPerson,
+                common.IdIndividual AS OtherPerson,
                 CASE 
-                    WHEN person.InPresentationDirectory = 1 THEN common.IdPerson 
+                    WHEN member.InPresentationDirectory = 1 THEN common.IdIndividual 
                     ELSE 0 
                 END AS OtherPersonInPresentationDirectory,
                 GROUP_CONCAT(
@@ -152,15 +152,16 @@ class ParticipantDataHelperTest extends DataHelperTestCase
             FROM (
                 SELECT 
                     p1.IdEvent,
-                    p2.IdPerson
+                    p2.IdIndividual
                 FROM Participant p1
                 JOIN Participant p2 ON p1.IdEvent = p2.IdEvent
-                WHERE p1.IdPerson = :idPerson
-                AND p2.IdPerson != :idPerson
+                WHERE p1.IdIndividual = :idPerson
+                AND p2.IdIndividual != :idPerson
             ) AS common
             JOIN Event e ON e.Id = common.IdEvent
-            JOIN Person person ON person.Id = common.IdPerson
-            GROUP BY common.IdPerson
+            JOIN Individual individual ON individual.Id = common.IdIndividual
+            INNER JOIN Member member ON member.Id = individual.Id
+            GROUP BY common.IdIndividual
             ORDER BY CommonEvents DESC
         ";
     }
@@ -169,13 +170,14 @@ class ParticipantDataHelperTest extends DataHelperTestCase
     {
         return "
             SELECT 
-                Id,     
-                FirstName || ' ' || LastName || 
+                i.Id,     
+                i.FirstName || ' ' || i.LastName || 
                     CASE 
-                        WHEN NickName != '' THEN ' (' || NickName || ')' 
+                        WHEN i.NickName != '' THEN ' (' || i.NickName || ')' 
                         ELSE '' 
                     END AS Name
-            FROM Person
+            FROM Individual i
+            INNER JOIN Member m ON m.Id = i.Id
         ";
     }
 }

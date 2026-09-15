@@ -15,7 +15,7 @@ enum FilterInputRule: string
     case DataUrl = 'dataurl';
     case DateInterval = '/^\d{4}-\d{2}-\d{2}\|\d{4}-\d{2}-\d{2}$/';
     case DateTime = '/^(\d{4}(-\d{2}(-\d{2})?)?( \d{2}:\d{2}(:\d{2})?)?|(\d{2}:\d{2}(:\d{2})?))$/';
-    case Email = '/^[a-z0-9._%+\-]*(@[a-z0-9.\-]*)?(\.[a-z]*)?$/i';
+    case Email = '/^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$/i';
     case Float = 'float';
     case Html = '/^\s*(<[^>]+>.*?)+\s*$/is';
     case HtmlSafeName = '/^[\p{L}\p{N}\p{P}\p{S}\p{Z}\p{M}]{2,100}$/u';

@@ -8,13 +8,11 @@ use DateTime;
 use Throwable;
 use app\enums\FilterInputRule;
 use app\exceptions\EmailException;
-use app\helpers\Application;
 use app\helpers\Password;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\AuthResult;
 use app\models\DataHelper;
-use app\modules\Common\services\EmailService;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\valueObjects\Person;
 
@@ -23,11 +21,19 @@ use app\modules\Common\valueObjects\Person;
  */
 class AuthenticationService
 {
-    public function __construct(private DataHelper $dataHelper, private EmailService $emailService)
-    {
+    public function __construct(
+        private DataHelper $dataHelper,
+        private string $baseUrl
+    ) {
     }
 
-    public function handleForgotPassword(string $email): bool
+    /**
+     * Génère et persiste le jeton de réinitialisation, puis retourne le message
+     * à envoyer. L'envoi lui-même est de la responsabilité de l'appelant.
+     *
+     * @throws EmailException si l'adresse est inconnue
+     */
+    public function prepareForgotPasswordEmail(string $email): EmailMessage
     {
         $person = $this->findPersonByEmail($email);
         if ($person === false) {
@@ -36,30 +42,23 @@ class AuthenticationService
 
         $token = bin2hex(random_bytes(32));
         $this->dataHelper->set(
-            'Person',
+            'Member',
             [
-                'Token' => $token,
+                'Token'          => $token,
                 'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
             ],
             ['Id' => $person->Id]
         );
-        $resetLink = Application::$root . '/user/setPassword/' . $token;
-        $subject = "Initialisation du mot de passe";
-        $message = "Cliquez sur ce lien pour initialiser votre mot de passe : $resetLink";
 
-        $host = parse_url(Application::$root, PHP_URL_HOST);
-        if ($host === 'localhost' || $host === null) {
-            $host = 'myclub.foo';
-        }
+        $resetLink = $this->baseUrl . '/user/setPassword/' . $token;
 
-        $emailMessage = new EmailMessage(
-            from: null,
-            to: $email,
-            subject: $subject,
-            body: $message,
-            isHtml: true
+        return new EmailMessage(
+            from:    null,
+            to:      $email,
+            subject: 'Initialisation du mot de passe',
+            body:    "Cliquez sur ce lien pour initialiser votre mot de passe : $resetLink",
+            isHtml:  true
         );
-        return $this->emailService->send($emailMessage);
     }
 
     public function handleRememberMeLogin(): ?AuthResult
@@ -67,30 +66,49 @@ class AuthenticationService
         if (!isset($_COOKIE['rememberMe'])) {
             return null;
         }
+
         $token = $_COOKIE['rememberMe'];
-        $personRow = $this->dataHelper->get(
-            'Person',
+
+        $member = $this->dataHelper->get(
+            'Member',
             ['Token' => $token],
-            'Id, Inactivated, Email'
+            'Id, Inactivated'
         );
-        if (!$personRow) {
+
+        if (!$member) {
             $this->clearRememberMeCookie();
             return null;
         }
-        /** @var object{Id: int|string, Email: string, Inactivated: bool|int|string|null} $personRow */
-        if ((bool)($personRow->Inactivated ?? false)) {
+
+        if ((bool)($member->Inactivated ?? false)) {
             $this->clearRememberMeCookie();
             return null;
         }
+
+        $individual = $this->dataHelper->get(
+            'Individual',
+            ['Id' => $member->Id],
+            'Id, Email, FirstName, LastName, NickName, Avatar'
+        );
+
+        if (!$individual) {
+            $this->clearRememberMeCookie();
+            return null;
+        }
+
+        $personRow = (object) array_merge((array) $individual, (array) $member);
         /** @var PersonRow $personRow */
         $person = Person::fromRow($personRow);
+
         $this->dataHelper->set(
-            'Person',
+            'Member',
             ['LastSignIn' => date('Y-m-d H:i:s')],
             ['Id' => $person->Id]
         );
-        $_SESSION['user'] = $person->Email;
+
+        $_SESSION['user']   = $person->Email;
         $_SESSION['navbar'] = '';
+
         return AuthResult::success($person);
     }
 
@@ -100,17 +118,20 @@ class AuthenticationService
     public function handleSignIn(array $requestData): AuthResult
     {
         $schema = [
-            'email' => FilterInputRule::Email->value,
-            'password' => FilterInputRule::Password->value,
+            'email'      => FilterInputRule::Email->value,
+            'password'   => FilterInputRule::Password->value,
             'rememberMe' => ['on'],
         ];
+
         $input = WebApp::filterInput($schema, $requestData);
-        if ($input['email'] == null) {
+
+        if ($input['email'] === null) {
             return AuthResult::error('Invalid email address');
         }
-        if ($input['password'] == null) {
+        if ($input['password'] === null) {
             return AuthResult::error('Password rules are not respected [6..30] characters');
         }
+
         return $this->authenticate(
             To::str($input['email']),
             To::str($input['password']),
@@ -120,61 +141,98 @@ class AuthenticationService
 
     public function resetPassword(string $token, string $newPassword): bool
     {
-        $personRow = $this->dataHelper->get('Person', ['Token' => $token], 'Id, TokenCreatedAt, Email');
-        if (!$personRow) {
+        $member = $this->dataHelper->get(
+            'Member',
+            ['Token' => $token],
+            'Id, TokenCreatedAt'
+        );
+
+        if (!$member) {
             return false;
         }
-        /** @var object{Id: int|string, Email: string, TokenCreatedAt: string|null} $personRow */
-        $tokenCreatedAt = $personRow->TokenCreatedAt;
+
+        /** @var object{Id: int|string, TokenCreatedAt: string|null} $member */
+        $tokenCreatedAt = $member->TokenCreatedAt;
+
         if ($tokenCreatedAt === null || (new DateTime($tokenCreatedAt))->diff(new DateTime())->h >= 1) {
             return false;
         }
-        $this->dataHelper->set('Person', [
-            'Password' => Password::signPassword($newPassword),
-            'Token' => null,
+
+        $this->dataHelper->set('Member', [
+            'Password'       => Password::signPassword($newPassword),
+            'Token'          => null,
             'TokenCreatedAt' => null
-        ], ['Id' => (int)$personRow->Id]);
+        ], ['Id' => (int) $member->Id]);
+
         return true;
     }
 
     public function signOut(): void
     {
         $userEmail = $_SESSION['user'] ?? '';
-        if ($userEmail) {
-            $this->dataHelper->set(
-                'Person',
-                ['LastSignOut' => date('Y-m-d H:i:s')],
-                ['Email' => $userEmail]
+
+        if ($userEmail !== '') {
+            $individual = $this->dataHelper->get(
+                'Individual',
+                ['Email' => $userEmail],
+                'Id'
             );
+
+            if ($individual !== false) {
+                $this->dataHelper->set(
+                    'Member',
+                    ['LastSignOut' => date('Y-m-d H:i:s')],
+                    ['Id' => $individual->Id]
+                );
+            }
         }
+
         unset($_SESSION['user']);
         $_SESSION['navbar'] = '';
     }
 
-    #region Private methodes
+    #region Private methods
+
     private function authenticate(string $email, string $password, bool $rememberMe): AuthResult
     {
         try {
-            $row = $this->dataHelper->get(
-                'Person',
+            $individual = $this->dataHelper->get(
+                'Individual',
                 ['Email' => $email],
-                'Id, Email, Password, Inactivated, UseGravatar'
+                'Id, Email, FirstName, LastName, NickName, Avatar'
             );
-            if (!$row) {
+
+            if (!$individual) {
                 return AuthResult::error("Sign in failed: unknown email {$email}");
             }
-            /** @var object{Id: int|string, Email: string, Password: string|null, Inactivated: bool|int|string|null, UseGravatar?: bool|int|string|null} $row */
-            if ((bool)($row->Inactivated ?? false)) {
+
+            $member = $this->dataHelper->get(
+                'Member',
+                ['Id' => $individual->Id],
+                'Password, Inactivated, UseGravatar, Alert'
+            );
+
+            if (!$member) {
+                return AuthResult::error("Sign in failed: unknown email {$email}");
+            }
+
+            if ((bool)($member->Inactivated ?? false)) {
                 return AuthResult::error("Sign in failed: inactivated user {$email}");
             }
-            if (!Password::verifyPassword($password, $row->Password ?? '')) {
+
+            if (!Password::verifyPassword($password, $member->Password ?? '')) {
                 return AuthResult::error("Sign in failed: wrong password for {$email}");
             }
-            /** @var PersonRow $row */
-            $person = Person::fromRow($row);
+
+            $personRow = (object) array_merge((array) $individual, (array) $member);
+            /** @var PersonRow $personRow */
+            $person = Person::fromRow($personRow);
+
             return $this->loginUser($person, $rememberMe);
         } catch (Throwable $e) {
-            return AuthResult::error("Authentication error: {$e->getMessage()} in {$e->getFile()} at line {$e->getLine()}");
+            return AuthResult::error(
+                "Authentication error: {$e->getMessage()} in {$e->getFile()} at line {$e->getLine()}"
+            );
         }
     }
 
@@ -185,16 +243,29 @@ class AuthenticationService
 
     private function findPersonByEmail(string $email): Person|false
     {
-        $row = $this->dataHelper->get(
-            'Person',
+        $individual = $this->dataHelper->get(
+            'Individual',
             ['Email' => $email],
-            'Id, Email, UseGravatar'
+            'Id, Email, FirstName, LastName, NickName, Avatar'
         );
-        if (!$row) {
+
+        if (!$individual) {
             return false;
         }
-        /** @var PersonRow $row */
-        return Person::fromRow($row);
+
+        $member = $this->dataHelper->get(
+            'Member',
+            ['Id' => $individual->Id],
+            'UseGravatar, Alert'
+        );
+
+        if (!$member) {
+            return false;
+        }
+
+        $personRow = (object) array_merge((array) $individual, (array) $member);
+        /** @var PersonRow $personRow */
+        return Person::fromRow($personRow);
     }
 
     private function generateRememberMeToken(): string
@@ -205,26 +276,31 @@ class AuthenticationService
     private function loginUser(Person $person, bool $rememberMe): AuthResult
     {
         $this->dataHelper->set(
-            'Person',
+            'Member',
             ['LastSignIn' => date('Y-m-d H:i:s')],
             ['Id' => $person->Id]
         );
+
         if ($rememberMe) {
             $this->setRememberMeToken($person->Id);
         }
-        $_SESSION['user'] = $person->Email;
+
+        $_SESSION['user']   = $person->Email;
         $_SESSION['navbar'] = '';
+
         return AuthResult::success($person);
     }
 
     private function setRememberMeToken(int $personId): void
     {
         $token = $this->generateRememberMeToken();
+
         $this->dataHelper->set(
-            'Person',
+            'Member',
             ['Token' => $token],
             ['Id' => $personId]
         );
+
         setcookie('rememberMe', $token, time() + (30 * 24 * 60 * 60), '/');
     }
 }

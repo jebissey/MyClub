@@ -22,8 +22,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application, private LanguagesDataHelper $languagesDataHelper)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
+
 
     public function addMessage(
         ?int $articleId,
@@ -47,6 +48,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             return false;
         }
 
+
         $messageId = $this->set('Message', [
             'ArticleId' => $articleId,
             'EventId'   => $eventId,
@@ -59,6 +61,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return is_int($messageId) ? $messageId : false;
     }
 
+
     /**
      * @param list<EventParticipant> $participants
      * @return array<int, string>
@@ -69,14 +72,15 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         foreach ($participants as $participant) {
             $bccList[] = $participant->Email;
             $this->set('Message', [
-                'EventId' => $eventId,
+                'EventId'  => $eventId,
                 'PersonId' => $participant->PersonId,
-                'Text' => $text,
-                'From' => 'Webapp'
+                'Text'     => $text,
+                'From'     => 'Webapp'
             ]);
         }
         return $bccList;
     }
+
 
     /** @return array<int, stdClass> */
     public function getArticleMessages(int $articleId): array
@@ -84,14 +88,15 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         $sql = "
             SELECT 
                 Message.*,
-                Person.FirstName,
-                Person.LastName,
-                Person.NickName,
-                Person.Avatar,
-                Person.UseGravatar,
-                Person.Email
+                Individual.FirstName,
+                Individual.LastName,
+                Individual.NickName,
+                Individual.Avatar,
+                Member.UseGravatar,
+                Individual.Email
             FROM Message
-            LEFT JOIN Person ON Message.PersonId = Person.Id
+            LEFT JOIN Member     ON Message.PersonId = Member.Id
+            LEFT JOIN Individual ON Member.Id = Individual.Id
             WHERE Message.ArticleId = :articleId
             ORDER BY Message.Id ASC
         ";
@@ -102,21 +107,23 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
+
     /** @return array<int, stdClass> */
     public function getEventMessages(int $eventId): array
     {
         $sql = "
             SELECT 
                 Message.*,
-                Person.FirstName,
-                Person.LastName,
-                Person.NickName,
-                Person.Avatar,
-                Person.UseGravatar,
-                Person.Email
+                Individual.FirstName,
+                Individual.LastName,
+                Individual.NickName,
+                Individual.Avatar,
+                Member.UseGravatar,
+                Individual.Email
             FROM Message
-            LEFT JOIN Person ON Message.PersonId = Person.Id
-            WHERE Message.EventId = :eventId AND Message.'From' = 'User'
+            LEFT JOIN Member     ON Message.PersonId = Member.Id
+            LEFT JOIN Individual ON Member.Id = Individual.Id
+            WHERE Message.EventId = :eventId AND Message.\"From\" = 'User'
             ORDER BY Message.Id ASC
         ";
         $stmt = $this->pdo->prepare($sql);
@@ -125,6 +132,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
+
 
     /** @return array<int, stdClass> */
     public function getGroupMessages(int $groupId): array
@@ -136,14 +144,15 @@ class MessageDataHelper extends Data implements NewsProviderInterface
                 Message.Text,
                 Message.ImagePath,
                 Message.LastUpdate,
-                Person.FirstName,
-                Person.LastName,
-                Person.NickName,
-                Person.Avatar,
-                Person.UseGravatar,
-                Person.Email
+                Individual.FirstName,
+                Individual.LastName,
+                Individual.NickName,
+                Individual.Avatar,
+                Member.UseGravatar,
+                Individual.Email
             FROM Message
-            LEFT JOIN Person ON Message.PersonId = Person.Id
+            LEFT JOIN Member     ON Message.PersonId = Member.Id
+            LEFT JOIN Individual ON Member.Id = Individual.Id
             WHERE Message.GroupId = :groupId
             ORDER BY Message.Id ASC
         ";
@@ -153,6 +162,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
+
 
     /** @return array<int, array<string, mixed>> */
     public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
@@ -173,6 +183,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             return $result;
         }, $rows);
     }
+
 
     /** @return array{0: int, 1: int, 2: string} */
     public function getImageInfoFromMessage(int $messageId): array
@@ -205,6 +216,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return [(int)$year, (int)$month, $filename];
     }
 
+
     /**
      * @param array{start: string, end: string} $season
      * @return array<string, int>
@@ -212,11 +224,12 @@ class MessageDataHelper extends Data implements NewsProviderInterface
     public function getMessages(array $season): array
     {
         $query = $this->pdo->prepare("
-            SELECT LOWER(p.Email) AS Email, COUNT(m.Id) AS MessageCount
+            SELECT LOWER(i.Email) AS Email, COUNT(m.Id) AS MessageCount
             FROM Message m
-            JOIN Person p ON p.Id = m.PersonId
+            JOIN Member     mb ON mb.Id = m.PersonId
+            JOIN Individual i  ON i.Id  = mb.Id
             WHERE m.LastUpdate BETWEEN :start AND :end
-            GROUP BY p.Email
+            GROUP BY i.Email
         ");
         $query->execute([
             ':start' => $season['start'],
@@ -224,6 +237,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         ]);
         return $query->fetchAll(PDO::FETCH_KEY_PAIR);
     }
+
 
     /**
      * @return array{
@@ -241,7 +255,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             FROM Message m
             JOIN Event e ON e.Id = m.EventId
             WHERE m.EventId IS NOT NULL
-            AND m.ImagePath LIKE :path
+              AND m.ImagePath LIKE :path
             ORDER BY e.StartTime DESC
         ");
         $events->execute([':path' => $like]);
@@ -251,7 +265,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             FROM Message m
             JOIN Article a ON a.Id = m.ArticleId
             WHERE m.ArticleId IS NOT NULL
-            AND m.ImagePath LIKE :path
+              AND m.ImagePath LIKE :path
             ORDER BY a.Title ASC
         ");
         $articles->execute([':path' => $like]);
@@ -261,7 +275,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             FROM Message m
             JOIN `Group` g ON g.Id = m.GroupId
             WHERE m.GroupId IS NOT NULL
-            AND m.ImagePath LIKE :path
+              AND m.ImagePath LIKE :path
             ORDER BY g.Name ASC
         ");
         $groups->execute([':path' => $like]);
@@ -272,6 +286,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             'groups'   => $groups->fetchAll(PDO::FETCH_OBJ),
         ];
     }
+
 
     /**
      * @return array<int, array{
@@ -290,29 +305,39 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             return $news;
         }
         $sql = "
-            SELECT m.Id, m.Text, m.LastUpdate, m.EventId, p.FirstName, p.LastName, p.NickName, e.Summary, e.StartTime
-            From Message m
-            JOIN Person p ON p.Id = m.PersonId
-            JOIN Event e ON e.Id = m.EventId
-            WHERE m.LastUpdate > :searchFrom AND m.'From' = 'User' 
-            AND m.EventId IN (SELECT IdEvent FROM Participant WHERE IdPerson = " . $connectedUser->person->Id . ")
+            SELECT m.Id, m.Text, m.LastUpdate, m.EventId,
+                   i.FirstName, i.LastName, i.NickName,
+                   e.Summary, e.StartTime
+            FROM Message m
+            JOIN Member     mb ON mb.Id = m.PersonId
+            JOIN Individual i  ON i.Id  = mb.Id
+            JOIN Event      e  ON e.Id  = m.EventId
+            WHERE m.LastUpdate > :searchFrom
+              AND m.\"From\" = 'User'
+              AND m.EventId IN (
+                  SELECT IdEvent FROM Participant WHERE IdIndividual = :personId
+              )
             ORDER BY m.LastUpdate DESC
         ";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':searchFrom' => $searchFrom]);
+        $stmt->execute([
+            ':searchFrom' => $searchFrom,
+            ':personId'   => $connectedUser->person->Id,
+        ]);
         $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($messages as $message) {
             $news[] = [
-                'type' => 'message',
-                'id' => $message->EventId,
+                'type'  => 'message',
+                'id'    => $message->EventId,
                 'title' => $message->Summary . '(' . TranslationManager::getShortDate($message->StartTime) . ')' . ' => ' . $message->Text,
-                'from' => $message->FirstName . ' ' . $message->LastName,
-                'date' => $message->LastUpdate,
-                'url' => '/event/chat/' . $message->EventId
+                'from'  => $message->FirstName . ' ' . $message->LastName,
+                'date'  => $message->LastUpdate,
+                'url'   => '/event/chat/' . $message->EventId
             ];
         }
         return $news;
     }
+
 
     /**
      * @param array<int, string> $paths
@@ -339,8 +364,9 @@ class MessageDataHelper extends Data implements NewsProviderInterface
                 }
             }
         }
-        return $used; // ['data/media/2024/01/photo.jpg' => true, ...]
+        return $used;
     }
+
 
     public function hasNewMessages(int $personId, int $lastLogId): bool
     {
@@ -362,6 +388,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         }
     }
 
+
     public function updateMessage(int $messageId, int $personId, string $text): true
     {
         /** @var object{PersonId: int}|false $message */
@@ -369,9 +396,10 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         if (!$message || $message->PersonId != $personId) {
             throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à modifier ce message");
         }
-        $this->set('Message', ['Text' => $text, 'LastUpdate' =>  date('Y-m-d H:i:s')], ['Id' => $messageId]);
+        $this->set('Message', ['Text' => $text, 'LastUpdate' => date('Y-m-d H:i:s')], ['Id' => $messageId]);
         return true;
     }
+
 
     #region Private functions
     /**
@@ -394,6 +422,7 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
+
     /** @return array<int, stdClass> */
     private function doGetGroupedMessages(int $personId, string $searchFrom): array
     {
@@ -414,28 +443,29 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         INNER JOIN EventType et ON e.IdEventType = et.Id
         INNER JOIN Message m ON m.EventId = e.Id AND m.\"From\" = 'User'
         LEFT JOIN (
-            SELECT m2.EventId, p.Avatar, p.UseGravatar, p.Email
+            SELECT m2.EventId, i.Avatar, mb.UseGravatar, i.Email
             FROM Message m2
-            INNER JOIN Person p ON p.Id = m2.PersonId
-            WHERE m2.`From` = 'User'
-            AND m2.LastUpdate = (
-                SELECT MAX(m3.LastUpdate)
-                FROM Message m3
-                WHERE m3.EventId = m2.EventId
-                    AND m3.`From` = 'User'
-            )
+            INNER JOIN Member     mb ON mb.Id = m2.PersonId
+            INNER JOIN Individual i  ON i.Id  = mb.Id
+            WHERE m2.\"From\" = 'User'
+              AND m2.LastUpdate = (
+                  SELECT MAX(m3.LastUpdate)
+                  FROM Message m3
+                  WHERE m3.EventId = m2.EventId
+                    AND m3.\"From\" = 'User'
+              )
         ) lp_e ON lp_e.EventId = e.Id
         WHERE et.Inactivated = 0
-        AND (
-            et.IdGroup IS NULL 
-            OR et.IdGroup IN (
-                SELECT IdGroup 
-                FROM PersonGroup 
-                WHERE IdPerson = ?
-            )
-        )
-        $whereClause
-        GROUP BY e.Id, e.Summary, lp_e.Avatar, lp_e.UseGravatar
+          AND (
+              et.IdGroup IS NULL 
+              OR et.IdGroup IN (
+                  SELECT IdGroup 
+                  FROM MemberGroup 
+                  WHERE IdMember = ?
+              )
+          )
+          $whereClause
+        GROUP BY e.Id, e.Summary, lp_e.Avatar, lp_e.UseGravatar, lp_e.Email
         HAVING message_count > 0";
 
         $params[] = $personId;
@@ -456,29 +486,30 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         FROM Article a
         INNER JOIN Message m ON m.ArticleId = a.Id AND m.\"From\" = 'User'
         LEFT JOIN (
-            SELECT m2.ArticleId, p.Avatar, p.UseGravatar, p.Email
+            SELECT m2.ArticleId, i.Avatar, mb.UseGravatar, i.Email
             FROM Message m2
-            INNER JOIN Person p ON p.Id = m2.PersonId
-            WHERE m2.`From` = 'User'
-            AND m2.LastUpdate = (
-                SELECT MAX(m3.LastUpdate)
-                FROM Message m3
-                WHERE m3.ArticleId = m2.ArticleId
-                    AND m3.`From` = 'User'
-            )
+            INNER JOIN Member     mb ON mb.Id = m2.PersonId
+            INNER JOIN Individual i  ON i.Id  = mb.Id
+            WHERE m2.\"From\" = 'User'
+              AND m2.LastUpdate = (
+                  SELECT MAX(m3.LastUpdate)
+                  FROM Message m3
+                  WHERE m3.ArticleId = m2.ArticleId
+                    AND m3.\"From\" = 'User'
+              )
         ) lp_a ON lp_a.ArticleId = a.Id
         WHERE a.PublishedBy IS NOT NULL
-        AND (
-            a.CreatedBy = ?
-            OR a.IdGroup IS NULL
-            OR a.IdGroup IN (
-                SELECT IdGroup 
-                FROM PersonGroup 
-                WHERE IdPerson = ?
-            )
-        )
-        $whereClause
-        GROUP BY a.Id, a.Title, lp_a.Avatar, lp_a.UseGravatar
+          AND (
+              a.CreatedBy = ?
+              OR a.IdGroup IS NULL
+              OR a.IdGroup IN (
+                  SELECT IdGroup 
+                  FROM MemberGroup 
+                  WHERE IdMember = ?
+              )
+          )
+          $whereClause
+        GROUP BY a.Id, a.Title, lp_a.Avatar, lp_a.UseGravatar, lp_a.Email
         HAVING message_count > 0";
 
         $params[] = $personId;
@@ -498,24 +529,25 @@ class MessageDataHelper extends Data implements NewsProviderInterface
             lp_g.UseGravatar,
             lp_g.Email
         FROM `Group` g
-        LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?
+        LEFT JOIN MemberGroup mg ON mg.IdGroup = g.Id AND mg.IdMember = ?
         INNER JOIN Message m ON m.GroupId = g.Id AND m.\"From\" = 'User'
         LEFT JOIN (
-            SELECT m2.GroupId, p.Avatar, p.UseGravatar, p.Email
+            SELECT m2.GroupId, i.Avatar, mb.UseGravatar, i.Email
             FROM Message m2
-            INNER JOIN Person p ON p.Id = m2.PersonId
-            WHERE m2.`From` = 'User'
-            AND m2.LastUpdate = (
-                SELECT MAX(m3.LastUpdate)
-                FROM Message m3
-                WHERE m3.GroupId = m2.GroupId
-                    AND m3.`From` = 'User'
-            )
+            INNER JOIN Member     mb ON mb.Id = m2.PersonId
+            INNER JOIN Individual i  ON i.Id  = mb.Id
+            WHERE m2.\"From\" = 'User'
+              AND m2.LastUpdate = (
+                  SELECT MAX(m3.LastUpdate)
+                  FROM Message m3
+                  WHERE m3.GroupId = m2.GroupId
+                    AND m3.\"From\" = 'User'
+              )
         ) lp_g ON lp_g.GroupId = g.Id
         WHERE g.Inactivated = 0
-        AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
-        $whereClause
-        GROUP BY g.Id, g.Name, lp_g.Avatar, lp_g.UseGravatar
+          AND (g.SelfRegistration = 1 OR mg.Id IS NOT NULL)
+          $whereClause
+        GROUP BY g.Id, g.Name, lp_g.Avatar, lp_g.UseGravatar, lp_g.Email
         HAVING message_count > 0";
 
         $params[] = $personId;
@@ -524,17 +556,19 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         }
 
         $query = "
-        $eventsQuery
-        UNION ALL
-        $articlesQuery
-        UNION ALL
-        $groupsQuery
-        ORDER BY LastUpdate DESC";
+            $eventsQuery
+            UNION ALL
+            $articlesQuery
+            UNION ALL
+            $groupsQuery
+            ORDER BY LastUpdate DESC
+        ";
 
         $stmt = $this->pdo->prepare($query);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
+
 
     private function getLastCreatedAt(int $lastLogId): ?string
     {
@@ -544,13 +578,14 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         return $result !== false ? (string)$result : null;
     }
 
+
     private function hasRecentMessageApiCall(int $lastLogId): bool
     {
         $stmt = $this->pdoForLog->prepare("
             SELECT COUNT(*)
             FROM Log
             WHERE Id > ?
-            AND (Uri = '/api/message/add (POST)' OR Uri = '/api/message/update (POST)')
+              AND (Uri = '/api/message/add (POST)' OR Uri = '/api/message/update (POST)')
         ");
         $stmt->execute([$lastLogId]);
         return (int)$stmt->fetchColumn() > 0;

@@ -13,7 +13,7 @@ class LogWriterDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdoForLog(), $application->getErrorManager(), $application->getPdoForLog());
     }
 
     public function add(string $code, string $message, ?float $duration = null): void

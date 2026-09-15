@@ -12,8 +12,9 @@ class ArticleTableDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
+
 
     public function getQuery(ConnectedUser $connectedUser, int $spotlightArticleId): Select
     {
@@ -29,21 +30,24 @@ class ArticleTableDataHelper extends Data
                     END
                 END AS Published');
 
+
         if ($connectedUser->person !== null) {
             if (!$connectedUser->isEditor()) {
                 $query = $query->where('(CreatedBy = ' . $connectedUser->person->Id . '
-                OR (PublishedBy IS NOT NULL 
-                    AND (IdGroup IS NULL 
-                        OR IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $connectedUser->person->Id . '))
-                ))');
+                    OR (PublishedBy IS NOT NULL 
+                        AND (IdGroup IS NULL 
+                            OR IdGroup IN (SELECT IdGroup FROM MemberGroup WHERE IdMember = ' . $connectedUser->person->Id . '))
+                    ))');
             }
         } else {
             $query = $query->where('(IdGroup IS NULL AND OnlyForMembers = 0 AND PublishedBy IS NOT NULL)');
         }
 
+
         $query = $query->orderBy('LastUpdate DESC');
         return $query;
     }
+
 
     public function getQueryForPublicArticles(): Select
     {

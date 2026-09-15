@@ -48,10 +48,14 @@ class LoanDataHelperTest extends DataHelperTestCase
             'Status',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'FirstName',
             'LastName',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Member', [
+            'Id',
         ]);
     }
 
@@ -149,9 +153,9 @@ class LoanDataHelperTest extends DataHelperTestCase
 
         $this->assertStringContainsString('FROM   LoanRecord lr', $sql);
         $this->assertStringContainsString('JOIN   LoanItem   li ON li.Id = lr.ItemId', $sql);
-        $this->assertStringContainsString('JOIN   Person     b  ON b.Id  = lr.BorrowerId', $sql);
-        $this->assertStringContainsString('JOIN   Person     l  ON l.Id  = lr.LenderId', $sql);
-        $this->assertStringContainsString('LEFT JOIN Person  rt ON rt.Id = lr.ReturnedToId', $sql);
+        $this->assertStringContainsString('JOIN   Individual b  ON b.Id  = lr.BorrowerId', $sql);
+        $this->assertStringContainsString('JOIN   Individual l  ON l.Id  = lr.LenderId', $sql);
+        $this->assertStringContainsString('LEFT JOIN Individual rt ON rt.Id = lr.ReturnedToId', $sql);
     }
 
     public function testGetAllLoansSqlIsValidAgainstTemplateSchema(): void
@@ -266,7 +270,7 @@ class LoanDataHelperTest extends DataHelperTestCase
 
         $this->assertStringContainsString('FROM   LoanReservation res', $sql);
         $this->assertStringContainsString('JOIN   LoanItem li ON li.Id = res.ItemId', $sql);
-        $this->assertStringContainsString('JOIN   Person   p  ON p.Id  = res.UserId', $sql);
+        $this->assertStringContainsString('JOIN   Individual p  ON p.Id  = res.UserId', $sql);
     }
 
     public function testGetAllReservationsSqlIsValidAgainstTemplateSchema(): void
@@ -392,8 +396,10 @@ class LoanDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->query($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString("FirstName || ' ' || LastName AS FullName", $sql);
-        $this->assertStringContainsString('FROM Person ORDER BY LastName ASC, FirstName ASC', $sql);
+        $this->assertStringContainsString("i.FirstName || ' ' || i.LastName AS FullName", $sql);
+        $this->assertStringContainsString('FROM Individual i', $sql);
+        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
+        $this->assertStringContainsString('ORDER BY i.LastName ASC, i.FirstName ASC', $sql);
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -463,9 +469,9 @@ class LoanDataHelperTest extends DataHelperTestCase
 				       rt.FirstName || ' ' || rt.LastName AS ReturnedToName
 				FROM   LoanRecord lr
 				JOIN   LoanItem   li ON li.Id = lr.ItemId
-				JOIN   Person     b  ON b.Id  = lr.BorrowerId
-				JOIN   Person     l  ON l.Id  = lr.LenderId
-				LEFT JOIN Person  rt ON rt.Id = lr.ReturnedToId";
+				JOIN   Individual b  ON b.Id  = lr.BorrowerId
+				JOIN   Individual l  ON l.Id  = lr.LenderId
+				LEFT JOIN Individual rt ON rt.Id = lr.ReturnedToId";
     }
 
     private function getGetAllLoansSql(): string
@@ -540,7 +546,7 @@ class LoanDataHelperTest extends DataHelperTestCase
 				       p.FirstName || ' ' || p.LastName AS UserName
 				FROM   LoanReservation res
 				JOIN   LoanItem li ON li.Id = res.ItemId
-				JOIN   Person   p  ON p.Id  = res.UserId";
+				JOIN   Individual p  ON p.Id  = res.UserId";
     }
 
     private function getGetAllReservationsSql(): string
@@ -606,7 +612,7 @@ class LoanDataHelperTest extends DataHelperTestCase
 			        b.FirstName || ' ' || b.LastName AS BorrowerName
 			 FROM   LoanRecord lr
 			 JOIN   LoanItem li ON li.Id = lr.ItemId
-			 JOIN   Person   b  ON b.Id  = lr.BorrowerId
+			 JOIN   Individual b  ON b.Id  = lr.BorrowerId
 			 WHERE  lr.Status IN ('active','returned','overdue')
 			   AND  lr.LoanDate <= :end
 			   AND  lr.DueDate  >= :start";
@@ -619,14 +625,16 @@ class LoanDataHelperTest extends DataHelperTestCase
 			        p.FirstName || ' ' || p.LastName AS UserName
 			 FROM   LoanReservation res
 			 JOIN   LoanItem li ON li.Id = res.ItemId
-			 JOIN   Person   p  ON p.Id  = res.UserId
+			 JOIN   Individual p  ON p.Id  = res.UserId
 			 WHERE  res.Status = 'active'
 			   AND  res.ReservationDate BETWEEN :start AND :end";
     }
 
     private function getGetAllPersonsSql(): string
     {
-        return "SELECT Id, FirstName || ' ' || LastName AS FullName
-			 FROM Person ORDER BY LastName ASC, FirstName ASC";
+        return "SELECT i.Id, i.FirstName || ' ' || i.LastName AS FullName
+			 FROM Individual i
+			 INNER JOIN Member m ON m.Id = i.Id
+			 ORDER BY i.LastName ASC, i.FirstName ASC";
     }
 }

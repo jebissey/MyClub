@@ -18,7 +18,7 @@ class LogDataHelper extends Data
 {
     public function __construct(Application $application, private DataHelper $dataHelper)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     /**
@@ -98,11 +98,22 @@ class LogDataHelper extends Data
             $visit->MinutesAgo    = MyClubDateTime::calculateMinutesAgo($visit->LastActivity);
             $visit->FormattedDate = MyClubDateTime::formatDateFromUTC($visit->LastActivity);
 
-            $person = $this->dataHelper->get(
-                'Person',
+            $individual = $this->dataHelper->get(
+                'Individual',
                 ['Email' => $visit->Email],
-                'Email, UseGravatar, Avatar'
+                'Id, Email, Avatar'
             );
+            $member = $individual
+                ? $this->dataHelper->get(
+                    'Member',
+                    ['Id' => $individual->Id],
+                    'UseGravatar'
+                )
+                : false;
+
+            $person = $individual && $member
+                ? (object) array_merge((array) $individual, (array) $member)
+                : false;
 
             $visit->UseGravatar = $person->UseGravatar ?? 'no';
             $visit->Avatar      = $person->Avatar ?? '';
@@ -200,7 +211,9 @@ class LogDataHelper extends Data
             array_map('trim', array_values($filteredPersonEmails))
         );
 
-        $sql = "SELECT LOWER(Email) AS Email, FirstName, LastName FROM Person";
+        $sql = "SELECT LOWER(i.Email) AS Email, i.FirstName, i.LastName
+                FROM Individual i
+                INNER JOIN Member m ON m.Id = i.Id";
         $params = [];
 
         if (!empty($emails)) {
@@ -209,7 +222,7 @@ class LogDataHelper extends Data
                 array_fill(0, count($emails), '?')
             );
 
-            $sql .= " WHERE LOWER(Email) IN ($placeholders)";
+            $sql .= " WHERE LOWER(i.Email) IN ($placeholders)";
             $params = array_map('strtolower', $emails);
         }
 

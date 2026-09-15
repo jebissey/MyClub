@@ -15,9 +15,9 @@ use app\modules\Article\valueObjects\SurveyWithCreatorRow;
 
 class SurveyDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     public function articleHasSurveyNotClosed(int $articleId): object|bool
@@ -68,8 +68,9 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         $sql = "
             SELECT r.Id, r.IdPerson, r.IdSurvey, r.Answers, r.LastUpdate
             FROM Reply r
-            JOIN Person p ON r.IdPerson = p.Id
-            WHERE r.IdSurvey = :surveyId and p.Inactivated = 0
+            JOIN Individual i ON r.IdPerson = i.Id
+            INNER JOIN Member m ON m.Id = i.Id
+            WHERE r.IdSurvey = :surveyId and m.Inactivated = 0
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':surveyId' => $surveyId]);
@@ -84,28 +85,29 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
     {
         $query = "
             SELECT 
-                p.Id AS PersonId, 
-                p.Email, 
+                i.Id AS PersonId, 
+                i.Email, 
                 a.Id AS ArticleId, 
                 a.Title AS ArticleTitle, 
                 s.Id AS SurveyId, 
                 s.Question AS SurveyQuestion, 
                 s.ClosingDate
-            FROM Person p
+            FROM Individual i
+            INNER JOIN Member m ON m.Id = i.Id
             CROSS JOIN Survey s
             JOIN Article a ON s.IdArticle = a.Id
-            LEFT JOIN Reply r ON r.IdSurvey = s.Id AND r.IdPerson = p.Id
-            LEFT JOIN PersonGroup pg ON pg.IdPerson = p.Id AND pg.IdGroup = a.IdGroup
+            LEFT JOIN Reply r ON r.IdSurvey = s.Id AND r.IdPerson = i.Id
+            LEFT JOIN MemberGroup mg ON mg.IdMember = i.Id AND mg.IdGroup = a.IdGroup
             WHERE 
                 a.PublishedBy IS NOT NULL
-                AND p.Inactivated = 0
+                AND m.Inactivated = 0
                 AND s.ClosingDate > date('now')
                 AND (
                     a.IdGroup IS NULL
-                    OR pg.IdGroup IS NOT NULL 
+                    OR mg.IdGroup IS NOT NULL 
                 )
                 AND r.Id IS NULL
-            ORDER BY s.ClosingDate, p.LastName, p.FirstName";
+            ORDER BY s.ClosingDate, i.LastName, i.FirstName";
 
         $stmt = $this->pdo->query($query);
         if ($stmt === false) {
@@ -148,8 +150,8 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
             FROM Reply r
             JOIN Survey s ON s.Id = r.IdSurvey
             JOIN Article a ON a.Id = s.IdArticle
-            JOIN Person p ON p.Id = a.CreatedBy
-            JOIN Person v ON v.Id = r.IdPerson
+            JOIN Individual p ON p.Id = a.CreatedBy
+            JOIN Individual v ON v.Id = r.IdPerson
             WHERE r.LastUpdate >= :searchFrom
             GROUP BY s.Id
             ORDER BY LastActivity DESC
@@ -158,12 +160,11 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
         $stmt->execute([':searchFrom' => $searchFrom]);
         $surveys = $stmt->fetchAll(PDO::FETCH_OBJ);
         $news = [];
-        $authorizationDataHelper = new AuthorizationDataHelper($this->application);
         foreach ($surveys as $survey) {
-            $article = $authorizationDataHelper->getArticle($survey->IdArticle, $connectedUser);
+            $article = $this->authorizationDataHelper->getArticle($survey->IdArticle, $connectedUser);
             if (
                 $article !== false
-                && $authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser)
+                && $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser)
             ) {
                 $news[] = [
                     'type'   => 'survey',

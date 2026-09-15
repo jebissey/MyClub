@@ -81,7 +81,7 @@ class UserDirectoryController extends AbstractController
             }
         }
 
-        $loggedPersonRow = $this->dataHelper->get('Person', ['Id' => $person->Id], 'InPresentationDirectory');
+        $loggedPersonRow = $this->dataHelper->get('Member', ['Id' => $person->Id], 'InPresentationDirectory');
         /** @var object{InPresentationDirectory: bool|int|string|null}|false $loggedPersonRow */
         $loggedPersonInPresentationDirectory = $loggedPersonRow !== false
             ? (bool)($loggedPersonRow->InPresentationDirectory ?? false)

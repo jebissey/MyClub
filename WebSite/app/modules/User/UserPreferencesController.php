@@ -39,7 +39,7 @@ class UserPreferencesController extends AbstractController
             );
         }
 
-        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Preferences');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Preferences');
         /** @var object{Preferences: string|null}|false $row */
         $preferencesJson = $row !== false ? ($row->Preferences ?? '') : '';
 
@@ -68,7 +68,7 @@ class UserPreferencesController extends AbstractController
             FilterInputRule::CheckboxMatrix->value,
             $this->flight->request()->data->getData()
         ) ?? '';
-        $this->dataHelper->set('Person', ['preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
+        $this->dataHelper->set('Member', ['preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
         $this->redirect('/user');
     }
 }

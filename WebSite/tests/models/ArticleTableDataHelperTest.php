@@ -15,9 +15,9 @@ class ArticleTableDataHelperTest extends DataHelperTestCase
         // pas ici. On ne vérifie ici que la table réelle interrogée.
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
             'IdGroup',
-            'IdPerson',
+            'IdMember',
         ]);
     }
 
@@ -50,7 +50,7 @@ class ArticleTableDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('CreatedBy = 7', $sql);
         $this->assertStringContainsString('PublishedBy IS NOT NULL', $sql);
         $this->assertStringContainsString('IdGroup IS NULL', $sql);
-        $this->assertStringContainsString('IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = 7)', $sql);
+        $this->assertStringContainsString('IdGroup IN (SELECT IdGroup FROM MemberGroup WHERE IdMember = 7)', $sql);
         $this->assertStringContainsString('ORDER BY LastUpdate DESC', $sql);
     }
 
@@ -113,7 +113,7 @@ class ArticleTableDataHelperTest extends DataHelperTestCase
         ';
     }
 
-    private function getQueryForConnectedNonEditorSql(int $personId, int $spotlightArticleId = 42): string
+    private function getQueryForConnectedNonEditorSql(int $memberId, int $spotlightArticleId = 42): string
     {
         return '
             SELECT Id, CreatedBy, Title, LastUpdate, PersonName, GroupName, Pool, PoolDetail, ForMembers, Messages, Menu, CASE 
@@ -125,10 +125,10 @@ class ArticleTableDataHelperTest extends DataHelperTestCase
                     END
                 END AS Published
             FROM article_list_view
-            WHERE (CreatedBy = ' . $personId . '
+            WHERE (CreatedBy = ' . $memberId . '
                 OR (PublishedBy IS NOT NULL 
                     AND (IdGroup IS NULL 
-                        OR IdGroup IN (SELECT IdGroup FROM PersonGroup WHERE IdPerson = ' . $personId . '))
+                        OR IdGroup IN (SELECT IdGroup FROM MemberGroup WHERE IdMember = ' . $memberId . '))
                 ))
             ORDER BY LastUpdate DESC
         ';

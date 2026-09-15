@@ -31,7 +31,7 @@ class UserAccountController extends AbstractController
         }
         $person = $connectedUser->person;
 
-        $imported = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Imported');
+        $imported = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Imported');
         $readOnly = $imported !== false && (bool)($imported->Imported ?? false);
 
         $viewModel = new UserAccountViewModel(
@@ -72,7 +72,7 @@ class UserAccountController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $imported = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Imported');
+        $imported = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Imported');
         $isImported = $imported !== false && (bool)($imported->Imported ?? false);
 
         $schema = [
@@ -84,17 +84,19 @@ class UserAccountController extends AbstractController
             'avatar' => FilterInputRule::Avatar->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $this->dataHelper->set('Person', [
+        $this->dataHelper->set('Individual', [
             'FirstName' => $input['firstName'] ?? '???',
             'LastName' => $input['lastName'] ?? '???',
             'NickName' => $input['nickName'] ?? '',
             'Avatar' => ($input['useGravatar'] ?? YesNo::No->value) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
+        ], ['Id' => $person->Id]);
+        $this->dataHelper->set('Member', [
             'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
         ], ['Id' => $person->Id]);
         if (!$isImported) {
             $emailInput = $input['email'] ?? '';
             $email = is_string($emailInput) ? urldecode($emailInput) : '';
-            $this->dataHelper->set('Person', ['Email' => $email], ['Id' => $person->Id]);
+            $this->dataHelper->set('Member', ['Email' => $email], ['Id' => $person->Id]);
             $_SESSION['user'] = $email;
         }
         $this->redirect('/user');

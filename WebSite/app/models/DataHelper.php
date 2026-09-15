@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use app\helpers\Application;
+use PDO;
+use app\helpers\ErrorManager;
 
-class DataHelper extends Data
+final class DataHelper extends Data
 {
-    public function __construct(Application $application)
-    {
-        parent::__construct($application);
+    public function __construct(
+        PDO $pdo,
+        ErrorManager $errorManager,
+        ?PDO $pdoForLog = null,
+    ) {
+        parent::__construct($pdo, $errorManager, $pdoForLog);
     }
 }

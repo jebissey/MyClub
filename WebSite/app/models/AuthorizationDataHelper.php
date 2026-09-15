@@ -23,8 +23,9 @@ class AuthorizationDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
+
 
     /**
      * @return array<int, string>
@@ -32,15 +33,18 @@ class AuthorizationDataHelper extends Data
     public function getsFor(ConnectedUser $connectedUser): array
     {
         $query = $this->pdo->prepare("
-            SELECT DISTINCT Authorization.Name FROM Person 
-            INNER JOIN PersonGroup ON Person.Id = PersonGroup.IdPerson
-            INNER JOIN `Group` ON PersonGroup.IdGroup = `Group`.Id
-            INNER JOIN GroupAuthorization on `Group`.Id = GroupAuthorization.IdGroup
-            INNER JOIN Authorization on GroupAuthorization.IdAuthorization = Authorization.Id 
-            WHERE Person.Id = ?");
+            SELECT DISTINCT Authorization.Name
+            FROM Member
+            INNER JOIN MemberGroup       ON Member.Id = MemberGroup.IdMember
+            INNER JOIN `Group`           ON MemberGroup.IdGroup = `Group`.Id
+            INNER JOIN GroupAuthorization ON `Group`.Id = GroupAuthorization.IdGroup
+            INNER JOIN Authorization     ON GroupAuthorization.IdAuthorization = Authorization.Id
+            WHERE Member.Id = ?
+        ");
         $query->execute([$connectedUser->person->Id ?? 0]);
         return array_column($query->fetchAll(), 'Name');
     }
+
 
     /**
      * @param array<int, object{Url?: string}> $navItems
@@ -103,6 +107,7 @@ class AuthorizationDataHelper extends Data
         return false;
     }
 
+
     public function canPersonReadOrderResults(ArticleAuthorizationRow $article, ConnectedUser $connectedUser): bool
     {
         $row = $this->get('Order', ['IdArticle' => $article->Id], 'ClosingDate, Visibility, Id');
@@ -128,6 +133,7 @@ class AuthorizationDataHelper extends Data
         }
         return false;
     }
+
 
     public function canPersonReadSurveyResults(ArticleAuthorizationRow $article, ConnectedUser $connectedUser): bool
     {
@@ -155,6 +161,7 @@ class AuthorizationDataHelper extends Data
         return false;
     }
 
+
     public function getArticle(int $id, ConnectedUser $connectedUser): ArticleAuthorizationRow|false
     {
         $row = $this->get(
@@ -173,16 +180,18 @@ class AuthorizationDataHelper extends Data
         return $article;
     }
 
+
     /**
      * @return array<int, int>
      */
     public function getUserGroups(string $userEmail): array
     {
         $sql = '
-            SELECT PersonGroup.IdGroup AS IdGroup
-            FROM PersonGroup
-            LEFT JOIN Person ON Person.Id = PersonGroup.IdPerson
-            WHERE Person.Email COLLATE NOCASE = :email
+            SELECT MemberGroup.IdGroup AS IdGroup
+            FROM MemberGroup
+            INNER JOIN Member     ON Member.Id = MemberGroup.IdMember
+            INNER JOIN Individual ON Individual.Id = Member.Id
+            WHERE Individual.Email COLLATE NOCASE = :email
         ';
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':email' => $userEmail]);
@@ -190,10 +199,12 @@ class AuthorizationDataHelper extends Data
         return array_column($rows, 'IdGroup');
     }
 
+
     public function isUserInGroup(string $personEmail, string $groupsFilter): bool
     {
         return !empty(array_intersect($this->getGroups($groupsFilter), $this->getUserGroups($personEmail)));
     }
+
 
     #region Private functions
     private function canReadArticle(ArticleAuthorizationRow $article, ConnectedUser $connectedUser): bool
@@ -212,6 +223,7 @@ class AuthorizationDataHelper extends Data
             $this->getUserGroups($connectedUser->person->Email ?? '')
         ));
     }
+
 
     private function canReadEventById(int $eventId, ConnectedUser $connectedUser): bool
     {
@@ -237,7 +249,7 @@ class AuthorizationDataHelper extends Data
                   AND (
                       et.IdGroup IS NULL
                       OR et.IdGroup IN (
-                          SELECT IdGroup FROM PersonGroup WHERE IdPerson = :personId
+                          SELECT IdGroup FROM MemberGroup WHERE IdMember = :personId
                       )
                   )
             ");
@@ -248,6 +260,7 @@ class AuthorizationDataHelper extends Data
         }
         return (bool) $stmt->fetch(PDO::FETCH_OBJ);
     }
+
 
     private function canReadMessageParent(object $message, ConnectedUser $connectedUser): bool
     {
@@ -273,6 +286,7 @@ class AuthorizationDataHelper extends Data
 
         return false;
     }
+
 
     /**
      * @return array<int, int>

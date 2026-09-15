@@ -13,7 +13,7 @@ use RuntimeException;
 use stdClass;
 use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
-use app\helpers\Application;
+use app\helpers\ErrorManager;
 
 abstract class Data
 {
@@ -28,10 +28,13 @@ abstract class Data
     /** @var array<int, string>|null */
     private static ?array $cachedTables = null;
 
-    public function __construct(protected Application $application)
-    {
-        $this->pdo = $application->getPdo();
-        $this->pdoForLog = $application->getPdoForLog();
+    public function __construct(
+        PDO $pdo,
+        protected ErrorManager $errorManager,
+        ?PDO $pdoForLog = null,
+    ) {
+        $this->pdo = $pdo;
+        $this->pdoForLog = $pdoForLog ?? $pdo;
         $this->fluent = new Query($this->pdo);
         $this->fluentForLog = new Query($this->pdoForLog);
         self::$cachedTables ??= $this->getTables();
@@ -39,6 +42,7 @@ abstract class Data
     }
 
     #region Protected methods
+
     /** @return array<int, string> */
     protected function getCheckValues(string $table, string $column): array
     {
@@ -80,6 +84,7 @@ abstract class Data
     }
 
     #region Public methods
+
     /** @param array<string, mixed> $where */
     public function delete(string $table, array $where): int
     {
@@ -100,7 +105,7 @@ abstract class Data
             $stmt->execute($params);
             return $stmt->rowCount();
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(
+            $this->errorManager->raise(
                 ApplicationError::Error,
                 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__
             );
@@ -143,7 +148,7 @@ abstract class Data
             $result = $stmt->fetch(PDO::FETCH_OBJ);
             return is_object($result) ? $result : false;
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(
+            $this->errorManager->raise(
                 ApplicationError::Error,
                 "Database error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()} with query {$sql}"
             );
@@ -218,7 +223,7 @@ abstract class Data
             }
             return $stmt->fetchAll(PDO::FETCH_OBJ);
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(
+            $this->errorManager->raise(
                 ApplicationError::Error,
                 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__
             );
@@ -270,7 +275,7 @@ abstract class Data
             $result = $stmt->fetch(PDO::FETCH_OBJ);
             return is_object($result) ? $result : false;
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(
+            $this->errorManager->raise(
                 ApplicationError::Error,
                 "Database error {$e->getMessage()} in {$e->getFile()}:{$e->getLine()} with query {$sql}"
             );
@@ -299,8 +304,8 @@ abstract class Data
                 default:
                     return $result;
             }
-        } catch (\PDOException $e) {
-            $this->application->getErrorManager()->raise(
+        } catch (PDOException $e) {
+            $this->errorManager->raise(
                 ApplicationError::Error,
                 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__
             );
@@ -331,7 +336,7 @@ abstract class Data
                 $stmt = $this->pdo->prepare($sql);
                 $result = $stmt->execute($params);
 
-                return $result ? (int)$this->pdo->lastInsertId() : false;
+                return $result ? (int) $this->pdo->lastInsertId() : false;
             } else {
                 // UPDATE
                 $setClause = [];
@@ -359,7 +364,7 @@ abstract class Data
                 return $stmt->execute($params);
             }
         } catch (PDOException $e) {
-            $this->application->getErrorManager()->raise(
+            $this->errorManager->raise(
                 ApplicationError::Error,
                 'Database error: ' . $e->getMessage() . ' in file ' . __FILE__ . ' at line ' . __LINE__
             );
@@ -374,7 +379,7 @@ abstract class Data
         } else {
             $this->set('Settings', [
                 'Name'  => $name,
-                'Value' => $value
+                'Value' => $value,
             ]);
         }
     }

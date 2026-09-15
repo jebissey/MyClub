@@ -12,7 +12,7 @@ class CrosstabDataHelperTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'FirstName',
             'LastName',
@@ -53,8 +53,8 @@ class CrosstabDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('FROM Person p', $sql);
-        $this->assertStringContainsString('JOIN Event e ON p.Id = e.CreatedBy', $sql);
+        $this->assertStringContainsString('FROM Individual i', $sql);
+        $this->assertStringContainsString('JOIN Event e ON i.Id = e.CreatedBy', $sql);
         $this->assertStringContainsString('JOIN EventType et ON e.IdEventType = et.Id', $sql);
         $this->assertStringContainsString('LEFT JOIN Participant part ON part.IdEvent = e.Id', $sql);
         $this->assertStringContainsString('AS columnForCrosstab', $sql);
@@ -62,8 +62,8 @@ class CrosstabDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('COUNT(DISTINCT e.Id) AS countForCrosstab', $sql);
         $this->assertStringContainsString('COUNT(part.Id) AS count2ForCrosstab', $sql);
         $this->assertStringContainsString('WHERE e.LastUpdate BETWEEN :start AND :end', $sql);
-        $this->assertStringContainsString('GROUP BY p.Id, et.Id', $sql);
-        $this->assertStringContainsString('ORDER BY p.LastName, p.FirstName', $sql);
+        $this->assertStringContainsString('GROUP BY i.Id, et.Id', $sql);
+        $this->assertStringContainsString('ORDER BY i.LastName, i.FirstName', $sql);
 
         $stmt->execute([':start' => '2026-01-01', ':end' => '2026-12-31']);
         $this->assertIsArray($stmt->fetchAll());
@@ -156,21 +156,21 @@ class CrosstabDataHelperTest extends DataHelperTestCase
     {
         return "
             SELECT 
-                p.FirstName || ' ' || p.LastName || 
+                i.FirstName || ' ' || i.LastName || 
                 CASE 
-                    WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                    WHEN i.NickName IS NOT NULL AND i.NickName != '' THEN ' (' || i.NickName || ')'
                     ELSE ''
                 END AS columnForCrosstab,
                 et.Name AS rowForCrosstab,
                 COUNT(DISTINCT e.Id) AS countForCrosstab,
                 COUNT(part.Id) AS count2ForCrosstab
-            FROM Person p
-            JOIN Event e ON p.Id = e.CreatedBy
+            FROM Individual i
+            JOIN Event e ON i.Id = e.CreatedBy
             JOIN EventType et ON e.IdEventType = et.Id
             LEFT JOIN Participant part ON part.IdEvent = e.Id
             WHERE e.LastUpdate BETWEEN :start AND :end
-            GROUP BY p.Id, et.Id
-            ORDER BY p.LastName, p.FirstName
+            GROUP BY i.Id, et.Id
+            ORDER BY i.LastName, i.FirstName
         ";
     }
 

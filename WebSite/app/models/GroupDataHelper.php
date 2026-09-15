@@ -14,10 +14,11 @@ use app\helpers\ConnectedUser;
 
 class GroupDataHelper extends Data
 {
-    public function __construct(Application $application)
+    public function __construct(private Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
+
 
     /** @return array{0: array<int, stdClass>, 1: array<int, stdClass>} */
     public function getAvailableGroups(ConnectedUser $connectedUser, int $personId): array
@@ -33,13 +34,13 @@ class GroupDataHelper extends Data
                 g.Name,
                 GROUP_CONCAT(a.Name) AS Authorizations
             FROM `Group` g
-            INNER JOIN PersonGroup pg ON pg.IdGroup = g.Id
+            INNER JOIN MemberGroup mg ON mg.IdGroup = g.Id
             LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
             LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
-            WHERE pg.IdPerson = ?
-            AND g.Inactivated = 0
-            AND g.Id <> 1
-            AND g.SelfRegistration = 0
+            WHERE mg.IdMember = ?
+              AND g.Inactivated = 0
+              AND g.Id <> 1
+              AND g.SelfRegistration = 0
             GROUP BY g.Id, g.Name
             $having
         ");
@@ -55,8 +56,8 @@ class GroupDataHelper extends Data
             LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
             LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
             WHERE g.Inactivated = 0
-            AND g.SelfRegistration = 0
-            AND g.Id <> 1
+              AND g.SelfRegistration = 0
+              AND g.Id <> 1
             GROUP BY g.Id, g.Name
             $having
         ";
@@ -68,8 +69,8 @@ class GroupDataHelper extends Data
             WHERE ag.Id NOT IN (
                 SELECT g.Id
                 FROM `Group` g
-                INNER JOIN PersonGroup pg ON g.Id = pg.IdGroup
-                WHERE pg.IdPerson = ?
+                INNER JOIN MemberGroup mg ON g.Id = mg.IdGroup
+                WHERE mg.IdMember = ?
             )
         ");
         $availableGroupsLeftQuery->execute([$personId]);
@@ -80,20 +81,22 @@ class GroupDataHelper extends Data
         ];
     }
 
+
     /** @return array<int, stdClass> */
     public function getCurrentGroups(int $personId): array
     {
         $query = $this->pdo->prepare('
             SELECT g.*, 
-                CASE WHEN pg.Id IS NOT NULL THEN 1 ELSE 0 END as isMember,
+                CASE WHEN mg.Id IS NOT NULL THEN 1 ELSE 0 END as isMember,
                 g.SelfRegistration as canToggle
             FROM `Group` g 
-            LEFT JOIN PersonGroup pg ON pg.IdGroup = g.Id AND pg.IdPerson = ?
-            WHERE g.Inactivated = 0 AND (g.SelfRegistration = 1 OR pg.Id IS NOT NULL)
+            LEFT JOIN MemberGroup mg ON mg.IdGroup = g.Id AND mg.IdMember = ?
+            WHERE g.Inactivated = 0 AND (g.SelfRegistration = 1 OR mg.Id IS NOT NULL)
             ORDER BY g.SelfRegistration DESC, g.Name');
         $query->execute([$personId]);
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
+
 
     /** @return array<int, stdClass>|false */
     public function getGroupsWithAuthorizations(ConnectedUser $connectedUser): array|false
@@ -135,6 +138,7 @@ class GroupDataHelper extends Data
         return $statement->fetchAll(PDO::FETCH_OBJ);
     }
 
+
     /** @return array<int, stdClass>|false */
     public function getGroupsWithType(int $idPerson): array|false
     {
@@ -143,20 +147,22 @@ class GroupDataHelper extends Data
                 g.Id,
                 g.Name,
                 CASE
-                    WHEN pg.Id IS NOT NULL AND g.SelfRegistration = 1 THEN 'joined'
-                    WHEN pg.Id IS NOT NULL AND g.SelfRegistration = 0 THEN 'subscribed'
+                    WHEN mg.Id IS NOT NULL AND g.SelfRegistration = 1 THEN 'joined'
+                    WHEN mg.Id IS NOT NULL AND g.SelfRegistration = 0 THEN 'subscribed'
                     ELSE ''
                 END AS Type
-            FROM 'Group' g
-            LEFT JOIN PersonGroup pg 
-                ON pg.IdGroup = g.Id 
-                AND pg.IdPerson = :idPerson
+            FROM `Group` g
+            LEFT JOIN MemberGroup mg 
+                ON mg.IdGroup = g.Id 
+               AND mg.IdMember = :idPerson
             WHERE 
-                (g.SelfRegistration = 1 OR pg.Id IS NOT NULL) AND g.Inactivated = 0        
-            ORDER BY Type, g.Name;");
-        $query->execute([$idPerson]);
+                (g.SelfRegistration = 1 OR mg.Id IS NOT NULL) AND g.Inactivated = 0        
+            ORDER BY Type, g.Name
+        ");
+        $query->execute([':idPerson' => $idPerson]);
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
+
 
     /** @return array<int, array{name: string, total: int, withPresentation: int}> */
     public function getGroupCount(): array
@@ -166,12 +172,12 @@ class GroupDataHelper extends Data
             SELECT 
                 g.Id, 
                 g.Name,
-                COUNT(DISTINCT pg.IdPerson) as Total,
-                COUNT(DISTINCT CASE WHEN p.InPresentationDirectory = '1' THEN pg.IdPerson END) as WithPresentation
+                COUNT(DISTINCT mg.IdMember) as Total,
+                COUNT(DISTINCT CASE WHEN m.InPresentationDirectory = 1 THEN mg.IdMember END) as WithPresentation
             FROM `Group` g
-            JOIN PersonGroup pg ON g.Id = pg.IdGroup
-            JOIN Person p ON pg.IdPerson = p.Id
-            WHERE p.Inactivated = 0
+            JOIN MemberGroup mg ON g.Id = mg.IdGroup
+            JOIN Member m ON mg.IdMember = m.Id
+            WHERE m.Inactivated = 0
             GROUP BY g.Id, g.Name
         ");
         if ($statement === false) {
@@ -188,6 +194,7 @@ class GroupDataHelper extends Data
         }
         return $groupCounts;
     }
+
 
     /** @param array<int, int> $selectedAuthorizations */
     public function insert(string $name, int $selfRegistration, array $selectedAuthorizations): void
@@ -208,6 +215,7 @@ class GroupDataHelper extends Data
         }
     }
 
+
     public function inactive(int $id): void
     {
         if ($id === 1) {
@@ -218,7 +226,7 @@ class GroupDataHelper extends Data
         try {
             $this->set('Group', ['Inactivated' => 1], ['Id' => $id]);
             $query = $this->pdo->prepare('
-                DELETE FROM PersonGroup
+                DELETE FROM MemberGroup
                 WHERE IdGroup = ?');
             $query->execute([$id]);
             $this->pdo->commit();
@@ -227,6 +235,7 @@ class GroupDataHelper extends Data
             throw $e;
         }
     }
+
 
     /** @param array<int, int> $selectedAuthorizations */
     public function update(int $id, string $name, int $selfRegistration, array $selectedAuthorizations): void
@@ -253,6 +262,7 @@ class GroupDataHelper extends Data
             throw $e;
         }
     }
+
 
     #region Private functions
     private function getAuthorizationHavingClause(ConnectedUser $connectedUser): string

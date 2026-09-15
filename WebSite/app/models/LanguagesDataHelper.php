@@ -17,7 +17,7 @@ class LanguagesDataHelper extends Data
 
     public function __construct(protected Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
         $this->initializeLanguages();
     }
 

@@ -401,7 +401,8 @@ class ControllerFactory
     {
         return new UserController(
             $this->application,
-            $this->authenticationService
+            $this->authenticationService,
+            $this->emailService
         );
     }
 
@@ -522,8 +523,8 @@ class ControllerFactory
             $this->personDataHelper,
             $this->logDataHelper,
             $this->crosstabDataHelper,
-            new LogAnalyticsDataHelper($this->application),
-            new LogStatisticsDataHelper($this->application),
+            new LogAnalyticsDataHelper($this->application->getPdo(), $this->application->getErrorManager(), $this->application->getPdo()),
+            new LogStatisticsDataHelper($this->application->getPdo(), $this->application->getErrorManager(), $this->application->getPdo()),
         );
     }
 

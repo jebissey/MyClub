@@ -31,7 +31,7 @@ class UserPresentationController extends AbstractController
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
-            $row = $this->dataHelper->get('Person', ['Id' => $person->Id]);
+            $row = $this->dataHelper->get('Member', ['Id' => $person->Id]);
             if ($row === false) {
                 $this->raiseBadRequest("Unknown person {$person->Id}", __FILE__, __LINE__);
                 return;
@@ -71,7 +71,7 @@ class UserPresentationController extends AbstractController
                 $location =  $input['location'] ?? '???';
                 $inDirectory = $input['inPresentationDirectory'] ?? 0;
 
-                $this->dataHelper->set('Person', [
+                $this->dataHelper->set('Member', [
                     'Presentation' => $presentation,
                     'PresentationLastUpdate' => date('Y-m-d H:i:s'),
                     'Location' => $location,
@@ -105,7 +105,7 @@ class UserPresentationController extends AbstractController
             return;
         }
 
-        $row = $this->dataHelper->get('Person', [
+        $row = $this->dataHelper->get('Member', [
             'Id' => $personId,
             'Inactivated' => 0,
             'InPresentationDirectory' => 1,

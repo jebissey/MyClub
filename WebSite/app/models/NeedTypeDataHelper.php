@@ -11,7 +11,7 @@ class NeedTypeDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     public function insertOrUpdate(?int $id, string $name): int

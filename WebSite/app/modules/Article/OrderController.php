@@ -195,7 +195,7 @@ class OrderController extends AbstractController
                 $answers = json_decode($reply->Answers) ?? [];
 
                 $personData = $this->dataHelper->get(
-                    'Person',
+                    'Individual',
                     ['Id' => $reply->IdPerson],
                     'FirstName, LastName'
                 );

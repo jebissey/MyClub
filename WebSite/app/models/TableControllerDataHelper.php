@@ -7,11 +7,11 @@ namespace app\models;
 use Envms\FluentPDO\Queries\Select;
 use app\helpers\Application;
 
-class TableControllerDataHelper extends Data
+final class TableControllerDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     public function getEventTypesQuery(): Select
@@ -30,24 +30,28 @@ class TableControllerDataHelper extends Data
 
     public function getActivePersonsQuery(): Select
     {
-        return $this->fluent->from('Person')
+        return $this->fluent->from('Individual')
+            ->innerJoin('Member ON Member.Id = Individual.Id')
             ->select(null)
-            ->select('Id, FirstName, LastName, NickName, Email, Phone, Alert, MemberInfo')
-            ->select("CASE WHEN Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated")
-            ->select("CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory")
-            ->orderBy('LastName')
-            ->where('Inactivated = 0');
+            ->select('Individual.Id, Individual.FirstName, Individual.LastName, Individual.NickName, Individual.Email, '
+                . 'Individual.Phone, Member.Alert, Member.MemberInfo')
+            ->select("CASE WHEN Member.Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated")
+            ->select("CASE WHEN Member.InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory")
+            ->orderBy('Individual.LastName')
+            ->where('Member.Inactivated = 0');
     }
 
     public function getDesactivatedPersonsQuery(): Select
     {
-        return $this->fluent->from('Person')
+        return $this->fluent->from('Individual')
+            ->innerJoin('Member ON Member.Id = Individual.Id')
             ->select(null)
-            ->select('Id, FirstName, LastName, NickName, Email, Phone, Alert, MemberInfo')
-            ->select("CASE WHEN Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated")
-            ->select("CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory")
-            ->orderBy('LastName')
-            ->where('Inactivated = 1');
+            ->select('Individual.Id, Individual.FirstName, Individual.LastName, Individual.NickName, Individual.Email, '
+                . 'Individual.Phone, Member.Alert, Member.MemberInfo')
+            ->select("CASE WHEN Member.Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated")
+            ->select("CASE WHEN Member.InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory")
+            ->orderBy('Individual.LastName')
+            ->where('Member.Inactivated = 1');
     }
 
     public function getLeapfrogQuery(): Select

@@ -16,62 +16,73 @@ use app\modules\Common\valueObjects\Person;
 /**
  * @phpstan-import-type PersonRow from Person
  */
-class ConnectedUser
+final class ConnectedUser
 {
     /** @var array<int, string> */
-    private array $authorizations;
-    private DataHelper $dataHelper;
-    private AuthorizationDataHelper $authorizationDataHelper;
+    private array $authorizations = [];
+
     public ?Person $person = null;
-    private MetadataDataHelper $metadataDataHelper;
-    private GravatarHandler $gravatarHandler;
 
     public function __construct(
-        private Application $application,
-        ?DataHelper $dataHelper = null,
-        ?AuthorizationDataHelper $authorizationDataHelper = null,
-        ?MetadataDataHelper $metadataDataHelper = null,
-        ?GravatarHandler $gravatarHandler = null,
+        private readonly ErrorManager $errorManager,
+        private readonly DataHelper $dataHelper,
+        private readonly AuthorizationDataHelper $authorizationDataHelper,
+        private readonly MetadataDataHelper $metadataDataHelper,
+        private readonly GravatarHandler $gravatarHandler = new GravatarHandler(),
     ) {
-        $this->dataHelper = $dataHelper ?? new DataHelper($this->application);
-        $this->authorizationDataHelper = $authorizationDataHelper ?? new AuthorizationDataHelper($this->application);
-        $this->metadataDataHelper = $metadataDataHelper ?? new MetadataDataHelper($application);
-        $this->gravatarHandler = $gravatarHandler ?? new GravatarHandler();
     }
 
     public function get(): void
     {
         $this->authorizations = [];
         $this->person = null;
+
         $sessionUser = $_SESSION['user'] ?? '';
         $userEmail = is_string($sessionUser) ? $sessionUser : '';
         if ($userEmail === '') {
             return;
         }
 
-        $personRow = $this->dataHelper->get(
-            'Person',
+        $individual = $this->dataHelper->get(
+            'Individual',
             ['Email' => $userEmail],
-            'Id, Email, Alert, FirstName, LastName, NickName, UseGravatar, Avatar'
+            'Id, Email, FirstName, LastName, NickName, Avatar'
         );
+        $member = $individual
+            ? $this->dataHelper->get(
+                'Member',
+                ['Id' => $individual->Id],
+                'Alert, UseGravatar'
+            )
+            : false;
+
+        $personRow = $individual && $member
+            ? (object) array_merge((array) $individual, (array) $member)
+            : false;
+
         if (!$personRow) {
             $_SESSION['user'] = '';
-            $this->application->getErrorManager()->raise(
+            $this->errorManager->raise(
                 ApplicationError::BadRequest,
                 "Unknown user with this email address {$userEmail} in file " . __FILE__ . ' at line ' . __LINE__
             );
             return;
         }
+
         /** @var PersonRow $personRow */
         $this->person = Person::fromRow($personRow);
+
         if ($this->person->Alert !== null) {
             Params::setMemberAlert($this->person->Alert);
         }
+
         $this->authorizations = $this->authorizationDataHelper->getsFor($this);
+
         $lang = TranslationManager::getCurrentLanguage();
         $defaultColors = $this->dataHelper->getDefaultColors();
         $requestUri = $_SERVER['REQUEST_URI'] ?? '';
         $requestUri = is_string($requestUri) ? $requestUri : '';
+
         Params::setParams(
             [
                 'href' => $this->getHref($this->person->Email),
@@ -114,7 +125,6 @@ class ConnectedUser
                 && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
             $this->person->Alert
         );
-        return;
     }
 
     public function getLastSignIn(): ?string
@@ -122,7 +132,7 @@ class ConnectedUser
         if ($this->person === null) {
             return null;
         }
-        $row = $this->dataHelper->get('Person', ['Id' => $this->person->Id], 'LastSignIn');
+        $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignIn');
         return $row !== false ? ($row->LastSignIn ?? null) : null;
     }
 
@@ -131,7 +141,7 @@ class ConnectedUser
         if ($this->person === null) {
             return null;
         }
-        $row = $this->dataHelper->get('Person', ['Id' => $this->person->Id], 'LastSignOut');
+        $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignOut');
         return $row !== false ? ($row->LastSignOut ?? null) : null;
     }
 

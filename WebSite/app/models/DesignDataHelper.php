@@ -13,7 +13,7 @@ class DesignDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     /**
@@ -50,25 +50,25 @@ class DesignDataHelper extends Data
     public function getUsersVotes(int $personId): array
     {
         $query = "SELECT d.Id, d.Name, d.Detail, d.NavBar, d.Status, d.OnlyForMembers, d.IdGroup, 
-            p.FirstName || ' ' || p.LastName || CASE WHEN p.NickName IS NOT NULL AND p.NickName != '' 
-                                                        THEN ' (' || p.NickName || ')' 
-                                                        ELSE '' 
-                                                END AS NameOfDesigner,
+            i.FirstName || ' ' || i.LastName || CASE WHEN i.NickName IS NOT NULL AND i.NickName != '' 
+                THEN ' (' || i.NickName || ')' 
+                ELSE '' 
+                END AS NameOfDesigner,
             CASE WHEN COUNT(CASE WHEN dv.Vote = 'voteUp' THEN 1 END) = 0 
-                    AND COUNT(CASE WHEN dv.Vote = 'voteDown' THEN 1 END) = 0
-                    AND COUNT(CASE WHEN dv.Vote = 'voteNeutral' THEN 1 END) = 0
-                    THEN '0/0'
-                    ELSE COUNT(CASE WHEN dv.Vote = 'voteUp' THEN 1 END) || ' / ' || 
+                AND COUNT(CASE WHEN dv.Vote = 'voteDown' THEN 1 END) = 0
+                AND COUNT(CASE WHEN dv.Vote = 'voteNeutral' THEN 1 END) = 0
+                THEN '0/0'
+                ELSE COUNT(CASE WHEN dv.Vote = 'voteUp' THEN 1 END) || ' / ' || 
                     (COUNT(CASE WHEN dv.Vote = 'voteUp' THEN 1 END) + COUNT(CASE WHEN dv.Vote = 'voteDown' THEN 1 END)) ||
-                    CASE 
-                        WHEN COUNT(CASE WHEN dv.Vote = 'voteNeutral' THEN 1 END) > 0 
-                        THEN ' (+' || COUNT(CASE WHEN dv.Vote = 'voteNeutral' THEN 1 END) || ')' 
-                        ELSE '' 
-                    END
+            CASE 
+                WHEN COUNT(CASE WHEN dv.Vote = 'voteNeutral' THEN 1 END) > 0 
+                THEN ' (+' || COUNT(CASE WHEN dv.Vote = 'voteNeutral' THEN 1 END) || ')' 
+                ELSE '' 
+            END
             END AS Votes
             FROM Design d
             LEFT JOIN DesignVote dv ON d.Id = dv.IdDesign
-            JOIN Person p ON d.IdPerson = p.Id
+            JOIN Individual i ON d.IdPerson = i.Id
             GROUP BY d.Id";
         $stmt = $this->pdo->query($query);
         if ($stmt === false) {
@@ -91,15 +91,16 @@ class DesignDataHelper extends Data
     {
         $query = "
         SELECT 
-            p.Id AS PersonId, 
-            p.Email, 
+            i.Id AS PersonId, 
+            i.Email, 
             d.Id AS DesignId, 
             d.Name AS DesignName,
             d.Detail AS DesignDetail
-        FROM Person p
+        FROM Individual i
+        INNER JOIN Member m ON m.Id = i.Id
         CROSS JOIN Design d
-        LEFT JOIN DesignVote dv ON dv.IdDesign = d.Id AND dv.IdPerson = p.Id
-        WHERE p.Inactivated = 0
+        LEFT JOIN DesignVote dv ON dv.IdDesign = d.Id AND dv.IdPerson = i.Id
+        WHERE m.Inactivated = 0
             AND d.Status = 'UnderReview'
             AND dv.Id IS NULL
         ORDER BY d.LastUpdate";

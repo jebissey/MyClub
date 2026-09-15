@@ -12,7 +12,7 @@ class ArwardsDataHelperTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'FirstName',
             'LastName',
@@ -41,7 +41,7 @@ class ArwardsDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('c.Name as CounterName,', $sql);
         $this->assertStringContainsString('SUM(c.Value) as CounterValue,', $sql);
         $this->assertStringContainsString('(SELECT SUM(Value) FROM Counter WHERE IdPerson = p.Id) as Total', $sql);
-        $this->assertStringContainsString('FROM Person p', $sql);
+        $this->assertStringContainsString('FROM Individual p', $sql);
         $this->assertStringContainsString('LEFT JOIN Counter c ON p.Id = c.IdPerson', $sql);
         $this->assertStringContainsString('GROUP BY p.Id, p.FirstName, p.LastName, p.NickName, c.Name', $sql);
         $this->assertStringContainsString('HAVING Total > 0', $sql);
@@ -70,7 +70,7 @@ class ArwardsDataHelperTest extends DataHelperTestCase
                 c.Name as CounterName, 
                 SUM(c.Value) as CounterValue, 
                 (SELECT SUM(Value) FROM Counter WHERE IdPerson = p.Id) as Total
-            FROM Person p
+            FROM Individual p
             LEFT JOIN Counter c ON p.Id = c.IdPerson
             GROUP BY p.Id, p.FirstName, p.LastName, p.NickName, c.Name
             HAVING Total > 0

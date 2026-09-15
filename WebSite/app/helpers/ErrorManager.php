@@ -20,7 +20,7 @@ class ErrorManager
     public function __construct(private Application $application)
     {
         $this->logWriterDataHelper = new LogWriterDataHelper($application);
-        $this->dataHelper = new DataHelper($application);
+        $this->dataHelper = new DataHelper($application->getPdo(), $application->getErrorManager(), $application->getPdoForLog());
         $this->languagesDataHelper = new LanguagesDataHelper($application);
         $this->emptyController = new EmptyController($application);
     }

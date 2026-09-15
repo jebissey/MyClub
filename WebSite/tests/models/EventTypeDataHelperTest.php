@@ -23,9 +23,9 @@ class EventTypeDataHelperTest extends DataHelperTestCase
             'Id',
         ]);
 
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
             'IdGroup',
-            'IdPerson',
+            'IdMember',
         ]);
 
         $this->assertColumnsExist($pdo, 'EventTypeAttribute', [
@@ -45,8 +45,8 @@ class EventTypeDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('et.Id, et.Name, et.Inactivated, et.IdGroup', $sql);
         $this->assertStringContainsString('LEFT JOIN `Group`', $sql);
         $this->assertStringContainsString('et.Inactivated = 0', $sql);
-        $this->assertStringContainsString('PersonGroup', $sql);
-        $this->assertStringContainsString('et.IdGroup is NULL', $sql);
+        $this->assertStringContainsString('MemberGroup', $sql);
+        $this->assertStringContainsString('et.IdGroup IS NULL', $sql);
         $this->assertStringContainsString('ORDER BY et.Name', $sql);
     }
 
@@ -74,13 +74,14 @@ class EventTypeDataHelperTest extends DataHelperTestCase
             FROM EventType et
             LEFT JOIN `Group` g ON et.IdGroup = g.Id
             WHERE et.Inactivated = 0 
-            AND (
-                g.Id IN (
-                    SELECT pg.IdGroup
-                    FROM PersonGroup pg
-                    WHERE pg.IdPerson = ? AND pg.IdGroup = g.Id
-                )
-                OR et.IdGroup is NULL)
+              AND (
+                  g.Id IN (
+                      SELECT mg.IdGroup
+                      FROM MemberGroup mg
+                      WHERE mg.IdMember = ? AND mg.IdGroup = g.Id
+                  )
+                  OR et.IdGroup IS NULL
+              )
             ORDER BY et.Name
 ";
     }

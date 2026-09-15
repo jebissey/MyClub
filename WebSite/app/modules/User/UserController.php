@@ -13,14 +13,18 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\AuthenticationService;
+use app\modules\Common\services\EmailService;
 use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\User\viewModels\UserSetPasswordViewModel;
 use app\modules\User\viewModels\UserSignInViewModel;
 
 class UserController extends AbstractController
 {
-    public function __construct(Application $application, private AuthenticationService $authService)
-    {
+    public function __construct(
+        Application $application,
+        private AuthenticationService $authService,
+        private EmailService $emailService
+    ) {
         parent::__construct($application);
     }
 
@@ -30,47 +34,32 @@ class UserController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $email = urldecode($encodedEmail);
+
+        $email   = urldecode($encodedEmail);
         $success = false;
+
         try {
-            $success = $this->authService->handleForgotPassword($email);
+            $success = $this->emailService->send(
+                $this->authService->prepareForgotPasswordEmail($email)
+            );
         } catch (EmailException $e) {
             Flight::set('message', "Error {$e->getMessage()} with email {$email}");
             Flight::set('code', ApplicationError::BadRequest->value);
-            $viewModel = new InfoViewModel(
-                content: ($this->t)('message_email_unknown'),
-                hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
-                timer: 10000,
-                previousPage: false,
-                layoutParams: $this->getAllParams([]),
-            );
-            $this->render('Common/views/info.latte', $viewModel->toArray());
+            $this->renderInfo(($this->t)('message_email_unknown'), 10000);
             return;
         } catch (InvalidArgumentException $e) {
             $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
+            return;
         }
+
         if ($success) {
             Flight::set('message', "Password reset email sent to {$email}");
             Flight::set('code', ApplicationError::Ok->value);
-            $viewModel = new InfoViewModel(
-                content: ($this->t)('message_email_unknown'),
-                hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
-                timer: 10000,
-                previousPage: false,
-                layoutParams: $this->getAllParams([]),
-            );
-            $this->render('Common/views/info.latte', $viewModel->toArray());
+            $this->renderInfo(($this->t)('message_password_reset_sent'), 10000);
         } else {
             Flight::set('message', "Unable to send password reset email to {$email}");
             Flight::set('code', ApplicationError::Error->value);
-            $viewModel = new InfoViewModel(
-                content: ($this->t)('message_password_reset_failed'),
-                hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
-                timer: 30000,
-                previousPage: false,
-                layoutParams: $this->getAllParams([]),
-            );
-            $this->render('Common/views/info.latte', $viewModel->toArray());
+            $this->renderInfo(($this->t)('message_password_reset_failed'), 30000);
         }
     }
 
@@ -139,5 +128,18 @@ class UserController extends AbstractController
         $this->authService->signOut();
         $this->application->getConnectedUser()->get();
         $this->redirect('/', ApplicationError::Ok, "Sign out succeeded for {$userEmail}");
+    }
+
+
+    private function renderInfo(string $content, int $timer): void
+    {
+        $viewModel = new InfoViewModel(
+            content: $content,
+            hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
+            timer: $timer,
+            previousPage: false,
+            layoutParams: $this->getAllParams([]),
+        );
+        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 }

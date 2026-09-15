@@ -13,14 +13,16 @@ use PDO;
 use stdClass;
 use Throwable;
 use app\exceptions\DatabaseException;
+use app\models\AuthorizationDataHelper;
 use app\models\Database;
 use app\models\DataHelper;
 use app\models\LogCompactDataHelper;
 use app\models\LogWriterDataHelper;
+use app\models\MetadataDataHelper;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\valueObjects\CompactSettingsRow;
 
-class Application
+final class Application
 {
     public const VERSION = '0.90.1';
     public const  EMOJI_LIST = [
@@ -66,7 +68,13 @@ class Application
             $this->pdo = $db->getPdo();
             $this->pdoForLog = $db->getPdoForLog();
             $this->errorManager = new ErrorManager($this);
-            $this->connectedUser = new ConnectedUser($this);
+            $this->connectedUser = new ConnectedUser(
+                $this->getErrorManager(),
+                new DataHelper($this->getPdo(), $this->getErrorManager(), $this->getPdoForLog()),
+                new AuthorizationDataHelper($this),
+                new MetadataDataHelper($this),
+                new GravatarHandler(),
+            );
         } catch (Throwable $e) {
             throw new DatabaseException('Database error ' . $e->getMessage() . ' in ' . $e->getFile() . ' at ' . $e->getLine());
         }
@@ -78,7 +86,9 @@ class Application
             self::$instance = new self();
         }
         $row = new DataHelper(
-            self::$instance
+            self::$instance->getPdo(),
+            self::$instance->getErrorManager(),
+            self::$instance->getPdoForLog()
         )->get('Metadata', ['Id' => 1], 'Compact_everyXdays, Compact_removeOlderThanXmonths, Compact_compactOlderThanXmonths');
         if ($row === false) {
             Application::unreachable("Missing metadata", __FILE__, __LINE__);

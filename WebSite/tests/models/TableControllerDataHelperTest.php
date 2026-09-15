@@ -34,13 +34,17 @@ class TableControllerDataHelperTest extends DataHelperTestCase
             'Name',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'FirstName',
             'LastName',
             'NickName',
             'Email',
             'Phone',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Member', [
+            'Id',
             'Alert',
             'MemberInfo',
             'Password',
@@ -78,12 +82,13 @@ class TableControllerDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('FROM Person', $sql);
-        $this->assertStringContainsString('Id, FirstName, LastName, NickName, Email, Phone, Alert, MemberInfo', $sql);
-        $this->assertStringContainsString("CASE WHEN Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated", $sql);
-        $this->assertStringContainsString("CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory", $sql);
-        $this->assertStringContainsString('Inactivated = 0', $sql);
-        $this->assertStringContainsString('ORDER BY LastName', $sql);
+        $this->assertStringContainsString('FROM Individual', $sql);
+        $this->assertStringContainsString('INNER JOIN Member ON Member.Id = Individual.Id', $sql);
+        $this->assertStringContainsString('Individual.Id, Individual.FirstName, Individual.LastName, Individual.NickName, Individual.Email, Individual.Phone, Member.Alert, Member.MemberInfo', $sql);
+        $this->assertStringContainsString("CASE WHEN Member.Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated", $sql);
+        $this->assertStringContainsString("CASE WHEN Member.InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory", $sql);
+        $this->assertStringContainsString('Member.Inactivated = 0', $sql);
+        $this->assertStringContainsString('ORDER BY Individual.LastName', $sql);
     }
 
     public function testGetDesactivatedPersonsQuerySqlIsValidAgainstTemplateSchema(): void
@@ -94,12 +99,13 @@ class TableControllerDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('FROM Person', $sql);
-        $this->assertStringContainsString('Id, FirstName, LastName, NickName, Email, Phone, Alert, MemberInfo', $sql);
-        $this->assertStringContainsString("CASE WHEN Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated", $sql);
-        $this->assertStringContainsString("CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory", $sql);
-        $this->assertStringContainsString('Inactivated = 1', $sql);
-        $this->assertStringContainsString('ORDER BY LastName', $sql);
+        $this->assertStringContainsString('FROM Individual', $sql);
+        $this->assertStringContainsString('INNER JOIN Member ON Member.Id = Individual.Id', $sql);
+        $this->assertStringContainsString('Individual.Id, Individual.FirstName, Individual.LastName, Individual.NickName, Individual.Email, Individual.Phone, Member.Alert, Member.MemberInfo', $sql);
+        $this->assertStringContainsString("CASE WHEN Member.Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated", $sql);
+        $this->assertStringContainsString("CASE WHEN Member.InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory", $sql);
+        $this->assertStringContainsString('Member.Inactivated = 1', $sql);
+        $this->assertStringContainsString('ORDER BY Individual.LastName', $sql);
     }
 
     public function testLeapfrogViewCheckSqlIsValidAgainstTemplateSchema(): void
@@ -154,24 +160,26 @@ class TableControllerDataHelperTest extends DataHelperTestCase
     private function getActivePersonsSql(): string
     {
         return "
-            SELECT Id, FirstName, LastName, NickName, Email, Phone, Alert, MemberInfo,
-                   CASE WHEN Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated,
-                   CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory
-            FROM Person
-            WHERE Inactivated = 0
-            ORDER BY LastName
+            SELECT Individual.Id, Individual.FirstName, Individual.LastName, Individual.NickName, Individual.Email, Individual.Phone, Member.Alert, Member.MemberInfo,
+                   CASE WHEN Member.Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated,
+                   CASE WHEN Member.InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory
+            FROM Individual
+            INNER JOIN Member ON Member.Id = Individual.Id
+            WHERE Member.Inactivated = 0
+            ORDER BY Individual.LastName
         ";
     }
 
     private function getDesactivatedPersonsSql(): string
     {
         return "
-            SELECT Id, FirstName, LastName, NickName, Email, Phone, Alert, MemberInfo,
-                   CASE WHEN Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated,
-                   CASE WHEN InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory
-            FROM Person
-            WHERE Inactivated = 1
-            ORDER BY LastName
+            SELECT Individual.Id, Individual.FirstName, Individual.LastName, Individual.NickName, Individual.Email, Individual.Phone, Member.Alert, Member.MemberInfo,
+                   CASE WHEN Member.Password IS NOT NULL THEN 'oui' ELSE 'non' END AS PasswordCreated,
+                   CASE WHEN Member.InPresentationDirectory = 1 THEN 'oui' ELSE 'non' END AS PresentInDirectory
+            FROM Individual
+            INNER JOIN Member ON Member.Id = Individual.Id
+            WHERE Member.Inactivated = 1
+            ORDER BY Individual.LastName
         ";
     }
 

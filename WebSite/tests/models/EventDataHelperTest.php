@@ -46,7 +46,7 @@ class EventDataHelperTest extends DataHelperTestCase
             'Color',
         ]);
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'Email',
             'FirstName',
@@ -54,15 +54,15 @@ class EventDataHelperTest extends DataHelperTestCase
             'NickName',
         ]);
 
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
-            'IdPerson',
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
+            'IdMember',
             'IdGroup',
         ]);
 
         $this->assertColumnsExist($pdo, 'Participant', [
             'Id',
             'IdEvent',
-            'IdPerson',
+            'IdIndividual',
         ]);
 
         $this->assertColumnsExist($pdo, 'ParticipantSupply', [
@@ -157,7 +157,7 @@ class EventDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('LEFT JOIN PersonGroup', $sql);
+        $this->assertStringContainsString('LEFT JOIN MemberGroup', $sql);
         $this->assertStringContainsString('e.LastUpdate >= :searchFrom', $sql);
     }
 
@@ -254,14 +254,14 @@ class EventDataHelperTest extends DataHelperTestCase
             SELECT e.Id, e.Summary, e.LastUpdate
             FROM Event e
             JOIN EventType et ON e.IdEventType = et.Id
-            LEFT JOIN PersonGroup pg 
-                ON et.IdGroup = pg.IdGroup 
-                AND pg.IdPerson = :personId
+            LEFT JOIN MemberGroup mg 
+                ON et.IdGroup = mg.IdGroup 
+               AND mg.IdMember = :personId
             WHERE e.LastUpdate >= :searchFrom
-            AND (
-                et.IdGroup IS NULL
-                OR pg.IdPerson IS NOT NULL
-            )
+              AND (
+                  et.IdGroup IS NULL
+                  OR mg.IdMember IS NOT NULL
+              )
             ORDER BY e.LastUpdate DESC
         ";
     }

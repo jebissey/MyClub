@@ -28,7 +28,7 @@ class UserNotepadController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $row = $this->dataHelper->get('Person', ['Id' => $person->Id], 'Notepad');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Notepad');
         /** @var object{Notepad: string|null}|false $row */
         $notepad = $row !== false ? ($row->Notepad ?? '') : '';
 
@@ -56,7 +56,7 @@ class UserNotepadController extends AbstractController
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $notepad = $input['content'] ?? '???';
 
-        $this->dataHelper->set('Person', [
+        $this->dataHelper->set('Member', [
             'Notepad' => $notepad,
         ], ['Id' => $person->Id]);
         $this->redirect('/user');

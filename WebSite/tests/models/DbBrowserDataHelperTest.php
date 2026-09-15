@@ -51,7 +51,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $helper = $this->makeDbBrowserHelper($pdo);
 
         $this->expectException(SqliteTableException::class);
-        $helper->getTableColumns('Person; DROP TABLE Person;--');
+        $helper->getTableColumns('Individual; DROP TABLE Individual;--');
     }
 
     public function testRejectsTableNameNotInSchema(): void
@@ -68,7 +68,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $columns = $helper->getTableColumns('Person');
+        $columns = $helper->getTableColumns('Individual');
 
         $this->assertContains('Id', $columns);
     }
@@ -83,7 +83,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $columns = $helper->getTableColumns('Person');
+        $columns = $helper->getTableColumns('Individual');
 
         $this->assertContains('Id', $columns);
         $this->assertContains('FirstName', $columns);
@@ -96,7 +96,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $details = $helper->getTableColumnsDetails('Person');
+        $details = $helper->getTableColumnsDetails('Individual');
         $names = array_column($details, 'name');
 
         $this->assertContains('Id', $names);
@@ -111,7 +111,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $types = $helper->getColumnTypes('Person');
+        $types = $helper->getColumnTypes('Individual');
 
         $this->assertArrayHasKey('Id', $types);
         $this->assertArrayHasKey('type', $types['Id']);
@@ -119,12 +119,12 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $this->assertSame(1, $types['Id']['pk']);
     }
 
-    public function testGetPrimaryKeyReturnsIdForPersonTable(): void
+    public function testGetPrimaryKeyReturnsIdForIndividualTable(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $this->assertSame('Id', $helper->getPrimaryKey('Person'));
+        $this->assertSame('Id', $helper->getPrimaryKey('Individual'));
     }
 
     public function testShowCreateFormReturnsColumnsAndTypesTogether(): void
@@ -132,7 +132,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        [$columns, $types] = $helper->showCreateForm('Person');
+        [$columns, $types] = $helper->showCreateForm('Individual');
 
         $this->assertContains('FirstName', $columns);
         $this->assertArrayHasKey('FirstName', $types);
@@ -145,11 +145,11 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
     public function testShowEditFormReturnsExistingRecord(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Jean', 'Dupont', 'jean.dupont@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Jean', 'Dupont', 'jean.dupont@test.local')");
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        [$columns, $record, $primaryKey, $types] = $helper->showEditForm('Person', $id);
+        [$columns, $record, $primaryKey, $types] = $helper->showEditForm('Individual', $id);
 
         $this->assertContains('LastName', $columns);
         $this->assertSame('Dupont', $record->LastName);
@@ -163,7 +163,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $helper = $this->makeDbBrowserHelper($pdo);
 
         $this->expectException(RuntimeException::class);
-        $helper->showEditForm('Person', 999999);
+        $helper->showEditForm('Individual', 999999);
     }
 
     // -------------------------------------------------------------------------
@@ -175,24 +175,24 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $_POST = ['FirstName' => 'Alice', 'LastName' => 'Martin', 'Email' => 'alice.martin@test.local'];
-        $helper->createRecord('Person');
+        $_POST = ['Type' => 'Member', 'FirstName' => 'Alice', 'LastName' => 'Martin', 'Email' => 'alice.martin@test.local'];
+        $helper->createRecord('Individual');
 
-        $stmt = $pdo->query("SELECT FirstName FROM Person WHERE LastName = 'Martin'");
+        $stmt = $pdo->query("SELECT FirstName FROM Individual WHERE LastName = 'Martin'");
         $this->assertSame('Alice', $stmt->fetchColumn());
     }
 
     public function testUpdateRecordUpdatesRowFromPostData(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Paul', 'Durand', 'paul.durand@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Paul', 'Durand', 'paul.durand@test.local')");
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDbBrowserHelper($pdo);
 
         $_POST = ['FirstName' => 'Paul-Updated', 'LastName' => 'Durand'];
-        $helper->updateRecord('Person', $id);
+        $helper->updateRecord('Individual', $id);
 
-        $stmt = $pdo->prepare('SELECT FirstName FROM Person WHERE Id = :id');
+        $stmt = $pdo->prepare('SELECT FirstName FROM Individual WHERE Id = :id');
         $stmt->execute([':id' => $id]);
         $this->assertSame('Paul-Updated', $stmt->fetchColumn());
     }
@@ -200,14 +200,14 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
     public function testUpdateRecordIgnoresPrimaryKeyFieldFromPostData(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Marc', 'Petit', 'marc.petit@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Marc', 'Petit', 'marc.petit@test.local')");
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDbBrowserHelper($pdo);
 
         $_POST = ['Id' => $id + 1000, 'FirstName' => 'Marc-Updated', 'LastName' => 'Petit'];
-        $helper->updateRecord('Person', $id);
+        $helper->updateRecord('Individual', $id);
 
-        $stmt = $pdo->prepare('SELECT FirstName FROM Person WHERE Id = :id');
+        $stmt = $pdo->prepare('SELECT FirstName FROM Individual WHERE Id = :id');
         $stmt->execute([':id' => $id]);
         $this->assertSame('Marc-Updated', $stmt->fetchColumn());
     }
@@ -215,13 +215,13 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
     public function testDeleteRecordRemovesRow(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('ToDelete', 'Person', 'todelete.person@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'ToDelete', 'Person', 'todelete.person@test.local')");
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $helper->deleteRecord('Person', $id);
+        $helper->deleteRecord('Individual', $id);
 
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM Person WHERE Id = :id');
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM Individual WHERE Id = :id');
         $stmt->execute([':id' => $id]);
         $this->assertSame(0, (int) $stmt->fetchColumn());
     }
@@ -235,7 +235,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $config = $helper->generateFilterConfig('Person');
+        $config = $helper->generateFilterConfig('Individual');
         $names = array_column($config, 'name');
 
         $this->assertContains('Email', $names);
@@ -249,7 +249,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $schema = $helper->generateFilterSchema('Person');
+        $schema = $helper->generateFilterSchema('Individual');
 
         $this->assertSame(FilterInputRule::Int->value, $schema['Id']);
     }
@@ -259,7 +259,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $schema = $helper->generateFilterSchema('Person');
+        $schema = $helper->generateFilterSchema('Individual');
 
         $this->assertSame(FilterInputRule::Content->value, $schema['FirstName']);
     }
@@ -271,11 +271,11 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
     public function testShowTableReturnsOnePageOfRowsWithoutFilters(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('A', 'Un', 'a.un@test.local')");
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('B', 'Deux', 'b.deux@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'A', 'Un', 'a.un@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'B', 'Deux', 'b.deux@test.local')");
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        [$rows, $columns, $page, $totalPages, $filters] = $helper->showTable('Person', 1, [], 1);
+        [$rows, $columns, $page, $totalPages, $filters] = $helper->showTable('Individual', 1, [], 1);
 
         $this->assertCount(1, $rows);
         $this->assertContains('FirstName', $columns);
@@ -287,11 +287,11 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
     public function testShowTableAppliesColumnFilter(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Zoe', 'UniqueFilteredLastName', 'zoe.filtered@test.local')");
-        $pdo->exec("INSERT INTO Person (FirstName, LastName, Email) VALUES ('Zoe', 'SomeoneElse', 'zoe.other@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Zoe', 'UniqueFilteredLastName', 'zoe.filtered@test.local')");
+        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Zoe', 'SomeoneElse', 'zoe.other@test.local')");
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        [$rows] = $helper->showTable('Person', 10, ['LastName' => 'UniqueFilteredLastName'], 1);
+        [$rows] = $helper->showTable('Individual', 10, ['LastName' => 'UniqueFilteredLastName'], 1);
 
         $this->assertCount(1, $rows);
         $this->assertSame('UniqueFilteredLastName', $rows[0]->LastName);
@@ -306,8 +306,8 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $select = $helper->getQuery('Person');
+        $select = $helper->getQuery('Individual');
 
-        $this->assertStringContainsString('Person', (string) $select);
+        $this->assertStringContainsString('Individual', (string) $select);
     }
 }

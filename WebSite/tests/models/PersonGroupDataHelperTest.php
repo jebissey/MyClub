@@ -12,9 +12,9 @@ class PersonGroupDataHelperTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
             'Id',
-            'IdPerson',
+            'IdMember',
             'IdGroup',
         ]);
 
@@ -29,9 +29,9 @@ class PersonGroupDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
 
         // The underlying Data::get() uses these columns
-        $this->assertColumnsExist($pdo, 'PersonGroup', [
+        $this->assertColumnsExist($pdo, 'MemberGroup', [
             'Id',
-            'IdPerson',
+            'IdMember',
             'IdGroup',
         ]);
     }
@@ -44,8 +44,8 @@ class PersonGroupDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('DELETE FROM PersonGroup', $sql);
-        $this->assertStringContainsString('WHERE IdPerson = :personId', $sql);
+        $this->assertStringContainsString('DELETE FROM MemberGroup', $sql);
+        $this->assertStringContainsString('WHERE IdMember = :personId', $sql);
         $this->assertStringContainsString('AND IdGroup IN (SELECT Id FROM `Group` WHERE SelfRegistration = 1)', $sql);
     }
 
@@ -57,8 +57,8 @@ class PersonGroupDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('INSERT INTO PersonGroup', $sql);
-        $this->assertStringContainsString('(IdPerson, IdGroup)', $sql);
+        $this->assertStringContainsString('INSERT INTO MemberGroup', $sql);
+        $this->assertStringContainsString('(IdMember, IdGroup)', $sql);
         $this->assertStringContainsString('VALUES (?, ?)', $sql);
     }
 
@@ -69,14 +69,14 @@ class PersonGroupDataHelperTest extends DataHelperTestCase
     private function getDeleteSelfRegistrationGroupsSql(): string
     {
         return "
-            DELETE FROM PersonGroup 
-            WHERE IdPerson = :personId 
+            DELETE FROM MemberGroup 
+            WHERE IdMember = :personId 
             AND IdGroup IN (SELECT Id FROM `Group` WHERE SelfRegistration = 1)
-        ";
+";
     }
 
     private function getInsertPersonGroupSql(): string
     {
-        return 'INSERT INTO PersonGroup (IdPerson, IdGroup) VALUES (?, ?)';
+        return 'INSERT INTO MemberGroup (IdMember, IdGroup) VALUES (?, ?)';
     }
 }

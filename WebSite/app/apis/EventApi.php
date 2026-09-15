@@ -179,7 +179,7 @@ class EventApi extends AbstractApi
             $unsubscribeLink = $root . '/user/preferences';
 
             /** @var object{Email: string|null}|false $eventCreatorRow */
-            $eventCreatorRow = $this->dataHelper->get('Person', ['Id' => $event->CreatedBy], 'Email');
+            $eventCreatorRow = $this->dataHelper->get('Individual', ['Id' => $event->CreatedBy], 'Email');
             $eventCreatorEmail = ($eventCreatorRow !== false)
                 ? PersonEmailRow::fromStdClass($eventCreatorRow)->Email
                 : null;

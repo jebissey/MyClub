@@ -24,7 +24,7 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         Application $application,
         private AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
 
     /**
@@ -180,13 +180,13 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
             SELECT 
                 Article.Id,
                 CASE 
-                    WHEN Person.NickName != '' 
-                    THEN Person.FirstName || ' ' || Person.LastName || ' (' || Person.NickName || ')' 
-                    ELSE Person.FirstName || ' ' || Person.LastName 
+                    WHEN Individual.NickName IS NOT NULL AND Individual.NickName != '' 
+                    THEN Individual.FirstName || ' ' || Individual.LastName || ' (' || Individual.NickName || ')' 
+                    ELSE Individual.FirstName || ' ' || Individual.LastName 
                 END AS PersonName,
                 Article.Title AS ArticleTitle
             FROM Article
-            JOIN Person ON Article.CreatedBy = Person.Id
+            JOIN Individual ON Article.CreatedBy = Individual.Id
             WHERE Article.Id IN ($placeholders)
         ";
 
@@ -225,12 +225,12 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
 
         $sql = "
             SELECT Article.*, 
-                Person.FirstName, 
-                Person.LastName, 
+                Individual.FirstName, 
+                Individual.LastName, 
                 \"Group\".Name AS GroupName,
                 Article.CreatedBy
             FROM Article
-            LEFT JOIN Person ON Person.Id = Article.CreatedBy
+            LEFT JOIN Individual ON Individual.Id = Article.CreatedBy
             LEFT JOIN \"Group\" ON Article.IdGroup = \"Group\".Id
             WHERE Article.Id IN (" . implode(',', $placeholders) . ")
             ORDER BY Article.LastUpdate DESC
@@ -357,9 +357,9 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
     public function getWithAuthor(int $id): ArticleRow|false
     {
         $sql = "
-            SELECT a.*, p.FirstName, p.LastName, p.NickName
+            SELECT a.*, i.FirstName, i.LastName, i.NickName
             FROM Article a
-            LEFT JOIN Person p ON a.CreatedBy = p.Id
+            LEFT JOIN Individual i ON a.CreatedBy = i.Id
             WHERE a.Id = :id
             LIMIT 1
         ";

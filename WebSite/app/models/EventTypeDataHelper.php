@@ -13,8 +13,9 @@ class EventTypeDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application);
+        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
     }
+
 
     /**
      * @return list<EventTypeRow>
@@ -26,13 +27,14 @@ class EventTypeDataHelper extends Data
             FROM EventType et
             LEFT JOIN `Group` g ON et.IdGroup = g.Id
             WHERE et.Inactivated = 0 
-            AND (
-                g.Id IN (
-                    SELECT pg.IdGroup
-                    FROM PersonGroup pg
-                    WHERE pg.IdPerson = ? AND pg.IdGroup = g.Id
-                )
-                OR et.IdGroup is NULL)
+              AND (
+                  g.Id IN (
+                      SELECT mg.IdGroup
+                      FROM MemberGroup mg
+                      WHERE mg.IdMember = ? AND mg.IdGroup = g.Id
+                  )
+                  OR et.IdGroup IS NULL
+              )
             ORDER BY et.Name
         ");
         $query->execute([$personId]);
@@ -42,6 +44,7 @@ class EventTypeDataHelper extends Data
             $query->fetchAll(PDO::FETCH_OBJ)
         ));
     }
+
 
     /**
      * @param list<int> $attributes

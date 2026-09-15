@@ -12,7 +12,7 @@ class ArticleCrosstabDataHelperTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        $this->assertColumnsExist($pdo, 'Person', [
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'FirstName',
             'LastName',
@@ -51,7 +51,7 @@ class ArticleCrosstabDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('a.PublishedBy IS NOT NULL', $sql);
         $this->assertStringContainsString('Tous (les visiteurs)', $sql);
         $this->assertStringContainsString('Club (membres)', $sql);
-        $this->assertStringContainsString('ORDER BY p.LastName, p.FirstName', $sql);
+        $this->assertStringContainsString('ORDER BY i.LastName, i.FirstName', $sql);
     }
 
     /**
@@ -62,9 +62,9 @@ class ArticleCrosstabDataHelperTest extends DataHelperTestCase
     {
         return "
             SELECT 
-                p.FirstName || ' ' || p.LastName || 
+                i.FirstName || ' ' || i.LastName || 
                 CASE 
-                    WHEN p.NickName IS NOT NULL AND p.NickName != '' THEN ' (' || p.NickName || ')'
+                    WHEN i.NickName IS NOT NULL AND i.NickName != '' THEN ' (' || i.NickName || ')'
                     ELSE ''
                 END AS columnForCrosstab,
                 CASE 
@@ -73,12 +73,12 @@ class ArticleCrosstabDataHelperTest extends DataHelperTestCase
                     WHEN a.OnlyForMembers = 1 THEN 'Club (membres)'
                 END AS rowForCrosstab,
                 1 AS countForCrosstab
-            FROM Person p
-            JOIN Article a ON p.Id = a.CreatedBy
+            FROM Individual i
+            JOIN Article a ON i.Id = a.CreatedBy
             LEFT JOIN \"Group\" g ON g.Id = a.IdGroup
             WHERE a.LastUpdate BETWEEN :start AND :end
             AND a.PublishedBy IS NOT NULL
-            ORDER BY p.LastName, p.FirstName
-        ";
+            ORDER BY i.LastName, i.FirstName
+";
     }
 }
