@@ -49,7 +49,7 @@ class NotificationSender
                 if ($excludeEndpoint !== null) {
                     $conditions['EndPoint !='] = $excludeEndpoint;
                 }
-                $subscriptionData = $this->dataHelper->gets('PushSubscription', $conditions);
+                $subscriptionData = $this->dataHelper->gets('PushSubscription', $conditions, '*');
                 if (empty($subscriptionData)) {
                     continue;
                 }

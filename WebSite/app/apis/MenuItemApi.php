@@ -60,7 +60,7 @@ class MenuItemApi extends AbstractApi
             return;
         }
         try {
-            $this->renderJsonOk(['item' => $this->dataHelper->get('MenuItem', ['Id' => $id])]);
+            $this->renderJsonOk(['item' => $this->dataHelper->get('MenuItem', ['Id' => $id], '*')]);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
         }

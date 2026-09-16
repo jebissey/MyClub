@@ -23,28 +23,32 @@ class AuthorizationDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
-
     /**
-     * @return array<int, string>
+     * @return list<string>
      */
-    public function getsFor(ConnectedUser $connectedUser): array
+    public function getsFor(int $memberId): array
     {
         $query = $this->pdo->prepare("
             SELECT DISTINCT Authorization.Name
             FROM Member
-            INNER JOIN MemberGroup       ON Member.Id = MemberGroup.IdMember
-            INNER JOIN `Group`           ON MemberGroup.IdGroup = `Group`.Id
+            INNER JOIN MemberGroup        ON Member.Id = MemberGroup.IdMember
+            INNER JOIN `Group`            ON MemberGroup.IdGroup = `Group`.Id
             INNER JOIN GroupAuthorization ON `Group`.Id = GroupAuthorization.IdGroup
-            INNER JOIN Authorization     ON GroupAuthorization.IdAuthorization = Authorization.Id
+            INNER JOIN Authorization      ON GroupAuthorization.IdAuthorization = Authorization.Id
             WHERE Member.Id = ?
         ");
-        $query->execute([$connectedUser->person->Id ?? 0]);
+        $query->execute([$memberId]);
+
+        /** @var list<string> */
         return array_column($query->fetchAll(), 'Name');
     }
-
 
     /**
      * @param array<int, object{Url?: string}> $navItems
@@ -209,7 +213,10 @@ class AuthorizationDataHelper extends Data
     #region Private functions
     private function canReadArticle(ArticleAuthorizationRow $article, ConnectedUser $connectedUser): bool
     {
-        if (($connectedUser->person ?? false) && ($article->CreatedBy === $connectedUser->person->Id || $connectedUser->isEditor())) {
+        if (
+            ($connectedUser->person ?? false)
+            && ($article->CreatedBy === $connectedUser->person->Id || $connectedUser->isEditor())
+        ) {
             return true;
         }
         if ($article->PublishedBy === null) {
@@ -294,7 +301,7 @@ class AuthorizationDataHelper extends Data
     private function getGroups(string $groupsFilter): array
     {
         $groupsFilter = preg_replace('/[^\p{L}]/u', '', $groupsFilter);
-        $rows = $this->gets('Group', ['Name LIKE "%' . $groupsFilter . '%"' => null]);
+        $rows = $this->gets('Group', ['Name LIKE "%' . $groupsFilter . '%"' => null], '*');
         return array_column($rows, 'Id');
     }
 }

@@ -22,7 +22,11 @@ class MessageDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application, private LanguagesDataHelper $languagesDataHelper)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
 
@@ -38,13 +42,13 @@ class MessageDataHelper extends Data implements NewsProviderInterface
         if ($nonNullCount !== 1) {
             return false;
         }
-        if ($articleId !== null && $this->get('Article', ['Id' => $articleId]) === false) {
+        if ($articleId !== null && $this->get('Article', ['Id' => $articleId], '*') === false) {
             return false;
         }
-        if ($eventId !== null && $this->get('Event', ['Id' => $eventId]) === false) {
+        if ($eventId !== null && $this->get('Event', ['Id' => $eventId], '*') === false) {
             return false;
         }
-        if ($groupId !== null && $this->get('Group', ['Id' => $groupId]) === false) {
+        if ($groupId !== null && $this->get('Group', ['Id' => $groupId], '*') === false) {
             return false;
         }
 

@@ -28,7 +28,7 @@ abstract class AbstractApi
         protected PersonDataHelper $personDataHelper
     ) {
         $this->latte = $application->getLatte();
-        $this->logWriterDataHelper = new LogWriterDataHelper($application);
+        $this->logWriterDataHelper = new LogWriterDataHelper($application, $application->getErrorManager());
     }
 
     /**

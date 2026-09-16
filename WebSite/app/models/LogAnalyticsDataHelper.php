@@ -14,6 +14,15 @@ class LogAnalyticsDataHelper extends Data
 {
     private const PERIOD_TO_SHOW = 13;
 
+    public function __construct(Application $application)
+    {
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
+    }
+
     /** @return array<int, array<string, mixed>> */
     public function getStatisticsData(string $periodType, int $offset): array
     {

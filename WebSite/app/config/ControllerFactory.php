@@ -523,8 +523,8 @@ class ControllerFactory
             $this->personDataHelper,
             $this->logDataHelper,
             $this->crosstabDataHelper,
-            new LogAnalyticsDataHelper($this->application->getPdo(), $this->application->getErrorManager(), $this->application->getPdo()),
-            new LogStatisticsDataHelper($this->application->getPdo(), $this->application->getErrorManager(), $this->application->getPdo()),
+            new LogAnalyticsDataHelper($this->application),
+            new LogStatisticsDataHelper($this->application),
         );
     }
 

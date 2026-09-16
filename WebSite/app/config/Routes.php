@@ -111,6 +111,7 @@ use app\models\LanguagesDataHelper;
 use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogWriterDataHelper;
+use app\models\MemberDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
@@ -533,14 +534,17 @@ final class Routes
             'eventDataHelper' => new EventDataHelper($this->application, $this->dataHelper),
             'groupDataHelper' => new GroupDataHelper($this->application),
             'logDataHelper' => new LogDataHelper($this->application, $this->dataHelper),
-            'messageDataHelper' => new MessageDataHelper($this->application, new LanguagesDataHelper($this->application)),
+            'messageDataHelper' => new MessageDataHelper(
+                $this->application,
+                new LanguagesDataHelper($this->application, $this->application->getErrorManager())
+            ),
             'needDataHelper' => new NeedDataHelper($this->application),
             'orderDataHelper' => new OrderDataHelper($this->application, $articleDataHelper, $authorizationDataHelper),
             'participantDataHelper' => new ParticipantDataHelper($this->application),
             'surveyDataHelper' => new SurveyDataHelper($this->application, $authorizationDataHelper),
             'sharedFileDataHelper' => new SharedFileDataHelper($this->application),
             'loanDataHelper' => new LoanDataHelper($this->application),
-            'languagesDataHelper' => new LanguagesDataHelper($this->application),
+            'languagesDataHelper' => new LanguagesDataHelper($this->application, $this->application->getErrorManager()),
             'membershipDataHelper' => new MembershipDataHelper($this->application),
         ];
     }
@@ -591,7 +595,10 @@ final class Routes
             $dataHelpers['surveyDataHelper'],
         ];
 
-        $authenticationService = new AuthenticationService($this->dataHelper, Application::$root);
+        $authenticationService = new AuthenticationService(
+            new MemberDataHelper($this->application),
+            Application::$root
+        );
         $this->application->setAuthenticationService($authenticationService);
 
         $notificationSender = new NotificationSender($this->dataHelper, CredentialService::getInstance());
@@ -699,7 +706,7 @@ final class Routes
             $dataHelpers['languagesDataHelper'],
             $dataHelpers['loanDataHelper'],
             $dataHelpers['logDataHelper'],
-            new LogWriterDataHelper($this->application),
+            new LogWriterDataHelper($this->application, $this->application->getErrorManager()),
             $services['mediaManager'],
             $dataHelpers['membershipDataHelper'],
             new MenuItemDataHelper($this->application, $dataHelpers['authorizationDataHelper']),

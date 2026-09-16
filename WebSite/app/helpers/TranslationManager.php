@@ -9,11 +9,11 @@ use DateTimeInterface;
 use IntlDateFormatter;
 use IntlDatePatternGenerator;
 use app\models\LanguagesDataHelper;
-use app\models\MetadataDataHelper;
 
 class TranslationManager
 {
     public const DEFAULT_LANGUAGE = 'fr_FR';
+
 
     /** @var list<string> */
     private const SUPPORTED_LANGUAGES = [
@@ -37,12 +37,12 @@ class TranslationManager
 
     private static function getForcedLanguage(): string
     {
-        if (self::$forcedLanguage === null) {
-            self::$forcedLanguage = (new MetadataDataHelper(Application::init()))
-                ->getForcedLanguage();
-        }
+        return self::$forcedLanguage ?? '';
+    }
 
-        return self::$forcedLanguage;
+    public static function setForcedLanguage(?string $forcedLanguage): void
+    {
+        self::$forcedLanguage = $forcedLanguage ?? '';
     }
 
     public static function setLanguage(string $language): void

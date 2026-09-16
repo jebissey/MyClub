@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\User;
 
+use stdClass;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\ParticipantDataHelper;
@@ -63,8 +64,12 @@ class UserConnectionsController extends AbstractController
                 (array) $member
             );
         }
+        $user = (object) array_merge(
+            (array) $individual,
+            (array) $member
+        );
 
-        /** @var PersonRow $userRow */
+/** @var stdClass&PersonRow $userRow */
         $userRow = $user;
         $person = Person::fromRow($userRow);
         $data = $this->participantDataHelper->getConnections($idPerson);

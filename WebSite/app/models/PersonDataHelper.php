@@ -43,6 +43,20 @@ use app\modules\User\valueObjects\EventRegistrationRow;
  *         newArticle?: NewArticlePrefs
  *     }
  * }
+ * @phpstan-type CsvColumnMapping array{
+ *     email: int|string,
+ *     firstName: int|string,
+ *     lastName: int|string,
+ *     phone: int|string
+ * }
+ * @phpstan-type CsvImportResults array{
+ *     created: int,
+ *     updated: int,
+ *     deactivated: int,
+ *     errors: int,
+ *     processedEmails: list<string>,
+ *     messages: list<string>
+ * }
  */
 class PersonDataHelper extends Data implements NewsProviderInterface
 {
@@ -51,7 +65,11 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         private PersonPreferences $personPreferences,
         private EmailService $emailService
     ) {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     public function create(): int
@@ -487,6 +505,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     /**
      * Imports persons from a CSV file.
      * ...
+     * @param CsvColumnMapping $mapping
+     * @param array<string, int> $existingPersons
+     * @return CsvImportResults
      */
     public function importFromCsvFile(
         string $filePath,
@@ -630,7 +651,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     ): bool {
         // Contact est maintenant un sous-type d'Individual
         /** @var object{Id: int}|false $individual */
-        $individual = $this->get('Individual', ['Email' => $emailContact]);
+        $individual = $this->get('Individual', ['Email' => $emailContact], '*');
 
         if ($individual === false) {
             // Créer Individual + Contact

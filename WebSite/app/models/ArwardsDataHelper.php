@@ -13,7 +13,11 @@ class ArwardsDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     /**

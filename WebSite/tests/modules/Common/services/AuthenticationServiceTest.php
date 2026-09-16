@@ -7,7 +7,7 @@ namespace tests\modules\Common\services;
 use PHPUnit\Framework\TestCase;
 use app\exceptions\EmailException;
 use app\helpers\Password;
-use app\models\DataHelper;
+use app\models\MemberDataHelper;
 use app\modules\Common\services\AuthenticationService;
 
 final class AuthenticationServiceTest extends TestCase
@@ -29,9 +29,12 @@ final class AuthenticationServiceTest extends TestCase
         $_COOKIE  = $this->cookie;
     }
 
-    private function makeService(?DataHelper $dataHelper = null): AuthenticationService
+    private function makeService(?MemberDataHelper $memberDataHelper = null): AuthenticationService
     {
-        return new AuthenticationService($dataHelper ?? $this->createStub(DataHelper::class), 'https://myclub.test');
+        return new AuthenticationService(
+            $memberDataHelper ?? $this->createStub(MemberDataHelper::class),
+            'https://myclub.test'
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -40,9 +43,7 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testHandleSignInRejectsInvalidEmail(): void
     {
-        $service = $this->makeService();
-
-        $result = $service->handleSignIn([
+        $result = $this->makeService()->handleSignIn([
             'email'    => 'not-an-email',
             'password' => 'validpassword',
         ]);
@@ -53,11 +54,9 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testHandleSignInRejectsInvalidPassword(): void
     {
-        $service = $this->makeService();
-
-        $result = $service->handleSignIn([
+        $result = $this->makeService()->handleSignIn([
             'email'    => 'user@example.com',
-            'password' => '123', // trop court
+            'password' => '123',
         ]);
 
         $this->assertFalse($result->isSuccess());
@@ -66,44 +65,29 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testHandleSignInSuccess(): void
     {
-        $individual = (object) [
-            'Id'        => 42,
-            'Email'     => 'user@example.com',
-            'FirstName' => 'Jean',
-            'LastName'  => 'Dupont',
-            'NickName'  => null,
-            'Avatar'    => null,
+        $row = (object) [
+            'Id'          => 42,
+            'Email'       => 'user@example.com',
+            'FirstName'   => 'Jean',
+            'LastName'    => 'Dupont',
+            'NickName'    => null,
+            'Avatar'      => null,
+            'Password'    => Password::signPassword('validpassword'),
+            'Inactivated' => 0,
+            'UseGravatar' => 'no',
+            'Alert'       => null,
         ];
 
-        $member = (object) [
-            'Password'     => Password::signPassword('validpassword'),
-            'Inactivated'  => 0,
-            'UseGravatar'  => 'no',
-            'Alert'        => null,
-        ];
+        $memberDataHelper = $this->createMock(MemberDataHelper::class);
+        $memberDataHelper->expects($this->once())
+            ->method('findForSignIn')
+            ->with('user@example.com')
+            ->willReturn($row);
+        $memberDataHelper->expects($this->once())
+            ->method('recordSignIn')
+            ->with(42);
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->exactly(2))
-            ->method('get')
-            ->willReturnCallback(function (string $table, array $where) use ($individual, $member) {
-                if ($table === 'Individual') {
-                    $this->assertSame(['Email' => 'user@example.com'], $where);
-                    return $individual;
-                }
-                if ($table === 'Member') {
-                    $this->assertSame(['Id' => 42], $where);
-                    return $member;
-                }
-                $this->fail("Unexpected table $table");
-            });
-
-        $dataHelper->expects($this->once())
-            ->method('set')
-            ->with('Member', $this->arrayHasKey('LastSignIn'), ['Id' => 42]);
-
-        $service = $this->makeService($dataHelper);
-
-        $result = $service->handleSignIn([
+        $result = $this->makeService($memberDataHelper)->handleSignIn([
             'email'      => 'user@example.com',
             'password'   => 'validpassword',
             'rememberMe' => '',
@@ -116,30 +100,23 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testHandleSignInFailsWhenUserInactivated(): void
     {
-        $individual = (object) [
-            'Id'        => 42,
-            'Email'     => 'user@example.com',
+        $row = (object) [
+            'Id' => 42,
+            'Email' => 'user@example.com',
             'FirstName' => 'Jean',
-            'LastName'  => 'Dupont',
-            'NickName'  => null,
-            'Avatar'    => null,
+            'LastName' => 'Dupont',
+            'NickName' => null,
+            'Avatar' => null,
+            'Password' => Password::signPassword('validpassword'),
+            'Inactivated' => 1,
+            'UseGravatar' => 'no',
+            'Alert' => null,
         ];
 
-        $member = (object) [
-            'Password'     => Password::signPassword('validpassword'),
-            'Inactivated'  => 1,
-            'UseGravatar'  => 'no',
-            'Alert'        => null,
-        ];
+        $memberDataHelper = $this->createStub(MemberDataHelper::class);
+        $memberDataHelper->method('findForSignIn')->willReturn($row);
 
-        $dataHelper = $this->createStub(DataHelper::class);
-        $dataHelper->method('get')->willReturnCallback(
-            fn(string $table) => $table === 'Individual' ? $individual : $member
-        );
-
-        $service = $this->makeService($dataHelper);
-
-        $result = $service->handleSignIn([
+        $result = $this->makeService($memberDataHelper)->handleSignIn([
             'email'    => 'user@example.com',
             'password' => 'validpassword',
         ]);
@@ -150,30 +127,23 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testHandleSignInFailsWithWrongPassword(): void
     {
-        $individual = (object) [
-            'Id'        => 42,
-            'Email'     => 'user@example.com',
+        $row = (object) [
+            'Id' => 42,
+            'Email' => 'user@example.com',
             'FirstName' => 'Jean',
-            'LastName'  => 'Dupont',
-            'NickName'  => null,
-            'Avatar'    => null,
+            'LastName' => 'Dupont',
+            'NickName' => null,
+            'Avatar' => null,
+            'Password' => Password::signPassword('correctpassword'),
+            'Inactivated' => 0,
+            'UseGravatar' => 'no',
+            'Alert' => null,
         ];
 
-        $member = (object) [
-            'Password'     => Password::signPassword('correctpassword'),
-            'Inactivated'  => 0,
-            'UseGravatar'  => 'no',
-            'Alert'        => null,
-        ];
+        $memberDataHelper = $this->createStub(MemberDataHelper::class);
+        $memberDataHelper->method('findForSignIn')->willReturn($row);
 
-        $dataHelper = $this->createStub(DataHelper::class);
-        $dataHelper->method('get')->willReturnCallback(
-            fn(string $table) => $table === 'Individual' ? $individual : $member
-        );
-
-        $service = $this->makeService($dataHelper);
-
-        $result = $service->handleSignIn([
+        $result = $this->makeService($memberDataHelper)->handleSignIn([
             'email'    => 'user@example.com',
             'password' => 'wrongpassword',
         ]);
@@ -188,38 +158,31 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testHandleRememberMeLoginReturnsNullWhenNoCookie(): void
     {
-        $service = $this->makeService();
-        $this->assertNull($service->handleRememberMeLogin());
+        $this->assertNull($this->makeService()->handleRememberMeLogin());
     }
 
     public function testHandleRememberMeLoginSuccess(): void
     {
         $_COOKIE['rememberMe'] = 'valid-token';
 
-        $member = (object) [
-            'Id'          => 42,
+        $row = (object) [
+            'Id' => 42,
+            'Email' => 'user@example.com',
+            'FirstName' => 'Jean',
+            'LastName' => 'Dupont',
+            'NickName' => null,
+            'Avatar' => null,
             'Inactivated' => 0,
         ];
 
-        $individual = (object) [
-            'Id'        => 42,
-            'Email'     => 'user@example.com',
-            'FirstName' => 'Jean',
-            'LastName'  => 'Dupont',
-            'NickName'  => null,
-            'Avatar'    => null,
-        ];
+        $memberDataHelper = $this->createMock(MemberDataHelper::class);
+        $memberDataHelper->expects($this->once())
+            ->method('findByRememberToken')
+            ->with('valid-token')
+            ->willReturn($row);
+        $memberDataHelper->expects($this->once())->method('recordSignIn')->with(42);
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturnCallback(
-            function (string $table) use ($member, $individual) {
-                return $table === 'Member' ? $member : $individual;
-            }
-        );
-        $dataHelper->expects($this->once())->method('set');
-
-        $service = $this->makeService($dataHelper);
-        $result  = $service->handleRememberMeLogin();
+        $result = $this->makeService($memberDataHelper)->handleRememberMeLogin();
 
         $this->assertNotNull($result);
         $this->assertTrue($result->isSuccess());
@@ -230,13 +193,10 @@ final class AuthenticationServiceTest extends TestCase
     {
         $_COOKIE['rememberMe'] = 'invalid-token';
 
-        $dataHelper = $this->createStub(DataHelper::class);
-        $dataHelper->method('get')->willReturn(false);
+        $memberDataHelper = $this->createStub(MemberDataHelper::class);
+        $memberDataHelper->method('findByRememberToken')->willReturn(false);
 
-        $service = $this->makeService($dataHelper);
-        $result  = $service->handleRememberMeLogin();
-
-        $this->assertNull($result);
+        $this->assertNull($this->makeService($memberDataHelper)->handleRememberMeLogin());
     }
 
     // -------------------------------------------------------------------------
@@ -247,24 +207,13 @@ final class AuthenticationServiceTest extends TestCase
     {
         $_SESSION['user'] = 'user@example.com';
 
-        $individual = (object) ['Id' => 42];
+        $memberDataHelper = $this->createMock(MemberDataHelper::class);
+        $memberDataHelper->expects($this->once())
+            ->method('recordSignOutByEmail')
+            ->with('user@example.com')
+            ->willReturn(true);
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->once())
-            ->method('get')
-            ->with('Individual', ['Email' => 'user@example.com'], 'Id')
-            ->willReturn($individual);
-
-        $dataHelper->expects($this->once())
-            ->method('set')
-            ->with(
-                'Member',
-                $this->arrayHasKey('LastSignOut'),
-                ['Id' => 42]
-            );
-
-        $service = $this->makeService($dataHelper);
-        $service->signOut();
+        $this->makeService($memberDataHelper)->signOut();
 
         $this->assertArrayNotHasKey('user', $_SESSION);
         $this->assertSame('', $_SESSION['navbar']);
@@ -276,11 +225,10 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testResetPasswordFailsWhenTokenUnknown(): void
     {
-        $dataHelper = $this->createStub(DataHelper::class);
-        $dataHelper->method('get')->willReturn(false);
+        $memberDataHelper = $this->createStub(MemberDataHelper::class);
+        $memberDataHelper->method('findByResetToken')->willReturn(false);
 
-        $service = $this->makeService($dataHelper);
-        $this->assertFalse($service->resetPassword('unknown-token', 'newpassword'));
+        $this->assertFalse($this->makeService($memberDataHelper)->resetPassword('unknown-token', 'newpassword'));
     }
 
     public function testResetPasswordFailsWhenTokenExpired(): void
@@ -290,11 +238,10 @@ final class AuthenticationServiceTest extends TestCase
             'TokenCreatedAt' => (new \DateTime('-2 hours'))->format('Y-m-d H:i:s'),
         ];
 
-        $dataHelper = $this->createStub(DataHelper::class);
-        $dataHelper->method('get')->willReturn($member);
+        $memberDataHelper = $this->createStub(MemberDataHelper::class);
+        $memberDataHelper->method('findByResetToken')->willReturn($member);
 
-        $service = $this->makeService($dataHelper);
-        $this->assertFalse($service->resetPassword('expired-token', 'newpassword'));
+        $this->assertFalse($this->makeService($memberDataHelper)->resetPassword('expired-token', 'newpassword'));
     }
 
     public function testResetPasswordSuccess(): void
@@ -304,22 +251,13 @@ final class AuthenticationServiceTest extends TestCase
             'TokenCreatedAt' => (new \DateTime())->format('Y-m-d H:i:s'),
         ];
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn($member);
-        $dataHelper->expects($this->once())
-            ->method('set')
-            ->with(
-                'Member',
-                $this->callback(function (array $data) {
-                    return isset($data['Password'])
-                        && $data['Token'] === null
-                        && $data['TokenCreatedAt'] === null;
-                }),
-                ['Id' => 42]
-            );
+        $memberDataHelper = $this->createMock(MemberDataHelper::class);
+        $memberDataHelper->method('findByResetToken')->willReturn($member);
+        $memberDataHelper->expects($this->once())
+            ->method('finalizeReset')
+            ->with(42, $this->callback(fn($password) => is_string($password) && $password !== 'newpassword123'));
 
-        $service = $this->makeService($dataHelper);
-        $this->assertTrue($service->resetPassword('valid-token', 'newpassword123'));
+        $this->assertTrue($this->makeService($memberDataHelper)->resetPassword('valid-token', 'newpassword123'));
     }
 
     // -------------------------------------------------------------------------
@@ -328,48 +266,33 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testPrepareForgotPasswordEmailThrowsWhenEmailUnknown(): void
     {
-        $dataHelper = $this->createStub(DataHelper::class);
-        $dataHelper->method('get')->willReturn(false);
-
-        $service = $this->makeService($dataHelper);
+        $memberDataHelper = $this->createStub(MemberDataHelper::class);
+        $memberDataHelper->method('findBasicByEmail')->willReturn(false);
 
         $this->expectException(EmailException::class);
-        $service->prepareForgotPasswordEmail('unknown@example.com');
+        $this->makeService($memberDataHelper)->prepareForgotPasswordEmail('unknown@example.com');
     }
 
     public function testPrepareForgotPasswordEmailStoresTokenAndBuildsMessage(): void
     {
-        $individual = (object) [
-            'Id'        => 42,
-            'Email'     => 'user@example.com',
+        $row = (object) [
+            'Id' => 42,
+            'Email' => 'user@example.com',
             'FirstName' => 'Jean',
-            'LastName'  => 'Dupont',
-            'NickName'  => null,
-            'Avatar'    => null,
-        ];
-
-        $member = (object) [
+            'LastName' => 'Dupont',
+            'NickName' => null,
+            'Avatar' => null,
             'UseGravatar' => 'no',
-            'Alert'       => null,
+            'Alert' => null,
         ];
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturnCallback(
-            fn(string $table) => $table === 'Individual' ? $individual : $member
-        );
-        $dataHelper->expects($this->once())
-            ->method('set')
-            ->with(
-                'Member',
-                $this->callback(
-                    fn(array $data) => isset($data['Token'], $data['TokenCreatedAt'])
-                        && strlen($data['Token']) === 64
-                ),
-                ['Id' => 42]
-            );
+        $memberDataHelper = $this->createMock(MemberDataHelper::class);
+        $memberDataHelper->method('findBasicByEmail')->willReturn($row);
+        $memberDataHelper->expects($this->once())
+            ->method('setResetToken')
+            ->with(42, $this->callback(fn(string $token) => strlen($token) === 64));
 
-        $service = $this->makeService($dataHelper);
-        $message = $service->prepareForgotPasswordEmail('user@example.com');
+        $message = $this->makeService($memberDataHelper)->prepareForgotPasswordEmail('user@example.com');
 
         $this->assertSame('user@example.com', $message->to);
         $this->assertStringContainsString('/user/setPassword/', $message->body);

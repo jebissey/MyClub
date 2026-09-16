@@ -53,10 +53,10 @@ class EventDataHelper extends Data implements NewsProviderInterface
     /** @return array<int, mixed> */
     public function removeParticipant(int $id, int $personId): array
     {
-        if (!$this->get('Event', ['Id' => $id, 'CreatedBy' => $personId])) {
+        if (!$this->get('Event', ['Id' => $id, 'CreatedBy' => $personId], '*')) {
             return [['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value];
         }
-        if ($this->gets('Participant', ['IdEvent' => $id])) {
+        if ($this->gets('Participant', ['IdEvent' => $id], '*')) {
             $this->set('Event', ['Canceled' => 1], ['Id' => $id]);
             return [['success' => true, 'message' => 'Evénement annulé'], ApplicationError::Unauthorized->value];
         }
@@ -113,7 +113,7 @@ class EventDataHelper extends Data implements NewsProviderInterface
                 'Audience'        => $eventRow->Audience
             ];
             $newEventId = $this->set('Event', $newEvent);
-            $attributes = $this->gets('EventAttribute', ['IdEvent' => $id]);
+            $attributes = $this->gets('EventAttribute', ['IdEvent' => $id], '*');
             foreach ($attributes as $attr) {
                 $this->set('EventAttribute', [
                     'IdEvent'     => $newEventId,

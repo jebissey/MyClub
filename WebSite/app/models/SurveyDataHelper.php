@@ -17,7 +17,11 @@ class SurveyDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     public function articleHasSurveyNotClosed(int $articleId): object|bool

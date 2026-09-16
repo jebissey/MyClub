@@ -22,7 +22,11 @@ class CrosstabDataHelper extends Data
 {
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     /**

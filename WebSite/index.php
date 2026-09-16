@@ -55,7 +55,7 @@ $flight->before('start', function () use ($maintenanceController, $connectedUser
 $webapp = new WebApp();
 new Routes($application, $flight)->add($errorManager);
 
-$logWriterDataHelper = new LogWriterDataHelper($application);
+$logWriterDataHelper = new LogWriterDataHelper($application, $errorManager);
 $flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $errorManager, $startTime) {
     $appFrames = array_filter(
         $ex->getTrace(),

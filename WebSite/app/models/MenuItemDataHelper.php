@@ -16,7 +16,11 @@ class MenuItemDataHelper extends Data
 {
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     public function authorizedUser(string $url, ?Person $person): bool
@@ -99,14 +103,14 @@ class MenuItemDataHelper extends Data
             throw new InvalidArgumentException("Invalid 'Type' value: {$data['type']}");
         }
         if (!empty($data['parentId'])) {
-            $parent = $this->get('MenuItem', ['Id' => $data['parentId']]);
+            $parent = $this->get('MenuItem', ['Id' => $data['parentId']], '*');
             if ($parent === false) {
                 throw new InvalidArgumentException("ParentId {$data['parentId']} does not exist.");
             }
             /** @var object{Position: int} $parent */
         }
         if (!empty($data['idGroup'])) {
-            $group = $this->get('Group', ['Id' => $data['idGroup']]);
+            $group = $this->get('Group', ['Id' => $data['idGroup']], '*');
             if ($group === false) {
                 throw new InvalidArgumentException("IdGroup {$data['idGroup']} does not exist.");
             }

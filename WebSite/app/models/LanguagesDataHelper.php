@@ -7,6 +7,7 @@ namespace app\models;
 use PDO;
 use RuntimeException;
 use app\helpers\Application;
+use app\helpers\ErrorManager;
 use app\helpers\TranslationManager;
 
 class LanguagesDataHelper extends Data
@@ -15,9 +16,13 @@ class LanguagesDataHelper extends Data
     private array $allowedLanguages = [];
     private string $defaultLanguage = 'fr_FR';
 
-    public function __construct(protected Application $application)
+    public function __construct(protected Application $application, ErrorManager $errorManager)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $errorManager,
+            $application->getPdoForLog()
+        );
         $this->initializeLanguages();
     }
 

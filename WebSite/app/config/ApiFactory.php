@@ -346,7 +346,7 @@ class ApiFactory
             $this->connectedUser,
             $this->dataHelper,
             $this->personDataHelper,
-            new LanguagesDataHelper($this->application)
+            new LanguagesDataHelper($this->application, $this->application->getErrorManager())
         );
     }
 

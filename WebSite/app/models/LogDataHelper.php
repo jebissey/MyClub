@@ -18,7 +18,11 @@ class LogDataHelper extends Data
 {
     public function __construct(Application $application, private DataHelper $dataHelper)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     /**
@@ -98,12 +102,15 @@ class LogDataHelper extends Data
             $visit->MinutesAgo    = MyClubDateTime::calculateMinutesAgo($visit->LastActivity);
             $visit->FormattedDate = MyClubDateTime::formatDateFromUTC($visit->LastActivity);
 
+            /** @var object{Id: int, Email: string, Avatar: string|null}|false $individual */
             $individual = $this->dataHelper->get(
                 'Individual',
                 ['Email' => $visit->Email],
                 'Id, Email, Avatar'
             );
-            $member = $individual
+
+            /** @var object{UseGravatar: string|null}|false $member */
+            $member = $individual !== false
                 ? $this->dataHelper->get(
                     'Member',
                     ['Id' => $individual->Id],
@@ -111,12 +118,17 @@ class LogDataHelper extends Data
                 )
                 : false;
 
-            $person = $individual && $member
+            $person = ($individual !== false && $member !== false)
                 ? (object) array_merge((array) $individual, (array) $member)
                 : false;
 
-            $visit->UseGravatar = $person->UseGravatar ?? 'no';
-            $visit->Avatar      = $person->Avatar ?? '';
+            if ($person !== false) {
+                $visit->UseGravatar = $person->UseGravatar ?? 'no';
+                $visit->Avatar      = $person->Avatar ?? '';
+            } else {
+                $visit->UseGravatar = 'no';
+                $visit->Avatar      = '';
+            }
         }
 
         return $visits;

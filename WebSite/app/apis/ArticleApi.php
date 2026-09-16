@@ -180,7 +180,7 @@ class ArticleApi extends AbstractApi
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("JSON error: " . json_last_error_msg());
             }
-            $previousReplyData = $this->dataHelper->get('OrderReply', ['IdOrder' => $order->Id, 'IdPerson' => $person->Id]);
+            $previousReplyData = $this->dataHelper->get('OrderReply', ['IdOrder' => $order->Id, 'IdPerson' => $person->Id], '*');
             $previousAnswers = null;
             if ($previousReplyData) {
                 /** @var object{Answers: string} $previousReplyData */
@@ -227,7 +227,7 @@ class ArticleApi extends AbstractApi
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("JSON error: " . json_last_error_msg());
             }
-            $previousReplyData = $this->dataHelper->get('Reply', ['IdSurvey' => $survey->Id, 'IdPerson' => $person->Id]);
+            $previousReplyData = $this->dataHelper->get('Reply', ['IdSurvey' => $survey->Id, 'IdPerson' => $person->Id], '*');
             $previousAnswers = null;
             if ($previousReplyData) {
                 /** @var object{Answers: string} $previousReplyData */

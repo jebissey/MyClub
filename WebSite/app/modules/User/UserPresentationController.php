@@ -31,7 +31,7 @@ class UserPresentationController extends AbstractController
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
-            $row = $this->dataHelper->get('Member', ['Id' => $person->Id]);
+            $row = $this->dataHelper->get('Member', ['Id' => $person->Id], '*');
             if ($row === false) {
                 $this->raiseBadRequest("Unknown person {$person->Id}", __FILE__, __LINE__);
                 return;
@@ -109,7 +109,7 @@ class UserPresentationController extends AbstractController
             'Id' => $personId,
             'Inactivated' => 0,
             'InPresentationDirectory' => 1,
-        ]);
+        ], '*');
 
         if ($row === false) {
             $this->raiseBadRequest("Unknown person {$personId}", __FILE__, __LINE__);

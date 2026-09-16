@@ -5,22 +5,19 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use app\enums\ApplicationError;
-use app\enums\Authorization;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\MetadataDataHelper;
+use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
 use app\modules\Common\valueObjects\Person;
 
-/**
- * @phpstan-import-type PersonRow from Person
- */
 final class ConnectedUser
 {
-    /** @var array<int, string> */
-    private array $authorizations = [];
+    public ?ConnectedUserVO $user = null;
 
+    /** Conservé pour la compatibilité et la lisibilité (API plate) */
     public ?Person $person = null;
 
     public function __construct(
@@ -34,11 +31,12 @@ final class ConnectedUser
 
     public function get(): void
     {
-        $this->authorizations = [];
+        $this->user = null;
         $this->person = null;
 
         $sessionUser = $_SESSION['user'] ?? '';
         $userEmail = is_string($sessionUser) ? $sessionUser : '';
+
         if ($userEmail === '') {
             return;
         }
@@ -48,19 +46,18 @@ final class ConnectedUser
             ['Email' => $userEmail],
             'Id, Email, FirstName, LastName, NickName, Avatar'
         );
-        $member = $individual
-            ? $this->dataHelper->get(
+
+        $member = false;
+        if ($individual !== false) {
+            /** @var object{Id: int, Email: string, FirstName: ?string, LastName: ?string, NickName: ?string, Avatar: ?string} $individual */
+            $member = $this->dataHelper->get(
                 'Member',
                 ['Id' => $individual->Id],
                 'Alert, UseGravatar'
-            )
-            : false;
+            );
+        }
 
-        $personRow = $individual && $member
-            ? (object) array_merge((array) $individual, (array) $member)
-            : false;
-
-        if (!$personRow) {
+        if ($individual === false || $member === false) {
             $_SESSION['user'] = '';
             $this->errorManager->raise(
                 ApplicationError::BadRequest,
@@ -69,14 +66,29 @@ final class ConnectedUser
             return;
         }
 
-        /** @var PersonRow $personRow */
-        $this->person = Person::fromRow($personRow);
+        /**
+         * @var array{
+         *     Id: int|string,
+         *     Email: string,
+         *     Alert?: string|null,
+         *     FirstName?: string|null,
+         *     LastName?: string|null,
+         *     NickName?: string|null,
+         *     UseGravatar?: bool|int|string|null,
+         *     Avatar?: string|null
+         * } $personRow
+         */
+        $personRow = array_merge((array) $individual, (array) $member);
+        $person = Person::fromArray($personRow);
+
+        $authorizations = $this->authorizationDataHelper->getsFor($person->Id);
+
+        $this->person = $person;
+        $this->user   = new ConnectedUserVO($person, $authorizations);
 
         if ($this->person->Alert !== null) {
             Params::setMemberAlert($this->person->Alert);
         }
-
-        $this->authorizations = $this->authorizationDataHelper->getsFor($this);
 
         $lang = TranslationManager::getCurrentLanguage();
         $defaultColors = $this->dataHelper->getDefaultColors();
@@ -87,9 +99,9 @@ final class ConnectedUser
             [
                 'href' => $this->getHref($this->person->Email),
                 'userImg' => WebApp::computeUserImg(
-                    $this->person->UseGravatar ?? false,
-                    $this->person->Email ?? null,
-                    $this->person->Avatar ?? null,
+                    $this->person->UseGravatar,
+                    $this->person->Email,
+                    $this->person->Avatar,
                     $this->gravatarHandler
                 ),
                 'userEmail' => $this->person->Email,
@@ -122,16 +134,133 @@ final class ConnectedUser
                 'navbarIconColor' => $defaultColors['navbarIconColor'],
             ],
             $this->metadataDataHelper->isTestSite()
-                && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl()) ? $prodSiteUrl : null,
+                && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl())
+                ? $prodSiteUrl
+                : null,
             $this->person->Alert
         );
     }
+
+    public function isConnected(): bool
+    {
+        return $this->user !== null;
+    }
+
+    // === Délégation vers le Value Object ===
+
+    public function isAdministrator(): bool
+    {
+        return $this->user?->isAdministrator() ?? false;
+    }
+
+    public function isCommunicationManager(): bool
+    {
+        return $this->user?->isCommunicationManager() ?? false;
+    }
+
+    public function isDesigner(): bool
+    {
+        return $this->user?->isDesigner() ?? false;
+    }
+
+    public function isEditor(): bool
+    {
+        return $this->user?->isEditor() ?? false;
+    }
+
+    public function isEventDesigner(): bool
+    {
+        return $this->user?->isEventDesigner() ?? false;
+    }
+
+    public function isEventManager(): bool
+    {
+        return $this->user?->isEventManager() ?? false;
+    }
+
+    public function isExerciseDesigner(): bool
+    {
+        return $this->user?->isExerciseDesigner() ?? false;
+    }
+
+    public function isGroupManager(): bool
+    {
+        return $this->user?->isGroupManager() ?? false;
+    }
+
+    public function isHomeDesigner(): bool
+    {
+        return $this->user?->isHomeDesigner() ?? false;
+    }
+
+    public function isKanbanDesigner(): bool
+    {
+        return $this->user?->isKanbanDesigner() ?? false;
+    }
+
+    public function isLoan(): bool
+    {
+        return $this->user?->isLoan() ?? false;
+    }
+
+    public function isLoanDesigner(): bool
+    {
+        return $this->user?->isLoanDesigner() ?? false;
+    }
+
+    public function isLoanManager(): bool
+    {
+        return $this->user?->isLoanManager() ?? false;
+    }
+
+    public function isMenuDesigner(): bool
+    {
+        return $this->user?->isMenuDesigner() ?? false;
+    }
+
+    public function isPersonManager(): bool
+    {
+        return $this->user?->isPersonManager() ?? false;
+    }
+
+    public function isRedactor(): bool
+    {
+        return $this->user?->isRedactor() ?? false;
+    }
+
+    public function isTranslator(): bool
+    {
+        return $this->user?->isTranslator() ?? false;
+    }
+
+    public function isVisitorInsights(): bool
+    {
+        return $this->user?->isVisitorInsights() ?? false;
+    }
+
+    public function isWebmaster(): bool
+    {
+        return $this->user?->isWebmaster() ?? false;
+    }
+
+    public function hasAutorization(): bool
+    {
+        return $this->user?->hasAuthorizationAny() ?? false;
+    }
+
+    public function hasOnlyOneAutorization(): bool
+    {
+        return $this->user?->hasOnlyOneAuthorization() ?? false;
+    }
+
+    // === Méthodes qui restent dans le helper ===
 
     public function getLastSignIn(): ?string
     {
         if ($this->person === null) {
             return null;
         }
+
         $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignIn');
         return $row !== false ? ($row->LastSignIn ?? null) : null;
     }
@@ -141,6 +270,7 @@ final class ConnectedUser
         if ($this->person === null) {
             return null;
         }
+
         $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignOut');
         return $row !== false ? ($row->LastSignOut ?? null) : null;
     }
@@ -155,126 +285,8 @@ final class ConnectedUser
         return $segments[$segment] ?? null;
     }
 
-    public function isAdministrator(): bool
-    {
-        return $this->isCommunicationManager() || $this->isDesigner() || $this->isEditor() || $this->isEventManager()
-            || $this->isLoanManager() || $this->isPersonManager() || $this->isRedactor() || $this->isTranslator()
-            || $this->isVisitorInsights() || $this->isWebmaster();
-    }
-
-    public function isCommunicationManager(): bool
-    {
-        return in_array(Authorization::CommunicationManager->value, $this->authorizations ?? []);
-    }
-
-    public function isConnected(): bool
-    {
-        return $this->person !== null;
-    }
-
-    public function isDesigner(): bool
-    {
-        return $this->isEventDesigner()
-            || $this->isExerciseDesigner()
-            || $this->isHomeDesigner()
-            || $this->isKanbanDesigner()
-            || $this->isLoanDesigner()
-            || $this->isMenuDesigner();
-    }
-
-    public function isEditor(): bool
-    {
-        return in_array(Authorization::Editor->value, $this->authorizations ?? []);
-    }
-
-    public function isEventDesigner(): bool
-    {
-        return in_array(Authorization::EventDesigner->value, $this->authorizations ?? []);
-    }
-
-    public function isEventManager(): bool
-    {
-        return in_array(Authorization::EventManager->value, $this->authorizations ?? []);
-    }
-
-    public function isExerciseDesigner(): bool
-    {
-        return in_array(Authorization::ExerciseDesigner->value, $this->authorizations ?? []);
-    }
-
-    public function isGroupManager(): bool
-    {
-        return $this->isPersonManager() || $this->isWebmaster();
-    }
-
-    public function isHomeDesigner(): bool
-    {
-        return in_array(Authorization::HomeDesigner->value, $this->authorizations ?? []);
-    }
-
-    public function isKanbanDesigner(): bool
-    {
-        return in_array(Authorization::KanbanDesigner->value, $this->authorizations ?? []);
-    }
-
-    public function isLoan(): bool
-    {
-        return $this->isLoanDesigner() || $this->isLoanManager();
-    }
-
-    public function isLoanDesigner(): bool
-    {
-        return in_array(Authorization::LoanDesigner->value, $this->authorizations ?? []);
-    }
-
-    public function isLoanManager(): bool
-    {
-        return in_array(Authorization::LoanManager->value, $this->authorizations ?? []);
-    }
-
-    public function isMenuDesigner(): bool
-    {
-        return in_array(Authorization::MenuDesigner->value, $this->authorizations ?? []);
-    }
-
-    public function isPersonManager(): bool
-    {
-        return in_array(Authorization::PersonManager->value, $this->authorizations ?? []);
-    }
-
-    public function isRedactor(): bool
-    {
-        return in_array(Authorization::Redactor->value, $this->authorizations ?? []);
-    }
-
-    public function isTranslator(): bool
-    {
-        return in_array(Authorization::Translator->value, $this->authorizations ?? []);
-    }
-
-    public function isVisitorInsights(): bool
-    {
-        return in_array(Authorization::VisitorInsights->value, $this->authorizations ?? []);
-    }
-
-    public function isWebmaster(): bool
-    {
-        return in_array(Authorization::Webmaster->value, $this->authorizations ?? []);
-    }
-
-    public function hasAutorization(): bool
-    {
-        return count($this->authorizations ?? []) > 0;
-    }
-
-    public function hasOnlyOneAutorization(): bool
-    {
-        return count($this->authorizations ?? []) == 1;
-    }
-
-    #region Private functions
     private function getHref(string $userEmail): string
     {
-        return $userEmail == '' ? '/user/sign/in' : '/user';
+        return $userEmail === '' ? '/user/sign/in' : '/user';
     }
 }

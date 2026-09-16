@@ -12,7 +12,7 @@ use app\helpers\Password;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\AuthResult;
-use app\models\DataHelper;
+use app\models\MemberDataHelper;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\valueObjects\Person;
 
@@ -22,33 +22,23 @@ use app\modules\Common\valueObjects\Person;
 class AuthenticationService
 {
     public function __construct(
-        private DataHelper $dataHelper,
+        private MemberDataHelper $memberDataHelper,
         private string $baseUrl
     ) {
     }
 
     /**
-     * Génère et persiste le jeton de réinitialisation, puis retourne le message
-     * à envoyer. L'envoi lui-même est de la responsabilité de l'appelant.
-     *
      * @throws EmailException si l'adresse est inconnue
      */
     public function prepareForgotPasswordEmail(string $email): EmailMessage
     {
-        $person = $this->findPersonByEmail($email);
-        if ($person === false) {
+        $row = $this->memberDataHelper->findBasicByEmail($email);
+        if ($row === false) {
             throw new EmailException();
         }
 
         $token = bin2hex(random_bytes(32));
-        $this->dataHelper->set(
-            'Member',
-            [
-                'Token'          => $token,
-                'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
-            ],
-            ['Id' => $person->Id]
-        );
+        $this->memberDataHelper->setResetToken((int) $row->Id, $token);
 
         $resetLink = $this->baseUrl . '/user/setPassword/' . $token;
 
@@ -67,44 +57,16 @@ class AuthenticationService
             return null;
         }
 
-        $token = $_COOKIE['rememberMe'];
-
-        $member = $this->dataHelper->get(
-            'Member',
-            ['Token' => $token],
-            'Id, Inactivated'
-        );
-
-        if (!$member) {
+        $row = $this->memberDataHelper->findByRememberToken(To::str($_COOKIE['rememberMe']));
+        if ($row === false) {
             $this->clearRememberMeCookie();
             return null;
         }
 
-        if ((bool)($member->Inactivated ?? false)) {
-            $this->clearRememberMeCookie();
-            return null;
-        }
+        /** @var PersonRow $row */
+        $person = Person::fromRow($row);
 
-        $individual = $this->dataHelper->get(
-            'Individual',
-            ['Id' => $member->Id],
-            'Id, Email, FirstName, LastName, NickName, Avatar'
-        );
-
-        if (!$individual) {
-            $this->clearRememberMeCookie();
-            return null;
-        }
-
-        $personRow = (object) array_merge((array) $individual, (array) $member);
-        /** @var PersonRow $personRow */
-        $person = Person::fromRow($personRow);
-
-        $this->dataHelper->set(
-            'Member',
-            ['LastSignIn' => date('Y-m-d H:i:s')],
-            ['Id' => $person->Id]
-        );
+        $this->memberDataHelper->recordSignIn($person->Id);
 
         $_SESSION['user']   = $person->Email;
         $_SESSION['navbar'] = '';
@@ -112,9 +74,7 @@ class AuthenticationService
         return AuthResult::success($person);
     }
 
-    /**
-     * @param array<string, mixed> $requestData
-     */
+    /** @param array<string, mixed> $requestData */
     public function handleSignIn(array $requestData): AuthResult
     {
         $schema = [
@@ -141,50 +101,26 @@ class AuthenticationService
 
     public function resetPassword(string $token, string $newPassword): bool
     {
-        $member = $this->dataHelper->get(
-            'Member',
-            ['Token' => $token],
-            'Id, TokenCreatedAt'
-        );
-
-        if (!$member) {
+        $member = $this->memberDataHelper->findByResetToken($token);
+        if ($member === false) {
             return false;
         }
 
-        /** @var object{Id: int|string, TokenCreatedAt: string|null} $member */
-        $tokenCreatedAt = $member->TokenCreatedAt;
-
-        if ($tokenCreatedAt === null || (new DateTime($tokenCreatedAt))->diff(new DateTime())->h >= 1) {
+        if ($member->TokenCreatedAt === null || (new DateTime($member->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
             return false;
         }
 
-        $this->dataHelper->set('Member', [
-            'Password'       => Password::signPassword($newPassword),
-            'Token'          => null,
-            'TokenCreatedAt' => null
-        ], ['Id' => (int) $member->Id]);
+        $this->memberDataHelper->finalizeReset((int) $member->Id, Password::signPassword($newPassword));
 
         return true;
     }
 
     public function signOut(): void
     {
-        $userEmail = $_SESSION['user'] ?? '';
+        $userEmail = To::str($_SESSION['user'] ?? '');
 
         if ($userEmail !== '') {
-            $individual = $this->dataHelper->get(
-                'Individual',
-                ['Email' => $userEmail],
-                'Id'
-            );
-
-            if ($individual !== false) {
-                $this->dataHelper->set(
-                    'Member',
-                    ['LastSignOut' => date('Y-m-d H:i:s')],
-                    ['Id' => $individual->Id]
-                );
-            }
+            $this->memberDataHelper->recordSignOutByEmail($userEmail);
         }
 
         unset($_SESSION['user']);
@@ -196,37 +132,22 @@ class AuthenticationService
     private function authenticate(string $email, string $password, bool $rememberMe): AuthResult
     {
         try {
-            $individual = $this->dataHelper->get(
-                'Individual',
-                ['Email' => $email],
-                'Id, Email, FirstName, LastName, NickName, Avatar'
-            );
+            $row = $this->memberDataHelper->findForSignIn($email);
 
-            if (!$individual) {
+            if ($row === false) {
                 return AuthResult::error("Sign in failed: unknown email {$email}");
             }
 
-            $member = $this->dataHelper->get(
-                'Member',
-                ['Id' => $individual->Id],
-                'Password, Inactivated, UseGravatar, Alert'
-            );
-
-            if (!$member) {
-                return AuthResult::error("Sign in failed: unknown email {$email}");
-            }
-
-            if ((bool)($member->Inactivated ?? false)) {
+            if ((bool) ($row->Inactivated ?? false)) {
                 return AuthResult::error("Sign in failed: inactivated user {$email}");
             }
 
-            if (!Password::verifyPassword($password, $member->Password ?? '')) {
+            if (!Password::verifyPassword($password, $row->Password ?? '')) {
                 return AuthResult::error("Sign in failed: wrong password for {$email}");
             }
 
-            $personRow = (object) array_merge((array) $individual, (array) $member);
-            /** @var PersonRow $personRow */
-            $person = Person::fromRow($personRow);
+            /** @var PersonRow $row */
+            $person = Person::fromRow($row);
 
             return $this->loginUser($person, $rememberMe);
         } catch (Throwable $e) {
@@ -241,33 +162,6 @@ class AuthenticationService
         setcookie('rememberMe', '', time() - 3600, '/');
     }
 
-    private function findPersonByEmail(string $email): Person|false
-    {
-        $individual = $this->dataHelper->get(
-            'Individual',
-            ['Email' => $email],
-            'Id, Email, FirstName, LastName, NickName, Avatar'
-        );
-
-        if (!$individual) {
-            return false;
-        }
-
-        $member = $this->dataHelper->get(
-            'Member',
-            ['Id' => $individual->Id],
-            'UseGravatar, Alert'
-        );
-
-        if (!$member) {
-            return false;
-        }
-
-        $personRow = (object) array_merge((array) $individual, (array) $member);
-        /** @var PersonRow $personRow */
-        return Person::fromRow($personRow);
-    }
-
     private function generateRememberMeToken(): string
     {
         return bin2hex(random_bytes(32));
@@ -275,11 +169,7 @@ class AuthenticationService
 
     private function loginUser(Person $person, bool $rememberMe): AuthResult
     {
-        $this->dataHelper->set(
-            'Member',
-            ['LastSignIn' => date('Y-m-d H:i:s')],
-            ['Id' => $person->Id]
-        );
+        $this->memberDataHelper->recordSignIn($person->Id);
 
         if ($rememberMe) {
             $this->setRememberMeToken($person->Id);
@@ -295,11 +185,7 @@ class AuthenticationService
     {
         $token = $this->generateRememberMeToken();
 
-        $this->dataHelper->set(
-            'Member',
-            ['Token' => $token],
-            ['Id' => $personId]
-        );
+        $this->memberDataHelper->setRememberToken($personId, $token);
 
         setcookie('rememberMe', $token, time() + (30 * 24 * 60 * 60), '/');
     }

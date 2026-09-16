@@ -6,10 +6,20 @@ namespace app\models;
 
 use DateTime;
 use PDO;
+use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 
 class LogStatisticsDataHelper extends Data
 {
+    public function __construct(Application $application)
+    {
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
+    }
+
     /** @return array{labels: array<int, string>, data: array<int, int>} */
     public function getOsDistribution(string $period, string $currentDate): array
     {

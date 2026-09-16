@@ -11,14 +11,25 @@ namespace app\modules\Common\valueObjects;
  * requêtée séparément par le ViewModel/contrôleur concerné.
  *
  * @phpstan-type PersonRow object{
- *    Id: int|string,
- *    Email: string,
- *    Alert?: string|null,
- *    FirstName?: string|null,
- *    LastName?: string|null,
- *    NickName?: string|null,
- *    UseGravatar?: bool|int|string|null,
- *    Avatar?: string|null,
+ *     Id: int|string,
+ *     Email: string,
+ *     Alert?: string|null,
+ *     FirstName?: string|null,
+ *     LastName?: string|null,
+ *     NickName?: string|null,
+ *     UseGravatar?: bool|int|string|null,
+ *     Avatar?: string|null
+ * }
+ *
+ * @phpstan-type PersonArray array{
+ *     Id: int|string,
+ *     Email: string,
+ *     Alert?: string|null,
+ *     FirstName?: string|null,
+ *     LastName?: string|null,
+ *     NickName?: string|null,
+ *     UseGravatar?: bool|int|string|null,
+ *     Avatar?: string|null
  * }
  */
 final readonly class Person extends AbstractValueObject
@@ -51,6 +62,25 @@ final readonly class Person extends AbstractValueObject
             NickName: $row->NickName ?? null,
             UseGravatar: $useGravatar,
             Avatar: $row->Avatar ?? null,
+        );
+    }
+
+    /**
+     * @param PersonArray $row
+     */
+    public static function fromArray(array $row): self
+    {
+        $useGravatar = isset($row['UseGravatar']) && $row['UseGravatar'] === 'yes';
+
+        return new self(
+            Id: (int) $row['Id'],
+            Email: $row['Email'],
+            Alert: $row['Alert'] ?? null,
+            FirstName: $row['FirstName'] ?? null,
+            LastName: $row['LastName'] ?? null,
+            NickName: $row['NickName'] ?? null,
+            UseGravatar: $useGravatar,
+            Avatar: $row['Avatar'] ?? null,
         );
     }
 }

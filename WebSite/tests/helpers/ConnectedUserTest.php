@@ -12,6 +12,7 @@ use app\helpers\ErrorManager;
 use app\helpers\GravatarHandler;
 use app\enums\Authorization;
 use app\enums\ApplicationError;
+use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
 use app\modules\Common\valueObjects\Person;
 use app\models\DataHelper;
 use app\models\AuthorizationDataHelper;
@@ -105,12 +106,12 @@ final class ConnectedUserTest extends TestCase
         );
     }
 
-    /** @param array<int, string> $authorizations */
+    /** @param list<string> $authorizations */
     private function setAuthorizations(ConnectedUser $user, array $authorizations): void
     {
-        $ref  = new ReflectionClass($user);
-        $prop = $ref->getProperty('authorizations');
-        $prop->setValue($user, $authorizations);
+        $person = (new ReflectionClass(Person::class))->newInstanceWithoutConstructor();
+        $user->person = $person;
+        $user->user   = new ConnectedUserVO($person, $authorizations);
     }
 
     // -------------------------------------------------------------------------
@@ -250,6 +251,7 @@ final class ConnectedUserTest extends TestCase
         // Person is final readonly → cannot be mocked.
         $person = (new ReflectionClass(Person::class))->newInstanceWithoutConstructor();
         $user->person = $person;
+        $user->user   = new ConnectedUserVO($person, []);
 
         $this->assertTrue($user->isConnected());
     }

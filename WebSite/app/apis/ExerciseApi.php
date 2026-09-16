@@ -27,7 +27,7 @@ class ExerciseApi extends AbstractApi
         if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        $row = $this->dataHelper->get('Exercise', ['Id' =>  $id]);
+        $row = $this->dataHelper->get('Exercise', ['Id' =>  $id], '*');
         if (!$row) {
             $this->renderJsonBadRequest("Exercise {$id} not found", __FILE__, __LINE__);
             return;
@@ -64,7 +64,7 @@ class ExerciseApi extends AbstractApi
         $data = $this->getJsonInput();
         $index = To::int($data['index'] ?? -1, -1);
 
-        $row = $this->dataHelper->get('Exercise', ['Id' => $id]);
+        $row = $this->dataHelper->get('Exercise', ['Id' => $id], '*');
         if (!$row) {
             $this->renderJsonBadRequest("Exercise {$id} not found", __FILE__, __LINE__);
             return;

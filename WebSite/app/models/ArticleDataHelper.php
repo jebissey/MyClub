@@ -24,7 +24,11 @@ class ArticleDataHelper extends Data implements NewsProviderInterface
         Application $application,
         private AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     /**

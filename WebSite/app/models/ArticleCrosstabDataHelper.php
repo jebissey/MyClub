@@ -11,7 +11,11 @@ class ArticleCrosstabDataHelper extends Data
 {
     public function __construct(Application $application, private CrosstabDataHelper $crosstabDataHelper)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     /**

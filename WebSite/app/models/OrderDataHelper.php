@@ -37,9 +37,13 @@ class OrderDataHelper extends Data implements NewsProviderInterface
     public function __construct(
         Application $application,
         private ArticleDataHelper $articleDataHelper,
-        private authorizationDataHelper $authorizationDataHelper
+        private AuthorizationDataHelper $authorizationDataHelper
     ) {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     public function articleHasOrderNotClosed(int $articleId): object|bool

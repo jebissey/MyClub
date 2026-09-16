@@ -15,7 +15,11 @@ class LogCompactDataHelper extends Data
 {
     public function __construct(private Application $application)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     public function compactLog(int $removeOlderThanXmonths, int $compactOlderThanXmonths): void
@@ -94,7 +98,7 @@ class LogCompactDataHelper extends Data
             $this->pdoForLog->commit();
             $this->pdoForLog->exec("VACUUM");
 
-            (new LogWriterDataHelper($this->application))->add(
+            (new LogWriterDataHelper($this->application, $this->application->getErrorManager()))->add(
                 (string)ApplicationError::Ok->value,
                 "Compact log: {$deletedRows} old deleted, {$compactedInserted} compacted, {$compactedDeleted} compacted deleted"
             );
@@ -103,7 +107,7 @@ class LogCompactDataHelper extends Data
                 $this->pdoForLog->rollBack();
             }
 
-            (new LogWriterDataHelper($this->application))->add(
+            (new LogWriterDataHelper($this->application, $this->application->getErrorManager()))->add(
                 (string)ApplicationError::Error->value,
                 "Compact log FAILED: " . $e->getMessage()
             );
@@ -129,7 +133,7 @@ class LogCompactDataHelper extends Data
         }
         $countAfter = To::int($this->fetchColumnOrFail($this->pdoForLog->query("SELECT COUNT(*) FROM Log")));
         if ($countAfter < $countBefore) {
-            (new LogWriterDataHelper($this->application))->add(
+            (new LogWriterDataHelper($this->application, $this->application->getErrorManager()))->add(
                 (string)ApplicationError::Ok->value,
                 "Compact log from $countBefore to $countAfter"
             );

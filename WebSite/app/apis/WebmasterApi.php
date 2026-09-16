@@ -66,7 +66,7 @@ class WebmasterApi extends AbstractApi
         $title = $request['title'] ?? 'Nouveau message';
         $body  = $request['body']  ?? 'Cliquez pour voir !';
         $webPush = new WebPush($this->vapid);
-        $subscriptions = $this->dataHelper->gets('PushSubscription');
+        $subscriptions = $this->dataHelper->gets('PushSubscription', [], '*');
         $sent = 0;
         foreach ($subscriptions as $subData) {
             try {
@@ -118,7 +118,7 @@ class WebmasterApi extends AbstractApi
             $this->renderJsonBadRequest('Requête incomplète.', __FILE__, __LINE__);
             return;
         }
-        if ($this->dataHelper->get('PushSubscription', ['EndPoint' => $endpoint])) {
+        if ($this->dataHelper->get('PushSubscription', ['EndPoint' => $endpoint], '*')) {
             $this->renderJsonOk([], 'Déjà abonné.');
             return;
         }

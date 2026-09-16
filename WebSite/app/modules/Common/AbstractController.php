@@ -44,7 +44,7 @@ abstract class AbstractController
         $this->latte = $application->getLatte();
         $this->addLatteFilters();
         $this->dataHelper = new DataHelper($application->getPdo(), $application->getErrorManager(), $application->getPdoForLog());
-        $this->languagesDataHelper = new LanguagesDataHelper($application);
+        $this->languagesDataHelper = new LanguagesDataHelper($application, $application->getErrorManager());
         $this->authorizationDataHelper = new AuthorizationDataHelper($application);
         $this->menuItemDataHelper = new MenuItemDataHelper($application, $this->authorizationDataHelper);
         $this->metadataDataHelper = new MetadataDataHelper($application);
@@ -133,7 +133,7 @@ abstract class AbstractController
             }
         }
 
-        $groups = $this->dataHelper->gets('Group', ['Inactivated' => 0]);
+        $groups = $this->dataHelper->gets('Group', ['Inactivated' => 0], '*');
         $groupsById = [];
         foreach ($groups as $group) {
             $groupsById[$group->Id] = (string) $group->Name;

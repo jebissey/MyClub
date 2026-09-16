@@ -7,7 +7,6 @@ namespace tests\models;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
-use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\models\DataHelper;
 
@@ -21,28 +20,6 @@ class DataTest extends DataHelperTestCase
         );
     }
 
-    /**
-     * Comme makeDataHelper(), mais câble aussi $application avec un stub
-     * dont getErrorManager() renvoie un stub d'ErrorManager (raise() est
-     * une méthode void non configurée : le stub ne fait rien et ne
-     * déclenche ni rendu Latte, ni header(), ni exit()). Nécessaire pour
-     * exercer les blocs catch (PDOException $e) de Data, qui appellent
-     * tous $this->application->getErrorManager()->raise(...) avant de
-     * relever l'exception.
-     */
-    private function makeDataHelperWithStubbedErrorManager(PDO $pdo): DataHelper
-    {
-        $helper = $this->makeDataHelper($pdo);
-
-        $errorManagerStub = $this->createStub(ErrorManager::class);
-        $applicationStub = $this->createStub(Application::class);
-        $applicationStub->method('getErrorManager')->willReturn($errorManagerStub);
-
-        $this->setProperty($helper, 'application', $applicationStub);
-
-        return $helper;
-    }
-
     // -------------------------------------------------------------------------
     // get()
     // -------------------------------------------------------------------------
@@ -53,7 +30,7 @@ class DataTest extends DataHelperTestCase
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Jean', 'Dupont', 'jean.dupont@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $record = $helper->get('Individual', ['LastName' => 'Dupont']);
+        $record = $helper->get('Individual', ['LastName' => 'Dupont'], '*');
 
         $this->assertIsObject($record);
         $this->assertSame('Jean', $record->FirstName);
@@ -64,7 +41,7 @@ class DataTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDataHelper($pdo);
 
-        $this->assertFalse($helper->get('Individual', ['LastName' => 'NoSuchLastName']));
+        $this->assertFalse($helper->get('Individual', ['LastName' => 'NoSuchLastName'], '*'));
     }
 
     public function testGetEmailWhereIsCaseInsensitive(): void
@@ -73,7 +50,7 @@ class DataTest extends DataHelperTestCase
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'John', 'Doe', 'John.Doe@Example.com')");
         $helper = $this->makeDataHelper($pdo);
 
-        $record = $helper->get('Individual', ['Email' => 'john.doe@example.com']);
+        $record = $helper->get('Individual', ['Email' => 'john.doe@example.com'], '*');
 
         $this->assertIsObject($record);
         $this->assertSame('John', $record->FirstName);
@@ -90,7 +67,7 @@ class DataTest extends DataHelperTestCase
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'B', 'SameLastName', 'b@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $rows = $helper->gets('Individual', ['LastName' => 'SameLastName']);
+        $rows = $helper->gets('Individual', ['LastName' => 'SameLastName'],'*');
 
         $this->assertCount(2, $rows);
     }
@@ -214,7 +191,7 @@ class DataTest extends DataHelperTestCase
     public function testDeleteWithEmptyWhereThrowsAndReportsPDOException(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDataHelperWithStubbedErrorManager($pdo);
+        $helper = $this->makeDataHelper($pdo);
 
         $this->expectException(PDOException::class);
         $helper->delete('Individual', []);
@@ -223,10 +200,10 @@ class DataTest extends DataHelperTestCase
     public function testGetWithUnknownWhereColumnThrowsAndReportsPDOException(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDataHelperWithStubbedErrorManager($pdo);
+        $helper = $this->makeDataHelper($pdo);
 
         $this->expectException(PDOException::class);
-        $helper->get('Individual', ['ThisColumnDoesNotExist' => 'x']);
+        $helper->get('Individual', ['ThisColumnDoesNotExist' => 'x'], '*');
     }
 
     // -------------------------------------------------------------------------
@@ -250,7 +227,7 @@ class DataTest extends DataHelperTestCase
         // query() ne relève pas l'exception : elle est avalée et query()
         // renvoie false, contrairement à get()/gets()/set()/delete()/last().
         $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDataHelperWithStubbedErrorManager($pdo);
+        $helper = $this->makeDataHelper($pdo);
 
         $result = $helper->query('SELECT * FROM ThisTableDoesNotExist');
 

@@ -13,7 +13,11 @@ class DesignDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     /**
@@ -77,7 +81,7 @@ class DesignDataHelper extends Data
         $designs = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $userVotes = [];
-        $votes = $this->gets('DesignVote', ['IdPerson' => $personId]);
+        $votes = $this->gets('DesignVote', ['IdPerson' => $personId], '*');
         foreach ($votes as $vote) {
             $userVotes[$vote->IdDesign] = $vote->Vote;
         }

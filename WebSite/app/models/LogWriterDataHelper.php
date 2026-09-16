@@ -8,12 +8,13 @@ use RuntimeException;
 use Throwable;
 use app\helpers\Application;
 use app\helpers\Client;
+use app\helpers\ErrorManager;
 
 class LogWriterDataHelper extends Data
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, ErrorManager $errorManager)
     {
-        parent::__construct($application->getPdoForLog(), $application->getErrorManager(), $application->getPdoForLog());
+        parent::__construct($application->getPdoForLog(), $errorManager, $application->getPdoForLog());
     }
 
     public function add(string $code, string $message, ?float $duration = null): void

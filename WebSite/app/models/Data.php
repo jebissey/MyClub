@@ -25,9 +25,6 @@ abstract class Data
     /** @var array<int, string> */
     private array $tables;
 
-    /** @var array<int, string>|null */
-    private static ?array $cachedTables = null;
-
     public function __construct(
         PDO $pdo,
         protected ErrorManager $errorManager,
@@ -37,8 +34,7 @@ abstract class Data
         $this->pdoForLog = $pdoForLog ?? $pdo;
         $this->fluent = new Query($this->pdo);
         $this->fluentForLog = new Query($this->pdoForLog);
-        self::$cachedTables ??= $this->getTables();
-        $this->tables = self::$cachedTables;
+        $this->tables = self::getTables();
     }
 
     #region Protected methods
@@ -115,20 +111,13 @@ abstract class Data
 
     /**
      * @param array<string, mixed> $where
-     * @param string|array<int, string> $fields
      */
-    public function get(string $table, array $where = [], string|array $fields = '*'): object|false
+    public function get(string $table, array $where, string $fields = '*'): object|false
     {
         $this->validateTableName($table);
-        $sql = "";
+        $sql = '';
         try {
-            if (is_array($fields)) {
-                $fieldsStr = implode(', ', $fields);
-            } else {
-                $fieldsStr = $fields;
-            }
-
-            $sql = "SELECT {$fieldsStr} FROM \"{$table}\"";
+            $sql = "SELECT {$fields} FROM \"{$table}\"";
             $params = [];
             if (!empty($where)) {
                 $conditions = [];
@@ -140,8 +129,8 @@ abstract class Data
                     }
                     $params[":{$field}"] = $value;
                 }
-                $sql .= " WHERE " . implode(' AND ', $conditions);
-                $sql .= " LIMIT 1";
+                $sql .= ' WHERE ' . implode(' AND ', $conditions);
+                $sql .= ' LIMIT 1';
             }
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
@@ -177,7 +166,7 @@ abstract class Data
      * @param array<string, mixed> $where
      * @return array<int|string, stdClass>
      */
-    public function gets(string $table, array $where = [], string $fields = '*', string $orderBy = '', bool $keyPair = false): array
+    public function gets(string $table, array $where, string $fields, string $orderBy = '', bool $keyPair = false): array
     {
         $this->validateTableName($table);
         try {

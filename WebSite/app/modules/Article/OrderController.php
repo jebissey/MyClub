@@ -166,7 +166,7 @@ class OrderController extends AbstractController
                 $connectedUser
             )
         ) {
-            $repliesData = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id]);
+            $repliesData = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id], '*');
 
             $replies = array_map(function ($row) {
                 /** @var object{

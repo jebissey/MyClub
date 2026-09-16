@@ -68,11 +68,15 @@ final class Application
             $this->pdo = $db->getPdo();
             $this->pdoForLog = $db->getPdoForLog();
             $this->errorManager = new ErrorManager($this);
+
+            $metadataDataHelper = new MetadataDataHelper($this);
+            TranslationManager::setForcedLanguage($metadataDataHelper->getForcedLanguage());
+
             $this->connectedUser = new ConnectedUser(
                 $this->getErrorManager(),
                 new DataHelper($this->getPdo(), $this->getErrorManager(), $this->getPdoForLog()),
                 new AuthorizationDataHelper($this),
-                new MetadataDataHelper($this),
+                $metadataDataHelper,
                 new GravatarHandler(),
             );
         } catch (Throwable $e) {
@@ -167,7 +171,7 @@ final class Application
             }
         }
         if ($log) {
-            new LogWriterDataHelper(self::init())->add('UNREACHABLE', $msg);
+            new LogWriterDataHelper(self::init(), self::init()->getErrorManager())->add('UNREACHABLE', $msg);
         }
         throw new LogicException($msg);
     }

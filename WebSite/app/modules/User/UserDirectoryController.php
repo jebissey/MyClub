@@ -97,7 +97,7 @@ class UserDirectoryController extends AbstractController
             countOfMessages: count($this->dataHelper->gets('Message', [
                 '"From"' => 'User',
                 'GroupId' => $selectedGroup
-            ])),
+            ], '*')),
             userIsInGroup: $this->personGroupDataHelper->isPersonInGroup($person->Id, $selectedGroup ?? 0),
             countOfLocatedMembers: count($persons),
             numberOfPublicMembers: count($this->dataHelper->gets('Person', [

@@ -38,15 +38,15 @@ class GroupApi extends AbstractApi
             return;
         }
         try {
-            if (!$this->dataHelper->get('Individual', ['Id' => $personId])) {
+            if (!$this->dataHelper->get('Individual', ['Id' => $personId], '*')) {
                 $this->renderJsonBadRequest("person ({$personId}) does't exist)", __FILE__, __LINE__);
                 return;
             }
-            if (!$this->dataHelper->get('Group', ['Id' => $groupId])) {
+            if (!$this->dataHelper->get('Group', ['Id' => $groupId], '*')) {
                 $this->renderJsonBadRequest("group ({$groupId}) does't exist)", __FILE__, __LINE__);
                 return;
             }
-            if ($this->dataHelper->get('MemberGroup', ['IdPerson' => $personId, 'idGroup' => $groupId])) {
+            if ($this->dataHelper->get('MemberGroup', ['IdPerson' => $personId, 'idGroup' => $groupId], '*')) {
                 $this->renderJsonBadRequest("person ({$personId}) is already in group ({$groupId})", __FILE__, __LINE__);
                 return;
             }

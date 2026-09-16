@@ -212,7 +212,7 @@ class EventController extends AbstractController
             countOfMessages: count($this->dataHelper->gets('Message', [
                 '"From"' => 'User',
                 'EventId' => $eventId
-            ])),
+            ], '*')),
             eventNeeds: array_values($this->eventDataHelper->getEventNeeds($eventId)),
             participantSupplies: array_values($this->eventDataHelper->getParticipantSupplies($eventId)),
             userSupplies: array_values($this->eventDataHelper->getUserSupplies($eventId, $userEmail)),

@@ -48,7 +48,8 @@ class V15ToV16Migrator implements DatabaseMigratorInterface
         ');
         $pdo->exec('DROP TABLE "Page"');
 
-        $languagesHelper = new LanguagesDataHelper(Application::init());
+        $application = Application::init();
+        $languagesHelper = new LanguagesDataHelper($application, $application->getErrorManager());
         $stmt = $pdo->prepare("SELECT Id FROM Languages WHERE Name = :name");
         $stmt->execute([':name' => 'Designer']);
         $designerId = (int)$stmt->fetchColumn();

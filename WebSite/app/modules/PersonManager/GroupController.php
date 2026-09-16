@@ -46,7 +46,7 @@ class GroupController extends AbstractController
     public function groupCreateSave(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
-            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null]);
+            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*');
             $schema = [
                 'name' => FilterInputRule::HtmlSafeName->value,
                 'selfRegistration' => FilterInputRule::Int->value,

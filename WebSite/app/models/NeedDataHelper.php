@@ -13,7 +13,11 @@ class NeedDataHelper extends Data
 {
     public function __construct(Application $application)
     {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
     }
 
     /**
@@ -57,6 +61,6 @@ class NeedDataHelper extends Data
 
     public function countForNeedType(int $needTypeid): int
     {
-        return count($this->gets('Need', ['IdNeedType' => $needTypeid]));
+        return count($this->gets('Need', ['IdNeedType' => $needTypeid], '*'));
     }
 }

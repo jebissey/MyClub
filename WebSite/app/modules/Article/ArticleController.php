@@ -97,7 +97,7 @@ class ArticleController extends TableController
         // 2. Map explicitly to our object model
         $viewModel = new ArticleCarouselViewModel(
             article: $article,
-            carouselItems: array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id])),
+            carouselItems: array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id], '*')),
         );
 
         $this->render('Article/views/article_carousel.latte', $viewModel->toArray());
@@ -251,7 +251,7 @@ class ArticleController extends TableController
             publishedBy: $article->PublishedBy != $article->CreatedBy
                 ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
             carouselItems: array_values(
-                $this->dataHelper->gets('Carousel', ['IdArticle' => $id])
+                $this->dataHelper->gets('Carousel', ['IdArticle' => $id], '*')
             ),
             i18n: [
                 'editorNotReady' => ($this->t)('article.edit.error.editor_not_ready'),
@@ -576,7 +576,7 @@ class ArticleController extends TableController
                 $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')
             );
             $carouselItems = array_values(
-                $this->dataHelper->gets('Carousel', ['IdArticle' => $id])
+                $this->dataHelper->gets('Carousel', ['IdArticle' => $id], '*')
             );
             $hasSurvey = $this->dataHelper->get(
                 'Survey',
@@ -613,7 +613,8 @@ class ArticleController extends TableController
                 countOfMessages: count(
                     $this->dataHelper->gets(
                         'Message',
-                        ['"From"' => 'User', 'ArticleId' => $id]
+                        ['"From"' => 'User', 'ArticleId' => $id],
+                        '*'
                     )
                 ),
                 isCreator: $connectedUser->person !== null

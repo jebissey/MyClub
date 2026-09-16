@@ -327,7 +327,7 @@ class VisitorInsightsController extends TableController
             return;
         }
 
-        $activePersons = array_values($this->dataHelper->gets('Person', ['Inactivated' => 0]));
+        $activePersons = array_values($this->dataHelper->gets('Person', ['Inactivated' => 0], '*'));
 
         $viewModel = new LastVisitsViewModel(
             lastVisits: $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
