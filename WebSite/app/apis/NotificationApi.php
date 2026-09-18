@@ -45,7 +45,7 @@ class NotificationApi extends AbstractApi
             $existingRow = $this->dataHelper->get(
                 'PushSubscription',
                 ['EndPoint' => $input['endpoint']],
-                '*'
+                'Id'
             );
             if ($existingRow instanceof \stdClass) {
                 $existing = PushSubscriptionRow::fromStdClass($existingRow);
@@ -94,7 +94,7 @@ class NotificationApi extends AbstractApi
             $existingRow = $this->dataHelper->get(
                 'PushSubscription',
                 ['EndPoint' => $input['endpoint']],
-                '*'
+                'Id'
             );
 
             if ($existingRow instanceof stdClass) {

@@ -26,7 +26,7 @@ class CarouselDataHelper extends Data
     {
         if (!empty($data['id'])) {
             $this->set('Carousel', ['Item' => $item], [
-                'id' => $data['id'],
+                'Id' => $data['id'],
                 'IdArticle' => $data['idArticle']
             ]);
             return 'Élément mis à jour avec succès';

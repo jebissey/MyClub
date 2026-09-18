@@ -69,7 +69,7 @@ class CarouselApi extends AbstractApi
             $this->renderJsonOk(['items' => $this->dataHelper->gets(
                 'Carousel',
                 ['IdArticle' => $idArticle],
-                '*'
+                'Id, IdArticle, Item'
             )]);
         } catch (QueryException $e) {
             $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());

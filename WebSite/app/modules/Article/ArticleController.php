@@ -25,11 +25,19 @@ use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\viewModels\ArticleCarouselViewModel;
 use app\modules\Article\viewModels\ArticleEditViewModel;
 use app\modules\Article\viewModels\ArticleShowViewModel;
+use app\modules\Article\viewModels\ChangeOwnerViewModel;
+use app\modules\Article\viewModels\PublishViewModel;
+use app\modules\Article\viewModels\RedactorHomeViewModel;
 use app\modules\Common\TableController;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
 use app\modules\Common\valueObjects\EmailMessage;
+use app\modules\Common\viewModels\ChatViewModel;
+use app\modules\Common\viewModels\CrosstabViewModel;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\Common\viewModels\TableIndexViewModel;
+use app\modules\Common\viewModels\TopItemsByPeriodViewModel;
 
 class ArticleController extends TableController
 {
@@ -91,13 +99,10 @@ class ArticleController extends TableController
             return;
         }
 
-        // 1. Grab everything generated globally by the framework infrastructure
-        $dynamicContext = $this->getAllParams([]);
-
-        // 2. Map explicitly to our object model
         $viewModel = new ArticleCarouselViewModel(
             article: $article,
-            carouselItems: array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id], '*')),
+            carouselItems: array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id], 'Id, IdArticle, Item')),
+            layoutParams: $this->getAllParams([]),
         );
 
         $this->render('Article/views/article_carousel.latte', $viewModel->toArray());
@@ -141,10 +146,12 @@ class ArticleController extends TableController
                 $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
                 return;
             }
-            $this->render('User/views/changeOwner.latte', $this->getAllParams([
-                'article' => $article,
-                'redactors' => $this->personDataHelper->getRedactors(),
-            ]));
+            $viewModel = new ChangeOwnerViewModel(
+                article: $article,
+                redactors: array_values($this->personDataHelper->getRedactors()),
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('User/views/changeOwner.latte', $viewModel->toArray());
         } else {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
         }
@@ -251,7 +258,7 @@ class ArticleController extends TableController
             publishedBy: $article->PublishedBy != $article->CreatedBy
                 ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
             carouselItems: array_values(
-                $this->dataHelper->gets('Carousel', ['IdArticle' => $id], '*')
+                $this->dataHelper->gets('Carousel', ['IdArticle' => $id], 'Id, IdArticle, Item')
             ),
             i18n: [
                 'editorNotReady' => ($this->t)('article.edit.error.editor_not_ready'),
@@ -330,15 +337,13 @@ class ArticleController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
             $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Redactor'], $lang);
-            // TODO: accès dynamique $helpRow->$lang - PHPStan ne peut pas valider une propriété
-            // dont le nom est une variable. Nécessitera soit un tableau associatif en retour
-            // de Data::get(), soit un accès via {$helpRow->{$lang}} documenté comme mixed.
             $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $content,
-                'timer' => 0,
-                'btn_HistoryBack' => true,
-            ]));
+            $viewModel = new InfoViewModel(
+                content: $content,
+                timer: 0,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Common/views/info.latte', $viewModel->toArray());
         }
     }
 
@@ -346,10 +351,13 @@ class ArticleController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'redactor';
-            $this->render('Article/views/redactor.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'content' => ($this->t)('Redactor')
-            ]));
+            $viewModel = new RedactorHomeViewModel(
+                content: ($this->t)('Redactor'),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
+            );
+            $this->render('Article/views/redactor.latte', $viewModel->toArray());
         }
     }
 
@@ -405,20 +413,24 @@ class ArticleController extends TableController
             $spotlightArticleId
         );
         $data = $this->prepareTableData($query, $filterValues);
-        $this->render('Article/views/articles_index.latte', $this->getAllParams([
-            'articles' => $data['items'],
-            'currentPage' => $data['currentPage'],
-            'totalPages' => $data['totalPages'],
-            'filterValues' => $filterValues,
-            'filters' => $filterConfig,
-            'columns' => $columns,
-            'resetUrl' => '/articles',
-            'userConnected' => $connectedUser->person ?? false,
-            'navItems' => $this->getNavItems($connectedUser->person),
-            'page' => $connectedUser->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/",
-        ]));
+
+        $viewModel = new TableIndexViewModel(
+            articles: array_values($data['items']),
+            currentPage: $data['currentPage'],
+            totalPages: $data['totalPages'],
+            filterValues: $filterValues,
+            filters: $filterConfig,
+            columns: $columns,
+            resetUrl: '/articles',
+            userConnected: $connectedUser->person ?? false,
+            navItems: $this->getNavItems($connectedUser->person),
+            layoutParams: $this->getAllParams([
+                'page' => $connectedUser->getPage(),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/',
+            ]),
+        );
+        $this->render('Article/views/articles_index.latte', $viewModel->toArray());
     }
 
     public function publicIndex(): void
@@ -446,20 +458,24 @@ class ArticleController extends TableController
         ];
         $query = $this->articleTableDataHelper->getQueryForPublicArticles();
         $data = $this->prepareTableData($query, $filterValues);
-        $this->render('Article/views/publicArticles_index.latte', $this->getAllParams([
-            'articles' => $data['items'],
-            'currentPage' => $data['currentPage'],
-            'totalPages' => $data['totalPages'],
-            'filterValues' => $filterValues,
-            'filters' => $filterConfig,
-            'columns' => $columns,
-            'resetUrl' => '/articles',
-            'userConnected' => $connectedUser->person ?? false,
-            'navItems' => $this->getNavItems($connectedUser->person),
-            'page' => $connectedUser->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/",
-        ]));
+
+        $viewModel = new TableIndexViewModel(
+            articles: array_values($data['items']),
+            currentPage: $data['currentPage'],
+            totalPages: $data['totalPages'],
+            filterValues: $filterValues,
+            filters: $filterConfig,
+            columns: $columns,
+            resetUrl: '/articles',
+            userConnected: $connectedUser->person ?? false,
+            navItems: $this->getNavItems($connectedUser->person),
+            layoutParams: $this->getAllParams([
+                'page' => $connectedUser->getPage(),
+                'btn_HistoryBack' => true,
+                'btn_Parent' => '/',
+            ]),
+        );
+        $this->render('Article/views/publicArticles_index.latte', $viewModel->toArray());
     }
 
     public function publish(int $id): void
@@ -508,10 +524,13 @@ class ArticleController extends TableController
                 $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
                 return;
             }
-            $this->render('User/views/publish.latte', $this->getAllParams([
-                'article' => $article,
-                'page' => $this->application->getConnectedUser()->getPage()
-            ]));
+            $viewModel = new PublishViewModel(
+                article: $article,
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
+            );
+            $this->render('User/views/publish.latte', $viewModel->toArray());
         } else {
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
         }
@@ -568,15 +587,13 @@ class ArticleController extends TableController
 
             [$message, $messageType] = MessageService::get();
 
-            // 1. Grab everything generated globally by the framework infrastructure
             $layoutParams = $this->getAllParams([]);
 
-            // 2. Résolution des données annexes en variables locales typées
             $groups = array_values(
                 $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')
             );
             $carouselItems = array_values(
-                $this->dataHelper->gets('Carousel', ['IdArticle' => $id], '*')
+                $this->dataHelper->gets('Carousel', ['IdArticle' => $id], 'Id, IdArticle, Item')
             );
             $hasSurvey = $this->dataHelper->get(
                 'Survey',
@@ -589,7 +606,6 @@ class ArticleController extends TableController
                 'ClosingDate'
             ) ?: null;
 
-            // 3. Map explicitly to our object model
             $viewModel = new ArticleShowViewModel(
                 id: $id,
                 article: $article,
@@ -614,7 +630,7 @@ class ArticleController extends TableController
                     $this->dataHelper->gets(
                         'Message',
                         ['"From"' => 'User', 'ArticleId' => $id],
-                        '*'
+                        'Id'
                     )
                 ),
                 isCreator: $connectedUser->person !== null
@@ -658,19 +674,22 @@ class ArticleController extends TableController
         $lastLogId = isset($_SESSION['last_log_id']) && is_numeric($_SESSION['last_log_id'])
             ? (int)$_SESSION['last_log_id']
             : 0;
-        $this->render('Common/views/chat.latte', $this->getAllParams([
-            'article' => $article,
-            'event' => null,
-            'group' => null,
-            'messages' => $this->messageDataHelper->getArticleMessages($articleId),
-            'person' => $person,
-            'userImg' => $userImg,
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/article/{$articleId}",
-            'newMessages' => $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
-        ]));
+
+        $viewModel = new ChatViewModel(
+            article: $article,
+            event: null,
+            group: null,
+            messages: array_values($this->messageDataHelper->getArticleMessages($articleId)),
+            person: $person,
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            newMessages: $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
+            btnParent: "/article/{$articleId}",
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+                'userImg' => $userImg,
+            ]),
+        );
+        $this->render('Common/views/chat.latte', $viewModel->toArray());
     }
 
     public function showArticleCrosstab(): void
@@ -687,16 +706,19 @@ class ArticleController extends TableController
         $dateRange = $period->dateRange();
         $crosstabData = $this->articleCrosstabDataHelper->getItems($dateRange);
 
-        $this->render('Common/views/crosstab.latte', $this->getAllParams([
-            'crosstabData' => $crosstabData,
-            'period' => $period->value,
-            'dateRange' => $dateRange,
-            'availablePeriods' => Period::gets($this->languagesDataHelper),
-            'navbarTemplate' => '../../Article/views/navbar/redactor.latte',
-            'title' => 'Rédacteurs vs audience',
-            'totalLabels' => ['articles', ''],
-            'page' => $this->application->getConnectedUser()->getPage(1),
-        ]));
+        $viewModel = new CrosstabViewModel(
+            crosstabData: $crosstabData,
+            period: $period->value,
+            dateRange: $dateRange,
+            availablePeriods: Period::gets($this->languagesDataHelper),
+            navbarTemplate: '../../Article/views/navbar/redactor.latte',
+            title: 'Rédacteurs vs audience',
+            totalLabels: ['articles', ''],
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(1),
+            ]),
+        );
+        $this->render('Common/views/crosstab.latte', $viewModel->toArray());
     }
 
     public function topArticlesByPeriod(): void
@@ -720,15 +742,18 @@ class ArticleController extends TableController
             $page->ArticleTitle = $author?->ArticleTitle;
         }
 
-        $this->render('Article/views/topArticles.latte', $this->getAllParams([
-            'title'       => ($this->t)('visitor_insights.top_articles.title'),
-            'period'      => $period->value,
-            'periodFrom'  => $period->getStart()->format('Y-m-d H:i:s'),
-            'periodTo'    => $period->getEnd()->format('Y-m-d H:i:s'),
-            'topPages'    => $topPages,
-            'page'        => $this->application->getConnectedUser()->getPage(),
-            'translations' => TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
-        ]));
+        $viewModel = new TopItemsByPeriodViewModel(
+            title: ($this->t)('visitor_insights.top_articles.title'),
+            period: $period->value,
+            periodFrom: $period->getStart()->format('Y-m-d H:i:s'),
+            periodTo: $period->getEnd()->format('Y-m-d H:i:s'),
+            topPages: array_values($topPages),
+            translations: TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+        $this->render('Article/views/topArticles.latte', $viewModel->toArray());
     }
 
     public function update(int $id): void

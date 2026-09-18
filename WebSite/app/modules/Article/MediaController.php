@@ -15,6 +15,12 @@ use app\models\PersonGroupDataHelper;
 use app\models\SharedFileDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Article\valueObjects\SharedFileRow;
+use app\modules\Article\viewModels\MediaListViewModel;
+use app\modules\Article\viewModels\MediaUploadViewModel;
+use app\modules\Article\viewModels\MediaUsesInArticlesViewModel;
+use app\modules\Article\viewModels\MediaUsesInMessagesViewModel;
+use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\Common\viewModels\PageViewModel;
 
 class MediaController extends AbstractController
 {
@@ -80,20 +86,26 @@ class MediaController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $this->render('Article/views/media_gpxViewer.latte', $this->getAllParams([
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+        $viewModel = new PageViewModel(
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+        $this->render('Article/views/media_gpxViewer.latte', $viewModel->toArray());
     }
 
     public function help(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Media_list'], $lang)->$lang ?? '',
-                'timer' => 0,
-                'btn_HistoryBack' => true,
-            ]));
+            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Media_list'], $lang);
+            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
+            $viewModel = new InfoViewModel(
+                content: $content,
+                timer: 0,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Common/views/info.latte', $viewModel->toArray());
         }
     }
 
@@ -118,23 +130,21 @@ class MediaController extends AbstractController
             $totalFiles    = $this->getFiles($year, $month, '', '', false);
             $connectedUser = $this->application->getConnectedUser();
 
-            $this->render('Article/views/media_index.latte', $this->getAllParams([
-                'files'                => $filteredFiles,
-                'filteredCount'        => count($filteredFiles),
-                'totalCount'           => count($totalFiles),
-                'years'                => $years,
-                'currentYear'          => $year,
-                'months'               => $this->getMonths($year),
-                'currentMonth'         => $month,
-                'fileExtensions'       => $this->getFileExtensions(),
-                'currentFileExtension' => $fileExtension,
-                'search'               => $search,
-                'unusedOnly'           => $unusedOnly,
-                'baseUrl'              => WebApp::getBaseUrl(),
-                'page'                 => $connectedUser->getPage(),
-                'groups'               => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'isEditor'             => $connectedUser->isEditor(),
-                'i18n' => [
+            $viewModel = new MediaListViewModel(
+                files: array_values($filteredFiles),
+                filteredCount: count($filteredFiles),
+                totalCount: count($totalFiles),
+                years: array_values($years),
+                currentYear: $year,
+                months: array_values($this->getMonths($year)),
+                currentMonth: $month,
+                fileExtensions: array_values($this->getFileExtensions()),
+                currentFileExtension: $fileExtension,
+                search: $search,
+                unusedOnly: $unusedOnly,
+                baseUrl: WebApp::getBaseUrl(),
+                groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
+                i18n: [
                     // mediaShare.js
                     'urlCopied'     => ($this->t)('media.manager.share.url_copied'),
                     'linkCopied'    => ($this->t)('media.manager.share.link_copied'),
@@ -149,7 +159,12 @@ class MediaController extends AbstractController
                     'editError'     => ($this->t)('media.manager.edit.error'),
                     'saving'        => ($this->t)('media.manager.edit.saving'),
                 ],
-            ]));
+                layoutParams: $this->getAllParams([
+                    'page' => $connectedUser->getPage(),
+                    'isEditor' => $connectedUser->isEditor(),
+                ]),
+            );
+            $this->render('Article/views/media_index.latte', $viewModel->toArray());
         }
     }
 
@@ -178,14 +193,17 @@ class MediaController extends AbstractController
     public function showUploadForm(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $this->render('Article/views/media_upload.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'i18n' => [
+            $viewModel = new MediaUploadViewModel(
+                i18n: [
                     'uploadInProgress' => $this->languagesDataHelper->translate('loading'),
                     'uploadSuccess'    => $this->languagesDataHelper->translate('media.upload.success_title'),
                     'uploadError'      => $this->languagesDataHelper->translate('media.upload.error'),
                 ],
-            ]));
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
+            );
+            $this->render('Article/views/media_upload.latte', $viewModel->toArray());
         }
     }
 
@@ -193,12 +211,14 @@ class MediaController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $path = $this->flight->request()->query->path ?? '';
-            $this->render('Article/views/media_uses_articles.latte', $this->getAllParams([
-                'path'            => $path,
-                'articles'        => $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
-                'page'            => $this->application->getConnectedUser()->getPage(),
-                'btn_HistoryBack' => true,
-            ]));
+            $viewModel = new MediaUsesInArticlesViewModel(
+                path: $path,
+                articles: $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
+            );
+            $this->render('Article/views/media_uses_articles.latte', $viewModel->toArray());
         }
     }
 
@@ -207,14 +227,16 @@ class MediaController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $path = $this->flight->request()->query->path ?? '';
             $uses = $path !== '' ? $this->messageDataHelper->getMessageUses($path) : ['events' => [], 'articles' => [], 'groups' => []];
-            $this->render('Article/views/media_uses_messages.latte', $this->getAllParams([
-                'path'            => $path,
-                'events'          => $uses['events'],
-                'articles'        => $uses['articles'],
-                'groups'          => $uses['groups'],
-                'page'            => $this->application->getConnectedUser()->getPage(),
-                'btn_HistoryBack' => true,
-            ]));
+            $viewModel = new MediaUsesInMessagesViewModel(
+                path: $path,
+                events: array_values($uses['events']),
+                articles: array_values($uses['articles']),
+                groups: array_values($uses['groups']),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
+            );
+            $this->render('Article/views/media_uses_messages.latte', $viewModel->toArray());
         }
     }
 

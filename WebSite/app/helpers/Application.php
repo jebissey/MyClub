@@ -16,6 +16,7 @@ use app\exceptions\DatabaseException;
 use app\models\AuthorizationDataHelper;
 use app\models\Database;
 use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\LogCompactDataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\MetadataDataHelper;
@@ -25,6 +26,8 @@ use app\modules\Common\valueObjects\CompactSettingsRow;
 final class Application
 {
     public const VERSION = '0.90.1';
+
+    // @formatter:off    
     public const  EMOJI_LIST = [
         '😀', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🤨',
         '🙂', '🙃', '😉', '😌', '☹️', '😐', '🙄', '😯', '🥴',
@@ -38,6 +41,7 @@ final class Application
         '🐞', '🐝', '🦋', '🐜', '🦗', '🕷️', '🐛', '🐌', '🪱', '🦟', '🪰', '🪳', '🪲',
         '🌱', '🌿', '☘️', '🍀', '🌳', '🌲', '🌻', '🌺', '🌸', '🌼', '🌷', '🥀', '🍂', '🍁', '🪴'
     ];
+    // @formatter:on
 
     private static self $instance;
 
@@ -199,22 +203,100 @@ final class Application
             if (preg_match('/<p[^>]*>(.*?)<\/p>/s', $html, $matches)) {
                 return $matches[0];
             }
+
             if (preg_match('/<img[^>]*>/i', $html, $matches)) {
                 return $matches[0];
             }
+
             if (preg_match('/<a[^>]*>.*?<\/a>/i', $html, $matches)) {
                 return $matches[0];
             }
+
             $text = strip_tags($html);
+
             return strlen($text) > 150 ? substr($text, 0, 150) . '...' : $text;
         });
 
         self::$latte->addFilter('nl2br', function ($string) {
-            return nl2br(htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
+            return nl2br(
+                htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+            );
         });
 
         self::$latte->addFilter('urlencode', function ($s) {
             return urlencode($s);
+        });
+
+        self::$latte->addFilter('translate', function ($key) {
+            static $languagesDataHelper = null;
+
+            $languagesDataHelper ??= new LanguagesDataHelper(
+                $this,
+                $this->getErrorManager()
+            );
+
+            return $languagesDataHelper->translate($key);
+        });
+
+        self::$latte->addFilter(
+            'shortDate',
+            fn($date) => TranslationManager::getShortDate($date)
+        );
+
+        self::$latte->addFilter(
+            'longDate',
+            fn($date) => TranslationManager::getLongDate($date)
+        );
+
+        self::$latte->addFilter(
+            'longDateTime',
+            fn($date) => TranslationManager::getLongDateTime($date)
+        );
+
+        self::$latte->addFilter(
+            'shortDateTime',
+            fn($date) => TranslationManager::getShortDateTime($date)
+        );
+
+        self::$latte->addFilter(
+            'dayName',
+            fn($date) => TranslationManager::getDayName($date)
+        );
+
+        self::$latte->addFilter('formatFileSize', function ($bytes) {
+            if ($bytes >= 1073741824) {
+                return number_format($bytes / 1073741824, 2) . ' GB';
+            }
+
+            if ($bytes >= 1048576) {
+                return number_format($bytes / 1048576, 2) . ' MB';
+            }
+
+            if ($bytes >= 1024) {
+                return number_format($bytes / 1024, 2) . ' KB';
+            }
+
+            return $bytes . ' bytes';
+        });
+
+        self::$latte->addFilter('version', function (string $path): string {
+            $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
+
+            if (!is_string($documentRoot)) {
+                return $path;
+            }
+
+            $fullPath = $documentRoot . '/' . ltrim($path, '/');
+
+            if (file_exists($fullPath)) {
+                $mtime = filemtime($fullPath);
+
+                if ($mtime !== false) {
+                    return $path . '?v=' . $mtime;
+                }
+            }
+
+            return $path;
         });
     }
 }

@@ -8,6 +8,8 @@ use app\helpers\Application;
 use app\helpers\TranslationManager;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
+use app\modules\Communication\viewModels\CommunicationEditViewModel;
+use app\modules\Common\viewModels\InfoViewModel;
 
 class CommunicationController extends AbstractController
 {
@@ -24,14 +26,14 @@ class CommunicationController extends AbstractController
             $connectedUser = $this->application->getConnectedUser();
             $userEmail = $connectedUser->person->Email ?? '';
 
-            $this->render('Communication/views/communication_edit.latte', $this->getAllParams([
-                'groups'          => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'navItems'        => $this->getNavItems($connectedUser->person),
-                'page'            => $connectedUser->getPage(),
-                'btn_HistoryBack' => true,
-                'smtpFrom'        => $this->emailService->getSmtpConfig()?->getSenderAddress($userEmail),
-                'userEmail'       => $userEmail,
-                'i18n' => [
+            $contactEmailRow = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value');
+            $contactEmail = ($contactEmailRow !== false && isset($contactEmailRow->Value)) ? $contactEmailRow->Value : '';
+
+            $viewModel = new CommunicationEditViewModel(
+                groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
+                navItems: $this->getNavItems($connectedUser->person),
+                smtpFrom: $this->emailService->getSmtpConfig()?->getSenderAddress($userEmail),
+                i18n: [
                     'subjectRequired'     => ($this->t)('communication.email.subject_required'),
                     'contentRequired'     => ($this->t)('communication.email.content_required'),
                     'confirmSend'         => ($this->t)('communication.email.confirm_send'),
@@ -42,9 +44,14 @@ class CommunicationController extends AbstractController
                     'quotaMonthlyReached' => ($this->t)('communication.quota.monthly_reached'),
                     'quotaAlmost'         => ($this->t)('communication.quota.almost_exceeded'),
                 ],
-                'connectedPersonId' => $connectedUser->person->Id ?? null,
-                'contactEmail' => $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '',
-            ]));
+                connectedPersonId: $connectedUser->person->Id ?? null,
+                contactEmail: $contactEmail,
+                layoutParams: $this->getAllParams([
+                    'page' => $connectedUser->getPage(),
+                    'userEmail' => $userEmail,
+                ]),
+            );
+            $this->render('Communication/views/communication_edit.latte', $viewModel->toArray());
         }
     }
 
@@ -52,11 +59,15 @@ class CommunicationController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
             $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Communication'], $lang)->$lang ?? '',
-                'timer' => 0,
-                'btn_HistoryBack' => true,
-            ]));
+            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Communication'], $lang);
+            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
+
+            $viewModel = new InfoViewModel(
+                content: $content,
+                timer: 0,
+                layoutParams: $this->getAllParams([]),
+            );
+            $this->render('Common/views/info.latte', $viewModel->toArray());
         }
     }
 }

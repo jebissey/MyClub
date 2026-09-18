@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use DateTime;
+use PDO;
 use app\helpers\Application;
 
 /**
@@ -150,6 +151,26 @@ class MemberDataHelper extends Data
         $row = $this->get('Member', ['Token' => $token], 'Id, TokenCreatedAt');
 
         return $row;
+    }
+
+    /**
+     * Email of every active (non-inactivated) member, for statistics aggregation.
+     *
+     * @return list<object{Email: string}>
+     */
+    public function getActiveMemberEmails(): array
+    {
+        $sql = "
+            SELECT Individual.Email
+            FROM Individual
+            INNER JOIN Member ON Member.Id = Individual.Id
+            WHERE Member.Inactivated = 0
+        ";
+        $stmt = $this->pdo->query($sql);
+        if ($stmt === false) {
+            return [];
+        }
+        return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
     }
 
     public function recordSignIn(int $id): void

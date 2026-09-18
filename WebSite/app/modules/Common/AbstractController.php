@@ -42,7 +42,6 @@ abstract class AbstractController
     {
         $this->flight = $application->getFlight();
         $this->latte = $application->getLatte();
-        $this->addLatteFilters();
         $this->dataHelper = new DataHelper($application->getPdo(), $application->getErrorManager(), $application->getPdoForLog());
         $this->languagesDataHelper = new LanguagesDataHelper($application, $application->getErrorManager());
         $this->authorizationDataHelper = new AuthorizationDataHelper($application);
@@ -369,49 +368,5 @@ abstract class AbstractController
         }
         flush();
         Flight::stop();
-    }
-
-    #region Private functions
-    private function addLatteFilters(): void
-    {
-        $this->latte->addFilter('translate', function ($key) {
-            return ($this->t)($key);
-        });
-
-        $this->latte->addFilter('shortDate', function ($date) {
-            return TranslationManager::getShortDate($date);
-        });
-
-        $this->latte->addFilter('longDate', function ($date) {
-            return TranslationManager::getLongDate($date);
-        });
-
-        $this->latte->addFilter('longDateTime', function ($date) {
-            return TranslationManager::getLongDateTime($date);
-        });
-
-        $this->latte->addFilter('shortDateTime', function ($date) {
-            return TranslationManager::getShortDateTime($date);
-        });
-
-        $this->latte->addFilter('dayName', function ($date) {
-            return TranslationManager::getDayName($date);
-        });
-
-        $this->latte->addFilter('formatFileSize', function ($bytes) {
-            if ($bytes >= 1073741824) {
-                return number_format($bytes / 1073741824, 2) . ' GB';
-            } elseif ($bytes >= 1048576) {
-                return number_format($bytes / 1048576, 2) . ' MB';
-            } elseif ($bytes >= 1024) {
-                return number_format($bytes / 1024, 2) . ' KB';
-            } else {
-                return $bytes . ' bytes';
-            }
-        });
-
-        $this->latte->addFilter('readableDuration', function ($duration) {
-            return TranslationManager::getReadableDuration($duration);
-        });
     }
 }

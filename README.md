@@ -1,6 +1,6 @@
 # MyClub – The ultra-light, fully customizable CMS for your association
 
-![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-blue)  
+![PHP](https://img.shields.io/badge/PHP-%3E%3D8.4-blue)  
 ![SQLite](https://img.shields.io/badge/SQLite-Used-green)  
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)  
 

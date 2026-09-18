@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace tests\helpers;
 
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use PDO;
+use tests\models\DataHelperTestCase;
 use app\helpers\ConnectedUser;
 use app\helpers\ErrorManager;
 use app\helpers\GravatarHandler;
@@ -27,13 +27,14 @@ use app\models\MetadataDataHelper;
  * Here we test everything that only depends on internal state or on
  * the injectable collaborators.
  */
-final class ConnectedUserTest extends TestCase
+final class ConnectedUserTest extends DataHelperTestCase
 {
     private array $server;
     private array $session;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->server  = $_SERVER;
         $this->session = $_SESSION ?? [];
     }
@@ -42,6 +43,7 @@ final class ConnectedUserTest extends TestCase
     {
         $_SERVER  = $this->server;
         $_SESSION = $this->session;
+        parent::tearDown();
     }
 
     /**
@@ -382,5 +384,27 @@ final class ConnectedUserTest extends TestCase
         $this->assertTrue($user->isEditor());
         $this->assertFalse($user->isRedactor());
         $this->assertSame('known@example.com', $user->person->Email);
+    }
+
+    public function testQueriedColumnsExistInDatabaseSchema(): void
+    {
+        $pdo = $this->openDatabaseCopyOrSkip();
+
+        $this->assertColumnsExist($pdo, 'Individual', [
+            'Id',
+            'Email',
+            'FirstName',
+            'LastName',
+            'NickName',
+            'Avatar',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Member', [
+            'Id',
+            'Alert',
+            'UseGravatar',
+            'LastSignIn',
+            'LastSignOut',
+        ]);
     }
 }

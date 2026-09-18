@@ -38,20 +38,14 @@ class ArticleApiTest extends DataHelperTestCase
             'Answers',
         ]);
 
-        // Table / colonnes utilisées par DesignDataHelper::insertOrUpdate()
-        // (designId + vote + Id de la personne connectée)
-        $this->assertColumnsExist($pdo, 'Design', [
+        $this->assertColumnsExist($pdo, 'DesignVote', [
             'Id',
-            // adaptez le nom exact de la colonne de vote si différent
-            // (ex. 'Vote', 'Choice', 'Value'…)
+            'IdDesign',
+            'IdPerson',
+            'Vote',
         ]);
 
-        // Tables / colonnes utilisées par OrderReplyDataHelper::insertOrUpdate()
-        // et ReplyDataHelper::insertOrUpdate()
-        // (déjà couvertes ci-dessus par OrderReply et Reply)
-
-        // Personne connectée (Id utilisé partout)
-        $this->assertColumnsExist($pdo, 'Individual', [  
+        $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
         ]);
     }

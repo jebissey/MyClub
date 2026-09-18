@@ -12,6 +12,7 @@ use app\helpers\DistributionCalculator;
 use app\helpers\MyClubDateTime;
 use app\helpers\WebApp;
 use app\models\LogDataHelper;
+use app\models\MemberDataHelper;
 use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonStatisticsDataHelper;
@@ -28,6 +29,7 @@ class UserStatisticsController extends AbstractController
         private ParticipantDataHelper $participantDataHelper,
         private DistributionCalculator $distributionCalculator,
         private MessageDataHelper $messageDataHelper,
+        private MemberDataHelper $memberDataHelper
     ) {
         parent::__construct($application);
     }
@@ -94,7 +96,7 @@ class UserStatisticsController extends AbstractController
     private function getVisitCounts(array $season): array
     {
         $visits  = $this->logDataHelper->getVisits($season);
-        $members = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email');
+        $members = $this->memberDataHelper->getActiveMemberEmails();
         return $this->normalizeMemberCounts($members, $visits);
     }
 
@@ -105,7 +107,7 @@ class UserStatisticsController extends AbstractController
     private function getParticipationCounts(array $season): array
     {
         $participations = $this->participantDataHelper->getParticipations($season);
-        $members        = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email');
+        $members        = $this->memberDataHelper->getActiveMemberEmails();
         return $this->normalizeMemberCounts($members, $participations);
     }
 
@@ -116,12 +118,12 @@ class UserStatisticsController extends AbstractController
     private function getMessageCounts(array $season): array
     {
         $messages = $this->messageDataHelper->getMessages($season);
-        $members  = $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email');
+        $members  = $this->memberDataHelper->getActiveMemberEmails();
         return $this->normalizeMemberCounts($members, $messages);
     }
 
     /**
-     * @param  array<int|string, stdClass>  $members
+     * @param  array<int|string, object{Email: string}>  $members
      * @param  array<string, int|string> $rawCounts
      * @return array<string, int>
      */

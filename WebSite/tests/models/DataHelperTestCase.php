@@ -7,6 +7,7 @@ namespace tests\models;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionException;
 
 abstract class DataHelperTestCase extends TestCase
 {
@@ -138,7 +139,7 @@ abstract class DataHelperTestCase extends TestCase
             $class = $class->getParentClass();
         }
 
-        throw new \ReflectionException(
+        throw new ReflectionException(
             sprintf(
                 'Property %s::$%s does not exist',
                 $object::class,

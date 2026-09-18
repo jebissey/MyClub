@@ -103,14 +103,14 @@ class MenuItemDataHelper extends Data
             throw new InvalidArgumentException("Invalid 'Type' value: {$data['type']}");
         }
         if (!empty($data['parentId'])) {
-            $parent = $this->get('MenuItem', ['Id' => $data['parentId']], '*');
+            $parent = $this->get('MenuItem', ['Id' => $data['parentId']], 'Position');
             if ($parent === false) {
                 throw new InvalidArgumentException("ParentId {$data['parentId']} does not exist.");
             }
             /** @var object{Position: int} $parent */
         }
         if (!empty($data['idGroup'])) {
-            $group = $this->get('Group', ['Id' => $data['idGroup']], '*');
+            $group = $this->get('Group', ['Id' => $data['idGroup']], 'Id');
             if ($group === false) {
                 throw new InvalidArgumentException("IdGroup {$data['idGroup']} does not exist.");
             }

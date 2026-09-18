@@ -26,7 +26,6 @@ abstract class RenderableController
     {
         $this->flight = $application->getFlight();
         $this->latte = $application->getLatte();
-        $this->addLatteFilters();
     }
 
     /** @param object|array<string,mixed> $params */
@@ -39,37 +38,5 @@ abstract class RenderableController
         }
         flush();
         Flight::stop();
-    }
-
-    private function addLatteFilters(): void
-    {
-        // Résolution paresseuse : LanguagesDataHelper n'est construit qu'au
-        // premier appel réel du filtre, jamais pendant le constructeur —
-        // donc jamais pendant le bootstrap d'ErrorManager.
-        $this->latte->addFilter('translate', function ($key) {
-            static $languagesDataHelper = null;
-            $languagesDataHelper ??= new LanguagesDataHelper($this->application, $this->application->getErrorManager());
-            return $languagesDataHelper->translate($key);
-        });
-
-        $this->latte->addFilter('shortDate', fn($date) => TranslationManager::getShortDate($date));
-        $this->latte->addFilter('longDate', fn($date) => TranslationManager::getLongDate($date));
-        $this->latte->addFilter('longDateTime', fn($date) => TranslationManager::getLongDateTime($date));
-        $this->latte->addFilter('shortDateTime', fn($date) => TranslationManager::getShortDateTime($date));
-        $this->latte->addFilter('dayName', fn($date) => TranslationManager::getDayName($date));
-
-        $this->latte->addFilter('formatFileSize', function ($bytes) {
-            if ($bytes >= 1073741824) {
-                return number_format($bytes / 1073741824, 2) . ' GB';
-            } elseif ($bytes >= 1048576) {
-                return number_format($bytes / 1048576, 2) . ' MB';
-            } elseif ($bytes >= 1024) {
-                return number_format($bytes / 1024, 2) . ' KB';
-            } else {
-                return $bytes . ' bytes';
-            }
-        });
-
-        $this->latte->addFilter('readableDuration', fn($duration) => TranslationManager::getReadableDuration($duration));
     }
 }

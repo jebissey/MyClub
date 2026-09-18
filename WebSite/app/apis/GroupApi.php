@@ -38,19 +38,19 @@ class GroupApi extends AbstractApi
             return;
         }
         try {
-            if (!$this->dataHelper->get('Individual', ['Id' => $personId], '*')) {
+            if (!$this->dataHelper->get('Individual', ['Id' => $personId], 'Id')) {
                 $this->renderJsonBadRequest("person ({$personId}) does't exist)", __FILE__, __LINE__);
                 return;
             }
-            if (!$this->dataHelper->get('Group', ['Id' => $groupId], '*')) {
+            if (!$this->dataHelper->get('Group', ['Id' => $groupId], 'Id')) {
                 $this->renderJsonBadRequest("group ({$groupId}) does't exist)", __FILE__, __LINE__);
                 return;
             }
-            if ($this->dataHelper->get('MemberGroup', ['IdPerson' => $personId, 'idGroup' => $groupId], '*')) {
+            if ($this->dataHelper->get('MemberGroup', ['IdMember' => $personId, 'IdGroup' => $groupId], 'Id')) {
                 $this->renderJsonBadRequest("person ({$personId}) is already in group ({$groupId})", __FILE__, __LINE__);
                 return;
             }
-            $success = $this->dataHelper->set('MemberGroup', ['IdPerson' => $personId, 'IdGroup' => $groupId]) !== false;
+            $success = $this->dataHelper->set('MemberGroup', ['IdMember' => $personId, 'IdGroup' => $groupId]) !== false;
             $this->renderJson([], $success, $success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
@@ -92,7 +92,7 @@ class GroupApi extends AbstractApi
             return;
         }
         try {
-            $success = $this->dataHelper->delete('MemberGroup', ['IdPerson' => $personId, 'IdGroup' => $groupId]) === 1;
+            $success = $this->dataHelper->delete('MemberGroup', ['IdMember' => $personId, 'IdGroup' => $groupId]) === 1;
             $this->renderJson([], $success, $success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
