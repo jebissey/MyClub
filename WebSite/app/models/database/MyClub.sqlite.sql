@@ -8252,9 +8252,34 @@ INSERT INTO "Languages" VALUES (1087,'Help_Media_list','<div class="container my
     </div>
   </section>
 </div>');
+INSERT INTO "Languages" VALUES (1088,'availability.stats.title','Availability statistics','Statistiques de disponibilité','Statystyki dostępności');
+INSERT INTO "Languages" VALUES (1089,'availability.filled.title','Response rate','Taux de réponses','Wskaźnik odpowiedzi');
+INSERT INTO "Languages" VALUES (1090,'availability.filled.members','members have submitted their availability','membres ont renseigné leurs disponibilités','członków podało swoją dostępność');
+INSERT INTO "Languages" VALUES (1091,'availability.by_slot.title','Breakdown by time slot','Répartition par créneau','Podział według przedziałów czasowych');
+INSERT INTO "Languages" VALUES (1092,'availability.morning','Morning','Matin','Rano');
+INSERT INTO "Languages" VALUES (1093,'availability.afternoon','Afternoon','Après-midi','Popołudnie');
+INSERT INTO "Languages" VALUES (1094,'availability.evening','Evening','Soir','Wieczór');
+INSERT INTO "Languages" VALUES (1095,'availability.percent_available','% available','% disponible','% dostępnych');
+INSERT INTO "Languages" VALUES (1096,'navbar.event_manager.availabilities','Availabilities','Disponibilités','Dostępności');
+INSERT INTO "Languages" VALUES (1097,'availability.stats.title','Availability statistics','Statistiques de disponibilité','Statystyki dostępności');
+INSERT INTO "Languages" VALUES (1098,'availability.filled.title','Response rate','Taux de réponses','Wskaźnik odpowiedzi');
+INSERT INTO "Languages" VALUES (1099,'availability.filled.members','members have submitted their availability','membres ont renseigné leurs disponibilités','członków podało swoją dostępność');
+INSERT INTO "Languages" VALUES (1100,'availability.by_slot.title','Breakdown by time slot','Répartition par créneau','Podział według przedziałów czasowych');
+INSERT INTO "Languages" VALUES (1101,'availability.morning','Morning','Matin','Rano');
+INSERT INTO "Languages" VALUES (1102,'availability.afternoon','Afternoon','Après-midi','Popołudnie');
+INSERT INTO "Languages" VALUES (1103,'availability.evening','Evening','Soir','Wieczór');
+INSERT INTO "Languages" VALUES (1104,'availability.percent_available','% available','% disponible','% dostępnych');
+INSERT INTO "Languages" VALUES (1105,'navbar.event_manager.availabilities','Availabilities','Disponibilités','Dostępności');
+INSERT INTO "Languages" VALUES (1106,'day.monday','Monday','Lundi','Poniedziałek');
+INSERT INTO "Languages" VALUES (1107,'day.tuesday','Tuesday','Mardi','Wtorek');
+INSERT INTO "Languages" VALUES (1108,'day.wednesday','Wednesday','Mercredi','Środa');
+INSERT INTO "Languages" VALUES (1109,'day.thursday','Thursday','Jeudi','Czwartek');
+INSERT INTO "Languages" VALUES (1110,'day.friday','Friday','Vendredi','Piątek');
+INSERT INTO "Languages" VALUES (1111,'day.saturday','Saturday','Samedi','Sobota');
+INSERT INTO "Languages" VALUES (1112,'day.sunday','Sunday','Dimanche','Niedziela');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'0',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL);
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',81,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',82,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');
 INSERT INTO "Settings" VALUES (3,'SpotlightArticle','');

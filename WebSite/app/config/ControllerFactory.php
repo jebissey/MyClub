@@ -14,6 +14,7 @@ use app\helpers\WebApp;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
+use app\models\AvailabilityDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\DbBrowserDataHelper;
@@ -27,6 +28,7 @@ use app\models\LogDataHelper;
 use app\models\LogAnalyticsDataHelper;
 use app\models\LoanDataHelper;
 use app\models\LogStatisticsDataHelper;
+use app\models\MemberDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MessageDataHelper;
 use app\models\MetadataDataHelper;
@@ -52,6 +54,7 @@ use app\modules\Designer\DesignController;
 use app\modules\Designer\DesignerController;
 use app\modules\Designer\MenuItemController;
 use app\modules\Designer\WebappSettingsController;
+use app\modules\Event\EventAvailabilitiesController;
 use app\modules\Event\EventController;
 use app\modules\Event\EventEmailController;
 use app\modules\Event\EventGuestController;
@@ -198,6 +201,14 @@ class ControllerFactory
             $this->crosstabDataHelper,
             $this->participantDataHelper,
             $this->messageDataHelper
+        );
+    }
+
+    public function makeEventAvailabilitiesController(): EventAvailabilitiesController
+    {
+        return new EventAvailabilitiesController(
+            $this->application,
+            new AvailabilityDataHelper($this->application)
         );
     }
 
@@ -508,6 +519,7 @@ class ControllerFactory
             $this->participantDataHelper,
             new DistributionCalculator(),
             $this->messageDataHelper,
+            new MemberDataHelper($this->application),
         );
     }
 

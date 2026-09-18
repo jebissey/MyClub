@@ -1,0 +1,53 @@
+{extends $layout}
+
+{block content}
+<div class="container-fluid">
+    <h1 class="my-4">{='availability.stats.title'|translate}</h1>
+
+    {* Barre de progression : % de membres ayant renseigné *}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">{='availability.filled.title'|translate}</h5>
+        </div>
+        <div class="card-body">
+            <div class="progress" style="height: 28px;">
+                <div class="progress-bar bg-primary"
+                     role="progressbar"
+                     style="width: {$stats['percentageFilled']|noescape}%;"
+                     aria-valuenow="{$stats['percentageFilled']}"
+                     aria-valuemin="0"
+                     aria-valuemax="100">
+                    {$stats['percentageFilled']}%
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block">
+                {$stats['withAvailability']} / {$stats['totalActive']}
+                {='availability.filled.members'|translate}
+            </small>
+        </div>
+    </div>
+
+    {* Graphique empilé *}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">{='availability.by_slot.title'|translate}</h5>
+        </div>
+        <div class="card-body">
+            <div style="position: relative; height: 360px; width: 100%;">
+                <canvas id="availabilityChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script>
+    window.availabilityChartData = {$chartData};
+    {if isset($i18n)}
+        Object.assign(window.i18n, {=$i18n});
+    {/if}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script type="module" src="/app/modules/Event/js/availability_stats.js"></script>
+{/block}

@@ -21,6 +21,7 @@ use app\config\routes\Designer;
 use app\config\routes\Event;
 use app\config\routes\EventApi;
 use app\config\routes\EventAttributeApi;
+use app\config\routes\EventAvailabilities;
 use app\config\routes\EventEmail;
 use app\config\routes\EventGuest;
 use app\config\routes\EventNeed;
@@ -241,6 +242,7 @@ final class Routes
         $this->routes = array_merge($this->routes, (new Event($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new EventApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new EventAttributeApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new EventAvailabilities($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new EventEmail($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new EventGuest($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new EventNeed($this->controllerFactory))->get());
