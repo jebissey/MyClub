@@ -60,18 +60,28 @@ class PersonController extends TableController
     public function edit(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $row = $this->dataHelper->get('Member', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName, Alert, MemberInfo');
-            if (!$row) {
+            $individual = $this->dataHelper->get(
+                'Individual',
+                ['Id' => $id],
+                'Id, Email, FirstName, LastName'
+            );
+            $member = $this->dataHelper->get(
+                'Member',
+                ['Id' => $id],
+                'Imported, Alert, MemberInfo'
+            );
+            if ($individual === false || $member === false) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
-            /** @var object{Id: int|string, Imported: bool|int|string|null, Email: string, FirstName: string|null, LastName: string|null, Alert: string|null, MemberInfo: string|null} $row */
+            /** @var object{Id: int|string, Email: string, FirstName: string|null, LastName: string|null} $individual */
+            /** @var object{Imported: bool|int|string|null, Alert: string|null, MemberInfo: string|null} $member */
 
             $viewModel = new UserAccountViewModel(
-                readOnly: (bool)($row->Imported ?? false),
-                email: $row->Email,
-                firstName: $row->FirstName ?? '',
-                lastName: $row->LastName ?? '',
+                readOnly: (bool)($member->Imported ?? false),
+                email: $individual->Email,
+                firstName: $individual->FirstName ?? '',
+                lastName: $individual->LastName ?? '',
                 nickName: '',
                 avatar: '',
                 useGravatar: '',
@@ -84,8 +94,8 @@ class PersonController extends TableController
                     'account.form.emoji.selected'         => ($this->t)('account.form.emoji.selected'),
                 ],
                 layout: $this->getLayout(),
-                alert: $row->Alert ?? '',
-                memberInfo: $row->MemberInfo ?? '',
+                alert: $member->Alert ?? '',
+                memberInfo: $member->MemberInfo ?? '',
                 layoutParams: $this->getAllParams([]),
             );
 
@@ -96,17 +106,23 @@ class PersonController extends TableController
     public function editSave(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $row = $this->dataHelper->get('Member', ['Id' => $id], 'Id, Imported, Email, FirstName, LastName');
-            if (!$row) {
+            $individual = $this->dataHelper->get(
+                'Individual',
+                ['Id' => $id],
+                'Id, Email, FirstName, LastName'
+            );
+            $member = $this->dataHelper->get('Member', ['Id' => $id], 'Imported');
+            if ($individual === false || $member === false) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
-            /** @var object{Id: int|string, Imported: bool|int|string|null, Email: string, FirstName: string|null, LastName: string|null} $row */
-            $personId = (int)$row->Id;
-            $personEmail = $row->Email;
-            $personFirstName = $row->FirstName;
-            $personLastName = $row->LastName;
-            $personImported = (bool)($row->Imported ?? false);
+            /** @var object{Id: int|string, Email: string, FirstName: string|null, LastName: string|null} $individual */
+            /** @var object{Imported: bool|int|string|null} $member */
+            $personId = (int)$individual->Id;
+            $personEmail = $individual->Email;
+            $personFirstName = $individual->FirstName;
+            $personLastName = $individual->LastName;
+            $personImported = (bool)($member->Imported ?? false);
 
             $schema = [
                 'email'      => FilterInputRule::Email->value,
@@ -123,20 +139,21 @@ class PersonController extends TableController
                 $this->raiseBadRequest("Missing email", __FILE__, __LINE__);
                 return;
             }
-            $existingRow = $this->dataHelper->get(
-                'Member',
+            $existingIndividual = $this->dataHelper->get(
+                'Individual',
                 ['Email' => $email],
-                'Id, FirstName, LastName, Inactivated'
+                'Id, FirstName, LastName'
             );
 
             $isDuplicate = false;
             $fullName = '';
             $status = '';
 
-            if ($existingRow) {
-                /** @var object{Id: int|string, FirstName: string|null, LastName: string|null, Inactivated: bool|int|string|null} $existingRow */
-                $existingId = (int)$existingRow->Id;
-                $existingInactivated = (bool)($existingRow->Inactivated ?? false);
+            if ($existingIndividual !== false) {
+                /** @var object{Id: int|string, FirstName: string|null, LastName: string|null} $existingIndividual */
+                $existingId = (int)$existingIndividual->Id;
+                $existingMember = $this->dataHelper->get('Member', ['Id' => $existingId], 'Inactivated');
+                $existingInactivated = $existingMember !== false && (bool)($existingMember->Inactivated ?? false);
 
                 $isNewRecord = (
                     $personEmail === '' &&
@@ -147,7 +164,7 @@ class PersonController extends TableController
                 $isDuplicate = $isNewRecord ? true : ($existingId !== $personId);
 
                 if ($isDuplicate) {
-                    $fullName = trim(($existingRow->FirstName ?? '') . ' ' . ($existingRow->LastName ?? ''));
+                    $fullName = trim(($existingIndividual->FirstName ?? '') . ' ' . ($existingIndividual->LastName ?? ''));
                     $status = $existingInactivated ? 'Disabled' : 'Active';
                 }
             }
@@ -174,7 +191,7 @@ class PersonController extends TableController
             }
 
             $this->dataHelper->set(
-                'Member',
+                'Individual',
                 [
                     'FirstName' => $input['firstName'] ?? '???',
                     'LastName'  => $input['lastName'] ?? '???',

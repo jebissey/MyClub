@@ -96,7 +96,7 @@ class UserAccountController extends AbstractController
         if (!$isImported) {
             $emailInput = $input['email'] ?? '';
             $email = is_string($emailInput) ? urldecode($emailInput) : '';
-            $this->dataHelper->set('Member', ['Email' => $email], ['Id' => $person->Id]);
+            $this->dataHelper->set('Individual', ['Email' => $email], ['Id' => $person->Id]);
             $_SESSION['user'] = $email;
         }
         $this->redirect('/user');
