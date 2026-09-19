@@ -8,6 +8,7 @@ use DateTime;
 use Throwable;
 use app\enums\ApplicationError;
 use app\enums\Period;
+use app\enums\TimeOfDay;
 use app\exceptions\EmailException;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -40,7 +41,6 @@ class EventApi extends AbstractApi
         private EventDataHelper $eventDataHelper,
         private EventServiceInterface $eventService,
         private ParticipantDataHelper $participantDataHelper,
-        private PersonPreferences $personPreferences,
         private MessageDataHelper $messageDataHelper,
         private EmailService $emailService,
         ConnectedUser $connectedUser,
@@ -166,7 +166,7 @@ class EventApi extends AbstractApi
                 $this->eventDataHelper->getEventGroup($event->Id),
                 $event->IdEventType,
                 (new DateTime($event->StartTime))->format('N') - 1,
-                $this->personPreferences->getPeriodOfDay($event->StartTime)
+                TimeOfDay::fromDateTime($event->StartTime)->value
             );
             $participants = $this->toEmailParticipants($rows);
         } else {

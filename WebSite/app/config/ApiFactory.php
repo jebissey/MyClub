@@ -92,7 +92,6 @@ class ApiFactory
         private NotificationSender $notificationSender,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
-        private PersonPreferences $personPreferences,
     ) {
     }
 
@@ -153,7 +152,6 @@ class ApiFactory
             $this->eventDataHelper,
             $this->eventService,
             $this->participantDataHelper,
-            $this->personPreferences,
             $this->messageDataHelper,
             $this->emailService,
             $this->connectedUser,

@@ -719,7 +719,6 @@ final class Routes
             $services['notificationSender'],
             $dataHelpers['participantDataHelper'],
             $services['personDataHelper'],
-            $services['personPreferences'],
         );
     }
 }

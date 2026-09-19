@@ -38,12 +38,43 @@
             </div>
         </div>
     </div>
+
+    {* Filtre de période *}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">{='participation.title'|translate}</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end mb-3">
+                <div class="col-auto">
+                    <label class="form-label" for="startDate">{='participation.startDate'|translate}</label>
+                    <input type="date" class="form-control" id="startDate" name="startDate" value="{$selectedStartDate}">
+                </div>
+                <div class="col-auto">
+                    <label class="form-label" for="range">{='participation.range'|translate}</label>
+                    <select class="form-select" id="range" name="range">
+                        {foreach $rangeOptions as $key => $label}
+                            <option value="{$key}" {if $key === $selectedRange}selected{/if}>{$label}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">{='participation.apply'|translate}</button>
+                </div>
+            </form>
+
+            <div style="position: relative; height: 360px; width: 100%;">
+                <canvas id="participationChart"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
 {/block}
 
 {block scripts}
 <script>
     window.availabilityChartData = {$chartData};
+    window.participationChartData = {$participationChartData};
     {if isset($i18n)}
         Object.assign(window.i18n, {=$i18n});
     {/if}

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use DateTime;
+use app\enums\TimeOfDay;
 use app\models\DataHelper;
 use app\modules\Common\valueObjects\Person;
 
@@ -56,7 +57,7 @@ class PersonPreferences
                     $availabilitiesJson,
                     $idEventType,
                     $dayOfWeek,
-                    $this->getPeriodOfDay($startTime)
+                    TimeOfDay::fromDateTime($startTime)->value
                 )
             ) {
                 $filteredEvents[] = $event;
@@ -106,20 +107,6 @@ class PersonPreferences
         }
 
         return true;
-    }
-
-    public function getPeriodOfDay(string $dateString): string
-    {
-        $date = new DateTime($dateString);
-        $hour = (int)$date->format('H');
-
-        if ($hour < 12) {
-            return 'morning';
-        } elseif ($hour < 17) {
-            return 'afternoon';
-        } else {
-            return 'evening';
-        }
     }
 
     /**
