@@ -1,0 +1,208 @@
+{extends $layout}
+
+{block content}
+<div class="container-fluid">
+    <h1 class="my-4">{$i18n['title']}</h1>
+
+    {* ---- Localisation ---- *}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">{$i18n['location']}</h5>
+        </div>
+        <div class="card-body">
+            <form id="locationForm" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label" for="locName">
+                        {$i18n['name']}
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="locName"
+                        value="{$locationName}"
+                        placeholder="{$i18n['cityPlaceholder']}"
+                    >
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="lat">{$i18n['latitude']}</label>
+                    <input type="number" class="form-control" id="lat" step="0.00001" min="-90" max="90" value="{$latitude}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="lng">{$i18n['longitude']}</label>
+                    <input type="number" class="form-control" id="lng" step="0.00001" min="-180" max="180" value="{$longitude}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">{$i18n['save']}</button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" id="btnGeo" class="btn btn-outline-secondary w-100">
+                        {$i18n['useGeolocation']}
+                    </button>
+                </div>
+            </form>
+            <small class="text-muted d-block mt-2" id="locStatus"></small>
+        </div>
+    </div>
+
+    {* ---- Heures de lever / coucher ---- *}
+    <div class="card mb-4">
+
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">{$i18n['riseSetTitle']}</h5>
+            <span class="badge bg-secondary" id="currentDateLabel"></span>
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table
+                    class="table table-sm table-striped align-middle mb-0"
+                    id="riseSetTable"
+                >
+                    <thead>
+                        <tr>
+                            <th>{$i18n['body']}</th>
+                            <th>{$i18n['rise']}</th>
+                            <th>{$i18n['set']}</th>
+                            <th>{$i18n['visible']}</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {* ---- Animation / curseur d’heure ---- *}
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">{$i18n['skyPosition']}</h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="mb-3">
+
+                <label for="timeSlider" class="form-label">
+                    {$i18n['time']} :
+                    <strong id="timeLabel">--:--</strong>
+                </label>
+
+                <input
+                    type="range"
+                    class="form-range"
+                    id="timeSlider"
+                    min="0"
+                    max="1439"
+                    step="1"
+                    value="720"
+                >
+
+            </div>
+
+            <div
+                class="sky-container position-relative border rounded bg-dark overflow-hidden"
+                style="height: 320px; user-select: none;"
+            >
+
+                <div
+                    class="position-absolute bottom-0 start-0 end-0 border-top border-light"
+                    style="height: 2px; z-index: 2;"
+                ></div>
+
+                <div
+                    class="position-absolute bottom-0 start-0 text-white small p-1"
+                    style="z-index: 3;"
+                >
+                    {$i18n['east']} (−90°+)
+                </div>
+
+                <div
+                    class="position-absolute bottom-0 start-50 translate-middle-x text-white small p-1"
+                    style="z-index: 3;"
+                >
+                    {$i18n['south']} (0°)
+                </div>
+
+                <div
+                    class="position-absolute bottom-0 end-0 text-white small p-1"
+                    style="z-index: 3;"
+                >
+                    {$i18n['west']} (+90°+)
+                </div>
+
+                <div
+                    id="skyObjects"
+                    class="position-absolute top-0 start-0 w-100 h-100"
+                    style="z-index: 1;"
+                ></div>
+
+            </div>
+
+            <p class="text-muted small mt-2 mb-0">
+                {$i18n['azimuthDescription']}
+            </p>
+
+        </div>
+
+    </div>
+
+    {* ---- Détails des planètes à l’œil nu ---- *}
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">{$i18n['nakedEye']}</h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table
+                    class="table table-sm table-hover"
+                    id="planetDetailsTable"
+                >
+                    <thead>
+                        <tr>
+                            <th>{$i18n['planet']}</th>
+                            <th>{$i18n['altitude']}</th>
+                            <th>{$i18n['azimuth']}</th>
+                            <th>{$i18n['magnitude']}</th>
+                            <th>{$i18n['illumination']}</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{/block}
+
+{block scripts}
+<script>
+    window.astroConfig = {
+        latitude: {$latitude},
+        longitude: {$longitude},
+        locationName: {$locationName|json},
+        saveUrl: '/astronomy/saveLocation',
+        i18n: {=$i18n}
+    };
+</script>
+{* Astronomy Engine (browser build) *}
+<script src="https://cdn.jsdelivr.net/gh/cosinekitty/astronomy@master/source/js/astronomy.browser.min.js"></script>
+<script type="module" src="/app/modules/Astronomy/js/astronomy.js"></script>
+{/block}

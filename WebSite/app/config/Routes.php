@@ -10,6 +10,7 @@ use flight\Engine;
 use app\config\routes\Article;
 use app\config\routes\ArticleApi;
 use app\config\routes\Arward;
+use app\config\routes\Astronomy;
 use app\config\routes\CarouselApi;
 use app\config\routes\ChatApi;
 use app\config\routes\Communication;
@@ -231,6 +232,7 @@ final class Routes
         $this->routes = array_merge($this->routes, (new Article($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new ArticleApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Arward($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new Astronomy($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new CarouselApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new ChatApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Communication($this->controllerFactory))->get());
@@ -696,7 +698,6 @@ final class Routes
             $dataHelpers['authorizationDataHelper'],
             new CarouselDataHelper($this->application),
             $this->application->getConnectedUser(),
-            $this->dataHelper,
             $dataHelpers['designDataHelper'],
             $services['emailService'],
             $dataHelpers['eventDataHelper'],
@@ -719,6 +720,7 @@ final class Routes
             $services['notificationSender'],
             $dataHelpers['participantDataHelper'],
             $services['personDataHelper'],
+            new MemberDataHelper($this->application),
         );
     }
 }
