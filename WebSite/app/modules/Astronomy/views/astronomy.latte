@@ -4,13 +4,24 @@
 <div class="container-fluid">
     <h1 class="my-4">{$i18n['title']}</h1>
 
+    {if $locationSaved !== null}
+        <div class="alert alert-{if $locationSaved}success{else}danger{/if} alert-dismissible">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {if $locationSaved}
+                {$i18n['locationSaved']}
+            {else}
+                {$i18n['invalidCoordinates']}
+            {/if}
+        </div>
+    {/if}
+
     {* ---- Localisation ---- *}
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">{$i18n['location']}</h5>
         </div>
         <div class="card-body">
-            <form id="locationForm" class="row g-3 align-items-end">
+            <form id="locationForm" class="row g-3 align-items-end" action="/astronomy/save" method="post">
                 <div class="col-md-3">
                     <label class="form-label" for="locName">
                         {$i18n['name']}
@@ -20,17 +31,18 @@
                         type="text"
                         class="form-control"
                         id="locName"
+                        name="name"
                         value="{$locationName}"
                         placeholder="{$i18n['cityPlaceholder']}"
                     >
                 </div>
                 <div class="col-md-2">
                     <label class="form-label" for="lat">{$i18n['latitude']}</label>
-                    <input type="number" class="form-control" id="lat" step="0.00001" min="-90" max="90" value="{$latitude}">
+                    <input type="number" class="form-control" id="lat" name="lat" step="0.00001" min="-90" max="90" value="{$latitude}">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label" for="lng">{$i18n['longitude']}</label>
-                    <input type="number" class="form-control" id="lng" step="0.00001" min="-180" max="180" value="{$longitude}">
+                    <input type="number" class="form-control" id="lng" name="lng" step="0.00001" min="-180" max="180" value="{$longitude}">
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">{$i18n['save']}</button>
@@ -54,9 +66,7 @@
         </div>
 
         <div class="card-body">
-
             <div class="table-responsive">
-
                 <table
                     class="table table-sm table-striped align-middle mb-0"
                     id="riseSetTable"
@@ -69,15 +79,10 @@
                             <th>{$i18n['visible']}</th>
                         </tr>
                     </thead>
-
                     <tbody></tbody>
-
                 </table>
-
             </div>
-
         </div>
-
     </div>
 
     {* ---- Animation / curseur d’heure ---- *}
@@ -88,9 +93,7 @@
         </div>
 
         <div class="card-body">
-
             <div class="mb-3">
-
                 <label for="timeSlider" class="form-label">
                     {$i18n['time']} :
                     <strong id="timeLabel">--:--</strong>
@@ -105,7 +108,6 @@
                     step="1"
                     value="720"
                 >
-
             </div>
 
             <div
@@ -144,15 +146,11 @@
                     class="position-absolute top-0 start-0 w-100 h-100"
                     style="z-index: 1;"
                 ></div>
-
             </div>
-
             <p class="text-muted small mt-2 mb-0">
                 {$i18n['azimuthDescription']}
             </p>
-
         </div>
-
     </div>
 
     {* ---- Détails des planètes à l’œil nu ---- *}
@@ -163,9 +161,7 @@
         </div>
 
         <div class="card-body">
-
             <div class="table-responsive">
-
                 <table
                     class="table table-sm table-hover"
                     id="planetDetailsTable"
@@ -179,15 +175,10 @@
                             <th>{$i18n['illumination']}</th>
                         </tr>
                     </thead>
-
                     <tbody></tbody>
-
                 </table>
-
             </div>
-
         </div>
-
     </div>
 </div>
 {/block}
@@ -198,11 +189,9 @@
         latitude: {$latitude},
         longitude: {$longitude},
         locationName: {$locationName|json},
-        saveUrl: '/astronomy/saveLocation',
         i18n: {=$i18n}
     };
 </script>
-{* Astronomy Engine (browser build) *}
 <script src="https://cdn.jsdelivr.net/gh/cosinekitty/astronomy@master/source/js/astronomy.browser.min.js"></script>
 <script type="module" src="/app/modules/Astronomy/js/astronomy.js"></script>
 {/block}

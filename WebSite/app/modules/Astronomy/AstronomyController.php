@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace app\modules\Astronomy;
 
+use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\WebApp;
-use app\modules\Common\AbstractController;
 use app\modules\Astronomy\viewModels\AstronomyViewModel;
+use app\modules\Common\AbstractController;
 
 class AstronomyController extends AbstractController
 {
@@ -25,6 +27,9 @@ class AstronomyController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
+        $saved = filter_input(INPUT_GET, 'saved', FILTER_VALIDATE_INT);
+        $locationSaved = $saved === false || $saved === null ? null : ($saved === 1);
 
         $location = $this->getLocationFromCookieOrDefault();
         $i18n = [
@@ -86,6 +91,7 @@ class AstronomyController extends AbstractController
             latitude: $location['lat'],
             longitude: $location['lng'],
             locationName: $location['name'],
+            locationSaved: $locationSaved,
             navItems: $this->getNavItems($this->application->getConnectedUser()->person),
             i18n: $i18n,
             layoutParams: $this->getAllParams([
@@ -97,9 +103,6 @@ class AstronomyController extends AbstractController
         $this->render('Astronomy/views/astronomy.latte', $viewModel->toArray());
     }
 
-    /**
-     * Endpoint AJAX pour mémoriser la localisation dans un cookie.
-     */
     public function saveLocation(): void
     {
         if (WebApp::getRequestMethod() !== 'POST') {
@@ -107,36 +110,43 @@ class AstronomyController extends AbstractController
             return;
         }
 
-        $lat  = filter_input(INPUT_POST, 'lat', FILTER_VALIDATE_FLOAT);
-        $lng  = filter_input(INPUT_POST, 'lng', FILTER_VALIDATE_FLOAT);
-        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
+        $schema = [
+            'lat'  => FilterInputRule::Float->value,
+            'lng'  => FilterInputRule::Float->value,
+            'name' => FilterInputRule::HtmlSafeName->value,
+        ];
+        $filterValues = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 
-        if ($lat === false || $lng === false || $lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
-            http_response_code(400);
-            echo json_encode(['ok' => false, 'error' => 'Invalid coordinates']);
-            return;
+        $lat = $filterValues['lat'] ?? null;
+        $lng = $filterValues['lng'] ?? null;
+
+        $valid = is_numeric($lat) && is_numeric($lng)
+            && (float) $lat >= -90 && (float) $lat <= 90
+            && (float) $lng >= -180 && (float) $lng <= 180;
+
+        if ($valid) {
+            $payload = json_encode([
+                'lat'  => round((float) $lat, 5),
+                'lng'  => round((float) $lng, 5),
+                'name' => mb_substr(To::str($filterValues['name'] ?? '', ''), 0, 100),
+            ]);
+
+            if ($payload !== false) {
+                setcookie(
+                    self::COOKIE_NAME,
+                    $payload,
+                    [
+                        'expires'  => time() + self::COOKIE_TTL,
+                        'path'     => '/',
+                        'secure'   => true,
+                        'httponly' => false, // accessible en JS pour la géolocalisation
+                        'samesite' => 'Lax',
+                    ]
+                );
+            }
         }
 
-        $payload = json_encode([
-            'lat'  => round($lat, 5),
-            'lng'  => round($lng, 5),
-            'name' => mb_substr($name, 0, 100),
-        ]);
-
-        setcookie(
-            self::COOKIE_NAME,
-            $payload,
-            [
-                'expires'  => time() + self::COOKIE_TTL,
-                'path'     => '/',
-                'secure'   => true,
-                'httponly' => false, // accessible en JS pour la géolocalisation
-                'samesite' => 'Lax',
-            ]
-        );
-
-        header('Content-Type: application/json');
-        echo json_encode(['ok' => true]);
+        $this->redirect('/astronomy?saved=' . ($valid ? '1' : '0'));
     }
 
     /**
@@ -145,7 +155,7 @@ class AstronomyController extends AbstractController
     private function getLocationFromCookieOrDefault(): array
     {
         $default = [
-            'lat'  => 48.8566,   // Paris
+            'lat'  => 48.8566,
             'lng'  => 2.3522,
             'name' => 'Paris',
         ];
@@ -154,7 +164,7 @@ class AstronomyController extends AbstractController
             return $default;
         }
 
-        $data = json_decode($_COOKIE[self::COOKIE_NAME], true);
+        $data = json_decode(To::str($_COOKIE[self::COOKIE_NAME], ''), true);
         if (!is_array($data) || !isset($data['lat'], $data['lng'])) {
             return $default;
         }
@@ -162,7 +172,7 @@ class AstronomyController extends AbstractController
         return [
             'lat'  => (float) $data['lat'],
             'lng'  => (float) $data['lng'],
-            'name' => (string) ($data['name'] ?? ''),
+            'name' => To::str($data['name'] ?? '', ''),
         ];
     }
 }

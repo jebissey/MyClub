@@ -17,6 +17,7 @@ final readonly class AstronomyViewModel extends LayoutViewModel
         public readonly float $latitude,
         public readonly float $longitude,
         public readonly string $locationName,
+        public readonly ?bool $locationSaved,
         public readonly array $navItems,
         public readonly array $i18n,
         public readonly array $layoutParams,
@@ -25,7 +26,7 @@ final readonly class AstronomyViewModel extends LayoutViewModel
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
             btn_HistoryBack: true,
-            btn_Parent: "/eventManager", // adapter selon votre navigation
+            btn_Parent: "/",
         );
     }
 }
