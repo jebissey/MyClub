@@ -14,7 +14,6 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
-use app\models\DataHelper;
 use app\models\PersonDataHelper;
 
 class CarouselApi extends AbstractApi
@@ -22,12 +21,11 @@ class CarouselApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private AuthorizationDataHelper $authorizationDataHelper,
         private CarouselDataHelper $carouselDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function deleteItem(int $id): void

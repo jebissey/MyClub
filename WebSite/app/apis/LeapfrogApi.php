@@ -10,7 +10,6 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\models\DataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\PersonDataHelper;
 
@@ -19,11 +18,10 @@ class LeapfrogApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private LogWriterDataHelper $logWriterDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function logMovement(): void

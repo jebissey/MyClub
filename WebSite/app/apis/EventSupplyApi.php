@@ -15,7 +15,6 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\exceptions\QueryException;
 use app\exceptions\UnauthorizedAccessException;
-use app\models\DataHelper;
 use app\models\EventDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
@@ -26,10 +25,9 @@ class EventSupplyApi extends AbstractApi
         Application $application,
         private EventDataHelper $eventDataHelper,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function participantsSupplies(): void

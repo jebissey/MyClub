@@ -10,7 +10,6 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\models\DataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
 use app\models\PersonDataHelper;
@@ -23,10 +22,9 @@ class EventNeedTypeApi extends AbstractApi
         private NeedDataHelper $needDataHelper,
         private NeedTypeDataHelper $needTypeDataHelper,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function deleteNeedType(int $id): void

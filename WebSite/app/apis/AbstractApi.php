@@ -19,14 +19,19 @@ use app\models\PersonDataHelper;
 abstract class AbstractApi
 {
     protected LatteEngine $latte;
+    protected DataHelper $dataHelper;
     private LogWriterDataHelper $logWriterDataHelper;
 
     public function __construct(
         protected Application $application,
         protected ConnectedUser $connectedUser,
-        protected DataHelper $dataHelper,
         protected PersonDataHelper $personDataHelper
     ) {
+        $this->dataHelper = new DataHelper(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
         $this->latte = $application->getLatte();
         $this->logWriterDataHelper = new LogWriterDataHelper($application, $application->getErrorManager());
     }

@@ -9,7 +9,6 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\models\DataHelper;
 use app\models\MembershipDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\HelloAsso\services\HelloAssoService;
@@ -19,11 +18,10 @@ class HelloAssoApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private MembershipDataHelper $membershipDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     // ─── POST /api/helloAsso/checkout ───────────────────────────────────────

@@ -8,7 +8,6 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\models\DataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
 use app\models\PersonDataHelper;
@@ -21,10 +20,9 @@ class EventNeedApi extends AbstractApi
         private EventNeedDataHelper $eventNeedDataHelper,
         private EventDataHelper $eventDataHelper,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function deleteNeed(int $id): void

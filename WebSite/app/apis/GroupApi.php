@@ -9,7 +9,6 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
-use app\models\DataHelper;
 use app\models\PersonDataHelper;
 
 class GroupApi extends AbstractApi
@@ -17,10 +16,9 @@ class GroupApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function addToGroup(int $personId, int $groupId): void

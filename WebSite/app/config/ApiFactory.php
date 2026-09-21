@@ -33,7 +33,6 @@ use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
 use app\helpers\MediaManager;
 use app\helpers\NotificationSender;
-use app\helpers\PersonPreferences;
 use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
@@ -47,6 +46,7 @@ use app\models\LanguagesDataHelper;
 use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogWriterDataHelper;
+use app\models\MemberDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
@@ -69,7 +69,6 @@ class ApiFactory
         private AuthorizationDataHelper $authorizationDataHelper,
         private CarouselDataHelper $carouselDataHelper,
         private ConnectedUser $connectedUser,
-        private DataHelper $dataHelper,
         private DesignDataHelper $designDataHelper,
         private EmailService $emailService,
         private EventDataHelper $eventDataHelper,
@@ -92,6 +91,7 @@ class ApiFactory
         private NotificationSender $notificationSender,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
+        private MemberDataHelper $memberDataHelper,
     ) {
     }
 
@@ -100,7 +100,6 @@ class ApiFactory
         return new ArticleApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->designDataHelper,
         );
@@ -111,7 +110,6 @@ class ApiFactory
         return new CarouselApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->authorizationDataHelper,
             $this->carouselDataHelper
@@ -123,11 +121,11 @@ class ApiFactory
         return new ChatApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->logDataHelper,
             new GravatarHandler(),
-            $this->messageDataHelper
+            $this->messageDataHelper,
+            $this->memberDataHelper,
         );
     }
 
@@ -136,7 +134,6 @@ class ApiFactory
         return new CommunicationApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->emailService,
             $this->quotaTracker,
@@ -155,7 +152,6 @@ class ApiFactory
             $this->messageDataHelper,
             $this->emailService,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper
         );
     }
@@ -166,7 +162,6 @@ class ApiFactory
             $this->application,
             $this->attributeDataHelper,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper
         );
     }
@@ -178,7 +173,6 @@ class ApiFactory
             $this->eventNeedDataHelper,
             $this->eventDataHelper,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper
         );
     }
@@ -190,7 +184,6 @@ class ApiFactory
             $this->needDataHelper,
             $this->needTypeDataHelper,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper
         );
     }
@@ -201,7 +194,6 @@ class ApiFactory
             $this->application,
             $this->eventDataHelper,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper
         );
     }
@@ -211,7 +203,6 @@ class ApiFactory
         return new ExerciseApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
         );
     }
@@ -221,7 +212,6 @@ class ApiFactory
         return new GroupApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper
         );
     }
@@ -231,7 +221,6 @@ class ApiFactory
         return new HelloAssoApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->membershipDataHelper
         );
@@ -242,7 +231,6 @@ class ApiFactory
         return new ImportApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper
         );
     }
@@ -252,7 +240,6 @@ class ApiFactory
         return new KanbanApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->kanbanDataHelper
         );
@@ -263,7 +250,6 @@ class ApiFactory
         return new KaraokeApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->karaokeDataHelper
         );
@@ -274,7 +260,6 @@ class ApiFactory
         return new LeapfrogApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->logWriterDataHelper
         );
@@ -285,7 +270,6 @@ class ApiFactory
         return new LoanApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->loanDataHelper
         );
@@ -296,7 +280,6 @@ class ApiFactory
         return new MediaApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->mediaManager,
         );
@@ -308,7 +291,6 @@ class ApiFactory
             $this->application,
             $this->menuItemDataHelper,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper
         );
     }
@@ -319,7 +301,6 @@ class ApiFactory
             $this->application,
             $this->messageDataHelper,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->messageRecipientService,
             $this->notificationSender,
@@ -332,7 +313,6 @@ class ApiFactory
         return new NotificationApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper
         );
     }
@@ -342,7 +322,6 @@ class ApiFactory
         return new TranslatorApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             new LanguagesDataHelper($this->application, $this->application->getErrorManager())
         );
@@ -353,7 +332,6 @@ class ApiFactory
         return new VisitorInsightsApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->logDataHelper
         );
@@ -364,7 +342,6 @@ class ApiFactory
         return new WebmasterApi(
             $this->application,
             $this->connectedUser,
-            $this->dataHelper,
             $this->personDataHelper,
             $this->logWriterDataHelper,
             CredentialService::getInstance()

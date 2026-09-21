@@ -7,7 +7,6 @@ namespace app\apis;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\models\DataHelper;
 use app\models\LoanDataHelper;
 use app\models\PersonDataHelper;
 
@@ -16,11 +15,10 @@ class LoanApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private LoanDataHelper $loanDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     #region LoanDesigner functions

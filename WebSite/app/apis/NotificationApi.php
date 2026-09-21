@@ -10,7 +10,6 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
-use app\models\DataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Notifications\valueObjects\PushSubscriptionRow;
 
@@ -19,10 +18,9 @@ class NotificationApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function registerPushSubscription(): void

@@ -11,8 +11,8 @@ use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\models\DataHelper;
 use app\models\LogDataHelper;
+use app\models\MemberDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\Person;
@@ -24,13 +24,13 @@ class ChatApi extends AbstractApi
     public function __construct(
         Application $application,
         protected ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private LogDataHelper $logDataHelper,
         private GravatarHandler $gravatarHandler,
         private MessageDataHelper $messageDataHelper,
+        private MemberDataHelper $memberDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function getActiveUsers(): void
@@ -42,11 +42,7 @@ class ChatApi extends AbstractApi
         $previousLogId = To::int($_SESSION['last_log_id'] ?? null);
         $minutes = To::int($_GET['m'] ?? null, self::ACTIVE_WINDOW_MINUTES);
 
-        $activePersons = array_values($this->dataHelper->gets(
-            'Person',
-            ['Inactivated' => 0],
-            'Id, NickName, FirstName, LastName, UseGravatar, Email, Avatar'
-        ));
+        $activePersons = $this->memberDataHelper->getActiveMembersBasicInfo();
         $visits = $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons);
 
         $cutoff = new DateTime("-{$minutes} minutes", new DateTimeZone('UTC'));

@@ -7,7 +7,6 @@ namespace app\apis;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\models\DataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Exercise\valueObjects\ExerciseRow;
 
@@ -16,10 +15,9 @@ class ExerciseApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function get(int $id): void

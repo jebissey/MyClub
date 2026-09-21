@@ -17,13 +17,11 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Event\interfaces\AuthorizationServiceInterface;
 use app\modules\Common\interfaces\EventServiceInterface;
-use app\models\DataHelper;
 use app\models\EventDataHelper;
 use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
-use app\helpers\PersonPreferences;
 use app\modules\Common\valueObjects\ApiResponse;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Event\valueObjects\EventDetailRow;
@@ -44,10 +42,9 @@ class EventApi extends AbstractApi
         private MessageDataHelper $messageDataHelper,
         private EmailService $emailService,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function deleteEvent(int $id): void

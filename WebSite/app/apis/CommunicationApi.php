@@ -13,7 +13,6 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Common\interfaces\EmailQuotaTrackerInterface;
-use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
@@ -24,13 +23,12 @@ class CommunicationApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private readonly EmailService $emailService,
         private readonly ?EmailQuotaTrackerInterface $quotaTracker,
         private readonly LanguagesDataHelper $languagesDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function getQuota(): void
@@ -217,7 +215,7 @@ class CommunicationApi extends AbstractApi
                 return;
             }
 
-            $this->dataHelper->set('Settings', ['Name' => 'contactEmail', 'Value' => $value]);
+            $this->dataHelper->setSetting('contactEmail', $value);
             $this->renderJsonOk();
         }
     }

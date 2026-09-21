@@ -12,7 +12,6 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\models\DataHelper;
 use app\models\PersonDataHelper;
 use app\models\LanguagesDataHelper;
 
@@ -21,16 +20,10 @@ class TranslatorApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper,
         private LanguagesDataHelper $languagesDataHelper
     ) {
-        parent::__construct(
-            $application,
-            $connectedUser,
-            $dataHelper,
-            $personDataHelper
-        );
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function save(): void

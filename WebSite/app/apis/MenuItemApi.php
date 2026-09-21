@@ -11,7 +11,6 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\Data;
-use app\models\DataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\PersonDataHelper;
 
@@ -21,10 +20,9 @@ class MenuItemApi extends AbstractApi
         Application $application,
         private MenuItemDataHelper $menuItemDataHelper,
         ConnectedUser $connectedUser,
-        DataHelper $dataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $dataHelper, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper);
     }
 
     public function deleteItem(int $id): void
