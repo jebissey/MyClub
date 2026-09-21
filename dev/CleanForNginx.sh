@@ -47,6 +47,10 @@ rm -rf var/latte/temp/* 2>/dev/null
 rm -rf var/tracy/log/* 2>/dev/null
 echo -e "${GREEN}✓ Caches cleared${NC}"
 
+echo -e "${YELLOW}🧹 Clearing stale PHP session files owned by $USER...${NC}"
+sudo find /var/lib/php/sessions -maxdepth 1 -name 'sess_*' -user "$USER" -delete 2>/dev/null
+echo -e "${GREEN}✓ Session files cleared${NC}"
+
 # Fix ownership - set group to www-data
 echo -e "${YELLOW}👥 Setting group ownership to www-data...${NC}"
 sudo chgrp -R www-data data 2>/dev/null
