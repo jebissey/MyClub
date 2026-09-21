@@ -135,6 +135,22 @@ class PersonDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('LOWER(i.Email) AS EmailKey', $sql);
     }
 
+    public function testGetActiveMembersContactInfoByEmailSqlIsValidAgainstTemplateSchema(): void
+    {
+        $pdo = $this->openDatabaseCopyOrSkip();
+        $sql = $this->getGetActiveMembersContactInfoByEmailSql();
+
+        $stmt = $pdo->prepare($sql);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
+
+        $this->assertStringContainsString('FROM Member', $sql);
+        $this->assertStringContainsString('INNER JOIN Individual', $sql);
+        $this->assertStringContainsString('Member.Inactivated = 0', $sql);
+        $this->assertStringContainsString('Individual.Email', $sql);
+        $this->assertStringContainsString('Individual.Phone', $sql);
+        $this->assertStringContainsString('Individual.NickName', $sql);
+    }
+
     public function testGetMembersAlertsSqlIsValidAgainstTemplateSchema(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
@@ -294,7 +310,7 @@ class PersonDataHelperTest extends DataHelperTestCase
     }
 
     // -------------------------------------------------------------------------
-    // Private SQL extractors (mirrored from the new PersonDataHelper)
+    // Private SQL extractors (mirrored from PersonDataHelper)
     // -------------------------------------------------------------------------
 
     private function getSelectEmptyEmailPersonSql(): string
@@ -323,6 +339,16 @@ class PersonDataHelperTest extends DataHelperTestCase
         return "SELECT i.Id, LOWER(i.Email) AS EmailKey
              FROM Individual i
              INNER JOIN Member m ON m.Id = i.Id";
+    }
+
+    private function getGetActiveMembersContactInfoByEmailSql(): string
+    {
+        return "
+            SELECT Individual.Email, Individual.Phone, Individual.FirstName, Individual.LastName, Individual.NickName
+            FROM Member
+            INNER JOIN Individual ON Individual.Id = Member.Id
+            WHERE Member.Inactivated = 0
+        ";
     }
 
     private function getGetMembersAlertsSql(): string

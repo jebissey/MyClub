@@ -81,7 +81,7 @@ class EventEmailController extends AbstractController
             'emailsJson' => json_encode($filteredEmails),
             'emails' => $filteredEmails,
             'filters' => "{$groupName} / {$eventTypeName} / {$dayOfWeekName} / {$translatedTimeOfDay}",
-            'people' => $this->dataHelper->gets('Person', ['Inactivated' => 0], 'Email, Phone, FirstName, LastName, NickName', '', true),
+            'people' => $this->personDataHelper->getActiveMembersContactInfoByEmail(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'i18n' => [
                 'copySuccess' => ($this->t)('event.copy_emails.clipboard.success'),

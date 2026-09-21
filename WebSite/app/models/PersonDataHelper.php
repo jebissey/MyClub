@@ -121,6 +121,33 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
+     * Coordonnées (Email, Phone, FirstName, LastName, NickName) de chaque membre
+     * actif, indexées par Email — pour la copie presse-papier des contacts d'un
+     * groupe/type d'événement filtré (EventEmailController::copyEmails()).
+     *
+     * @return array<string, object{Email: string, Phone: string|null, FirstName: string, LastName: string|null, NickName: string|null}>
+     */
+    public function getActiveMembersContactInfoByEmail(): array
+    {
+        $sql = "
+            SELECT Individual.Email, Individual.Phone, Individual.FirstName, Individual.LastName, Individual.NickName
+            FROM Member
+            INNER JOIN Individual ON Individual.Id = Member.Id
+            WHERE Member.Inactivated = 0
+        ";
+        $stmt = $this->pdo->query($sql);
+        if ($stmt === false) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $row) {
+            $result[$row->Email] = $row;
+        }
+        return $result;
+    }
+
+    /**
      * @return string[]
      */
     public function getEmailsOfInterestedPeople(?int $idGroup, ?int $idEventType, ?int $dayOfWeek, string $timeOfDay): array

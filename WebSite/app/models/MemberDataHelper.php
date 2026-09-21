@@ -173,6 +173,42 @@ class MemberDataHelper extends Data
         return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
     }
 
+    /**
+     * Basic identity + presence fields for every active (non-inactivated) member,
+     * used by the "who's online" chat feature (ChatApi::getActiveUsers).
+     *
+     * @return list<object{
+     *     Id: int,
+     *     NickName: string|null,
+     *     FirstName: string,
+     *     LastName: string|null,
+     *     Email: string,
+     *     Avatar: string|null,
+     *     UseGravatar: mixed
+     * }&\stdClass>
+     */
+    public function getActiveMembersBasicInfo(): array
+    {
+        $sql = "
+            SELECT
+                Individual.Id,
+                Individual.NickName,
+                Individual.FirstName,
+                Individual.LastName,
+                Individual.Email,
+                Individual.Avatar,
+                Member.UseGravatar
+            FROM Member
+            INNER JOIN Individual ON Individual.Id = Member.Id
+            WHERE Member.Inactivated = 0
+        ";
+        $stmt = $this->pdo->query($sql);
+        if ($stmt === false) {
+            return [];
+        }
+        return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+    }
+
     public function recordSignIn(int $id): void
     {
         $this->set('Member', ['LastSignIn' => date('Y-m-d H:i:s')], ['Id' => $id]);

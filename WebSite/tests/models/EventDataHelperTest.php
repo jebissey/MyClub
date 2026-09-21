@@ -48,10 +48,20 @@ class EventDataHelperTest extends DataHelperTestCase
 
         $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
+            'Type',
             'Email',
             'FirstName',
             'LastName',
             'NickName',
+        ]);
+
+        // Contact : findContactByEmail(), createContact(), refreshContactToken()
+        // — le contact "invité" (Guest) est un Individual de type Contact dont
+        // le jeton d'accès est stocké dans Contact (V80ToV81Migrator)
+        $this->assertColumnsExist($pdo, 'Contact', [
+            'Id',
+            'Token',
+            'TokenCreatedAt',
         ]);
 
         $this->assertColumnsExist($pdo, 'MemberGroup', [
@@ -63,6 +73,9 @@ class EventDataHelperTest extends DataHelperTestCase
             'Id',
             'IdEvent',
             'IdIndividual',
+            // isAlreadyInvited(), inviteGuest() — remplace l'ancienne table Guest
+            'InvitedBy',
+            'InvitedAt',
         ]);
 
         $this->assertColumnsExist($pdo, 'ParticipantSupply', [
