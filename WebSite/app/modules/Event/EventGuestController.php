@@ -13,7 +13,6 @@ use app\helpers\WebApp;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
-use app\modules\Event\valueObjects\ContactRow;
 use app\modules\Common\valueObjects\EmailMessage;
 
 class EventGuestController extends AbstractController
@@ -78,53 +77,19 @@ class EventGuestController extends AbstractController
             }
             $nickname = To::str($input['nickname'] ?? '???');
             try {
-                /** @var object{Id: int|string, Token: string, NickName: string, TokenCreatedAt: string}|false $contactData */
-                $contactData = $this->dataHelper->get('Contact', ['Email' => $email], 'Id, Token, NickName, TokenCreatedAt');
-                $contact = $contactData ? ContactRow::fromStdClass($contactData) : null;
-                if (!$contact) {
-                    $token = bin2hex(random_bytes(32));
-                    $contactId = $this->dataHelper->set('Contact', [
-                        'Email' => $email,
-                        'NickName' => $nickname,
-                        'Token' => $token,
-                        'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
-                    ]);
-                } else {
-                    $contactId = $contact->Id;
-                    $token = $contact->Token;
-                    if (!empty($nickname) && $nickname !== $contact->NickName) {
-                        $this->dataHelper->set('Contact', ['NickName' => $nickname], ['Id' => $contactId]);
-                    }
-                    if (
-                        empty($token) ||
-                        (new DateTime($contact->TokenCreatedAt))->diff(new DateTime())->days > 0
-                    ) {
-                        $token = bin2hex(random_bytes(32));
-                        $this->dataHelper->set(
-                            'Contact',
-                            [
-                                'Token' => $token,
-                                'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s')
-                            ],
-                            ['Id' => $contactId]
-                        );
-                    }
-                }
-                $existingGuest = $this->dataHelper->get('Guest', [
-                    'IdContact' => $contactId,
-                    'IdEvent' => $eventId
-                ], 'Id');
-                if ($existingGuest) {
+                if ($this->eventDataHelper->findPendingInvitation($email, $eventId) !== false) {
                     $this->guest('Cette personne est déjà invitée à cet événement', 'error');
                     return;
                 }
-                $this->dataHelper->set(
-                    'Guest',
-                    [
-                        'IdContact' => $contactId,
-                        'IdEvent' => $eventId,
-                        'InvitedBy' => $this->application->getConnectedUser()->person->Id ?? 0
-                    ]
+
+                $token = bin2hex(random_bytes(32));
+                $this->eventDataHelper->createInvitation(
+                    $email,
+                    $nickname,
+                    $eventId,
+                    $token,
+                    $this->application->getConnectedUser()->person->Id ?? 0,
+                    (new DateTime())->format('Y-m-d H:i:s')
                 );
 
                 $root = Application::$root;

@@ -55,13 +55,25 @@ class EventDataHelperTest extends DataHelperTestCase
             'NickName',
         ]);
 
-        // Contact : findContactByEmail(), createContact(), refreshContactToken()
-        // — le contact "invité" (Guest) est un Individual de type Contact dont
-        // le jeton d'accès est stocké dans Contact (V80ToV81Migrator)
+        // Contact : createContactIndividual() — sous-type créé pour un nouvel
+        // Individual de type Contact confirmant une invitation
         $this->assertColumnsExist($pdo, 'Contact', [
             'Id',
             'Token',
             'TokenCreatedAt',
+        ]);
+
+        // Invitation : findPendingInvitation(), createInvitation(),
+        // findInvitationByToken() — invitation en attente à un email externe,
+        // avant création de tout Individual (V83ToV84Migrator)
+        $this->assertColumnsExist($pdo, 'Invitation', [
+            'Id',
+            'Email',
+            'NickName',
+            'IdEvent',
+            'Token',
+            'InvitedBy',
+            'InvitedAt',
         ]);
 
         $this->assertColumnsExist($pdo, 'MemberGroup', [
@@ -73,7 +85,8 @@ class EventDataHelperTest extends DataHelperTestCase
             'Id',
             'IdEvent',
             'IdIndividual',
-            // isAlreadyInvited(), inviteGuest() — remplace l'ancienne table Guest
+            // addConfirmedParticipant() — InvitedBy/InvitedAt ne sont renseignés
+            // que pour un participant issu d'une Invitation confirmée
             'InvitedBy',
             'InvitedAt',
         ]);

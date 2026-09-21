@@ -138,6 +138,146 @@ class EventDataHelper extends Data implements NewsProviderInterface
     }
 
 
+    /**
+     * Invitation en attente pour ce couple (Email, Événement), si elle existe.
+     * Sert à empêcher une double invitation (EventGuestController::guestInvite()).
+     *
+     * @return object{Id: int, NickName: string|null, Token: string, InvitedAt: string}|false
+     */
+    public function findPendingInvitation(string $email, int $eventId): object|false
+    {
+        /** @var object{Id: int, NickName: string|null, Token: string, InvitedAt: string}|false $row */
+        $row = $this->get('Invitation', ['Email' => $email, 'IdEvent' => $eventId], 'Id, NickName, Token, InvitedAt');
+        return $row;
+    }
+
+
+    /**
+     * Crée une invitation en attente pour un email externe. Aucun Individual
+     * n'est créé à ce stade : ça se fait à la confirmation, voir
+     * createContactIndividual().
+     */
+    public function createInvitation(
+        string $email,
+        string $nickname,
+        int $eventId,
+        string $token,
+        int $invitedBy,
+        string $invitedAt
+    ): void {
+        $this->set('Invitation', [
+            'Email'     => $email,
+            'NickName'  => $nickname,
+            'IdEvent'   => $eventId,
+            'Token'     => $token,
+            'InvitedBy' => $invitedBy,
+            'InvitedAt' => $invitedAt,
+        ]);
+    }
+
+
+    /**
+     * Invitation identifiée par son jeton — utilisée à la confirmation
+     * (EventController::register()). La ligne n'est pas supprimée après usage :
+     * le jeton reste valable pour basculer inscription/désinscription.
+     *
+     * @return object{Id: int, Email: string, NickName: string|null, IdEvent: int, InvitedBy: int, InvitedAt: string}|false
+     */
+    public function findInvitationByToken(string $token): object|false
+    {
+        /** @var object{Id: int, Email: string, NickName: string|null, IdEvent: int, InvitedBy: int, InvitedAt: string}|false $row */
+        $row = $this->get('Invitation', ['Token' => $token], 'Id, Email, NickName, IdEvent, InvitedBy, InvitedAt');
+        return $row;
+    }
+
+
+    /**
+     * Individual existant portant cet email, quel que soit son Type (Member ou
+     * Contact) — évite de recréer un Individual en double à la confirmation
+     * d'une invitation.
+     *
+     * @return object{Id: int, Type: string}|false
+     */
+    public function findIndividualByEmail(string $email): object|false
+    {
+        /** @var object{Id: int, Type: string}|false $row */
+        $row = $this->get('Individual', ['Email' => $email], 'Id, Type');
+        return $row;
+    }
+
+
+    /**
+     * Crée un nouvel Individual de type Contact (+ sa ligne Contact associée,
+     * avec son propre jeton d'accès général) et retourne son Id.
+     */
+    public function createContactIndividual(string $email, string $nickname): int
+    {
+        $id = (int) $this->set('Individual', [
+            'Type' => 'Contact',
+            'Email' => $email,
+            'FirstName' => $nickname !== '' ? $nickname : $email,
+            'LastName' => '',
+            'NickName' => $nickname,
+        ]);
+
+        $this->set('Contact', [
+            'Id' => $id,
+            'Token' => bin2hex(random_bytes(32)),
+            'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s'),
+        ]);
+
+        return $id;
+    }
+
+
+    /**
+     * Un Individual (Member ou Contact confirmé) participe-t-il déjà à cet
+     * événement ?
+     */
+    public function isAlreadyRegistered(int $individualId, int $eventId): bool
+    {
+        return $this->get('Participant', [
+            'IdIndividual' => $individualId,
+            'IdEvent' => $eventId,
+        ], 'Id') !== false;
+    }
+
+
+    /**
+     * Inscrit un Individual comme participant confirmé. $invitedBy/$invitedAt
+     * restent null pour une inscription directe (Member), et sont renseignés
+     * (recopiés depuis l'Invitation) lors de la confirmation d'une invitation.
+     */
+    public function addConfirmedParticipant(int $individualId, int $eventId, ?int $invitedBy = null, ?string $invitedAt = null): void
+    {
+        $this->set('Participant', [
+            'IdEvent'      => $eventId,
+            'IdIndividual' => $individualId,
+            'InvitedBy'    => $invitedBy,
+            'InvitedAt'    => $invitedAt,
+        ]);
+    }
+
+
+    /**
+     * Retire un Individual des participants d'un événement (désinscription),
+     * en purgeant aussi ses éventuels ParticipantSupply.
+     */
+    public function removeParticipantByIndividual(int $individualId, int $eventId): void
+    {
+        /** @var object{Id: int}|false $participant */
+        $participant = $this->get('Participant', [
+            'IdIndividual' => $individualId,
+            'IdEvent' => $eventId,
+        ], 'Id');
+        if ($participant === false) {
+            return;
+        }
+        $this->delete('ParticipantSupply', ['IdParticipant' => $participant->Id]);
+        $this->delete('Participant', ['Id' => $participant->Id]);
+    }
+
+
     /** @return array<int, stdClass> */
     public function getAttributesForNextWeekEvents(): array
     {

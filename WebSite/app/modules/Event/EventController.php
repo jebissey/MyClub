@@ -28,7 +28,6 @@ use app\modules\Event\viewModels\EventDetailViewModel;
 use app\modules\Event\viewModels\EventManagerHomeViewModel;
 use app\modules\Event\viewModels\EventNextEventsViewModel;
 use app\modules\Event\viewModels\EventWeekEventsViewModel;
-use app\modules\Event\valueObjects\ContactTokenRow;
 use app\modules\Event\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\EventAudienceRow;
 use app\modules\Event\valueObjects\EventTypeRow;
@@ -246,32 +245,22 @@ class EventController extends AbstractController
         }
         try {
             if ($token === null) {
-                $token = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
+                $rawToken = WebApp::getFiltered('t', FilterInputRule::Token->value, $this->flight->request()->query->getData());
+                $token = is_string($rawToken) ? $rawToken : null;
             }
             $person = $this->application->getConnectedUser()->person;
             if ($person !== null) {
+                // Membre connecté : inscription/désinscription directe, sans passer par une Invitation.
                 $userId = $person->Id;
                 if ($set) {
-                    if ($eventId > 0 && !$this->eventDataHelper->isUserRegistered($eventId, $person->Email)) {
-                        $this->dataHelper->set('Participant', [
-                            'IdEvent'  => $eventId,
-                            'IdPerson' => $userId,
-                            'IdContact' => null
-                        ]);
+                    if ($eventId > 0 && !$this->eventDataHelper->isAlreadyRegistered($userId, $eventId)) {
+                        $this->eventDataHelper->addConfirmedParticipant($userId, $eventId);
                     }
                 } else {
-                    $resultData = $this->dataHelper->get('Participant', [
-                        'IdEvent' => $eventId,
-                        'IdPerson' => $userId
-                    ], 'Id');
-                    if ($resultData) {
-                        /** @var object{Id: int|string} $resultData */
-                        $result = IdRow::fromStdClass($resultData);
-                        $this->dataHelper->delete('ParticipantSupply', ['IdParticipant' => $result->Id]);
-                        $this->dataHelper->delete('Participant', ['Id' => $result->Id]);
-                    }
+                    $this->eventDataHelper->removeParticipantByIndividual($userId, $eventId);
                 }
             } elseif ($token != null) {
+                // Contact externe via lien d'invitation.
                 $eventData = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
                 if (!$eventData) {
                     $this->show($eventId, 'Evénement inconnu', 'error');
@@ -280,51 +269,60 @@ class EventController extends AbstractController
                 /** @var object{Id: int|string, Audience: string} $eventData */
                 $event = EventAudienceRow::fromStdClass($eventData);
 
-                $contactData = $this->dataHelper->get('Contact', ['Token' => $token], 'Id, TokenCreatedAt');
-                if (!$contactData) {
+                $invitation = $this->eventDataHelper->findInvitationByToken($token);
+                if ($invitation === false || (int) $invitation->IdEvent !== $eventId) {
                     $this->show($eventId, 'Token inconnu', 'error');
                     return;
                 }
-                /** @var object{Id: int|string, TokenCreatedAt: string} $contactData */
-                $contact = ContactTokenRow::fromStdClass($contactData);
 
-                $tokenCreatedAt = new DateTime($contact->TokenCreatedAt);
+                $invitedAt = new DateTime($invitation->InvitedAt);
                 $now = new DateTime();
-                $interval = $now->diff($tokenCreatedAt);
+                $interval = $now->diff($invitedAt);
                 if ($interval->days >= 1 || ($interval->days == 0 && $interval->h >= 24)) {
                     $this->show($eventId, 'Token expiré', 'error');
                     return;
                 }
-                $existingParticipant = $this->dataHelper->get('Participant', [
-                    'IdEvent' => $eventId,
-                    'IdContact' => $contact->Id
-                ], 'Id');
-                if ($existingParticipant && $set) {
-                    $this->show($eventId, 'Participant déjà enregistré', 'error');
+
+                $individual = $this->eventDataHelper->findIndividualByEmail($invitation->Email);
+                if ($individual !== false && $individual->Type === 'Member') {
+                    $this->show(
+                        $eventId,
+                        'Cette adresse est déjà associée à un compte membre : merci de vous inscrire connecté(e)',
+                        'error'
+                    );
                     return;
                 }
-                if ($event->Audience === EventAudience::ForGuest) {
-                    $invitation = $this->dataHelper->get('Guest', [
-                        'IdEvent' => $event->Id,
-                        'IdContact' => $contact->Id
-                    ], 'Id');
-                    if (!$invitation) {
-                        $this->show($eventId, "Il faut avoir une invitation pour pouvoir s'inscrire à cet événement", 'error');
+
+                $individualId = $individual !== false
+                    ? $individual->Id
+                    : $this->eventDataHelper->createContactIndividual($invitation->Email, $invitation->NickName ?? '');
+
+                if ($set) {
+                    if ($this->eventDataHelper->isAlreadyRegistered($individualId, $eventId)) {
+                        $this->show($eventId, 'Participant déjà enregistré', 'error');
                         return;
                     }
-                }
-                $this->dataHelper->set('Participant', [
-                    'IdEvent' => $event->Id,
-                    'IdPerson' => null,
-                    'IdContact' => $contact->Id
-                ]);
+                    $this->eventDataHelper->addConfirmedParticipant(
+                        $individualId,
+                        $eventId,
+                        $invitation->InvitedBy,
+                        $invitation->InvitedAt
+                    );
 
-                $this->render('Common/views/registration_success.latte', $this->getAllParams([
-                    'event' => $event,
-                    'contact' => $contact,
-                    'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
-                    'page' => $this->application->getConnectedUser()->getPage()
-                ]));
+                    $this->render('Common/views/registration_success.latte', $this->getAllParams([
+                        'event' => $event,
+                        'contact' => (object) [
+                            'Id' => $individualId,
+                            'Email' => $invitation->Email,
+                            'NickName' => $invitation->NickName,
+                        ],
+                        'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                        'page' => $this->application->getConnectedUser()->getPage()
+                    ]));
+                    return;
+                } else {
+                    $this->eventDataHelper->removeParticipantByIndividual($individualId, $eventId);
+                }
             } else {
                 $eventData = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
                 if ($eventData !== false) {

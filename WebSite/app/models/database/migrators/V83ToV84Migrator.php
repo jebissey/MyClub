@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models\database\migrators;
 
 use PDO;
-
 use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 class V83ToV84Migrator implements DatabaseMigratorInterface
@@ -196,9 +195,12 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
     'Pozycja na niebie (patrząc na południe)'),
 
 ('astronomy.azimuth_description',
-    'Azimuth is measured from South (0°) towards West (positive) / East (negative). The ends extend beyond ±90° to allow rises/sets to be displayed in summer.',
-    'L’azimut est mesuré depuis le Sud (0°) vers l’Ouest (positif) / Est (négatif). Les extrémités dépassent ±90° pour permettre d’afficher les levers/couchers en été.',
-    'Azymut jest mierzony od południa (0°) w kierunku zachodnim (wartość dodatnia) / wschodnim (wartość ujemna). Końce przekraczają ±90°, aby umożliwić wyświetlanie wschodów i zachodów latem.'),
+    'Azimuth is measured from South (0°) towards West (positive) / East (negative). 
+    The ends extend beyond ±90° to allow rises/sets to be displayed in summer.',
+    'L’azimut est mesuré depuis le Sud (0°) vers l’Ouest (positif) / Est (négatif). 
+    Les extrémités dépassent ±90° pour permettre d’afficher les levers/couchers en été.',
+    'Azymut jest mierzony od południa (0°) w kierunku zachodnim (wartość dodatnia) / wschodnim (wartość ujemna). 
+    Końce przekraczają ±90°, aby umożliwić wyświetlanie wschodów i zachodów latem.'),
 
 ('astronomy.location_saved',
     'Location saved.',

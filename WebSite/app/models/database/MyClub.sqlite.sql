@@ -173,6 +173,19 @@ CREATE TABLE IF NOT EXISTS "Individual" (
 	"CreatedAt"	TEXT NOT NULL DEFAULT current_timestamp,
 	PRIMARY KEY("Id")
 );
+CREATE TABLE IF NOT EXISTS "Invitation" (
+	"Id"	INTEGER,
+	"Email"	TEXT NOT NULL,
+	"NickName"	TEXT,
+	"IdEvent"	INTEGER NOT NULL,
+	"Token"	TEXT NOT NULL,
+	"InvitedBy"	INTEGER NOT NULL,
+	"InvitedAt"	TEXT NOT NULL,
+	UNIQUE("Email","IdEvent"),
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
+	FOREIGN KEY("InvitedBy") REFERENCES "Member"("Id")
+);
 CREATE TABLE IF NOT EXISTS "KanbanCard" (
 	"Id"	INTEGER,
 	"Title"	TEXT NOT NULL,
@@ -8337,7 +8350,7 @@ INSERT INTO "Languages" VALUES (1169,'astronomy.invalid_coordinates','Invalid co
 INSERT INTO "Languages" VALUES (1170,'astronomy.cookie_save_failed','Unable to save location cookie','Impossible d’enregistrer le cookie de localisation','Nie można zapisać ciasteczka lokalizacji');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'0',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL);
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',84,0,1000000,NULL,10,36,6,NULL,0,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',85,0,1000000,NULL,10,36,6,NULL,0,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');
 INSERT INTO "Settings" VALUES (3,'SpotlightArticle','');
