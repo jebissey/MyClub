@@ -12,7 +12,7 @@ use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\Translator\viewModels\TranslatorViewModel;
 
-class TranslatorController extends AbstractController
+final class TranslatorController extends AbstractController
 {
     public function __construct(
         Application $application,

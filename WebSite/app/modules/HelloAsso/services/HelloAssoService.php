@@ -22,7 +22,7 @@ use app\modules\Common\services\CredentialService;
  * Sandbox base URL : https://api.helloasso-sandbox.com
  * Docs: https://api.helloasso.com/swagger/index.html
  */
-class HelloAssoService
+final class HelloAssoService
 {
     private const BASE_URL  = 'https://api.helloasso-sandbox.com';
     private const TOKEN_URL = self::BASE_URL . '/oauth2/token';

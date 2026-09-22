@@ -9,7 +9,7 @@ use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
-class DesignerController extends AbstractController
+final class DesignerController extends AbstractController
 {
     public function __construct(Application $application)
     {

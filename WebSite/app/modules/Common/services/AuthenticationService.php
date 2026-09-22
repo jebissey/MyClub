@@ -19,7 +19,7 @@ use app\modules\Common\valueObjects\Person;
 /**
  * @phpstan-import-type PersonRow from Person
  */
-class AuthenticationService
+final class AuthenticationService
 {
     public function __construct(
         private MemberDataHelper $memberDataHelper,

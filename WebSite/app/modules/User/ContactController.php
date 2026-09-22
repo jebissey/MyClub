@@ -17,7 +17,7 @@ use app\modules\Common\services\EmailService;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\User\valueObjects\EventRegistrationRow;
 
-class ContactController extends AbstractController
+final class ContactController extends AbstractController
 {
     private const MIN_FILL_SECONDS       = 5;
     private const RATE_LIMIT_MAX         = 3;

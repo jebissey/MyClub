@@ -20,7 +20,7 @@ use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserStatisticsViewModel;
 use app\modules\Common\valueObjects\Person;
 
-class UserStatisticsController extends AbstractController
+final class UserStatisticsController extends AbstractController
 {
     public function __construct(
         Application $application,

@@ -7,7 +7,7 @@ namespace app\modules\Notifications;
 use app\modules\Common\interfaces\RecipientResolverInterface;
 use app\modules\Common\valueObjects\MessageContext;
 
-class EventRecipientResolver implements RecipientResolverInterface
+final class EventRecipientResolver implements RecipientResolverInterface
 {
     public function supports(MessageContext $context): bool
     {

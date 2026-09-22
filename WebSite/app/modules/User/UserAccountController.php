@@ -11,7 +11,7 @@ use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserAccountViewModel;
 
-class UserAccountController extends AbstractController
+final class UserAccountController extends AbstractController
 {
     public function __construct(Application $application)
     {

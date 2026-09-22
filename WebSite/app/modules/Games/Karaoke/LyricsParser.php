@@ -6,7 +6,7 @@ namespace app\modules\Games\Karaoke;
 
 use app\exceptions\LyricsParserException;
 
-class LyricsParser
+final class LyricsParser
 {
     /** @var array<string, string> */
     private array $metadata = [];

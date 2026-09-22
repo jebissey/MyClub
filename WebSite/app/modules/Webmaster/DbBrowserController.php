@@ -13,7 +13,7 @@ use app\modules\Webmaster\viewModels\DbBrowserEditViewModel;
 use app\modules\Webmaster\viewModels\DbBrowserIndexViewModel;
 use app\modules\Webmaster\viewModels\DbBrowserTableViewModel;
 
-class DbBrowserController extends TableController
+final class DbBrowserController extends TableController
 {
     public function __construct(
         Application $application,

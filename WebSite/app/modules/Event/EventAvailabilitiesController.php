@@ -9,7 +9,7 @@ use app\models\AvailabilityDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Event\viewModels\AvailabilityStatsViewModel;
 
-class EventAvailabilitiesController extends AbstractController
+final class EventAvailabilitiesController extends AbstractController
 {
     /** @var array<string, string> */
     private const RANGE_MODIFIERS = [

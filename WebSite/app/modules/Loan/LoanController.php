@@ -14,7 +14,7 @@ use app\modules\Loan\viewModels\LoanDesignerViewModel;
 use app\modules\Loan\viewModels\LoanManagerViewModel;
 use app\modules\Loan\viewModels\LoanUserViewModel;
 
-class LoanController extends AbstractController
+final class LoanController extends AbstractController
 {
     public function __construct(
         Application $application,

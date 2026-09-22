@@ -17,7 +17,7 @@ use app\modules\Event\valueObjects\EventRow;
 /**
  * @phpstan-import-type WeekData from EventDataHelper
  */
-class RssController extends AbstractController
+final class RssController extends AbstractController
 {
     public function __construct(
         Application $application,

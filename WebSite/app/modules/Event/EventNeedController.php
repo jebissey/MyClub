@@ -8,7 +8,7 @@ use app\helpers\Application;
 use app\models\NeedDataHelper;
 use app\modules\Common\AbstractController;
 
-class EventNeedController extends AbstractController
+final class EventNeedController extends AbstractController
 {
     public function __construct(
         Application $application,

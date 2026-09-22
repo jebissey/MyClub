@@ -15,7 +15,7 @@ use app\modules\Common\TableController;
 use app\modules\PersonManager\viewModels\RegistrationIndexViewModel;
 use app\modules\PersonManager\viewModels\RegistrationUserGroupsViewModel;
 
-class RegistrationController extends TableController
+final class RegistrationController extends TableController
 {
     public function __construct(
         Application $application,

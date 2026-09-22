@@ -26,7 +26,7 @@ use app\modules\Webmaster\viewModels\WebmasterHomeViewModel;
 use app\modules\Webmaster\viewModels\WebmasterInstallationsViewModel;
 use app\modules\Webmaster\viewModels\WebmasterNotificationsViewModel;
 
-class WebmasterController extends AbstractController
+final class WebmasterController extends AbstractController
 {
     public function __construct(
         Application $application,

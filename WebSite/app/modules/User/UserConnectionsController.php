@@ -15,7 +15,7 @@ use app\modules\Common\valueObjects\Person;
 /**
  * @phpstan-import-type PersonRow from Person
  */
-class UserConnectionsController extends AbstractController
+final class UserConnectionsController extends AbstractController
 {
     public function __construct(
         Application $application,

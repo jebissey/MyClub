@@ -13,7 +13,7 @@ use app\modules\Common\AbstractController;
 use app\modules\Common\services\CredentialService;
 use app\modules\User\viewModels\UserNotificationsViewModel;
 
-class UserNotificationsController extends AbstractController
+final class UserNotificationsController extends AbstractController
 {
     public function __construct(
         Application $application,

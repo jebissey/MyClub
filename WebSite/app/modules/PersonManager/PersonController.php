@@ -21,7 +21,7 @@ use app\modules\PersonManager\viewModels\PersonManagerHomeViewModel;
 use app\modules\PersonManager\viewModels\PersonsIndexViewModel;
 use app\modules\User\viewModels\UserAccountViewModel;
 
-class PersonController extends TableController
+final class PersonController extends TableController
 {
     public function __construct(
         Application $application,

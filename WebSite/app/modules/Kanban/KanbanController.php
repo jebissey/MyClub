@@ -13,7 +13,7 @@ use app\modules\Common\AbstractController;
 use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Kanban\viewModels\KanbanBoardViewModel;
 
-class KanbanController extends AbstractController
+final class KanbanController extends AbstractController
 {
     public function __construct(
         Application $application,

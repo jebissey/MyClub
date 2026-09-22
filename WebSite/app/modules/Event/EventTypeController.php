@@ -13,7 +13,7 @@ use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 use app\modules\Event\valueObjects\EventTypeNameGroupRow;
 
-class EventTypeController extends TableController
+final class EventTypeController extends TableController
 {
     public function __construct(
         Application $application,

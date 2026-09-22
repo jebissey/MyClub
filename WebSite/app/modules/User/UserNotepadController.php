@@ -10,7 +10,7 @@ use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserNotepadViewModel;
 
-class UserNotepadController extends AbstractController
+final class UserNotepadController extends AbstractController
 {
     public function __construct(Application $application)
     {

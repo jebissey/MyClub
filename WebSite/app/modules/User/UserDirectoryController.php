@@ -33,7 +33,7 @@ use app\modules\Common\valueObjects\Person;
  *     ShowEmailInPresentationDirectory: int|string
  * }
  */
-class UserDirectoryController extends AbstractController
+final class UserDirectoryController extends AbstractController
 {
     public function __construct(
         Application $application,

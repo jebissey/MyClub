@@ -16,7 +16,7 @@ use app\models\PersonDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
 
-class HomeController extends AbstractController
+final class HomeController extends AbstractController
 {
     public function __construct(
         Application $application,

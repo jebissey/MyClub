@@ -12,7 +12,7 @@ use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserGroupsViewModel;
 
-class UserGroupsController extends AbstractController
+final class UserGroupsController extends AbstractController
 {
     public function __construct(
         Application $application,

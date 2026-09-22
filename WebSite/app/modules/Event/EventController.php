@@ -31,10 +31,9 @@ use app\modules\Event\viewModels\EventWeekEventsViewModel;
 use app\modules\Event\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\EventAudienceRow;
 use app\modules\Event\valueObjects\EventTypeRow;
-use app\modules\Common\valueObjects\IdRow;
 use app\modules\Event\valueObjects\NeedTypeRow;
 
-class EventController extends AbstractController
+final class EventController extends AbstractController
 {
     public function __construct(
         Application $application,

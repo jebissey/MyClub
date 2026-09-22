@@ -22,7 +22,7 @@ use app\modules\Article\viewModels\MediaUsesInMessagesViewModel;
 use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Common\viewModels\PageViewModel;
 
-class MediaController extends AbstractController
+final class MediaController extends AbstractController
 {
     public function __construct(
         Application $application,

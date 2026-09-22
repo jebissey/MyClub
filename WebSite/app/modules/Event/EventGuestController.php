@@ -15,7 +15,7 @@ use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\valueObjects\EmailMessage;
 
-class EventGuestController extends AbstractController
+final class EventGuestController extends AbstractController
 {
     public function __construct(
         Application $application,

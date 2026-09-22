@@ -39,7 +39,7 @@ use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Common\viewModels\TableIndexViewModel;
 use app\modules\Common\viewModels\TopItemsByPeriodViewModel;
 
-class ArticleController extends TableController
+final class ArticleController extends TableController
 {
     private const TOP = 50;
     private ArticleAuthorizationService $authorizationService;

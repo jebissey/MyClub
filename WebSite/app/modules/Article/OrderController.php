@@ -19,7 +19,7 @@ use app\modules\Common\AbstractController;
 use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\IdRow;
 
-class OrderController extends AbstractController
+final class OrderController extends AbstractController
 {
     public function __construct(Application $application, private OrderDataHelper $orderDataHelper)
     {

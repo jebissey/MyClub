@@ -5,38 +5,83 @@ declare(strict_types=1);
 namespace tests\modules\Article\services;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use app\enums\Authorization;
 use app\helpers\ConnectedUser;
 use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
+use app\models\Data;
 use app\modules\Article\services\ArticleAuthorizationService;
-use app\modules\Article\valueObjects\ArticleAccessRow;
-use app\modules\Article\valueObjects\ArticleOwnershipRow;
+use app\modules\Article\valueObjects\ArticleAuthorizationRow;
+use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
+use app\modules\Common\valueObjects\Person;
 
 final class ArticleAuthorizationServiceTest extends TestCase
 {
+    /**
+     * Construit un stub de Data (jamais DataHelper, qui est final) dont get()
+     * délègue à la closure fournie — permet de contrôler la réponse et/ou de
+     * capturer les arguments d'appel sans double de classe finale.
+     */
+    private function makeDataHelperStub(callable $getBehavior): Data
+    {
+        return new class($getBehavior) extends Data {
+            /** @var callable */
+            private $getBehavior;
+
+            public function __construct(callable $getBehavior)
+            {
+                $this->getBehavior = $getBehavior;
+            }
+
+            public function get(string $table, array $where, string $fields = '*'): object|false
+            {
+                return ($this->getBehavior)($table, $where, $fields);
+            }
+        };
+    }
+
     private function makeService(
-        ?DataHelper $dataHelper = null,
+        ?Data $dataHelper = null,
         ?AuthorizationDataHelper $authorizationDataHelper = null
     ): ArticleAuthorizationService {
         return new ArticleAuthorizationService(
-            $dataHelper ?? $this->createStub(DataHelper::class),
+            $dataHelper ?? $this->makeDataHelperStub(fn() => false),
             $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelper::class)
         );
     }
 
+    /**
+     * Construit un vrai helper ConnectedUser (final) sans passer par son
+     * constructeur (qui exige DataHelper/AuthorizationDataHelper/MetadataDataHelper,
+     * jamais utilisés par le code testé ici) et assigne directement ses
+     * propriétés publiques $person / $user avec de vraies instances des VO.
+     *
+     * NB: en production $person et $user sont toujours renseignés ensemble ;
+     * ici on peut volontairement les découpler (ex. testCanPublish...NoPersonButIsEditor)
+     * pour isoler une branche logique du service, ce qui ne reflète pas un état
+     * atteignable en production mais teste correctement le || du service.
+     */
     private function makeConnectedUser(
-        ?object $person = null,
+        ?Person $person = null,
         bool $isEditor = false
     ): ConnectedUser {
-        $user = $this->createMock(ConnectedUser::class);
-        $user->person = $person;
-        $user->method('isEditor')->willReturn($isEditor);
-        return $user;
+        $ref = new ReflectionClass(ConnectedUser::class);
+        /** @var ConnectedUser $helper */
+        $helper = $ref->newInstanceWithoutConstructor();
+
+        $helper->person = $person;
+
+        $authorizations = $isEditor ? [Authorization::Editor->value] : [];
+        // ConnectedUserVO exige une Person non-nulle ; on en fournit une factice
+        // quand $person est null mais qu'on veut quand même piloter isEditor().
+        $helper->user = new ConnectedUserVO($person ?? $this->makePerson(0), $authorizations);
+
+        return $helper;
     }
 
-    private function makePerson(int $id): object
+    private function makePerson(int $id): Person
     {
-        return (object) ['Id' => $id];
+        return new Person(Id: $id, Email: "person{$id}@example.test");
     }
 
     // -------------------------------------------------------------------------
@@ -54,23 +99,23 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanEditReturnsFalseWhenArticleDoesNotExist(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->once())
-            ->method('get')
-            ->with('Article', ['Id' => 99], 'CreatedBy')
-            ->willReturn(false);
+        $calls = [];
+        $dataHelper = $this->makeDataHelperStub(function (string $table, array $where, string $fields) use (&$calls) {
+            $calls[] = [$table, $where, $fields];
+            return false;
+        });
 
         $user = $this->makeConnectedUser($this->makePerson(42));
 
         $result = $this->makeService($dataHelper)->canEdit(99, $user);
 
         $this->assertFalse($result);
+        $this->assertSame([['Article', ['Id' => 99], 'CreatedBy']], $calls);
     }
 
     public function testCanEditReturnsTrueWhenUserIsAuthor(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) ['CreatedBy' => 42]);
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 42]);
 
         $user = $this->makeConnectedUser($this->makePerson(42));
 
@@ -81,8 +126,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanEditReturnsFalseWhenUserIsNotAuthor(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) ['CreatedBy' => 10]);
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 10]);
 
         $user = $this->makeConnectedUser($this->makePerson(42));
 
@@ -93,8 +137,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanDeleteDelegatesToCanEdit(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) ['CreatedBy' => 42]);
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 42]);
 
         $user = $this->makeConnectedUser($this->makePerson(42));
 
@@ -110,8 +153,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanPublishReturnsTrueWhenUserIsAuthor(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) ['CreatedBy' => 42]);
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 42]);
 
         $user = $this->makeConnectedUser($this->makePerson(42), isEditor: false);
 
@@ -122,8 +164,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanPublishReturnsTrueWhenUserIsEditorEvenIfNotAuthor(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) ['CreatedBy' => 10]);
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 10]);
 
         $user = $this->makeConnectedUser($this->makePerson(42), isEditor: true);
 
@@ -134,8 +175,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanPublishReturnsFalseWhenUserIsNeitherAuthorNorEditor(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) ['CreatedBy' => 10]);
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 10]);
 
         $user = $this->makeConnectedUser($this->makePerson(42), isEditor: false);
 
@@ -155,7 +195,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanPublishReturnsTrueWhenUserHasNoPersonButIsEditor(): void
     {
-        // canEdit returns false (no person), but isEditor() is true
+        // canEdit renvoie false (pas de personne), mais isEditor() est vrai
         $user = $this->makeConnectedUser(person: null, isEditor: true);
 
         $result = $this->makeService()->canPublish(1, $user);
@@ -169,26 +209,26 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanReadReturnsFalseWhenArticleDoesNotExist(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->once())
-            ->method('get')
-            ->with('Article', ['Id' => 99], 'OnlyForMembers, IdGroup')
-            ->willReturn(false);
+        $calls = [];
+        $dataHelper = $this->makeDataHelperStub(function (string $table, array $where, string $fields) use (&$calls) {
+            $calls[] = [$table, $where, $fields];
+            return false;
+        });
 
         $result = $this->makeService($dataHelper)->canRead(99, $this->makeConnectedUser());
 
         $this->assertFalse($result);
+        $this->assertSame([['Article', ['Id' => 99], 'OnlyForMembers, IdGroup']], $calls);
     }
 
     public function testCanReadReturnsTrueWhenArticleIsPublic(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) [
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
             'OnlyForMembers' => 0,
             'IdGroup'        => null,
         ]);
 
-        // Even without a connected person
+        // Même sans personne connectée
         $result = $this->makeService($dataHelper)->canRead(1, $this->makeConnectedUser(person: null));
 
         $this->assertTrue($result);
@@ -196,8 +236,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanReadReturnsFalseWhenArticleIsMembersOnlyAndUserHasNoPerson(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) [
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
             'OnlyForMembers' => 1,
             'IdGroup'        => null,
         ]);
@@ -209,8 +248,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanReadReturnsTrueWhenArticleIsMembersOnlyAndAuthorizationAllows(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) [
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
             'OnlyForMembers' => 1,
             'IdGroup'        => 5,
         ]);
@@ -219,7 +257,13 @@ final class ArticleAuthorizationServiceTest extends TestCase
         $authHelper->expects($this->once())
             ->method('getArticle')
             ->with(1, $this->isInstanceOf(ConnectedUser::class))
-            ->willReturn((object) ['Id' => 1]); // any truthy value
+            ->willReturn(new ArticleAuthorizationRow(
+                Id: 1,
+                CreatedBy: 42,
+                PublishedBy: null,
+                IdGroup: 5,
+                OnlyForMembers: true,
+            ));
 
         $user = $this->makeConnectedUser($this->makePerson(42));
 
@@ -230,13 +274,12 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     public function testCanReadReturnsFalseWhenArticleIsMembersOnlyAndAuthorizationDenies(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) [
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
             'OnlyForMembers' => 1,
             'IdGroup'        => 5,
         ]);
 
-        $authHelper = $this->createMock(AuthorizationDataHelper::class);
+        $authHelper = $this->createStub(AuthorizationDataHelper::class);
         $authHelper->method('getArticle')->willReturn(false);
 
         $user = $this->makeConnectedUser($this->makePerson(42));
@@ -249,8 +292,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
     public function testCanReadTreatsTruthyOnlyForMembersAsRestricted(): void
     {
         // OnlyForMembers peut arriver en string "1" ou bool true
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('get')->willReturn((object) [
+        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
             'OnlyForMembers' => '1',
             'IdGroup'        => null,
         ]);

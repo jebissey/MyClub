@@ -15,7 +15,7 @@ class UserAccountControllerTest extends DataHelperTestCase
         $this->assertColumnsExist($pdo, 'Member', [
             'Id',
             'Imported',
-            'useGravatar',
+            'UseGravatar',
         ]);
 
         $this->assertColumnsExist($pdo, 'Individual', [

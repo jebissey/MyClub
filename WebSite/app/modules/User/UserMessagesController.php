@@ -10,7 +10,7 @@ use app\models\MessageDataHelper;
 use app\modules\Common\AbstractShowController;
 use app\modules\User\viewModels\UserMessagesViewModel;
 
-class UserMessagesController extends AbstractShowController
+final class UserMessagesController extends AbstractShowController
 {
     public function __construct(
         Application $application,

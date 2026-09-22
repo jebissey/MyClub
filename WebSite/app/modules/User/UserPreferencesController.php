@@ -12,7 +12,7 @@ use app\models\EventTypeDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserPreferencesViewModel;
 
-class UserPreferencesController extends AbstractController
+final class UserPreferencesController extends AbstractController
 {
     public function __construct(Application $application, private EventTypeDataHelper $eventTypeDataHelper)
     {

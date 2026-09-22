@@ -11,7 +11,7 @@ use app\models\ArwardsDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Webmaster\viewModels\ArwardsViewModel;
 
-class ArwardsController extends AbstractController
+final class ArwardsController extends AbstractController
 {
     public function __construct(Application $application)
     {

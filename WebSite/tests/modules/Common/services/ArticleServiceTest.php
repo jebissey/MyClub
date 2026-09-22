@@ -7,22 +7,50 @@ namespace tests\modules\Common\services;
 use PHPUnit\Framework\TestCase;
 use app\helpers\MediaManager;
 use app\models\CarouselDataHelper;
-use app\models\DataHelper;
+use app\models\Data;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\valueObjects\UploadedFileInput;
+use app\modules\Common\valueObjects\UploadedMedia;
+use app\modules\Common\valueObjects\UploadMediaResult;
 use RuntimeException;
+
+/**
+ * Double de Data (jamais DataHelper, qui est final) dont set() renvoie une
+ * valeur fixe, avec capture des arguments d'appel — nommée pour rester
+ * typable statiquement (PHPStan) au lieu de Data seul.
+ */
+final class RecordingArticleDataStub extends Data
+{
+    /** @var list<array{0: string, 1: array<string, mixed>, 2: array<string, mixed>}> */
+    public array $setCalls = [];
+
+    public function __construct(private int|bool $setReturn = false)
+    {
+    }
+
+    public function set(string $table, array $fields, array $where = []): int|bool
+    {
+        $this->setCalls[] = [$table, $fields, $where];
+        return $this->setReturn;
+    }
+}
 
 final class ArticleServiceTest extends TestCase
 {
+    private function makeDataHelperStub(int|bool $setReturn): RecordingArticleDataStub
+    {
+        return new RecordingArticleDataStub($setReturn);
+    }
+
     private function makeService(
         ?CarouselDataHelper $carouselDataHelper = null,
         ?MediaManager $media = null,
-        ?DataHelper $dataHelper = null
+        ?Data $dataHelper = null
     ): ArticleService {
         return new ArticleService(
             $carouselDataHelper ?? $this->createStub(CarouselDataHelper::class),
             $media ?? $this->createStub(MediaManager::class),
-            $dataHelper ?? $this->createStub(DataHelper::class)
+            $dataHelper ?? $this->makeDataHelperStub(false)
         );
     }
 
@@ -62,15 +90,7 @@ final class ArticleServiceTest extends TestCase
 
     public function testCreateWithMediaSuccessWithoutFiles(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->once())
-            ->method('set')
-            ->with('Article', [
-                'Title'     => 'Mon titre',
-                'Content'   => 'Mon contenu',
-                'CreatedBy' => 42,
-            ])
-            ->willReturn(123);
+        $dataHelper = $this->makeDataHelperStub(123);
 
         $carouselDataHelper = $this->createMock(CarouselDataHelper::class);
         $carouselDataHelper->expects($this->never())->method('addOrUpdate');
@@ -82,12 +102,14 @@ final class ArticleServiceTest extends TestCase
             ->createWithMedia(42, null, 'Mon titre', 'Mon contenu');
 
         $this->assertSame(123, $articleId);
+        $this->assertSame([
+            ['Article', ['Title' => 'Mon titre', 'Content' => 'Mon contenu', 'CreatedBy' => 42], []],
+        ], $dataHelper->setCalls);
     }
 
     public function testCreateWithMediaSuccessWithEmptyFilesArray(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('set')->willReturn(10);
+        $dataHelper = $this->makeDataHelperStub(10);
 
         $carouselDataHelper = $this->createMock(CarouselDataHelper::class);
         $carouselDataHelper->expects($this->never())->method('addOrUpdate');
@@ -100,20 +122,15 @@ final class ArticleServiceTest extends TestCase
 
     public function testCreateWithMediaUsesDefaultEmptyTitleAndContent(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->once())
-            ->method('set')
-            ->with('Article', [
-                'Title'     => '',
-                'Content'   => '',
-                'CreatedBy' => 1,
-            ])
-            ->willReturn(5);
+        $dataHelper = $this->makeDataHelperStub(5);
 
         $articleId = $this->makeService(null, null, $dataHelper)
             ->createWithMedia(1);
 
         $this->assertSame(5, $articleId);
+        $this->assertSame([
+            ['Article', ['Title' => '', 'Content' => '', 'CreatedBy' => 1], []],
+        ], $dataHelper->setCalls);
     }
 
     // -------------------------------------------------------------------------
@@ -122,8 +139,7 @@ final class ArticleServiceTest extends TestCase
 
     public function testCreateWithMediaThrowsWhenDataHelperDoesNotReturnInt(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('set')->willReturn(false);
+        $dataHelper = $this->makeDataHelperStub(false);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Failed to create article');
@@ -132,30 +148,23 @@ final class ArticleServiceTest extends TestCase
             ->createWithMedia(42, null, 'Titre', 'Contenu');
     }
 
-    public function testCreateWithMediaThrowsWhenDataHelperReturnsString(): void
-    {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('set')->willReturn('error');
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Failed to create article');
-
-        $this->makeService(null, null, $dataHelper)
-            ->createWithMedia(42);
-    }
-
     // -------------------------------------------------------------------------
     // createWithMedia – with files
     // -------------------------------------------------------------------------
 
     public function testCreateWithMediaUploadsValidFilesAndAddsToCarousel(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('set')->willReturn(55);
+        $dataHelper = $this->makeDataHelperStub(55);
 
-        $uploadResult = (object) [
-            'file' => (object) ['url' => 'https://cdn.example.com/img1.jpg'],
-        ];
+        $uploadResult = new UploadMediaResult(
+            file: new UploadedMedia(
+                name: 'photo.jpg',
+                path: '/media/img1.jpg',
+                url: 'https://cdn.example.com/img1.jpg',
+                size: 2048,
+                type: 'image/jpeg',
+            ),
+        );
 
         $media = $this->createMock(MediaManager::class);
         $media->expects($this->once())
@@ -194,8 +203,7 @@ final class ArticleServiceTest extends TestCase
 
     public function testCreateWithMediaSkipsFilesWithUploadError(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('set')->willReturn(20);
+        $dataHelper = $this->makeDataHelperStub(20);
 
         $media = $this->createMock(MediaManager::class);
         $media->expects($this->never())->method('uploadFile');
@@ -206,7 +214,7 @@ final class ArticleServiceTest extends TestCase
         $files = $this->makeFiles([
             [
                 'tmp_name' => '/tmp/phpERR',
-                'error'    => UPLOAD_ERR_INI_SIZE, // or any non-OK
+                'error'    => UPLOAD_ERR_INI_SIZE,
                 'name'     => 'too-big.jpg',
             ],
         ]);
@@ -219,15 +227,26 @@ final class ArticleServiceTest extends TestCase
 
     public function testCreateWithMediaHandlesMultipleFilesAndSkipsFailedOnes(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('set')->willReturn(77);
+        $dataHelper = $this->makeDataHelperStub(77);
 
-        $uploadResult1 = (object) [
-            'file' => (object) ['url' => 'https://cdn.example.com/a.jpg'],
-        ];
-        $uploadResult2 = (object) [
-            'file' => (object) ['url' => 'https://cdn.example.com/b.png'],
-        ];
+        $uploadResult1 = new UploadMediaResult(
+            file: new UploadedMedia(
+                name: 'a.jpg',
+                path: '/media/a.jpg',
+                url: 'https://cdn.example.com/a.jpg',
+                size: 100,
+                type: 'image/jpeg',
+            ),
+        );
+        $uploadResult2 = new UploadMediaResult(
+            file: new UploadedMedia(
+                name: 'b.png',
+                path: '/media/b.png',
+                url: 'https://cdn.example.com/b.png',
+                size: 200,
+                type: 'image/png',
+            ),
+        );
 
         $media = $this->createMock(MediaManager::class);
         $media->expects($this->exactly(2))
@@ -247,6 +266,7 @@ final class ArticleServiceTest extends TestCase
             ->willReturnCallback(function (...$args) use (&$callIndex, $expectedCalls) {
                 $this->assertSame($expectedCalls[$callIndex], $args);
                 $callIndex++;
+                return 'ok';
             });
 
         $files = $this->makeFiles([
@@ -279,8 +299,7 @@ final class ArticleServiceTest extends TestCase
 
     public function testCreateWithMediaDoesNothingWhenFilesHasNoTmpNameKey(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('set')->willReturn(30);
+        $dataHelper = $this->makeDataHelperStub(30);
 
         $media = $this->createMock(MediaManager::class);
         $media->expects($this->never())->method('uploadFile');
@@ -288,7 +307,6 @@ final class ArticleServiceTest extends TestCase
         $carouselDataHelper = $this->createMock(CarouselDataHelper::class);
         $carouselDataHelper->expects($this->never())->method('addOrUpdate');
 
-        // Structure invalide (pas de clé tmp_name)
         $files = [
             'error' => [UPLOAD_ERR_OK],
             'name'  => ['x.jpg'],

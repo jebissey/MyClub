@@ -18,7 +18,7 @@ use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\User\viewModels\UserSetPasswordViewModel;
 use app\modules\User\viewModels\UserSignInViewModel;
 
-class UserController extends AbstractController
+final class UserController extends AbstractController
 {
     public function __construct(
         Application $application,

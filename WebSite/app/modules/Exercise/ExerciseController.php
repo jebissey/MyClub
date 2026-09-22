@@ -12,7 +12,7 @@ use app\helpers\WebApp;
 use app\models\ExerciseTableDataHelper;
 use app\modules\Common\TableController;
 
-class ExerciseController extends TableController
+final class ExerciseController extends TableController
 {
     public function __construct(
         Application $application,

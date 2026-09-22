@@ -12,7 +12,7 @@ use app\helpers\WebApp;
 use app\models\DesignDataHelper;
 use app\modules\Common\AbstractController;
 
-class DesignController extends AbstractController
+final class DesignController extends AbstractController
 {
     public function __construct(
         Application $application,

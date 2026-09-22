@@ -18,7 +18,7 @@ use app\modules\PersonManager\viewModels\GroupCreateViewModel;
 use app\modules\PersonManager\viewModels\GroupEditViewModel;
 use app\modules\PersonManager\viewModels\GroupIndexViewModel;
 
-class GroupController extends AbstractController
+final class GroupController extends AbstractController
 {
     public function __construct(
         Application $application,

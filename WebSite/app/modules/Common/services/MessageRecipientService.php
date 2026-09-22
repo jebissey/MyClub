@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace app\modules\Common\services;
 
 use app\modules\Common\interfaces\RecipientResolverInterface;
-use app\models\DataHelper;
+use app\models\Data;
 use app\modules\Notifications\ArticleRecipientResolver;
 use app\modules\Notifications\EventRecipientResolver;
 use app\modules\Notifications\GroupRecipientResolver;
 use app\modules\Common\valueObjects\MessageContext;
 
-class MessageRecipientService
+final class MessageRecipientService
 {
     /** @var RecipientResolverInterface[] */
     private array $resolvers;
 
-    public function __construct(private DataHelper $dataHelper)
+    public function __construct(private Data $dataHelper)
     {
         $this->resolvers = [
             new ArticleRecipientResolver(),

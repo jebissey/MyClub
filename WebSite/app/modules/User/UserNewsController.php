@@ -9,7 +9,7 @@ use app\helpers\News;
 use app\modules\Common\AbstractShowController;
 use app\modules\User\viewModels\UserNewsViewModel;
 
-class UserNewsController extends AbstractShowController
+final class UserNewsController extends AbstractShowController
 {
     public function __construct(
         Application $application,

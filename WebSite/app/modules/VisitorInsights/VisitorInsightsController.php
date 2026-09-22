@@ -27,7 +27,7 @@ use app\modules\VisitorInsights\viewModels\VisitorInsightsHomeViewModel;
 use app\modules\VisitorInsights\viewModels\VisitorLogsViewModel;
 use app\modules\VisitorInsights\viewModels\VisitorsGrafViewModel;
 
-class VisitorInsightsController extends TableController
+final class VisitorInsightsController extends TableController
 {
     private const TOP = 50;
     private const PERIOD_TYPES = ['day', 'week', 'month', 'year'];

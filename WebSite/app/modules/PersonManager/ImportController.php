@@ -11,7 +11,7 @@ use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\PersonManager\viewModels\UsersImportViewModel;
 
-class ImportController extends AbstractController
+final class ImportController extends AbstractController
 {
     /** @var array{headerRow: int, mapping: array{email: int|null, firstName: int|null, lastName: int|null, phone: int|null}} */
     private array $importSettings;

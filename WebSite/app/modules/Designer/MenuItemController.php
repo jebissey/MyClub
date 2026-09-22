@@ -10,7 +10,7 @@ use app\helpers\Application;
 use app\models\ArwardsDataHelper;
 use app\modules\Common\AbstractController;
 
-class MenuItemController extends AbstractController
+final class MenuItemController extends AbstractController
 {
     public function __construct(Application $application)
     {

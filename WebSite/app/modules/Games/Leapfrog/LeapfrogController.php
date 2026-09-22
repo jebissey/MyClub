@@ -10,7 +10,7 @@ use app\helpers\WebApp;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
 
-class LeapfrogController extends TableController
+final class LeapfrogController extends TableController
 {
     public function __construct(
         Application $application,

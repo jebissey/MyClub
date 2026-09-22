@@ -10,7 +10,7 @@ use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\User\viewModels\UserAvailabilitiesViewModel;
 
-class UserAvailabilitiesController extends AbstractController
+final class UserAvailabilitiesController extends AbstractController
 {
     public function __construct(Application $application)
     {

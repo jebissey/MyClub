@@ -11,7 +11,7 @@ use app\modules\Common\services\EmailService;
 use app\modules\Communication\viewModels\CommunicationEditViewModel;
 use app\modules\Common\viewModels\InfoViewModel;
 
-class CommunicationController extends AbstractController
+final class CommunicationController extends AbstractController
 {
     public function __construct(
         Application $application,

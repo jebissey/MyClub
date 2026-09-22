@@ -9,7 +9,7 @@ use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\ArticleService;
 
-class PwaController extends AbstractController
+final class PwaController extends AbstractController
 {
     public function __construct(
         Application $application,

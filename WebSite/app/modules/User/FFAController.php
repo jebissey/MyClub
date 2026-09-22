@@ -10,7 +10,7 @@ use app\helpers\FFAScraper;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
-class FFAController extends AbstractController
+final class FFAController extends AbstractController
 {
     public function __construct(
         Application $application,

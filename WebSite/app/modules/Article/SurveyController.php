@@ -18,7 +18,7 @@ use app\modules\Article\valueObjects\PersonNameRow;
 use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\IdRow;
 
-class SurveyController extends AbstractController
+final class SurveyController extends AbstractController
 {
     public function __construct(Application $application, private SurveyDataHelper $surveyDataHelper)
     {

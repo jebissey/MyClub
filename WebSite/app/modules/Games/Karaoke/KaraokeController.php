@@ -9,7 +9,7 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
-class KaraokeController extends AbstractController
+final class KaraokeController extends AbstractController
 {
     private const MEDIA_PATH =  __DIR__ . '/../../../../data/media/karaoke/';
 

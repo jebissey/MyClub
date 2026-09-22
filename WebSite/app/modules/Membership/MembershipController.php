@@ -10,7 +10,7 @@ use app\modules\Common\AbstractController;
 use app\modules\HelloAsso\services\HelloAssoService;
 use app\modules\Membership\viewModels\MembershipIndexViewModel;
 
-class MembershipController extends AbstractController
+final class MembershipController extends AbstractController
 {
     public function __construct(
         Application $application,

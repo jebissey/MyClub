@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use PDO;
 use app\helpers\Application;
 
-class CredentialService
+final class CredentialService
 {
     private const SQLITE_DEST_PATH  = __DIR__ . '/../../../../data/';
     private const SQLITE_FILE       = 'Credential.db';

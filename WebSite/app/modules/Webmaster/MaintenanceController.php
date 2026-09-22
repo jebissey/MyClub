@@ -10,7 +10,7 @@ use app\helpers\ErrorManager;
 use app\modules\Common\AbstractController;
 use app\modules\Webmaster\viewModels\MaintenanceViewModel;
 
-class MaintenanceController extends AbstractController
+final class MaintenanceController extends AbstractController
 {
     private const MAINTENANCE_UNSET = '/maintenance/unset';
 

@@ -6,16 +6,16 @@ namespace app\modules\Common\services;
 
 use app\helpers\MediaManager;
 use app\models\CarouselDataHelper;
-use app\models\DataHelper;
+use app\models\Data;
 use app\modules\Common\valueObjects\UploadedFileInput;
 use RuntimeException;
 
-class ArticleService
+final class ArticleService
 {
     public function __construct(
         private CarouselDataHelper $carouselDataHelper,
         private MediaManager $media,
-        private DataHelper $dataHelper
+        private Data $dataHelper
     ) {
     }
 

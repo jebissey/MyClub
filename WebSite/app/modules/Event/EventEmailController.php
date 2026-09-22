@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace app\modules\Event;
 
 use app\enums\FilterInputRule;
-use app\enums\WeekdayFormat;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 
-class EventEmailController extends AbstractController
+final class EventEmailController extends AbstractController
 {
     public function __construct(
         Application $application,

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace tests\modules\Common\services;
 
 use PHPUnit\Framework\TestCase;
-use app\models\DataHelper;
+use ReflectionClass;
+use app\models\Data;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Common\valueObjects\MessageContext;
 use app\modules\Common\interfaces\RecipientResolverInterface;
@@ -15,10 +16,34 @@ use app\modules\Notifications\GroupRecipientResolver;
 
 final class MessageRecipientServiceTest extends TestCase
 {
-    private function makeService(?DataHelper $dataHelper = null): MessageRecipientService
+    /**
+     * Construit un stub de Data (jamais DataHelper, qui est final) dont gets()
+     * renvoie une valeur fixe, avec capture des arguments d'appel.
+     *
+     * @param array<int, object> $getsReturn
+     */
+    private function makeDataHelperStub(array $getsReturn): Data
+    {
+        return new class ($getsReturn) extends Data {
+            /** @var list<array{0: string, 1: array<string, mixed>, 2: string}> */
+            public array $getsCalls = [];
+
+            public function __construct(private array $getsReturn)
+            {
+            }
+
+            public function gets(string $table, array $where, string $fields, string $orderBy = '', bool $keyPair = false): array
+            {
+                $this->getsCalls[] = [$table, $where, $fields];
+                return $this->getsReturn;
+            }
+        };
+    }
+
+    private function makeService(?Data $dataHelper = null): MessageRecipientService
     {
         return new MessageRecipientService(
-            $dataHelper ?? $this->createStub(DataHelper::class)
+            $dataHelper ?? $this->makeDataHelperStub([])
         );
     }
 
@@ -61,23 +86,21 @@ final class MessageRecipientServiceTest extends TestCase
 
     public function testGetRecipientsReturnsEmptyWhenNoMembers(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->once())
-            ->method('gets')
-            ->with('Member', ['Inactivated' => 0], 'Id, Notifications')
-            ->willReturn([]);
+        $dataHelper = $this->makeDataHelperStub([]);
 
         $result = $this->makeService($dataHelper)->getRecipientsForContext(
             $this->makeArticleContext()
         );
 
         $this->assertSame([], $result);
+        $this->assertSame([
+            ['Member', ['Inactivated' => 0], 'Id, Notifications'],
+        ], $dataHelper->getsCalls);
     }
 
     public function testGetRecipientsSkipsMembersWithEmptyPreferences(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('gets')->willReturn([
+        $dataHelper = $this->makeDataHelperStub([
             $this->makeMember(1, null),
             $this->makeMember(2, '{}'),
             $this->makeMember(3, ''),
@@ -92,8 +115,7 @@ final class MessageRecipientServiceTest extends TestCase
 
     public function testGetRecipientsSkipsMembersWithInvalidJsonPreferences(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('gets')->willReturn([
+        $dataHelper = $this->makeDataHelperStub([
             $this->makeMember(1, 'not-json'),
         ]);
 
@@ -112,8 +134,7 @@ final class MessageRecipientServiceTest extends TestCase
     {
         $preferences = json_encode(['article' => true]);
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('gets')->willReturn([
+        $dataHelper = $this->makeDataHelperStub([
             $this->makeMember(42, $preferences),
         ]);
 
@@ -135,8 +156,7 @@ final class MessageRecipientServiceTest extends TestCase
             'group'   => true,
         ]);
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('gets')->willReturn([
+        $dataHelper = $this->makeDataHelperStub([
             $this->makeMember(7, $preferences),
         ]);
 
@@ -152,8 +172,7 @@ final class MessageRecipientServiceTest extends TestCase
     {
         $preferences = json_encode(['article' => true]);
 
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('gets')->willReturn([
+        $dataHelper = $this->makeDataHelperStub([
             $this->makeMember(10, $preferences),
             $this->makeMember(20, $preferences),
             $this->makeMember(30, '{}'), // skipped
@@ -178,7 +197,7 @@ final class MessageRecipientServiceTest extends TestCase
     {
         $service = $this->makeService();
 
-        $reflection = new \ReflectionClass($service);
+        $reflection = new ReflectionClass($service);
         $property   = $reflection->getProperty('resolvers');
         $property->setAccessible(true);
         /** @var RecipientResolverInterface[] $resolvers */
@@ -196,19 +215,15 @@ final class MessageRecipientServiceTest extends TestCase
 
     public function testGetRecipientsCallsDataHelperWithCorrectArguments(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->expects($this->once())
-            ->method('gets')
-            ->with(
-                'Member',
-                ['Inactivated' => 0],
-                'Id, Notifications'
-            )
-            ->willReturn([]);
+        $dataHelper = $this->makeDataHelperStub([]);
 
         $this->makeService($dataHelper)->getRecipientsForContext(
             $this->makeArticleContext()
         );
+
+        $this->assertSame([
+            ['Member', ['Inactivated' => 0], 'Id, Notifications'],
+        ], $dataHelper->getsCalls);
     }
 
     // -------------------------------------------------------------------------
@@ -217,8 +232,7 @@ final class MessageRecipientServiceTest extends TestCase
 
     public function testGetRecipientsWithEventContext(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('gets')->willReturn([]);
+        $dataHelper = $this->makeDataHelperStub([]);
 
         $result = $this->makeService($dataHelper)->getRecipientsForContext(
             $this->makeEventContext(eventId: 99, eventCreatorId: 5)
@@ -229,8 +243,7 @@ final class MessageRecipientServiceTest extends TestCase
 
     public function testGetRecipientsWithGroupContext(): void
     {
-        $dataHelper = $this->createMock(DataHelper::class);
-        $dataHelper->method('gets')->willReturn([]);
+        $dataHelper = $this->makeDataHelperStub([]);
 
         $result = $this->makeService($dataHelper)->getRecipientsForContext(
             $this->makeGroupContext(groupId: 3)

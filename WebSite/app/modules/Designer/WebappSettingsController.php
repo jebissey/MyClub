@@ -12,7 +12,7 @@ use app\helpers\WebApp;
 use app\models\MetadataDataHelper;
 use app\modules\Common\AbstractController;
 
-class WebappSettingsController extends AbstractController
+final class WebappSettingsController extends AbstractController
 {
     private MetadataDataHelper $metadataDataHelper;
 

@@ -11,7 +11,7 @@ use app\helpers\WebApp;
 use app\modules\Astronomy\viewModels\AstronomyViewModel;
 use app\modules\Common\AbstractController;
 
-class AstronomyController extends AbstractController
+final class AstronomyController extends AbstractController
 {
     private const COOKIE_NAME = 'astro_location';
     private const COOKIE_TTL  = 60 * 60 * 24 * 365; // 1 year
