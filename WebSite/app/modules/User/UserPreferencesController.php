@@ -68,7 +68,7 @@ class UserPreferencesController extends AbstractController
             FilterInputRule::CheckboxMatrix->value,
             $this->flight->request()->data->getData()
         ) ?? '';
-        $this->dataHelper->set('Member', ['preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
+        $this->dataHelper->set('Member', ['Preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
         $this->redirect('/user');
     }
 }

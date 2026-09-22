@@ -30,35 +30,39 @@ class MessageRecipientService
      */
     public function getRecipientsForContext(MessageContext $context): array
     {
-        $persons = $this->dataHelper->gets(
-            'Person',
+        $members = $this->dataHelper->gets(
+            'Member',
             ['Inactivated' => 0],
             'Id, Notifications'
         );
+
         $recipients = [];
-        foreach ($persons as $person) {
+        foreach ($members as $member) {
             /** @var array<string, mixed> $preferences */
             $preferences = json_decode(
-                $person->Notifications ?? '{}',
+                $member->Notifications ?? '{}',
                 true
             ) ?? [];
+
             if ($preferences === []) {
                 continue;
             }
+
             foreach ($this->resolvers as $resolver) {
                 if (
                     $resolver->supports($context)
                     && $resolver->shouldNotify(
                         $context,
-                        $person->Id,
+                        $member->Id,
                         $preferences
                     )
                 ) {
-                    $recipients[] = $person->Id;
+                    $recipients[] = $member->Id;
                     break;
                 }
             }
         }
+
         return $recipients;
     }
 }

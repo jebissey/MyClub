@@ -6,6 +6,7 @@ namespace app\models;
 
 use InvalidArgumentException;
 use PDO;
+use PDOStatement;
 use RuntimeException;
 use stdClass;
 use Throwable;
@@ -60,6 +61,12 @@ use app\modules\User\valueObjects\EventRegistrationRow;
  */
 class PersonDataHelper extends Data implements NewsProviderInterface
 {
+    /**
+     * Fragment de jointure commun Member/Individual (alias m/i), utilisé par
+     * la plupart des requêtes de cette classe.
+     */
+    private const MEMBER_INDIVIDUAL_JOIN = 'FROM Member m INNER JOIN Individual i ON i.Id = m.Id';
+
     public function __construct(
         Application $application,
         private PersonPreferences $personPreferences,
@@ -70,6 +77,35 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             $application->getErrorManager(),
             $application->getPdoForLog()
         );
+    }
+
+    /**
+     * Exécute une requête SELECT et échoue bruyamment (Application::unreachable)
+     * si la préparation/exécution échoue, plutôt que de laisser un `false` se
+     * propager silencieusement.
+     */
+    private function queryOrFail(string $sql): PDOStatement
+    {
+        $stmt = $this->pdo->query($sql);
+        if ($stmt === false) {
+            Application::unreachable("Query failed", __FILE__, __LINE__);
+        }
+        return $stmt;
+    }
+
+    /**
+     * Ajoute une clause WHERE conditionnelle selon un filtre tri-état
+     * (true / false / null=ignoré).
+     *
+     * @param list<string> $wheres
+     */
+    private function addTriStateWhere(array &$wheres, ?bool $value, string $trueSql, string $falseSql): void
+    {
+        if ($value === true) {
+            $wheres[] = $trueSql;
+        } elseif ($value === false) {
+            $wheres[] = $falseSql;
+        }
     }
 
     public function create(): int
@@ -104,18 +140,12 @@ class PersonDataHelper extends Data implements NewsProviderInterface
      */
     public function getAllPersons(): array
     {
-        $query = $this->pdo->query(
-            "SELECT i.Id, LOWER(i.Email) AS EmailKey
-             FROM Individual i
-             INNER JOIN Member m ON m.Id = i.Id"
+        $stmt = $this->queryOrFail(
+            "SELECT i.Id, LOWER(i.Email) AS EmailKey " . self::MEMBER_INDIVIDUAL_JOIN
         );
 
-        if ($query === false) {
-            Application::unreachable("Query failed", __FILE__, __LINE__);
-        }
-
         /** @var list<object{Id:int, EmailKey:string}> $rows */
-        $rows = $query->fetchAll(PDO::FETCH_OBJ);
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return array_column($rows, 'Id', 'EmailKey');
     }
@@ -130,10 +160,9 @@ class PersonDataHelper extends Data implements NewsProviderInterface
     public function getActiveMembersContactInfoByEmail(): array
     {
         $sql = "
-            SELECT Individual.Email, Individual.Phone, Individual.FirstName, Individual.LastName, Individual.NickName
-            FROM Member
-            INNER JOIN Individual ON Individual.Id = Member.Id
-            WHERE Member.Inactivated = 0
+            SELECT i.Email, i.Phone, i.FirstName, i.LastName, i.NickName
+            " . self::MEMBER_INDIVIDUAL_JOIN . "
+            WHERE m.Inactivated = 0
         ";
         $stmt = $this->pdo->query($sql);
         if ($stmt === false) {
@@ -193,7 +222,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
      */
     public function getMembersAlerts(): array
     {
-        $query = "
+        $sql = "
             SELECT 
                 i.FirstName || ' ' || i.LastName || 
                 CASE 
@@ -212,19 +241,14 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                     WHEN m.Preferences LIKE '%newArticle%' THEN 'X'
                     ELSE ''
                 END AS NewArticle
-            FROM Member m
-            INNER JOIN Individual i ON i.Id = m.Id
+            " . self::MEMBER_INDIVIDUAL_JOIN . "
             WHERE (m.Preferences LIKE '%noAlerts%' 
                OR m.Preferences LIKE '%newEvent%' 
                OR m.Preferences LIKE '%newArticle%')
               AND m.Inactivated = 0
             ORDER BY clubMember
         ";
-        $stmt = $this->pdo->query($query);
-        if ($stmt === false) {
-            Application::unreachable("Query failed", __FILE__, __LINE__);
-        }
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $this->queryOrFail($sql)->fetchAll(PDO::FETCH_OBJ);
     }
 
     /**
@@ -239,8 +263,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
 
         $sql = "
             SELECT i.Id, i.Email, i.FirstName, i.LastName, m.PresentationLastUpdate
-            FROM Member m
-            INNER JOIN Individual i ON i.Id = m.Id
+            " . self::MEMBER_INDIVIDUAL_JOIN . "
             WHERE m.InPresentationDirectory = 1
               AND m.PresentationLastUpdate >= :searchFrom
               AND i.Email != :email
@@ -291,23 +314,26 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             $params[':groupId'] = $groupId;
         }
 
-        if ($presentation === true) {
-            $wheres[] = 'm.InPresentationDirectory = 1';
-        } elseif ($presentation === false) {
-            $wheres[] = 'm.InPresentationDirectory = 0';
-        }
+        $this->addTriStateWhere(
+            $wheres,
+            $presentation,
+            'm.InPresentationDirectory = 1',
+            'm.InPresentationDirectory = 0'
+        );
 
-        if ($password === true) {
-            $wheres[] = "(m.Password IS NOT NULL AND m.Password != '')";
-        } elseif ($password === false) {
-            $wheres[] = "(m.Password IS NULL OR m.Password = '')";
-        }
+        $this->addTriStateWhere(
+            $wheres,
+            $password,
+            "(m.Password IS NOT NULL AND m.Password != '')",
+            "(m.Password IS NULL OR m.Password = '')"
+        );
 
-        if ($inPublicMap === true) {
-            $wheres[] = "(m.MyPublicDataInPresentationDirectory IS NOT NULL AND m.MyPublicDataInPresentationDirectory <> '')";
-        } elseif ($inPublicMap === false) {
-            $wheres[] = "(m.MyPublicDataInPresentationDirectory IS NULL OR m.MyPublicDataInPresentationDirectory = '')";
-        }
+        $this->addTriStateWhere(
+            $wheres,
+            $inPublicMap,
+            "(m.MyPublicDataInPresentationDirectory IS NOT NULL AND m.MyPublicDataInPresentationDirectory <> '')",
+            "(m.MyPublicDataInPresentationDirectory IS NULL OR m.MyPublicDataInPresentationDirectory = '')"
+        );
 
         if ($desactivated === true) {
             $wheres[] = "m.Inactivated = 1";
@@ -318,8 +344,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $where = implode(' AND ', $wheres);
         $sql = "
             SELECT DISTINCT i.Id, i.FirstName, i.LastName, i.Email
-            FROM Member m
-            INNER JOIN Individual i ON i.Id = m.Id
+            " . self::MEMBER_INDIVIDUAL_JOIN . "
             $joins
             WHERE $where
             ORDER BY i.FirstName, i.LastName
@@ -342,7 +367,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
             $and = 'AND mg.IdGroup = ' . (int) $idGroup;
         }
 
-        $query = $this->pdo->query("
+        $sql = "
             SELECT
                 i.Id AS PersonId,
                 i.Id AS Id,
@@ -354,19 +379,14 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 m.InPresentationDirectory,
                 m.ShowPhoneInPresentationDirectory,
                 m.ShowEmailInPresentationDirectory
-            FROM Member m
-            INNER JOIN Individual i ON i.Id = m.Id
+            " . self::MEMBER_INDIVIDUAL_JOIN . "
             $innerJoin
             WHERE m.Inactivated = 0 $and
             ORDER BY i.FirstName, i.LastName
-        ");
-
-        if ($query === false) {
-            Application::unreachable("Query failed", __FILE__, __LINE__);
-        }
+        ";
 
         /** @var list<PersonGroupRow> $persons */
-        $persons = $query->fetchAll(PDO::FETCH_OBJ);
+        $persons = $this->queryOrFail($sql)->fetchAll(PDO::FETCH_OBJ);
 
         return $persons;
     }
@@ -376,7 +396,7 @@ class PersonDataHelper extends Data implements NewsProviderInterface
      */
     public function getPersonsInGroupForDirectory(int $groupId): array
     {
-        $stmt = $this->pdo->prepare("
+        $sql = "
             SELECT DISTINCT 
                 i.Id,
                 m.UseGravatar, 
@@ -385,14 +405,14 @@ class PersonDataHelper extends Data implements NewsProviderInterface
                 i.FirstName,
                 i.LastName,
                 i.NickName
-            FROM Member m
-            INNER JOIN Individual i ON i.Id = m.Id
+            " . self::MEMBER_INDIVIDUAL_JOIN . "
             INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
             WHERE mg.IdGroup = ?
               AND m.InPresentationDirectory = 1
               AND m.Inactivated = 0
             ORDER BY i.FirstName, i.LastName
-        ");
+        ";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$groupId]);
         $persons = $stmt->fetchAll(PDO::FETCH_OBJ);
 
@@ -490,39 +510,31 @@ class PersonDataHelper extends Data implements NewsProviderInterface
      */
     public function getRedactors(): array
     {
-        $query = $this->pdo->query("
+        $sql = "
             SELECT i.Id AS PersonId, i.FirstName, i.LastName, i.NickName, i.Email
-            FROM Member m
-            INNER JOIN Individual i ON i.Id = m.Id
+            " . self::MEMBER_INDIVIDUAL_JOIN . "
             INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
             INNER JOIN GroupAuthorization ga ON ga.IdGroup = mg.IdGroup
             WHERE m.Inactivated = 0
               AND ga.IdAuthorization = 4
             GROUP BY i.Id
             ORDER BY i.FirstName, i.LastName
-        ");
-        if ($query === false) {
-            Application::unreachable("Query failed", __FILE__, __LINE__);
-        }
-        return $query->fetchAll(PDO::FETCH_OBJ);
+        ";
+        return $this->queryOrFail($sql)->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function getWebmasterEmail(): string
     {
-        $query = $this->pdo->query('
+        $sql = '
             SELECT i.Email
-            FROM Member m
-            INNER JOIN Individual i ON i.Id = m.Id
+            ' . self::MEMBER_INDIVIDUAL_JOIN . '
             INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
             INNER JOIN "Group" g ON g.Id = mg.IdGroup
             INNER JOIN GroupAuthorization ga ON ga.IdGroup = g.Id
             INNER JOIN Authorization a ON a.Id = ga.IdAuthorization
             WHERE a.Name = "Webmaster"
-        ');
-        if ($query === false) {
-            Application::unreachable("Query failed", __FILE__, __LINE__);
-        }
-        $email = $query->fetchColumn();
+        ';
+        $email = $this->queryOrFail($sql)->fetchColumn();
         if (!is_string($email)) {
             Application::unreachable("Webmaster email not found", __FILE__, __LINE__);
         }
@@ -737,30 +749,23 @@ class PersonDataHelper extends Data implements NewsProviderInterface
         $stmt->execute([':email' => $email]);
         $lastActivity = $stmt->fetchColumn();
 
+        $setClauses = ['LastSignIn = :now'];
+        $params = [
+            ':now'   => date('Y-m-d H:i:s'),
+            ':email' => $email,
+        ];
         if ($lastActivity) {
-            $stmt = $this->pdo->prepare("
-                UPDATE Member
-                SET LastSignOut = :lastActivity
-                WHERE Id = (
-                    SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE
-                )
-            ");
-            $stmt->execute([
-                ':lastActivity' => $lastActivity,
-                ':email'        => $email
-            ]);
+            $setClauses[] = 'LastSignOut = :lastActivity';
+            $params[':lastActivity'] = $lastActivity;
         }
 
         $stmt = $this->pdo->prepare("
             UPDATE Member
-            SET LastSignIn = :now
+            SET " . implode(', ', $setClauses) . "
             WHERE Id = (
                 SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE
             )
         ");
-        $stmt->execute([
-            ':now'   => date('Y-m-d H:i:s'),
-            ':email' => $email
-        ]);
+        $stmt->execute($params);
     }
 }

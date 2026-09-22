@@ -92,7 +92,7 @@ class UserNotificationsController extends AbstractController
             $notifications['messageOnGroupSubscribed'],
             $notifications['messageOnGroupJoined']
         );
-        $this->dataHelper->set('Member', ['notifications' => json_encode($notifications)], ['Id' => $person->Id]);
+        $this->dataHelper->set('Member', ['Notifications' => json_encode($notifications)], ['Id' => $person->Id]);
         $this->redirect('/user');
     }
 }
