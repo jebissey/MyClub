@@ -26,7 +26,6 @@
                     <label class="form-label" for="locName">
                         {$i18n['name']}
                     </label>
-
                     <input
                         type="text"
                         class="form-control"
@@ -59,18 +58,14 @@
 
     {* ---- Heures de lever / coucher ---- *}
     <div class="card mb-4">
-
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">{$i18n['riseSetTitle']}</h5>
-            <span class="badge bg-secondary" id="currentDateLabel"></span>
+            <span class="badge bg-secondary" id="currentDateLabel" role="button"></span>
+            <input type="date" id="datePicker" class="visually-hidden" value="{$currentDate}">
         </div>
-
         <div class="card-body">
             <div class="table-responsive">
-                <table
-                    class="table table-sm table-striped align-middle mb-0"
-                    id="riseSetTable"
-                >
+                <table class="table table-sm table-striped align-middle mb-0" id="riseSetTable">
                     <thead>
                         <tr>
                             <th>{$i18n['body']}</th>
@@ -87,65 +82,24 @@
 
     {* ---- Animation / curseur d’heure ---- *}
     <div class="card mb-4">
-
         <div class="card-header">
             <h5 class="mb-0">{$i18n['skyPosition']}</h5>
         </div>
-
         <div class="card-body">
             <div class="mb-3">
                 <label for="timeSlider" class="form-label">
                     {$i18n['time']} :
                     <strong id="timeLabel">--:--</strong>
                 </label>
-
-                <input
-                    type="range"
-                    class="form-range"
-                    id="timeSlider"
-                    min="0"
-                    max="1439"
-                    step="1"
-                    value="720"
-                >
+                <input type="range" class="form-range" id="timeSlider" min="0" max="1439" step="1" value="720">
             </div>
 
-            <div
-                class="sky-container position-relative border rounded bg-dark overflow-hidden"
-                style="height: 320px; user-select: none;"
-            >
-
-                <div
-                    class="position-absolute bottom-0 start-0 end-0 border-top border-light"
-                    style="height: 2px; z-index: 2;"
-                ></div>
-
-                <div
-                    class="position-absolute bottom-0 start-0 text-white small p-1"
-                    style="z-index: 3;"
-                >
-                    {$i18n['east']} (−90°+)
-                </div>
-
-                <div
-                    class="position-absolute bottom-0 start-50 translate-middle-x text-white small p-1"
-                    style="z-index: 3;"
-                >
-                    {$i18n['south']} (0°)
-                </div>
-
-                <div
-                    class="position-absolute bottom-0 end-0 text-white small p-1"
-                    style="z-index: 3;"
-                >
-                    {$i18n['west']} (+90°+)
-                </div>
-
-                <div
-                    id="skyObjects"
-                    class="position-absolute top-0 start-0 w-100 h-100"
-                    style="z-index: 1;"
-                ></div>
+            <div class="sky-container position-relative border rounded bg-dark overflow-hidden user-select-none" style="height: 320px;">
+                <div class="position-absolute bottom-0 start-0 end-0 border-top border-light" style="height: 2px;"></div>
+                <div class="position-absolute bottom-0 start-0 text-white small p-1">{$i18n['east']} (−90°+)</div>
+                <div class="position-absolute bottom-0 start-50 translate-middle-x text-white small p-1">{$i18n['south']} (0°)</div>
+                <div class="position-absolute bottom-0 end-0 text-white small p-1">{$i18n['west']} (+90°+)</div>
+                <div id="skyObjects" class="position-absolute top-0 start-0 w-100 h-100"></div>
             </div>
             <p class="text-muted small mt-2 mb-0">
                 {$i18n['azimuthDescription']}
@@ -155,17 +109,12 @@
 
     {* ---- Détails des planètes à l’œil nu ---- *}
     <div class="card mb-4">
-
         <div class="card-header">
             <h5 class="mb-0">{$i18n['nakedEye']}</h5>
         </div>
-
         <div class="card-body">
             <div class="table-responsive">
-                <table
-                    class="table table-sm table-hover"
-                    id="planetDetailsTable"
-                >
+                <table class="table table-sm table-hover" id="planetDetailsTable">
                     <thead>
                         <tr>
                             <th>{$i18n['planet']}</th>
@@ -188,7 +137,8 @@
     window.astroConfig = {
         latitude: {$latitude},
         longitude: {$longitude},
-        locationName: {$locationName|json},
+        locationName: {$locationName},
+        currentDate: {$currentDate},
         i18n: {=$i18n}
     };
 </script>

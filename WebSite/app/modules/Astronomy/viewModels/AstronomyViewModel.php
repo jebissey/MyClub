@@ -18,6 +18,7 @@ final readonly class AstronomyViewModel extends LayoutViewModel
         public readonly float $longitude,
         public readonly string $locationName,
         public readonly ?bool $locationSaved,
+        public readonly string $currentDate,
         public readonly array $navItems,
         public readonly array $i18n,
         public readonly array $layoutParams,

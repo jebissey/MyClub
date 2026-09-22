@@ -31,6 +31,9 @@ class AstronomyController extends AbstractController
         $saved = filter_input(INPUT_GET, 'saved', FILTER_VALIDATE_INT);
         $locationSaved = $saved === false || $saved === null ? null : ($saved === 1);
 
+        $dateParam = filter_input(INPUT_GET, 'date', FILTER_UNSAFE_RAW);
+        $currentDate = $this->parseDateOrToday(is_string($dateParam) ? $dateParam : null);
+
         $location = $this->getLocationFromCookieOrDefault();
         $i18n = [
             'title' => ($this->t)('astronomy.title'),
@@ -92,6 +95,7 @@ class AstronomyController extends AbstractController
             longitude: $location['lng'],
             locationName: $location['name'],
             locationSaved: $locationSaved,
+            currentDate: $currentDate->format('Y-m-d'),
             navItems: $this->getNavItems($this->application->getConnectedUser()->person),
             i18n: $i18n,
             layoutParams: $this->getAllParams([
@@ -101,6 +105,17 @@ class AstronomyController extends AbstractController
         );
 
         $this->render('Astronomy/views/astronomy.latte', $viewModel->toArray());
+    }
+
+    private function parseDateOrToday(?string $date): \DateTimeImmutable
+    {
+        if ($date !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) === 1) {
+            $parsed = \DateTimeImmutable::createFromFormat('Y-m-d', $date);
+            if ($parsed !== false) {
+                return $parsed->setTime(0, 0);
+            }
+        }
+        return new \DateTimeImmutable('today');
     }
 
     public function saveLocation(): void

@@ -4,13 +4,13 @@
  */
 
 const BODIES = [
-    { name: 'Sun',     label: 'Soleil',   color: '#ffdd44', size: 18, nakedEye: true },
-    { name: 'Moon',    label: 'Lune',     color: '#e0e0e0', size: 14, nakedEye: true },
-    { name: 'Mercury', label: 'Mercure',  color: '#b0b0b0', size: 8,  nakedEye: true },
-    { name: 'Venus',   label: 'Vénus',    color: '#f5e6c8', size: 10, nakedEye: true },
-    { name: 'Mars',    label: 'Mars',     color: '#ff6b4a', size: 9,  nakedEye: true },
-    { name: 'Jupiter', label: 'Jupiter',  color: '#e8c48a', size: 12, nakedEye: true },
-    { name: 'Saturn',  label: 'Saturne',  color: '#f0d090', size: 11, nakedEye: true },
+    { name: 'Sun', label: 'Soleil', color: '#ffdd44', size: 18, nakedEye: true },
+    { name: 'Moon', label: 'Lune', color: '#e0e0e0', size: 14, nakedEye: true },
+    { name: 'Mercury', label: 'Mercure', color: '#b0b0b0', size: 8, nakedEye: true },
+    { name: 'Venus', label: 'Vénus', color: '#f5e6c8', size: 10, nakedEye: true },
+    { name: 'Mars', label: 'Mars', color: '#ff6b4a', size: 9, nakedEye: true },
+    { name: 'Jupiter', label: 'Jupiter', color: '#e8c48a', size: 12, nakedEye: true },
+    { name: 'Saturn', label: 'Saturne', color: '#f0d090', size: 11, nakedEye: true },
 ];
 
 const AZIMUTH_LIMIT = 120; // degrés depuis le Sud, au-delà de ±90° pour l'été
@@ -22,7 +22,17 @@ class AstronomyManager {
             config.longitude ?? 2.3522,
             0
         );
-        this.currentDate = new Date();
+        this.currentDate = this.parseDate(config.currentDate);
+    }
+
+    parseDate(value) {
+        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            const parsed = new Date(value + 'T00:00:00');
+            if (!isNaN(parsed.getTime())) {
+                return parsed;
+            }
+        }
+        return new Date();
     }
 
     init() {
@@ -30,8 +40,32 @@ class AstronomyManager {
             this.currentDate.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
         this.setupLocationForm();
+        this.setupDatePicker();
         this.setupTimeSlider();
         this.refreshAll();
+    }
+
+    // ── Sélecteur de date ────────────────────────────────────────────────
+
+    setupDatePicker() {
+        const label = document.getElementById('currentDateLabel');
+        const picker = document.getElementById('datePicker');
+
+        label.addEventListener('click', () => {
+            if (typeof picker.showPicker === 'function') {
+                picker.showPicker();
+            } else {
+                picker.click();
+            }
+        });
+
+        picker.addEventListener('change', () => {
+            if (!picker.value) return;
+            const url = new URL(window.location.href);
+            url.searchParams.set('date', picker.value);
+            url.searchParams.delete('saved');
+            window.location.href = url.toString();
+        });
     }
 
     // ── Localisation ─────────────────────────────────────────────────────
@@ -146,7 +180,7 @@ class AstronomyManager {
 
         for (const body of BODIES) {
             const rise = this.searchRiseSet(body.name, +1);
-            const set  = this.searchRiseSet(body.name, -1);
+            const set = this.searchRiseSet(body.name, -1);
 
             const now = new Date();
             const hor = this.getHorizontal(body.name, now);
@@ -188,7 +222,7 @@ class AstronomyManager {
 
         for (const body of BODIES) {
             const hor = this.getHorizontal(body.name, date);
-            const az  = this.toSouthAzimuth(hor.azimuth);
+            const az = this.toSouthAzimuth(hor.azimuth);
             const alt = hor.altitude;
 
             if (alt < -5) continue;
@@ -208,8 +242,6 @@ class AstronomyManager {
                 box-shadow: 0 0 8px ${body.color};
                 font-size: 9px;
                 color: #111;
-                z-index: 5;
-                cursor: default;
             `;
             el.title = `${body.label}\nAlt: ${alt.toFixed(1)}°\nAz (Sud): ${az.toFixed(1)}°`;
             el.textContent = body.label[0];
@@ -229,7 +261,7 @@ class AstronomyManager {
             if (!body.nakedEye) continue;
 
             const hor = this.getHorizontal(body.name, date);
-            const az  = this.toSouthAzimuth(hor.azimuth);
+            const az = this.toSouthAzimuth(hor.azimuth);
 
             let mag = '—';
             let illum = '—';
