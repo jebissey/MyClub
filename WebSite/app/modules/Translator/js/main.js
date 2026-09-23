@@ -138,7 +138,9 @@ class TranslatorController {
                         const textarea = cell.querySelector('.translation-field');
                         const preview = cell.querySelector('[data-content="preview"]');
                         if (textarea && preview) {
-                            preview.innerHTML = textarea.value;
+                            preview.innerHTML = DOMPurify.sanitize(textarea.value, {
+                                USE_PROFILES: { html: true }
+                            });
                         }
                     }
                 });
