@@ -31,8 +31,8 @@ jobs:
         working-directory: WebSite
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      # phpcs.xml (à la racine de WebSite) définit déjà le chemin (app),
-      # les exclusions et la règle PSR12 — on lance donc la même commande qu'en local.
+      # phpcs.xml (at the root of WebSite) already defines the path (app),
+      # the exclusions and the PSR12 rule — so we just run the same command as locally.
       - name: Check coding style (phpcs, PSR-12)
         working-directory: WebSite
         run: vendor/bin/phpcs
@@ -92,6 +92,10 @@ jobs:
         working-directory: WebSite
         run: composer install --no-interaction --no-progress --prefer-dist
 
+      - name: Check for missing unit tests
+        working-directory: WebSite
+        run: php ../test/CheckMissingTests.php
+
       - name: Run PHPUnit
         working-directory: WebSite
         run: vendor/bin/phpunit
@@ -122,25 +126,25 @@ jobs:
         working-directory: WebSite
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      # En CI il n'y a pas d'utilisateur www-data ni de sudo pertinent :
-      # on prépare juste les dossiers nécessaires au serveur de dev.
+      # There is no www-data user or relevant sudo in CI:
+      # we just prepare the folders needed by the dev server.
       - name: Prepare WebSite runtime folders
         working-directory: WebSite
         run: |
           mkdir -p data var/latte/temp var/tracy/log backup
           chmod -R 775 data var backup
 
-      # Démarre le serveur PHP intégré en arrière-plan, comme dev-server.sh,
-      # mais sans les étapes chown/sudo qui n'ont pas de sens en CI.
+      # Starts the built-in PHP server in the background, like dev-server.sh,
+      # but without the chown/sudo steps that don't make sense in CI.
       - name: Start dev server
         working-directory: WebSite
         run: |
           nohup php -S localhost:8000 ../dev/router.php > ../server.log 2>&1 &
           echo $! > ../server.pid
 
-      # Cette requête sert aussi à déclencher Database::check(), qui copie
-      # automatiquement data/MyClub.sqlite depuis le template s'il n'existe pas
-      # encore — nécessaire avant que FlightRouteTester.php ne tente de le sauvegarder.
+      # This request also triggers Database::check(), which automatically
+      # copies data/MyClub.sqlite from the template if it doesn't exist
+      # yet — required before FlightRouteTester.php tries to back it up.
       - name: Wait for server to be ready
         run: |
           for i in $(seq 1 20); do
