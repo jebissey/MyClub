@@ -16,22 +16,33 @@ class FlightRouteExtractor implements RouteExtractorInterface
     private const REGEX_ICONS_ROUTE = '/(\/[A-Za-z0-9\-]+\.[A-Za-z]{3})\'\s*=>/s';
     private const REGEX_ROUTE_PARAM = '/@\w+(?::[^\s\/]+)?/';
     private const REGEX_NEW_ROUTE = '/new\s+Route\(\s*[\'"]([^\'"]+)[\'"]/';
+    private const REGEX_STATIC_ARRAY_ROUTE = '/[\'"](\/[^\'"\s]+)[\'"]\s*=>\s*\[\s*[\'"]dir[\'"]/';
+    private const EXCLUDED_PATHS = [
+        '/.well-known/appspecific/com.chrome.devtools.json',
+    ];
     private array $routes = [];
 
     public function extractRoutes(string $filePath, string $directoryPath): array
     {
         if (!file_exists($filePath)) throw new InvalidArgumentException("File $filePath doesn't exist");
 
-        $content = file_get_contents($filePath);        
+        $content = file_get_contents($filePath);
         $this->lookingForRoutes($content, self::REGEX_MAP_ROUTE);
         $this->lookingForRoutes($content, self::REGEX_DIRECT_ROUTE);
         $this->lookingForRoutes($content, self::REGEX_ICONS_ROUTE);
+        $this->lookingForRoutes($content, self::REGEX_STATIC_ARRAY_ROUTE);
 
         $files = array_filter(scandir($directoryPath), fn($file) => pathinfo($file, PATHINFO_EXTENSION) === 'php');
         foreach ($files as $file) {
             $filePath = $directoryPath . DIRECTORY_SEPARATOR . $file;
             $this->lookingForRoutes(file_get_contents($filePath), self::REGEX_NEW_ROUTE);
         }
+
+        $this->routes = array_values(array_filter(
+            $this->routes,
+            fn(Route $r) => !in_array($r->originalPath, self::EXCLUDED_PATHS, true)
+        ));
+
         usort($this->routes, fn(Route $a, Route $b) => strcmp($a->originalPath, $b->originalPath));
         return $this->routes;
     }

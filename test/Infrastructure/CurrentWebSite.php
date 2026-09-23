@@ -20,14 +20,16 @@ class CurrentWebSite
 
     static public function restore(string $dbWebSitePath): bool
     {
-        CurrentWebSite::copyTest($dbWebSitePath);
+        if (file_exists($dbWebSitePath)) {
+            CurrentWebSite::copyTest($dbWebSitePath);
+        }
         $filename = basename($dbWebSitePath);
         $backupPath = __DIR__ . '/../Database/' . $filename;
         if (!file_exists($backupPath)) return false;
         return copy($backupPath, $dbWebSitePath);
     }
 
-    static private function copyTest(string $dbWebSitePath) :bool
+    static private function copyTest(string $dbWebSitePath): bool
     {
         $destination = __DIR__ . '/../Database/lastMyClubTest.sqlite';
         return copy($dbWebSitePath, $destination);

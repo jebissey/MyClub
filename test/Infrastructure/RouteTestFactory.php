@@ -58,6 +58,7 @@ class RouteTestFactory
                 $config
             ),
             $reporter,
+            $dbTestsPath
         );
     }
 }

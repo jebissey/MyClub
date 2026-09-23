@@ -7,6 +7,8 @@ namespace test\Infrastructure;
 use Throwable;
 
 use test\Core\StopRequestedException;
+use test\Core\TestCoverageChecker;
+use test\Core\TestCoverageException;
 use test\Core\TestExecutor;
 use test\Core\ValueObjects\TestResult;
 use test\Core\ValueObjects\TestSummary;
@@ -23,6 +25,7 @@ class RouteTestOrchestrator
         private SimulationExtractor $simulationExtractor,
         private TestExecutor $executor,
         private TestReporterInterface $reporter,
+        private ?string $dbTestsPath = null,
     ) {}
 
     public function runTests(string $routeFilePath, string $routeDirectoryPath, ?int $test, ?int $simu, ?int $start, bool $stop): array
@@ -35,6 +38,11 @@ class RouteTestOrchestrator
                 $totalRoutes = count($routes);
                 echo "Found {$totalRoutes} routes.\n";
                 echo str_repeat('-', 80) . "\n";
+
+                if ($this->dbTestsPath !== null) {
+                    TestCoverageChecker::check($routes, $this->dbTestsPath);
+                }
+
                 $results = $this->executor->testRoutes($routes, $test, $stop);
             }
             if ($test === null) {
@@ -50,6 +58,8 @@ class RouteTestOrchestrator
             }
         } catch (StopRequestedException $e) {
             echo "⚠️ Execution stopped\n";
+        } catch (TestCoverageException $e) {
+            throw $e;
         } catch (Throwable $e) {
             echo "❌ Unexpected error: " . $e->getMessage() . ' in ' . $e->getFile() . ' at ' . $e->getLine() . "\n";
         }
