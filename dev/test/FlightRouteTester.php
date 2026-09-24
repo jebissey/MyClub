@@ -38,11 +38,11 @@ function main(): int
     $start = optInt($options, 'start');
     $exportJson = isset($options['export-json']);
     $exportCsv  = isset($options['export-csv']);
-    $routeFile  = $options['routes-file'] ?? __DIR__ . '/../WebSite/app/config/Routes.php';
-    $routeDirectoryFiles = __DIR__ . '/../WebSite/app/config/routes';
+    $routeFile  = $options['routes-file'] ?? MYCLUB_WEBSITE_DIR . '/app/config/Routes.php';
+    $routeDirectoryFiles = MYCLUB_WEBSITE_DIR . '/app/config/routes';
     $dbTestsPath     = $options['db-path'] ?? __DIR__ . '/Database/tests.sqlite';
-    $dbMyClubPath    =  __DIR__ . '/../WebSite/data/MyClub.sqlite';
-    $dbWebSitePath   = $options['db-path'] ?? __DIR__ . '/../WebSite/data/MyClub.sqlite';
+    $dbMyClubPath    = MYCLUB_DB_PATH;
+    $dbWebSitePath   = $options['db-path'] ?? MYCLUB_DB_PATH;
     if (!CurrentWebSite::backup($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't exist");
     if (!CurrentWebSite::remove($dbWebSitePath)) throw new InvalidArgumentException("File $dbWebSitePath doesn't removed");
     $stop = isset($options['stop']) ? true : false;

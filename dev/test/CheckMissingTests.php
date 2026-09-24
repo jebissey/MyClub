@@ -11,9 +11,9 @@ function main(): int
 {
     require_once __DIR__ . '/../WebSite/vendor/autoload.php';
 
-    $projectRoot = realpath(__DIR__ . '/..');
-    $appDir = realpath(__DIR__ . '/../WebSite/app');
-    $testsDir = realpath(__DIR__ . '/../WebSite/tests');
+    $projectRoot = MYCLUB_ROOT;
+    $appDir = realpath(MYCLUB_WEBSITE_DIR . '/app');
+    $testsDir = realpath(MYCLUB_WEBSITE_DIR . '/tests');
     if ($projectRoot === false || $appDir === false || $testsDir === false) {
         fwrite(STDERR, "Répertoire app/ ou tests/ introuvable.\n");
         return 1;

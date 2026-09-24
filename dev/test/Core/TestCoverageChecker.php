@@ -112,14 +112,14 @@ final class TestCoverageChecker
         }
     }
 
-    /** @return string[] emails des comptes de base (un par autorisation) */
+    /** @return string[] emails des comptes de base (un par autorisation, + le compte sans droit) */
     private static function deriveRequiredContexts(PDO $pdo): array
     {
         $contexts = [];
 
         $stmt = $pdo->query(
             "SELECT \"JsonPostParameters\" FROM \"Test\"
-             WHERE \"Step\" BETWEEN 1000 AND 1900 AND \"Uri\" LIKE '/person/edit/%'"
+         WHERE \"Step\" BETWEEN 1000 AND 1900 AND \"Uri\" LIKE '/person/edit/%'"
         );
         foreach ($stmt as $row) {
             $params = json_decode($row['JsonPostParameters'] ?? '', true) ?? [];
@@ -130,14 +130,22 @@ final class TestCoverageChecker
 
         $webmaster = $pdo->query(
             "SELECT \"JsonPostParameters\" FROM \"Test\"
-             WHERE \"Uri\" = '/user/sign/in' AND \"ExpectedResponseCode\" = '200'
-             ORDER BY \"Step\" LIMIT 1"
+         WHERE \"Uri\" = '/user/sign/in' AND \"ExpectedResponseCode\" = '200'
+         ORDER BY \"Step\" LIMIT 1"
         )->fetch(PDO::FETCH_ASSOC);
         if ($webmaster) {
             $params = json_decode($webmaster['JsonPostParameters'], true) ?? [];
             if (isset($params['email'])) {
                 $contexts[$params['email']] = true;
             }
+        }
+
+        // Membre sans autorisation : compte de référence pour vérifier le comportement
+        // "connecté mais sans droit" sur toutes les routes.
+        if ($pdo->query(
+            "SELECT 1 FROM \"Test\" WHERE \"JsonConnectedUser\" LIKE '%\"email\":\"user@myclub.foo\"%' LIMIT 1"
+        )->fetchColumn()) {
+            $contexts['user@myclub.foo'] = true;
         }
 
         return array_keys($contexts);

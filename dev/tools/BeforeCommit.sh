@@ -2,7 +2,7 @@
 
 set -e
 
-cd "$(dirname "$0")/../WebSite"
+cd "$(dirname "$0")/../../WebSite"
 
 print_step() {
   echo >&2

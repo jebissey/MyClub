@@ -6,8 +6,8 @@ WebSite/data/*
 !WebSite/data/statics/html/businessCard.html
 WebSite/backup/*
 doc/*.pdf
-test/Database/MyClub.sqlite
-test/Database/lastMyClubTest.sqlite
+dev/test/Database/MyClub.sqlite
+dev/test/Database/lastMyClubTest.sqlite
 dev/FullInstall.zip
 dev/depends.txt
 WebSite/.phpunit.cache/
