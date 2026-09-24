@@ -166,7 +166,7 @@ jobs:
 
       - name: Run FlightRouteTester
         run: |
-          php test/FlightRouteTester.php \
+          php dev/test/FlightRouteTester.php \
             --base-url=http://localhost:8000 \
             --stop \
             --export-json \
