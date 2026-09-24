@@ -31,11 +31,9 @@ jobs:
         working-directory: WebSite
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      # phpcs.xml (at the root of WebSite) already defines the path (app),
-      # the exclusions and the PSR12 rule — so we just run the same command as locally.
       - name: Check coding style (phpcs, PSR-12)
         working-directory: WebSite
-        run: vendor/bin/phpcs
+        run: vendor/bin/phpcs --standard=../dev/phpcs.xml
 
   phpstan:
     name: Analyse statique (PHPStan niveau 9)
@@ -64,7 +62,7 @@ jobs:
 
       - name: Run PHPStan
         working-directory: WebSite
-        run: vendor/bin/phpstan analyse --memory-limit=1G
+        run: vendor/bin/phpstan analyse -c ../dev/phpstan.neon --memory-limit=1G
 
   tests:
     name: Tests unitaires / métier
@@ -94,11 +92,11 @@ jobs:
 
       - name: Check for missing unit tests
         working-directory: WebSite
-        run: php ../test/CheckMissingTests.php
+        run: php ../dev/test/CheckMissingTests.php
 
       - name: Run PHPUnit
         working-directory: WebSite
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit -c ../dev/phpunit.xml
 
   route-tests:
     name: FlightRouteTester
