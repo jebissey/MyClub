@@ -9,11 +9,11 @@ use app\models\Data;
 
 function main(): int
 {
-    require_once __DIR__ . '/../WebSite/vendor/autoload.php';
+    require_once MYCLUB_WEBSITE_DIR . '/vendor/autoload.php';
 
     $projectRoot = MYCLUB_ROOT;
     $appDir = realpath(MYCLUB_WEBSITE_DIR . '/app');
-    $testsDir = realpath(MYCLUB_WEBSITE_DIR . '/tests');
+    $testsDir = realpath(MYCLUB_ROOT . '/dev/tests');
     if ($projectRoot === false || $appDir === false || $testsDir === false) {
         fwrite(STDERR, "Répertoire app/ ou tests/ introuvable.\n");
         return 1;

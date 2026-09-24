@@ -11,8 +11,8 @@ use ReflectionException;
 
 abstract class DataHelperTestCase extends TestCase
 {
-    protected const DB_PATH = __DIR__ . '/../../app/models/database/MyClub.sqlite';
-    protected const LOG_DB_PATH = __DIR__ . '/../../app/models/database/LogMyClub.sqlite';
+    protected const DB_PATH = __DIR__ . '/../../../WebSite/app/models/database/MyClub.sqlite';
+    protected const LOG_DB_PATH = __DIR__ . '/../../../WebSite/app/models/database/LogMyClub.sqlite';
 
     /** @var list<string> */
     protected array $tmpDbPaths = [];
