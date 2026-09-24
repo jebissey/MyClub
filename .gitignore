@@ -10,4 +10,4 @@ dev/test/Database/MyClub.sqlite
 dev/test/Database/lastMyClubTest.sqlite
 dev/FullInstall.zip
 dev/depends.txt
-WebSite/.phpunit.cache/
+dev/.phpunit.cache/
