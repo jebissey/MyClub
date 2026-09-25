@@ -12,41 +12,12 @@ use app\modules\Webmaster\viewModels\MaintenanceViewModel;
 
 final class MaintenanceController extends AbstractController
 {
-    private const MAINTENANCE_UNSET = '/maintenance/unset';
 
     public function __construct(
         Application $application,
         protected ErrorManager $errorManager
     ) {
         parent::__construct($application);
-    }
-
-    public function checkIfSiteIsUnderMaintenance(): void
-    {
-        error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
-
-        if (is_string($requestUri) && strpos($requestUri, self::MAINTENANCE_UNSET) !== false) {
-            return;
-        }
-
-        $siteUnderMaintenance = $this->dataHelper->get('Metadata', ['Id' => 1], 'SiteUnderMaintenance');
-        if ($siteUnderMaintenance === false) {
-            return;
-        }
-
-        /** @var object{SiteUnderMaintenance: int} $siteUnderMaintenance */
-        if ($siteUnderMaintenance->SiteUnderMaintenance == 0) {
-            return;
-        }
-
-        $this->errorManager->raise(
-            ApplicationError::ServiceUnavailable,
-            "Maintenance",
-            30000,
-            false,
-            $this->application->getConnectedUser()->isWebmaster()
-        );
     }
 
     public function maintenance(): void

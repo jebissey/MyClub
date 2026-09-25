@@ -24,8 +24,9 @@ use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\helpers\LogMessage;
 use app\helpers\WebApp;
+use app\models\DataHelper;
 use app\models\LogWriterDataHelper;
-use app\modules\Webmaster\MaintenanceController;
+use app\modules\Webmaster\services\MaintenanceService;
 
 $startTime = microtime(true);
 
@@ -45,11 +46,24 @@ $flight->map('pass', function ($str) {
 
 $connectedUser = $application->getConnectedUser();
 $errorManager = new ErrorManager($application);
-$maintenanceController = new MaintenanceController($application, $errorManager);
-$flight->before('start', function () use ($maintenanceController, $connectedUser) {
+$dataHelper = new DataHelper(
+    $application->getPdo(),
+    $application->getErrorManager(),
+    $application->getPdoForLog()
+);
+$maintenanceService = new MaintenanceService($dataHelper);
+$flight->before('start', function () use ($maintenanceService, $connectedUser, $errorManager) {
     if (!isset($_SESSION['token'])) $_SESSION['token'] = bin2hex(random_bytes(32));
-    $connectedUser->get();
-    $maintenanceController->checkIfSiteIsUnderMaintenance();
+    $connectedUser->get();    
+    if ($maintenanceService->checkIfSiteIsUnderMaintenance()) {
+        $errorManager->raise(
+            ApplicationError::ServiceUnavailable,
+            'Maintenance',
+            30000,
+            false,
+            $connectedUser->isWebmaster()
+        );
+    }
 });
 
 $webapp = new WebApp();
@@ -90,7 +104,7 @@ $flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $error
     );
 });
 
-$flight->after('start', function () use ($logWriterDataHelper, $flight, $startTime) {
+$flight->after('start', function () use ($logWriterDataHelper, $startTime) {
     if (Flight::get('_error_already_logged')) return;
 
     $duration = round((microtime(true) - $startTime) * 1000, 2);
