@@ -6,7 +6,7 @@ namespace app\helpers;
 
 use app\exceptions\FileException;
 
-class File
+final class File
 {
     public static function sanitizeFilename(string $filename): string
     {

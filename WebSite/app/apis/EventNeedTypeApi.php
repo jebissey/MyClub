@@ -15,7 +15,7 @@ use app\models\NeedTypeDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
 
-class EventNeedTypeApi extends AbstractApi
+final class EventNeedTypeApi extends AbstractApi
 {
     public function __construct(
         Application $application,

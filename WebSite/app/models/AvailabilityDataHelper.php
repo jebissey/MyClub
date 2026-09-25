@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use DateTimeImmutable;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
 

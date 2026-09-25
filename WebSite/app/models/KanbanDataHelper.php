@@ -9,7 +9,7 @@ use Throwable;
 use app\enums\KanbanStatusChange;
 use app\helpers\Application;
 
-class KanbanDataHelper extends Data
+final class KanbanDataHelper extends Data
 {
     public function __construct(Application $application)
     {

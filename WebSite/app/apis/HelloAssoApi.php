@@ -13,7 +13,7 @@ use app\models\MembershipDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\HelloAsso\services\HelloAssoService;
 
-class HelloAssoApi extends AbstractApi
+final class HelloAssoApi extends AbstractApi
 {
     public function __construct(
         Application $application,

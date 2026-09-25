@@ -6,7 +6,7 @@ namespace app\models;
 
 use app\helpers\Application;
 
-class OrderReplyDataHelper extends Data
+final class OrderReplyDataHelper extends Data
 {
     public function __construct(Application $application)
     {

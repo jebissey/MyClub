@@ -8,7 +8,7 @@ use Envms\FluentPDO\Queries\Select;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 
-class ExerciseTableDataHelper extends Data
+final class ExerciseTableDataHelper extends Data
 {
     public function __construct(Application $application)
     {

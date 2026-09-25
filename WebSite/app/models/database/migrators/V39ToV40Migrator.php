@@ -7,7 +7,7 @@ namespace app\models\database\migrators;
 use PDO;
 use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
-class V39ToV40Migrator implements DatabaseMigratorInterface
+final class V39ToV40Migrator implements DatabaseMigratorInterface
 {
     public function upgrade(PDO $pdo, int $currentVersion): int
     {

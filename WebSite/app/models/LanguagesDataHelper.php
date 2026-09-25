@@ -10,7 +10,7 @@ use app\helpers\Application;
 use app\helpers\ErrorManager;
 use app\helpers\TranslationManager;
 
-class LanguagesDataHelper extends Data
+final class LanguagesDataHelper extends Data
 {
     /** @var array<int, string> */
     private array $allowedLanguages = [];

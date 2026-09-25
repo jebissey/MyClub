@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-use stdClass;
 use app\helpers\Application;
-use app\modules\Event\valueObjects\EventParticipant;
 
 /**
  * @phpstan-type EventParticipantRow object{
@@ -20,7 +18,7 @@ use app\modules\Event\valueObjects\EventParticipant;
  *     ContactId: int|null
  * }
  */
-class ParticipantDataHelper extends Data
+final class ParticipantDataHelper extends Data
 {
     public function __construct(Application $application)
     {

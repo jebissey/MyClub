@@ -7,7 +7,7 @@ namespace app\helpers;
 use DateTime;
 use DateTimeZone;
 
-class MyClubDateTime
+final class MyClubDateTime
 {
     private const DISPLAY_TIMEZONE = 'Europe/Paris';
 

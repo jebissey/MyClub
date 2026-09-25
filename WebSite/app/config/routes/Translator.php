@@ -8,7 +8,7 @@ use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-class Translator implements RouteInterface
+final class Translator implements RouteInterface
 {
     /**
      * @var array<int, Route>

@@ -13,7 +13,7 @@ use app\helpers\WebApp;
 use app\models\AttributeDataHelper;
 use app\models\PersonDataHelper;
 
-class EventAttributeApi extends AbstractApi
+final class EventAttributeApi extends AbstractApi
 {
     public function __construct(
         Application $application,

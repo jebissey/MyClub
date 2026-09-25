@@ -8,7 +8,7 @@ use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-class CommunicationApi implements RouteInterface
+final class CommunicationApi implements RouteInterface
 {
     /**
      * @var array<int, Route>

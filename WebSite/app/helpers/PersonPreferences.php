@@ -9,7 +9,7 @@ use app\enums\TimeOfDay;
 use app\models\DataHelper;
 use app\modules\Common\valueObjects\Person;
 
-class PersonPreferences
+final class PersonPreferences
 {
     public function __construct(private DataHelper $dataHelper)
     {

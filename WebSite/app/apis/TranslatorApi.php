@@ -15,7 +15,7 @@ use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\models\LanguagesDataHelper;
 
-class TranslatorApi extends AbstractApi
+final class TranslatorApi extends AbstractApi
 {
     public function __construct(
         Application $application,

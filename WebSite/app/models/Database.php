@@ -14,7 +14,7 @@ use app\helpers\File;
 use app\helpers\LogMessage;
 use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
-class Database
+final class Database
 {
     private const SQLITE_DEST_PATH = __DIR__ . '/../../data/';
     private const SQLITE_FILE = 'MyClub.sqlite';

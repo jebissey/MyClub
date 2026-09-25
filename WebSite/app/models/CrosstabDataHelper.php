@@ -18,7 +18,7 @@ use app\helpers\To;
  *     rows: array<string, array<string, CrosstabCell>>
  * }
  */
-class CrosstabDataHelper extends Data
+final class CrosstabDataHelper extends Data
 {
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {

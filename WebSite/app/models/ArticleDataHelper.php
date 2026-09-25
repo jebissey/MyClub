@@ -18,7 +18,7 @@ use app\modules\Common\interfaces\NewsProviderInterface;
 /**
  * @phpstan-import-type ArticleRowShape from ArticleRow
  */
-class ArticleDataHelper extends Data implements NewsProviderInterface
+final class ArticleDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(
         Application $application,

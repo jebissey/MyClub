@@ -9,7 +9,7 @@ use PDO;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 
-class LogStatisticsDataHelper extends Data
+final class LogStatisticsDataHelper extends Data
 {
     public function __construct(Application $application)
     {

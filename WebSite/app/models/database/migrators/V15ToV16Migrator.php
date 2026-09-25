@@ -9,7 +9,7 @@ use app\helpers\Application;
 use app\models\LanguagesDataHelper;
 use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
-class V15ToV16Migrator implements DatabaseMigratorInterface
+final class V15ToV16Migrator implements DatabaseMigratorInterface
 {
     public function upgrade(PDO $pdo, int $currentVersion): int
     {

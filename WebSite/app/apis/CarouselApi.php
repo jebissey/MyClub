@@ -16,7 +16,7 @@ use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\PersonDataHelper;
 
-class CarouselApi extends AbstractApi
+final class CarouselApi extends AbstractApi
 {
     public function __construct(
         Application $application,

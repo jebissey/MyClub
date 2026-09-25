@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
-class Password
+final class Password
 {
     private const SECRET_KEY = "MyClubSecretKeyForPasswordSignature";
     private const ALGO = 'sha256';

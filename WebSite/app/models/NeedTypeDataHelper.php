@@ -7,7 +7,7 @@ namespace app\models;
 use RuntimeException;
 use app\helpers\Application;
 
-class NeedTypeDataHelper extends Data
+final class NeedTypeDataHelper extends Data
 {
     public function __construct(Application $application)
     {

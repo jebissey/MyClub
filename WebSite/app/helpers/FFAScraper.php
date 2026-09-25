@@ -11,7 +11,7 @@ use DOMNameSpaceNode;
 use DOMNode;
 use DOMXPath;
 
-class FFAScraper
+final class FFAScraper
 {
     private string $baseUrl = 'https://bases.athle.fr/asp.net/liste.aspx';
     private Client $client;

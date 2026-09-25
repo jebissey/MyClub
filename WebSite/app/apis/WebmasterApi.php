@@ -15,7 +15,7 @@ use app\models\LogWriterDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\CredentialService;
 
-class WebmasterApi extends AbstractApi
+final class WebmasterApi extends AbstractApi
 {
     private const SERVICE = 'vapid';
 

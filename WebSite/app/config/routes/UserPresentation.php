@@ -8,7 +8,7 @@ use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-class UserPresentation implements RouteInterface
+final class UserPresentation implements RouteInterface
 {
     /**
      * @var array<int, Route>

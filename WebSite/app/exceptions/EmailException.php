@@ -8,7 +8,7 @@ use Exception;
 use Throwable;
 use app\enums\ApplicationError;
 
-class EmailException extends Exception
+final class EmailException extends Exception
 {
     public function __construct(
         string $message = 'Email error',

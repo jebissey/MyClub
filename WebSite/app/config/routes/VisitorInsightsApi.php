@@ -8,7 +8,7 @@ use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-class VisitorInsightsApi implements RouteInterface
+final class VisitorInsightsApi implements RouteInterface
 {
     /**
      * @var array<int, Route>

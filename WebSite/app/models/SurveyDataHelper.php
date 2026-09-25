@@ -13,7 +13,7 @@ use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Article\valueObjects\ReplyRow;
 use app\modules\Article\valueObjects\SurveyWithCreatorRow;
 
-class SurveyDataHelper extends Data implements NewsProviderInterface
+final class SurveyDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {

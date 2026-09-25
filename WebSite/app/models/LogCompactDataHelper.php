@@ -11,7 +11,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\To;
 
-class LogCompactDataHelper extends Data
+final class LogCompactDataHelper extends Data
 {
     public function __construct(private Application $application)
     {

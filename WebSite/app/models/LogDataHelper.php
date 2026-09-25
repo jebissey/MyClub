@@ -14,7 +14,7 @@ use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 use app\helpers\To;
 
-class LogDataHelper extends Data
+final class LogDataHelper extends Data
 {
     public function __construct(Application $application, private DataHelper $dataHelper)
     {

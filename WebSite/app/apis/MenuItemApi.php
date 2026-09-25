@@ -14,7 +14,7 @@ use app\models\Data;
 use app\models\MenuItemDataHelper;
 use app\models\PersonDataHelper;
 
-class MenuItemApi extends AbstractApi
+final class MenuItemApi extends AbstractApi
 {
     public function __construct(
         Application $application,

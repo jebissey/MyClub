@@ -40,7 +40,7 @@ use function imagepng;
 use function imagewebp;
 use function imagegif;
 
-class MessageApi extends AbstractApi
+final class MessageApi extends AbstractApi
 {
     private const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     private const MAX_BYTES    = 1 * 1024 * 1024;

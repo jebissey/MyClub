@@ -6,7 +6,7 @@ namespace app\helpers;
 
 use InvalidArgumentException;
 
-class Params
+final class Params
 {
     /**
      * @var array<string, mixed>

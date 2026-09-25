@@ -7,7 +7,7 @@ namespace app\models;
 use PDO;
 use app\helpers\Application;
 
-class SharedFileDataHelper extends Data
+final class SharedFileDataHelper extends Data
 {
     public function __construct(Application $application)
     {

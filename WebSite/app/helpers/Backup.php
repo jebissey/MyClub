@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
-class Backup
+final class Backup
 {
     private const SQLITE_PATH = __DIR__ . '/../../data/';
     private const SQLITE_FILE = 'MyClub.sqlite';

@@ -8,7 +8,7 @@ use PDO;
 use app\helpers\TranslationManager;
 use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
-class V24ToV25Migrator implements DatabaseMigratorInterface
+final class V24ToV25Migrator implements DatabaseMigratorInterface
 {
     public function upgrade(PDO $pdo, int $currentVersion): int
     {

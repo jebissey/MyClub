@@ -13,7 +13,7 @@ use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Notifications\valueObjects\PushSubscriptionRow;
 
-class NotificationApi extends AbstractApi
+final class NotificationApi extends AbstractApi
 {
     public function __construct(
         Application $application,

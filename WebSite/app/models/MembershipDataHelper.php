@@ -8,7 +8,7 @@ use stdClass;
 use app\helpers\Application;
 use app\helpers\To;
 
-class MembershipDataHelper extends Data
+final class MembershipDataHelper extends Data
 {
     public function __construct(Application $application)
     {

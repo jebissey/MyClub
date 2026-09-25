@@ -8,7 +8,7 @@ use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-class EventNeedTypeApi implements RouteInterface
+final class EventNeedTypeApi implements RouteInterface
 {
     /**
      * @var array<int, Route>

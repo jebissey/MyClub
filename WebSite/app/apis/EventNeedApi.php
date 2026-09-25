@@ -13,7 +13,7 @@ use app\models\EventNeedDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
 
-class EventNeedApi extends AbstractApi
+final class EventNeedApi extends AbstractApi
 {
     public function __construct(
         Application $application,

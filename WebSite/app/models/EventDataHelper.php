@@ -38,7 +38,7 @@ use app\modules\Common\valueObjects\Person;
  *     days: array<int, list<EventArrayShape>>
  * }
  */
-class EventDataHelper extends Data implements NewsProviderInterface
+final class EventDataHelper extends Data implements NewsProviderInterface
 {
     private PersonPreferences $personPreferences;
 

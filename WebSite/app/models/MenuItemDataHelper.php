@@ -12,7 +12,7 @@ use app\modules\Common\valueObjects\MaxPositionRow;
 use app\modules\Common\valueObjects\MenuItemAuthorizationRow;
 use app\modules\Common\valueObjects\Person;
 
-class MenuItemDataHelper extends Data
+final class MenuItemDataHelper extends Data
 {
     public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
     {

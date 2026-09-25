@@ -9,7 +9,7 @@ use PDOException;
 use stdClass;
 use app\helpers\Application;
 
-class ArwardsDataHelper extends Data
+final class ArwardsDataHelper extends Data
 {
     public function __construct(Application $application)
     {

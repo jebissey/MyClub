@@ -9,7 +9,7 @@ use PDOException;
 use stdClass;
 use app\helpers\Application;
 
-class DesignDataHelper extends Data
+final class DesignDataHelper extends Data
 {
     public function __construct(Application $application)
     {

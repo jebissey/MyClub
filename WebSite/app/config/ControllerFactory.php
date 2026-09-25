@@ -98,7 +98,7 @@ use app\modules\Webmaster\MaintenanceController;
 use app\modules\Webmaster\RssController;
 use app\modules\Webmaster\WebmasterController;
 
-class ControllerFactory
+final class ControllerFactory
 {
     public function __construct(
         private Application $application,

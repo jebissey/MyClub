@@ -19,7 +19,7 @@ use app\models\EventDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
 
-class EventSupplyApi extends AbstractApi
+final class EventSupplyApi extends AbstractApi
 {
     public function __construct(
         Application $application,

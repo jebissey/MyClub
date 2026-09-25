@@ -14,7 +14,7 @@ use app\helpers\WebApp;
 use app\models\KanbanDataHelper;
 use app\models\PersonDataHelper;
 
-class KanbanApi extends AbstractApi
+final class KanbanApi extends AbstractApi
 {
     public function __construct(
         Application $application,

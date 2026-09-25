@@ -18,7 +18,7 @@ use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\valueObjects\EmailMessage;
 
-class CommunicationApi extends AbstractApi
+final class CommunicationApi extends AbstractApi
 {
     public function __construct(
         Application $application,

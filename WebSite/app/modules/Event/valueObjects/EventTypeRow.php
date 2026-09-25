@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Event\valueObjects;
 
-final class EventTypeRow
+final readonly class EventTypeRow
 {
     /**
      * @param list<object> $Attributes

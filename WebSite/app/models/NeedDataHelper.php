@@ -9,7 +9,7 @@ use RuntimeException;
 use stdClass;
 use app\helpers\Application;
 
-class NeedDataHelper extends Data
+final class NeedDataHelper extends Data
 {
     public function __construct(Application $application)
     {

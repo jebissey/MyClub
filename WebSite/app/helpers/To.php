@@ -6,7 +6,7 @@ namespace app\helpers;
 
 use RuntimeException;
 
-class To
+final class To
 {
     public static function float(mixed $value): float
     {

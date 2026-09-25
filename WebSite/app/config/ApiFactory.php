@@ -36,7 +36,6 @@ use app\helpers\NotificationSender;
 use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
-use app\models\DataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
@@ -61,7 +60,7 @@ use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Event\services\AuthorizationService;
 
-class ApiFactory
+final class ApiFactory
 {
     public function __construct(
         private Application $application,

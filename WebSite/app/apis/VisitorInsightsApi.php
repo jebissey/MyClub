@@ -12,7 +12,7 @@ use app\helpers\WebApp;
 use app\models\LogDataHelper;
 use app\models\PersonDataHelper;
 
-class VisitorInsightsApi extends AbstractApi
+final class VisitorInsightsApi extends AbstractApi
 {
     public function __construct(
         Application $application,

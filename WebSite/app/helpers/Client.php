@@ -7,7 +7,7 @@ namespace app\helpers;
 use UAParser\Parser;
 use Throwable;
 
-class Client
+final class Client
 {
     private string $browser = 'Unknown';
     private string $version = '';

@@ -17,7 +17,7 @@ use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\Person;
 
-class ChatApi extends AbstractApi
+final class ChatApi extends AbstractApi
 {
     private const ACTIVE_WINDOW_MINUTES = 15;
 

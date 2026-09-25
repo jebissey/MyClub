@@ -18,7 +18,7 @@ use app\helpers\WebApp;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Event\valueObjects\EventParticipant;
 
-class MessageDataHelper extends Data implements NewsProviderInterface
+final class MessageDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application, private LanguagesDataHelper $languagesDataHelper)
     {

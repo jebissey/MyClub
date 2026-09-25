@@ -13,7 +13,7 @@ use app\helpers\To;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\UploadedFileInput;
 
-class MediaApi extends AbstractApi
+final class MediaApi extends AbstractApi
 {
     public function __construct(
         Application $application,

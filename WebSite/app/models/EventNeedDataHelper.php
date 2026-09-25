@@ -8,7 +8,7 @@ use stdClass;
 use PDO;
 use app\helpers\Application;
 
-class EventNeedDataHelper extends Data
+final class EventNeedDataHelper extends Data
 {
     public function __construct(Application $application)
     {

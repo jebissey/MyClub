@@ -14,7 +14,7 @@ use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\models\KaraokeDataHelper;
 
-class KaraokeApi extends AbstractApi
+final class KaraokeApi extends AbstractApi
 {
     private string $sessionId;
 

@@ -8,7 +8,7 @@ use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-class LeapfrogApi implements RouteInterface
+final class LeapfrogApi implements RouteInterface
 {
     /**
      * @var array<int, Route>

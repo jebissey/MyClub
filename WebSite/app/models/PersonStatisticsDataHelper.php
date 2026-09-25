@@ -8,7 +8,7 @@ use PDO;
 use app\helpers\Application;
 use app\modules\Common\valueObjects\Person;
 
-class PersonStatisticsDataHelper extends Data
+final class PersonStatisticsDataHelper extends Data
 {
     public function __construct(Application $application)
     {

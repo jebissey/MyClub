@@ -11,7 +11,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 
-class GroupApi extends AbstractApi
+final class GroupApi extends AbstractApi
 {
     public function __construct(
         Application $application,

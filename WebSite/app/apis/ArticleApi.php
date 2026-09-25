@@ -18,7 +18,7 @@ use app\models\ReplyDataHelper;
 use app\modules\Article\valueObjects\AnswersRow;
 use app\modules\Article\valueObjects\QuestionRow;
 
-class ArticleApi extends AbstractApi
+final class ArticleApi extends AbstractApi
 {
     private OrderReplyDataHelper $orderReplyDataHelper;
     private ReplyDataHelper $replyDataHelper;

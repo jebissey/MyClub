@@ -32,7 +32,7 @@ use app\modules\Article\valueObjects\OrderWithCreatorRow;
  *     url: string
  * }
  */
-class OrderDataHelper extends Data implements NewsProviderInterface
+final class OrderDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(
         Application $application,

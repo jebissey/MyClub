@@ -10,7 +10,7 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 
-class ImportApi extends AbstractApi
+final class ImportApi extends AbstractApi
 {
     public function __construct(
         Application $application,

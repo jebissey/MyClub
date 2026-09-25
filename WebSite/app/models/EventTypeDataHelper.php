@@ -9,7 +9,7 @@ use Throwable;
 use app\helpers\Application;
 use app\modules\Event\valueObjects\EventTypeRow;
 
-class EventTypeDataHelper extends Data
+final class EventTypeDataHelper extends Data
 {
     public function __construct(Application $application)
     {

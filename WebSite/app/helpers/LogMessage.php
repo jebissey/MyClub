@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
-class LogMessage
+final class LogMessage
 {
     private static ?self $instance = null;
     private ?string $code;

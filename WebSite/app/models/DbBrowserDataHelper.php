@@ -11,7 +11,7 @@ use stdClass;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 
-class DbBrowserDataHelper extends Data
+final class DbBrowserDataHelper extends Data
 {
     private const COL_MAX_SIZE = 100;
 

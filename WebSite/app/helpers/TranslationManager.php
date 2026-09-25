@@ -10,7 +10,7 @@ use IntlDateFormatter;
 use IntlDatePatternGenerator;
 use app\models\LanguagesDataHelper;
 
-class TranslationManager
+final class TranslationManager
 {
     public const DEFAULT_LANGUAGE = 'fr_FR';
 

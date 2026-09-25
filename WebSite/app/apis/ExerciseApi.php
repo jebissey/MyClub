@@ -10,7 +10,7 @@ use app\helpers\To;
 use app\models\PersonDataHelper;
 use app\modules\Exercise\valueObjects\ExerciseRow;
 
-class ExerciseApi extends AbstractApi
+final class ExerciseApi extends AbstractApi
 {
     public function __construct(
         Application $application,

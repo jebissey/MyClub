@@ -8,7 +8,7 @@ use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-class ImportApi implements RouteInterface
+final class ImportApi implements RouteInterface
 {
     /**
      * @var array<int, Route>

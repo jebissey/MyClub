@@ -8,7 +8,7 @@ use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-class CarouselApi implements RouteInterface
+final class CarouselApi implements RouteInterface
 {
     /**
      * @var array<int, Route>

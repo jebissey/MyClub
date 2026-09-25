@@ -8,7 +8,7 @@ use app\helpers\Application;
 use PDO;
 use RuntimeException;
 
-class LoanDataHelper extends Data
+final class LoanDataHelper extends Data
 {
     public function __construct(Application $application)
     {

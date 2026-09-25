@@ -8,7 +8,7 @@ use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-class VisitorInsights implements RouteInterface
+final class VisitorInsights implements RouteInterface
 {
     /**
      * @var array<int, Route>

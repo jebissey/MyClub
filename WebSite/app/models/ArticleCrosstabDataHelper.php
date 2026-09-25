@@ -7,7 +7,7 @@ namespace app\models;
 use app\helpers\Application;
 use app\models\CrosstabDataHelper;
 
-class ArticleCrosstabDataHelper extends Data
+final class ArticleCrosstabDataHelper extends Data
 {
     public function __construct(Application $application, private CrosstabDataHelper $crosstabDataHelper)
     {

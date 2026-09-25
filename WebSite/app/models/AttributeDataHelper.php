@@ -10,7 +10,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 
-class AttributeDataHelper extends Data
+final class AttributeDataHelper extends Data
 {
     public function __construct(Application $application)
     {

@@ -6,7 +6,7 @@ namespace app\exceptions;
 
 use Exception;
 
-class LyricsParserException extends Exception
+final class LyricsParserException extends Exception
 {
     public function __construct(string $message, string $file = '', int $line = 0)
     {

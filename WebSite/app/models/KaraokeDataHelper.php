@@ -10,7 +10,7 @@ use Throwable;
 use app\helpers\Application;
 use app\modules\Games\Karaoke\valueObjects\KaraokeSession;
 
-class KaraokeDataHelper extends Data
+final class KaraokeDataHelper extends Data
 {
     public function __construct(Application $application)
     {

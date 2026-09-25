@@ -13,7 +13,7 @@ use app\helpers\WebApp;
 use app\models\LogWriterDataHelper;
 use app\models\PersonDataHelper;
 
-class LeapfrogApi extends AbstractApi
+final class LeapfrogApi extends AbstractApi
 {
     public function __construct(
         Application $application,

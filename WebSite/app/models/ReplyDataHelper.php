@@ -7,7 +7,7 @@ namespace app\models;
 use app\helpers\Application;
 use app\helpers\To;
 
-class ReplyDataHelper extends Data
+final class ReplyDataHelper extends Data
 {
     public function __construct(Application $application)
     {

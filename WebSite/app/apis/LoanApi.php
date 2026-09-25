@@ -10,7 +10,7 @@ use app\helpers\To;
 use app\models\LoanDataHelper;
 use app\models\PersonDataHelper;
 
-class LoanApi extends AbstractApi
+final class LoanApi extends AbstractApi
 {
     public function __construct(
         Application $application,

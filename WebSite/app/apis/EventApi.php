@@ -31,7 +31,7 @@ use app\modules\Common\valueObjects\PersonEmailRow;
 /**
  * @phpstan-import-type EventParticipantShape from EventParticipant
  */
-class EventApi extends AbstractApi
+final class EventApi extends AbstractApi
 {
     public function __construct(
         Application $application,
