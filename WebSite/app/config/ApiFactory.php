@@ -10,6 +10,7 @@ use app\apis\ChatApi;
 use app\apis\CommunicationApi;
 use app\apis\EventApi;
 use app\apis\EventAttributeApi;
+use app\apis\EventAvailabilitiesApi;
 use app\apis\EventNeedApi;
 use app\apis\EventNeedTypeApi;
 use app\apis\EventSupplyApi;
@@ -35,6 +36,7 @@ use app\helpers\MediaManager;
 use app\helpers\NotificationSender;
 use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
+use app\models\AvailabilityDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
@@ -66,6 +68,7 @@ final class ApiFactory
         private Application $application,
         private AttributeDataHelper $attributeDataHelper,
         private AuthorizationDataHelper $authorizationDataHelper,
+        private AvailabilityDataHelper $availabilityDataHelper,
         private CarouselDataHelper $carouselDataHelper,
         private ConnectedUser $connectedUser,
         private DesignDataHelper $designDataHelper,
@@ -162,6 +165,16 @@ final class ApiFactory
             $this->attributeDataHelper,
             $this->connectedUser,
             $this->personDataHelper
+        );
+    }
+
+    public function makeEventAvailabilitiesApi(): EventAvailabilitiesApi
+    {
+        return new EventAvailabilitiesApi(
+            $this->application,
+            $this->connectedUser,
+            $this->personDataHelper,
+            $this->availabilityDataHelper,
         );
     }
 

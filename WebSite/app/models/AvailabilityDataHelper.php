@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use DateTimeImmutable;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
 
@@ -83,6 +84,61 @@ final class AvailabilityDataHelper extends Data
                 : 0.0,
             'byDay'             => $byDay,
         ];
+    }
+
+    /**
+     * @return array<int, array{id:int,date:string,startTime:string,durationMinutes:int,summary:string,participantCount:int}>
+     */
+    public function getEventsForSlot(DateTimeImmutable $start, DateTimeImmutable $end, int $day, string $slot): array
+    {
+        $sql = 'SELECT e.Id, e.StartTime, e.Duration, e.Summary, COUNT(p.Id) AS ParticipantCount
+            FROM Event e
+            LEFT JOIN Participant p ON p.IdEvent = e.Id
+            WHERE e.Canceled = 0
+            AND e.StartTime >= :start
+            AND e.StartTime < :end
+            GROUP BY e.Id';
+
+        $stmt = $this->pdo->prepare($sql);
+        if ($stmt === false) {
+            throw new \RuntimeException('Failed to prepare slot events query');
+        }
+        $stmt->execute([
+            ':start' => $start->format('Y-m-d H:i:s'),
+            ':end'   => $end->format('Y-m-d H:i:s'),
+        ]);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $events = [];
+        foreach ($rows as $row) {
+            $startTime = new DateTimeImmutable((string) $row['StartTime']);
+            $rowDay    = ((int) $startTime->format('N')) - 1; // 1=lundi..7=dimanche -> 0..6
+
+            if ($rowDay !== $day) {
+                continue;
+            }
+
+            $rowSlot = match (TimeOfDay::fromDateTime($startTime)) {
+                TimeOfDay::Morning   => 'morning',
+                TimeOfDay::Afternoon => 'afternoon',
+                TimeOfDay::Evening   => 'evening',
+            };
+
+            if ($rowSlot !== $slot) {
+                continue;
+            }
+
+            $events[] = [
+                'id'                => (int) $row['Id'],
+                'date'              => $startTime->format('Y-m-d'),
+                'startTime'         => $startTime->format('H:i'),
+                'durationMinutes'   => (int) ($row['Duration'] / 60),
+                'summary'           => (string) ($row['Summary'] ?? ''),
+                'participantCount'  => (int) $row['ParticipantCount'],
+            ];
+        }
+
+        return $events;
     }
 
     /**

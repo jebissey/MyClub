@@ -1,5 +1,6 @@
 import Chart from 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/auto/+esm';
 import ChartDataLabels from 'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/+esm';
+import EventDetailModal from './modules/EventDetailModal.js';
 
 Chart.register(ChartDataLabels);
 
@@ -154,7 +155,7 @@ if (pData && pData.labels) {
             }
         };
 
-        new Chart(pCtx.getContext('2d'), {
+        const participationChart = new Chart(pCtx.getContext('2d'), {
             type: 'bar',
             plugins: [centeredValuePlugin],
             data: {
@@ -216,5 +217,28 @@ if (pData && pData.labels) {
                 }
             }
         });
+
+        // --- Clic sur une barre : ouvre la liste des événements du jour/créneau ---
+        const eventDetailModal = new EventDetailModal();
+        eventDetailModal.bind();
+
+        pCtx.onclick = (evt) => {
+            const points = participationChart.getElementsAtEventForMode(
+                evt, 'nearest', { intersect: true }, true
+            );
+            if (!points.length) return;
+
+            const { datasetIndex, index } = points[0];
+            const slotKey = participationChart.data.datasets[datasetIndex].slotKey; // morning/afternoon/evening
+            const dayLabel = pData.labels[index];
+
+            eventDetailModal.open(
+                index,
+                slotKey,
+                dayLabel,
+                window.selectedRange || '6m',
+                window.selectedStartDate || ''
+            );
+        };
     }
 }

@@ -23,6 +23,7 @@ use app\config\routes\Event;
 use app\config\routes\EventApi;
 use app\config\routes\EventAttributeApi;
 use app\config\routes\EventAvailabilities;
+use app\config\routes\EventAvailabilitiesApi;
 use app\config\routes\EventEmail;
 use app\config\routes\EventGuest;
 use app\config\routes\EventNeed;
@@ -98,6 +99,7 @@ use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
+use app\models\AvailabilityDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\DataHelper;
@@ -245,6 +247,7 @@ final class Routes
         $this->routes = array_merge($this->routes, (new EventApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new EventAttributeApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new EventAvailabilities($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new EventAvailabilitiesApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new EventEmail($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new EventGuest($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new EventNeed($this->controllerFactory))->get());
@@ -696,6 +699,7 @@ final class Routes
             $this->application,
             new AttributeDataHelper($this->application),
             $dataHelpers['authorizationDataHelper'],
+            new AvailabilityDataHelper($this->application),
             new CarouselDataHelper($this->application),
             $this->application->getConnectedUser(),
             $dataHelpers['designDataHelper'],

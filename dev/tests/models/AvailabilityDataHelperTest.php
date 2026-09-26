@@ -91,6 +91,68 @@ class AvailabilityDataHelperTest extends DataHelperTestCase
         $this->assertTrue($result);
     }
 
+    public function testGetEventsForSlotQueriedColumnsExistInDatabaseSchema(): void
+    {
+        $pdo = $this->openDatabaseCopyOrSkip();
+
+        $this->assertColumnsExist($pdo, 'Event', [
+            'Id',
+            'StartTime',
+            'Duration',
+            'Summary',
+            'Canceled',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Participant', [
+            'Id',
+            'IdEvent',
+        ]);
+    }
+
+    public function testGetEventsForSlotSqlIsValidAgainstTemplateSchema(): void
+    {
+        $pdo = $this->openDatabaseCopyOrSkip();
+        $sql = $this->getEventsForSlotSql();
+
+        $stmt = $pdo->prepare($sql);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
+
+        $this->assertStringContainsString('SELECT e.Id, e.StartTime, e.Duration, e.Summary, COUNT(p.Id) AS ParticipantCount', $sql);
+        $this->assertStringContainsString('FROM Event e', $sql);
+        $this->assertStringContainsString('LEFT JOIN Participant p ON p.IdEvent = e.Id', $sql);
+        $this->assertStringContainsString('WHERE e.Canceled = 0', $sql);
+        $this->assertStringContainsString('AND e.StartTime >= :start', $sql);
+        $this->assertStringContainsString('AND e.StartTime < :end', $sql);
+        $this->assertStringContainsString('GROUP BY e.Id', $sql);
+    }
+
+    public function testGetEventsForSlotSqlBindsNamedParameters(): void
+    {
+        $pdo = $this->openDatabaseCopyOrSkip();
+        $sql = $this->getEventsForSlotSql();
+
+        $stmt = $pdo->prepare($sql);
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
+
+        $result = $stmt->execute([
+            ':start' => '2000-01-01 00:00:00',
+            ':end'   => '2000-01-02 00:00:00',
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    private function getEventsForSlotSql(): string
+    {
+        return 'SELECT e.Id, e.StartTime, e.Duration, e.Summary, COUNT(p.Id) AS ParticipantCount
+        FROM Event e
+        LEFT JOIN Participant p ON p.IdEvent = e.Id
+        WHERE e.Canceled = 0
+          AND e.StartTime >= :start
+          AND e.StartTime < :end
+        GROUP BY e.Id';
+    }
+
     private function getTotalActiveSql(): string
     {
         return 'SELECT COUNT(*) FROM Member WHERE Inactivated = 0';
