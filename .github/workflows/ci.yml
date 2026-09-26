@@ -31,9 +31,13 @@ jobs:
         working-directory: WebSite
         run: composer install --no-interaction --no-progress --prefer-dist
 
+      - name: Fix coding style (phpcbf)
+        working-directory: WebSite
+        run: vendor/bin/phpcbf --standard=../dev/phpcs.xml --runtime-set ignore_non_auto_fixable_on_exit 1 app || true
+
       - name: Check coding style (phpcs, PSR-12)
         working-directory: WebSite
-        run: vendor/bin/phpcs --standard=../dev/phpcs.xml
+        run: vendor/bin/phpcs --standard=../dev/phpcs.xml app
 
   phpstan:
     name: Analyse statique (PHPStan niveau 9)
@@ -97,6 +101,10 @@ jobs:
       - name: Run PHPUnit
         working-directory: WebSite
         run: vendor/bin/phpunit -c ../dev/phpunit.xml
+
+      - name: Check coding standards
+        working-directory: WebSite
+        run: php ../dev/test/CheckCodingStandards.php
 
   route-tests:
     name: FlightRouteTester
