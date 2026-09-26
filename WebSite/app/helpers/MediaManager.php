@@ -6,6 +6,7 @@ namespace app\helpers;
 
 use RuntimeException;
 use stdClass;
+use app\helpers\interfaces\MediaManagerInterface;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\SharedFileDataHelper;
@@ -16,7 +17,7 @@ use app\modules\Common\valueObjects\UploadedFileInput;
 use app\modules\Common\valueObjects\UploadedMedia;
 use app\modules\Common\valueObjects\UploadMediaResult;
 
-class MediaManager
+final class MediaManager implements MediaManagerInterface
 {
     private const MEDIA_PATH = __DIR__ . '/../../data/media/';
 

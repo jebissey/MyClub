@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Article\services;
 
 use app\helpers\ConnectedUser;
-use app\models\AuthorizationDataHelper;
+use app\models\interfaces\AuthorizationDataHelperInterface;
 use app\models\Data;
 use app\modules\Article\valueObjects\ArticleAccessRow;
 use app\modules\Article\valueObjects\ArticleOwnershipRow;
@@ -14,7 +14,7 @@ final class ArticleAuthorizationService
 {
     public function __construct(
         private Data $dataHelper,
-        private AuthorizationDataHelper $authorizationDataHelper
+        private AuthorizationDataHelperInterface $authorizationDataHelper
     ) {
     }
 

@@ -11,10 +11,10 @@ use app\exceptions\EmailException;
 use app\helpers\Password;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\models\AuthResult;
-use app\models\MemberDataHelper;
+use app\models\interfaces\MemberDataHelperInterface;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\valueObjects\Person;
+use app\modules\User\valueObjects\AuthResult;
 
 /**
  * @phpstan-import-type PersonRow from Person
@@ -22,7 +22,7 @@ use app\modules\Common\valueObjects\Person;
 final class AuthenticationService
 {
     public function __construct(
-        private MemberDataHelper $memberDataHelper,
+        private MemberDataHelperInterface $memberDataHelper,
         private string $baseUrl
     ) {
     }

@@ -13,7 +13,7 @@ use RuntimeException;
 use stdClass;
 use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
-use app\helpers\ErrorManager;
+use app\helpers\interfaces\ErrorManagerInterface;
 
 abstract class Data
 {
@@ -27,7 +27,7 @@ abstract class Data
 
     public function __construct(
         PDO $pdo,
-        protected ErrorManager $errorManager,
+        protected ErrorManagerInterface $errorManager,
         ?PDO $pdoForLog = null,
     ) {
         $this->pdo = $pdo;

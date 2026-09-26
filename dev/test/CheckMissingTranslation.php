@@ -12,11 +12,10 @@
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
-$scriptDir = __DIR__;              // MyClub/dev/
-$rootDir   = dirname($scriptDir);  // MyClub/
+require_once __DIR__ . '/bootstrap.php';
 
-$scanDir = $rootDir . '/WebSite/app';
-$sqlFile = $rootDir . '/WebSite/app/models/database/MyClub.sqlite.sql';
+$scanDir = MYCLUB_WEBSITE_DIR . '/app';
+$sqlFile = MYCLUB_WEBSITE_DIR . '/app/models/database/MyClub.sqlite.sql';
 
 $verbose = in_array('--verbose', $argv ?? [], true);
 

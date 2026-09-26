@@ -12,7 +12,8 @@ final class MaintenanceService
 
     public function __construct(
         private Data $dataHelper,
-    ) {}
+    ) {
+    }
 
     public function checkIfSiteIsUnderMaintenance(): bool
     {

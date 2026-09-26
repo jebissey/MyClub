@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Latte\Engine as LatteEngine;
 use Latte\Loaders\StringLoader;
 use app\enums\FilterInputRule;
+use app\helpers\interfaces\GravatarHandlerInterface;
 use app\modules\Common\valueObjects\Person;
 
 final class WebApp
@@ -91,8 +92,12 @@ final class WebApp
         return self::computeUserImg($person->UseGravatar, $person->Email, $person->Avatar, $gravatarHandler);
     }
 
-    public static function computeUserImg(bool $useGravatar, ?string $email, ?string $avatar, GravatarHandler $gravatarHandler): string
-    {
+    public static function computeUserImg(
+        bool $useGravatar,
+        ?string $email,
+        ?string $avatar,
+        GravatarHandlerInterface $gravatarHandler
+    ): string {
         if ($useGravatar) {
             return $gravatarHandler->getGravatar($email ?? '', true);
         }

@@ -10,9 +10,9 @@ use app\models\Data;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Common\valueObjects\MessageContext;
 use app\modules\Common\interfaces\RecipientResolverInterface;
-use app\modules\Notifications\ArticleRecipientResolver;
-use app\modules\Notifications\EventRecipientResolver;
-use app\modules\Notifications\GroupRecipientResolver;
+use app\modules\Notifications\services\ArticleRecipientResolver;
+use app\modules\Notifications\services\EventRecipientResolver;
+use app\modules\Notifications\services\GroupRecipientResolver;
 
 final class MessageRecipientServiceTest extends TestCase
 {

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use app\enums\ApplicationError;
+use app\helpers\interfaces\ErrorManagerInterface;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\LogWriterDataHelper;
 use app\modules\Common\EmptyController;
 
-class ErrorManager
+final class ErrorManager implements ErrorManagerInterface
 {
     private DataHelper $dataHelper;
     private LanguagesDataHelper $languagesDataHelper;

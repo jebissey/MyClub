@@ -60,7 +60,7 @@ final class UserNotificationsController extends AbstractController
 
         $viewModel = new UserNotificationsViewModel(
             currentNotifications: is_array($decodedNotifications) ? $decodedNotifications : [],
-            groups: $groupsWithType !== false ? array_values($groupsWithType) : [],
+            groups: array_values($groupsWithType),
             vapidPubliKey: $this->credentials->get('vapid', 'publicKey') ?? '',
             notification: $notification,
             layoutParams: $this->getAllParams([]),

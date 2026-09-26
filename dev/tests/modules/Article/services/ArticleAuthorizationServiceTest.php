@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use app\enums\Authorization;
 use app\helpers\ConnectedUser;
-use app\models\AuthorizationDataHelper;
 use app\models\Data;
+use app\models\interfaces\AuthorizationDataHelperInterface;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
@@ -42,11 +42,11 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     private function makeService(
         ?Data $dataHelper = null,
-        ?AuthorizationDataHelper $authorizationDataHelper = null
+        ?AuthorizationDataHelperInterface $authorizationDataHelper = null
     ): ArticleAuthorizationService {
         return new ArticleAuthorizationService(
             $dataHelper ?? $this->makeDataHelperStub(fn() => false),
-            $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelper::class)
+            $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelperInterface::class)
         );
     }
 
@@ -253,7 +253,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
             'IdGroup'        => 5,
         ]);
 
-        $authHelper = $this->createMock(AuthorizationDataHelper::class);
+        $authHelper = $this->createMock(AuthorizationDataHelperInterface::class);
         $authHelper->expects($this->once())
             ->method('getArticle')
             ->with(1, $this->isInstanceOf(ConnectedUser::class))
@@ -279,7 +279,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
             'IdGroup'        => 5,
         ]);
 
-        $authHelper = $this->createStub(AuthorizationDataHelper::class);
+        $authHelper = $this->createStub(AuthorizationDataHelperInterface::class);
         $authHelper->method('getArticle')->willReturn(false);
 
         $user = $this->makeConnectedUser($this->makePerson(42));

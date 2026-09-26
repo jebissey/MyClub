@@ -2,14 +2,12 @@
 <ruleset name="MyClub">
     <description>Coding standard for MyClub</description>
 
-    <file>../WebSite/app</file>
-
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/migrations/*</exclude-pattern>
     <exclude-pattern>*/app/sounds/*</exclude-pattern>
     <exclude-pattern>*/app/images/*</exclude-pattern>
 
-    <arg name="basepath" value="." />
+    <arg name="basepath" value="../WebSite" />
     <arg name="colors" />
     <arg value="sp" />
 

@@ -70,6 +70,7 @@ final class GroupController extends AbstractController
             }
             $selectedAuthorizations = $input['authorizations'] ?? [];
             $this->groupDataHelper->insert($name, $selfRegistration, $selectedAuthorizations);
+            $this->redirect('/groups');
         }
     }
 
@@ -157,6 +158,7 @@ final class GroupController extends AbstractController
                 $this->render('PersonManager/views/group_edit.latte', $viewModel->toArray());
             } else {
                 $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
+                $this->redirect('/groups');
             }
         }
     }

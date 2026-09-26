@@ -329,24 +329,22 @@ final class WebmasterController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $base_url = htmlspecialchars(
+
+        $baseUrl = htmlspecialchars(
             WebApp::getBaseUrl(),
             ENT_XML1 | ENT_QUOTES,
             'UTF-8'
         );
+
         $articles = $this->articleDataHelper->getArticlesForAll();
+
         $homepageLastmod = !empty($articles)
             ? (new DateTime($articles[0]->LastUpdate))->format(DateTime::ATOM)
             : (new DateTime())->format(DateTime::ATOM);
 
-        header('Content-Type: application/xml; charset=utf-8');
-
-        echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
-        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
-        echo '  <url>' . PHP_EOL;
-        echo '    <loc>' . $base_url . '</loc>' . PHP_EOL;
-        echo '    <lastmod>' . $homepageLastmod . '</lastmod>' . PHP_EOL;
-        echo '  </url>' . PHP_EOL;
+        $urls = [
+            ['loc' => $baseUrl, 'lastmod' => $homepageLastmod],
+        ];
 
         foreach ($articles as $article) {
             try {
@@ -354,13 +352,15 @@ final class WebmasterController extends AbstractController
             } catch (\Exception $e) {
                 $lastmod = (new DateTime())->format(DateTime::ATOM);
             }
-            echo '  <url>' . PHP_EOL;
-            echo '    <loc>' . $base_url . '/article/' . (int)$article->Id . '</loc>' . PHP_EOL;
-            echo '    <lastmod>' . $lastmod . '</lastmod>' . PHP_EOL;
-            echo '  </url>' . PHP_EOL;
+
+            $urls[] = [
+                'loc'     => $baseUrl . '/article/' . (int) $article->Id,
+                'lastmod' => $lastmod,
+            ];
         }
 
-        echo '</urlset>';
+        header('Content-Type: application/xml; charset=utf-8');
+        $this->render('Webmaster/views/sitemap.latte', ['urls' => $urls]);
     }
 
     public function turnstileCredentialsEdit(): void

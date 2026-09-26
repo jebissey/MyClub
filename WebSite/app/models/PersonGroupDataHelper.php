@@ -6,7 +6,7 @@ namespace app\models;
 
 use app\helpers\Application;
 
-class PersonGroupDataHelper extends Data
+final class PersonGroupDataHelper extends Data
 {
     public function __construct(Application $application)
     {

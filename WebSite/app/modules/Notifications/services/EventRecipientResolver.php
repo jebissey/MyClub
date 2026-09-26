@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Notifications;
+namespace app\modules\Notifications\services;
 
 use app\modules\Common\interfaces\RecipientResolverInterface;
 use app\modules\Common\valueObjects\MessageContext;

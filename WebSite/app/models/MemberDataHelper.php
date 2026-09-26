@@ -7,13 +7,14 @@ namespace app\models;
 use DateTime;
 use PDO;
 use app\helpers\Application;
+use app\models\interfaces\MemberDataHelperInterface;
 
 /**
  * Data access for sign-in, remember-me and password reset flows.
  * Hides the Individual/Member split and column names from callers
  * (especially AuthenticationService).
  */
-class MemberDataHelper extends Data
+final class MemberDataHelper extends Data implements MemberDataHelperInterface
 {
     public function __construct(Application $application)
     {

@@ -7,7 +7,7 @@ namespace app\models;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
 
-class AvailabilityDataHelper extends Data
+final class AvailabilityDataHelper extends Data
 {
     public function __construct(Application $application)
     {

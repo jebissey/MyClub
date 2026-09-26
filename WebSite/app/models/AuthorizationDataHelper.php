@@ -10,6 +10,7 @@ use app\enums\EventAudience;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\models\interfaces\AuthorizationDataHelperInterface;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
@@ -19,7 +20,7 @@ use app\modules\Common\valueObjects\ClosingVisibilityRow;
  * @phpstan-import-type ArticleRowShape from ArticleRow
  * @phpstan-import-type ClosingVisibilityRowShape from ClosingVisibilityRow
  */
-class AuthorizationDataHelper extends Data
+final class AuthorizationDataHelper extends Data implements AuthorizationDataHelperInterface
 {
     public function __construct(Application $application)
     {

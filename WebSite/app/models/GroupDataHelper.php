@@ -12,7 +12,7 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 
-class GroupDataHelper extends Data
+final class GroupDataHelper extends Data
 {
     public function __construct(private Application $application)
     {
@@ -143,8 +143,8 @@ class GroupDataHelper extends Data
     }
 
 
-    /** @return array<int, stdClass>|false */
-    public function getGroupsWithType(int $idPerson): array|false
+    /** @return array<int, stdClass> */
+    public function getGroupsWithType(int $idPerson): array
     {
         $query = $this->pdo->prepare("
             SELECT 
@@ -212,7 +212,6 @@ class GroupDataHelper extends Data
                 $query->execute([$groupId, $authId]);
             }
             $this->pdo->commit();
-            $this->application->getFlight()->redirect('/groups');
         } catch (Throwable $e) {
             $this->pdo->rollBack();
             throw $e;
@@ -260,7 +259,6 @@ class GroupDataHelper extends Data
                 $query->execute([$id, $authId]);
             }
             $this->pdo->commit();
-            $this->application->getFlight()->redirect('/groups');
         } catch (Throwable $e) {
             $this->pdo->rollBack();
             throw $e;

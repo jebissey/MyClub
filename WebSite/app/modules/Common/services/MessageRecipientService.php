@@ -6,9 +6,9 @@ namespace app\modules\Common\services;
 
 use app\modules\Common\interfaces\RecipientResolverInterface;
 use app\models\Data;
-use app\modules\Notifications\ArticleRecipientResolver;
-use app\modules\Notifications\EventRecipientResolver;
-use app\modules\Notifications\GroupRecipientResolver;
+use app\modules\Notifications\services\ArticleRecipientResolver;
+use app\modules\Notifications\services\EventRecipientResolver;
+use app\modules\Notifications\services\GroupRecipientResolver;
 use app\modules\Common\valueObjects\MessageContext;
 
 final class MessageRecipientService

@@ -18,15 +18,19 @@ final class CodingStandardsChecker
     private const RENDER_EXEMPT_METHODS = ['__construct', '__destruct', 'render'];
 
     // Appels considérés comme une fin légitime de méthode de contrôleur, en plus
-    // de render(...) : redirect (PRG après save/delete) et envoi de fichier/flux.
-    private const TERMINAL_CALL_PATTERNS = [
-        'render(',
-        'redirect(',
-        'readfile(',
-        'fpassthru(',
-        'sendFile(',
-        'download(',
-        'stream(',
+    // de render(...) : redirect (PRG après save/delete), envoi de fichier/flux,
+    // et raise() (levée d'erreur applicative via ErrorManager, ex. accès refusé).
+    // Chaque mot est un PRÉFIXE : "render" matche aussi renderInfo(), "raise"
+    // matche aussi raiseBadRequest()/raiseForbidden()/raiseMethodNotAllowed(), etc.
+    private const TERMINAL_CALL_BASE_WORDS = [
+        'render',
+        'redirect',
+        'readfile',
+        'fpassthru',
+        'sendFile',
+        'download',
+        'stream',
+        'raise',
     ];
 
     /** @var list<ClassInfo> */
@@ -188,7 +192,7 @@ final class CodingStandardsChecker
                 }
 
                 if (!$method['endsWithAcceptedTerminalCall']) {
-                    $issues[] = "{$class->className}::{$method['name']}() ({$this->rel($class)}) ne se termine ni par render(...), ni par un redirect, ni par un envoi de fichier";
+                    $issues[] = "{$class->className}::{$method['name']}() ({$this->rel($class)}) ne se termine ni par render(...), ni par un redirect, ni par un envoi de fichier, ni par un raise() d'erreur, ni par un echo direct";
                 }
             }
         }
@@ -358,12 +362,34 @@ final class CodingStandardsChecker
      */
     private function lastStatementEndsWithAcceptedCall(array $bodyTokens): bool
     {
+        return $this->blockEndsAcceptably($bodyTokens);
+    }
+
+    /**
+     * @param list<mixed> $blockTokens
+     */
+    private function blockEndsAcceptably(array $blockTokens): bool
+    {
+        $statements = $this->splitTopLevelStatements($blockTokens);
+        $last = end($statements);
+
+        return $last !== false && $this->statementEndsAcceptably($last);
+    }
+
+    /**
+     * @param list<mixed> $tokens
+     * @return list<list<mixed>>
+     */
+    private function splitTopLevelStatements(array $tokens): array
+    {
         $statements = [];
         $current = [];
         $braceDepth = 0;
         $parenDepth = 0;
+        $count = count($tokens);
 
-        foreach ($bodyTokens as $t) {
+        for ($i = 0; $i < $count; $i++) {
+            $t = $tokens[$i];
             $current[] = $t;
 
             if ($this->isOpenBraceToken($t)) {
@@ -371,6 +397,12 @@ final class CodingStandardsChecker
             } elseif ($this->isCloseBraceToken($t)) {
                 $braceDepth--;
                 if ($braceDepth === 0 && $parenDepth === 0) {
+                    // Ne pas finaliser l'instruction si un else/elseif/catch/
+                    // finally suit : le } qui vient de fermer n'est pas la fin
+                    // réelle du if/try, juste la fin d'une de ses branches.
+                    if ($this->nextMeaningfulIsContinuation($tokens, $i + 1, $count)) {
+                        continue;
+                    }
                     $statements[] = $current;
                     $current = [];
                 }
@@ -388,21 +420,294 @@ final class CodingStandardsChecker
             $statements[] = $current;
         }
 
-        $last = end($statements);
-        if ($last === false) {
+        return $statements;
+    }
+
+    private function nextMeaningfulIsContinuation(array $tokens, int $i, int $count): bool
+    {
+        $i = $this->skipTrivia($tokens, $i, $count);
+
+        if (!is_array($tokens[$i] ?? null)) {
             return false;
         }
 
-        $text = $this->tokensToText($last);
+        return in_array($tokens[$i][0], [T_ELSE, T_ELSEIF, T_CATCH, T_FINALLY], true);
+    }
 
-        foreach (self::TERMINAL_CALL_PATTERNS as $pattern) {
-            if (str_contains($text, $pattern)) {
+    /**
+     * Un "if" sans "else" est traité comme un garde-fou légitime (l'échec est
+     * supposé déjà géré ailleurs, ex. via raise() dans une méthode appelée en
+     * condition) : on ne vérifie alors que la branche if. Si un "else" (ou
+     * "elseif") existe, chaque branche présente doit se terminer proprement.
+     *
+     * @param list<mixed> $statementTokens
+     */
+    private function statementEndsAcceptably(array $statementTokens): bool
+    {
+        $firstIndex = $this->firstMeaningfulIndex($statementTokens);
+
+        if ($firstIndex !== null && is_array($statementTokens[$firstIndex])) {
+            if ($statementTokens[$firstIndex][0] === T_IF) {
+                return $this->ifChainEndsAcceptably($statementTokens, $firstIndex);
+            }
+
+            if ($statementTokens[$firstIndex][0] === T_TRY) {
+                return $this->tryChainEndsAcceptably($statementTokens, $firstIndex);
+            }
+        }
+
+        $text = $this->tokensToText($statementTokens);
+
+        if ($this->matchesTerminalCall($text)) {
+            return true;
+        }
+
+        // Redirect via header() brut plutôt qu'un wrapper dédié.
+        if (str_contains($text, 'header(') && stripos($text, 'Location') !== false) {
+            return true;
+        }
+
+        // echo direct d'un flux construit à la main (RSS, sitemap, etc.).
+        if ($this->containsEchoToken($statementTokens)) {
+            return true;
+        }
+
+        // Délégation pure vers une autre méthode de la même classe
+        // (ex. showConnectionsOfConnectedUser() -> showConnections(...)) :
+        // c'est cette méthode cible qui porte la responsabilité de bien
+        // terminer, et elle est vérifiée séparément si elle est publique.
+        return $this->isSelfDelegatingCall(trim($text));
+    }
+
+    /**
+     * @param list<mixed> $tokens
+     */
+    private function ifChainEndsAcceptably(array $tokens, int $ifIndex): bool
+    {
+        $count = count($tokens);
+        $i = $ifIndex;
+
+        while (true) {
+            // $tokens[$i] est ici T_IF ou T_ELSEIF.
+            $i++;
+            $i = $this->skipTrivia($tokens, $i, $count);
+
+            if (!(!is_array($tokens[$i] ?? null) && ($tokens[$i] ?? null) === '(')) {
+                return false; // structure inattendue : on reste prudent.
+            }
+
+            $parenDepth = 0;
+            for (; $i < $count; $i++) {
+                $t = $tokens[$i];
+                if (!is_array($t) && $t === '(') {
+                    $parenDepth++;
+                } elseif (!is_array($t) && $t === ')') {
+                    $parenDepth--;
+                    if ($parenDepth === 0) {
+                        $i++;
+                        break;
+                    }
+                }
+            }
+
+            $i = $this->skipTrivia($tokens, $i, $count);
+
+            [$bodyTokens, $i] = $this->extractBody($tokens, $i, $count);
+
+            if (!$this->blockEndsAcceptably($bodyTokens)) {
+                return false;
+            }
+
+            $i = $this->skipTrivia($tokens, $i, $count);
+
+            if (is_array($tokens[$i] ?? null) && $tokens[$i][0] === T_ELSEIF) {
+                continue;
+            }
+
+            if (is_array($tokens[$i] ?? null) && $tokens[$i][0] === T_ELSE) {
+                $i++;
+                $i = $this->skipTrivia($tokens, $i, $count);
+
+                if (is_array($tokens[$i] ?? null) && $tokens[$i][0] === T_IF) {
+                    // "else if" écrit en deux mots : on boucle comme pour un elseif.
+                    continue;
+                }
+
+                [$elseBodyTokens] = $this->extractBody($tokens, $i, $count);
+
+                return $this->blockEndsAcceptably($elseBodyTokens);
+            }
+
+            // Pas de else : garde-fou accepté sans exiger de branche finale.
+            return true;
+        }
+    }
+
+    /**
+     * Comme pour if/elseif/else : chaque branche présente (try, chaque catch)
+     * doit se terminer proprement. Si un finally existe, c'est lui qui
+     * gouverne la fin réelle de l'instruction (il s'exécute toujours après
+     * try/catch), donc on ne vérifie alors que le finally.
+     *
+     * @param list<mixed> $tokens
+     */
+    private function tryChainEndsAcceptably(array $tokens, int $tryIndex): bool
+    {
+        $count = count($tokens);
+        $i = $tryIndex + 1;
+        $i = $this->skipTrivia($tokens, $i, $count);
+
+        [$tryBody, $i] = $this->extractBody($tokens, $i, $count);
+        $tryOk = $this->blockEndsAcceptably($tryBody);
+
+        $i = $this->skipTrivia($tokens, $i, $count);
+
+        $catchOk = true;
+
+        while (is_array($tokens[$i] ?? null) && $tokens[$i][0] === T_CATCH) {
+            $i++;
+            $i = $this->skipTrivia($tokens, $i, $count);
+
+            if (!(!is_array($tokens[$i] ?? null) && ($tokens[$i] ?? null) === '(')) {
+                return false; // structure inattendue : on reste prudent.
+            }
+
+            $parenDepth = 0;
+            for (; $i < $count; $i++) {
+                $t = $tokens[$i];
+                if (!is_array($t) && $t === '(') {
+                    $parenDepth++;
+                } elseif (!is_array($t) && $t === ')') {
+                    $parenDepth--;
+                    if ($parenDepth === 0) {
+                        $i++;
+                        break;
+                    }
+                }
+            }
+
+            $i = $this->skipTrivia($tokens, $i, $count);
+
+            [$catchBody, $i] = $this->extractBody($tokens, $i, $count);
+            if (!$this->blockEndsAcceptably($catchBody)) {
+                $catchOk = false;
+            }
+
+            $i = $this->skipTrivia($tokens, $i, $count);
+        }
+
+        if (is_array($tokens[$i] ?? null) && $tokens[$i][0] === T_FINALLY) {
+            $i++;
+            $i = $this->skipTrivia($tokens, $i, $count);
+            [$finallyBody] = $this->extractBody($tokens, $i, $count);
+
+            return $this->blockEndsAcceptably($finallyBody);
+        }
+
+        return $tryOk && $catchOk;
+    }
+
+    /**
+     * @return array{0: list<mixed>, 1: int}
+     */
+    private function extractBody(array $tokens, int $i, int $count): array
+    {
+        if ($this->isOpenBraceToken($tokens[$i] ?? null)) {
+            $depth = 1;
+            $body = [];
+            $i++;
+            for (; $i < $count; $i++) {
+                $t = $tokens[$i];
+                if ($this->isOpenBraceToken($t)) {
+                    $depth++;
+                } elseif ($this->isCloseBraceToken($t)) {
+                    $depth--;
+                    if ($depth === 0) {
+                        $i++;
+                        break;
+                    }
+                }
+                $body[] = $t;
+            }
+
+            return [$body, $i];
+        }
+
+        // Corps sans accolades (rare avec PSR-12, mais on le gère quand même).
+        $body = [];
+        $parenDepth = 0;
+        for (; $i < $count; $i++) {
+            $t = $tokens[$i];
+            $body[] = $t;
+            if (!is_array($t) && $t === '(') {
+                $parenDepth++;
+            } elseif (!is_array($t) && $t === ')') {
+                $parenDepth--;
+            } elseif (!is_array($t) && $t === ';' && $parenDepth === 0) {
+                $i++;
+                break;
+            }
+        }
+
+        return [$body, $i];
+    }
+
+    private function skipTrivia(array $tokens, int $i, int $count): int
+    {
+        while ($i < $count && is_array($tokens[$i] ?? null) && in_array(
+            $tokens[$i][0],
+            [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT],
+            true,
+        )) {
+            $i++;
+        }
+
+        return $i;
+    }
+
+    /**
+     * @param list<mixed> $tokens
+     */
+    private function firstMeaningfulIndex(array $tokens): ?int
+    {
+        foreach ($tokens as $idx => $t) {
+            if (is_array($t) && in_array($t[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+                continue;
+            }
+
+            return $idx;
+        }
+
+        return null;
+    }
+
+    private function isSelfDelegatingCall(string $text): bool
+    {
+        return (bool) preg_match('/^\$this\s*->\s*\w+\s*\(.*\)\s*;?\s*$/s', $text);
+    }
+
+    private function matchesTerminalCall(string $text): bool
+    {
+        $alternation = implode('|', array_map(
+            static fn(string $w): string => preg_quote($w, '/'),
+            self::TERMINAL_CALL_BASE_WORDS,
+        ));
+
+        return (bool) preg_match('/\b(?:' . $alternation . ')\w*\s*\(/', $text);
+    }
+
+    /**
+     * @param list<mixed> $tokens
+     */
+    private function containsEchoToken(array $tokens): bool
+    {
+        foreach ($tokens as $t) {
+            if (is_array($t) && $t[0] === T_ECHO) {
                 return true;
             }
         }
 
-        // Redirect via header() brut plutôt qu'un wrapper dédié.
-        return str_contains($text, 'header(') && stripos($text, 'Location') !== false;
+        return false;
     }
 
     /**

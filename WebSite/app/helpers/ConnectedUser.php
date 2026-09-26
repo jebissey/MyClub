@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use app\enums\ApplicationError;
+use app\helpers\interfaces\ErrorManagerInterface;
+use app\helpers\interfaces\GravatarHandlerInterface;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
-use app\models\AuthorizationDataHelper;
+use app\models\interfaces\AuthorizationDataHelperInterface;
 use app\models\DataHelper;
-use app\models\MetadataDataHelper;
+use app\models\interfaces\MetadataDataHelperInterface;
 use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
 use app\modules\Common\valueObjects\Person;
 
@@ -21,11 +23,11 @@ final class ConnectedUser
     public ?Person $person = null;
 
     public function __construct(
-        private readonly ErrorManager $errorManager,
+        private readonly ErrorManagerInterface $errorManager,
         private readonly DataHelper $dataHelper,
-        private readonly AuthorizationDataHelper $authorizationDataHelper,
-        private readonly MetadataDataHelper $metadataDataHelper,
-        private readonly GravatarHandler $gravatarHandler = new GravatarHandler(),
+        private readonly AuthorizationDataHelperInterface $authorizationDataHelper,
+        private readonly MetadataDataHelperInterface $metadataDataHelper,
+        private readonly GravatarHandlerInterface $gravatarHandler = new GravatarHandler(),
     ) {
     }
 

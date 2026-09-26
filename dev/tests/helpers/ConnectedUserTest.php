@@ -8,15 +8,15 @@ use ReflectionClass;
 use PDO;
 use tests\models\DataHelperTestCase;
 use app\helpers\ConnectedUser;
-use app\helpers\ErrorManager;
-use app\helpers\GravatarHandler;
+use app\helpers\interfaces\ErrorManagerInterface;
+use app\helpers\interfaces\GravatarHandlerInterface;
 use app\enums\Authorization;
 use app\enums\ApplicationError;
 use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
 use app\modules\Common\valueObjects\Person;
 use app\models\DataHelper;
-use app\models\AuthorizationDataHelper;
-use app\models\MetadataDataHelper;
+use app\models\interfaces\AuthorizationDataHelperInterface;
+use app\models\interfaces\MetadataDataHelperInterface;
 
 /**
  * NOTE: getLastSignIn() / getLastSignOut() success paths and the full
@@ -83,7 +83,7 @@ final class ConnectedUserTest extends DataHelperTestCase
 
         return new DataHelper(
             $pdo,
-            $this->createStub(ErrorManager::class)
+            $this->createStub(ErrorManagerInterface::class)
         );
     }
 
@@ -92,19 +92,20 @@ final class ConnectedUserTest extends DataHelperTestCase
      * DataHelper est toujours un vrai objet (car final).
      * Les autres collaborateurs restent mockables tant qu’ils ne sont pas final.
      */
+
     private function makeConnectedUser(
         ?DataHelper $dataHelper = null,
-        ?AuthorizationDataHelper $authorizationDataHelper = null,
-        ?MetadataDataHelper $metadataDataHelper = null,
-        ?GravatarHandler $gravatarHandler = null,
-        ?ErrorManager $errorManager = null,
+        ?AuthorizationDataHelperInterface $authorizationDataHelper = null,
+        ?MetadataDataHelperInterface $metadataDataHelper = null,
+        ?GravatarHandlerInterface $gravatarHandler = null,   // ← interface
+        ?ErrorManagerInterface $errorManager = null,
     ): ConnectedUser {
         return new ConnectedUser(
-            $errorManager            ?? $this->createStub(ErrorManager::class),
+            $errorManager            ?? $this->createStub(ErrorManagerInterface::class),
             $dataHelper              ?? $this->makeRealDataHelper(),
-            $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelper::class),
-            $metadataDataHelper      ?? $this->createStub(MetadataDataHelper::class),
-            $gravatarHandler         ?? $this->createStub(GravatarHandler::class),
+            $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelperInterface::class),
+            $metadataDataHelper      ?? $this->createStub(MetadataDataHelperInterface::class),
+            $gravatarHandler         ?? $this->createStub(GravatarHandlerInterface::class),
         );
     }
 
@@ -321,7 +322,7 @@ final class ConnectedUserTest extends DataHelperTestCase
     {
         $_SESSION['user'] = 'unknown@example.com';
 
-        $errorManager = $this->createMock(ErrorManager::class);
+        $errorManager = $this->createMock(ErrorManagerInterface::class);
         $errorManager->expects($this->once())
             ->method('raise')
             ->with(
@@ -364,12 +365,12 @@ final class ConnectedUserTest extends DataHelperTestCase
             VALUES ($id, NULL, 0)
         ");
 
-        $authorizationDataHelper = $this->createMock(AuthorizationDataHelper::class);
+        $authorizationDataHelper = $this->createMock(AuthorizationDataHelperInterface::class);
         $authorizationDataHelper->expects($this->once())
             ->method('getsFor')
             ->willReturn([Authorization::Editor->value]);
 
-        $metadataDataHelper = $this->createStub(MetadataDataHelper::class);
+        $metadataDataHelper = $this->createStub(MetadataDataHelperInterface::class);
         $metadataDataHelper->method('isTestSite')->willReturn(false);
 
         $user = $this->makeConnectedUser(

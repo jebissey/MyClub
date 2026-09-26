@@ -7,8 +7,9 @@ namespace app\models;
 use PDO;
 use RuntimeException;
 use app\helpers\Application;
+use app\models\interfaces\CarouselDataHelperInterface;
 
-class CarouselDataHelper extends Data
+final class CarouselDataHelper extends Data implements CarouselDataHelperInterface
 {
     public function __construct(Application $application)
     {

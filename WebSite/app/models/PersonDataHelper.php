@@ -59,7 +59,7 @@ use app\modules\User\valueObjects\EventRegistrationRow;
  *     messages: list<string>
  * }
  */
-class PersonDataHelper extends Data implements NewsProviderInterface
+final class PersonDataHelper extends Data implements NewsProviderInterface
 {
     /**
      * Fragment de jointure commun Member/Individual (alias m/i), utilisé par

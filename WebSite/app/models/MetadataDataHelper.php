@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\helpers\Application;
+use app\models\interfaces\MetadataDataHelperInterface;
 
-class MetadataDataHelper extends Data
+final class MetadataDataHelper extends Data implements MetadataDataHelperInterface
 {
     public function __construct(Application $application)
     {

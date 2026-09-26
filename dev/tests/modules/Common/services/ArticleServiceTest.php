@@ -1,12 +1,13 @@
 <?php
+// tests/modules/Common/services/ArticleServiceTest.php
 
 declare(strict_types=1);
 
 namespace tests\modules\Common\services;
 
 use PHPUnit\Framework\TestCase;
-use app\helpers\MediaManager;
-use app\models\CarouselDataHelper;
+use app\helpers\interfaces\MediaManagerInterface;
+use app\models\interfaces\CarouselDataHelperInterface;
 use app\models\Data;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\valueObjects\UploadedFileInput;
@@ -16,8 +17,7 @@ use RuntimeException;
 
 /**
  * Double de Data (jamais DataHelper, qui est final) dont set() renvoie une
- * valeur fixe, avec capture des arguments d'appel — nommée pour rester
- * typable statiquement (PHPStan) au lieu de Data seul.
+ * valeur fixe, avec capture des arguments d'appel.
  */
 final class RecordingArticleDataStub extends Data
 {
@@ -35,6 +35,21 @@ final class RecordingArticleDataStub extends Data
     }
 }
 
+/**
+ * Stub de CarouselDataHelperInterface qui enregistre les appels à addOrUpdate.
+ */
+final class RecordingCarouselDataHelperStub implements CarouselDataHelperInterface
+{
+    /** @var list<array{0: array<string, mixed>, 1: string}> */
+    public array $addOrUpdateCalls = [];
+
+    public function addOrUpdate(array $data, string $item): string
+    {
+        $this->addOrUpdateCalls[] = [$data, $item];
+        return 'ok';
+    }
+}
+
 final class ArticleServiceTest extends TestCase
 {
     private function makeDataHelperStub(int|bool $setReturn): RecordingArticleDataStub
@@ -42,14 +57,19 @@ final class ArticleServiceTest extends TestCase
         return new RecordingArticleDataStub($setReturn);
     }
 
+    private function makeCarouselStub(): RecordingCarouselDataHelperStub
+    {
+        return new RecordingCarouselDataHelperStub();
+    }
+
     private function makeService(
-        ?CarouselDataHelper $carouselDataHelper = null,
-        ?MediaManager $media = null,
+        ?CarouselDataHelperInterface $carouselDataHelper = null,
+        ?MediaManagerInterface $media = null,
         ?Data $dataHelper = null
     ): ArticleService {
         return new ArticleService(
-            $carouselDataHelper ?? $this->createStub(CarouselDataHelper::class),
-            $media ?? $this->createStub(MediaManager::class),
+            $carouselDataHelper ?? $this->makeCarouselStub(),
+            $media ?? $this->createStub(MediaManagerInterface::class),
             $dataHelper ?? $this->makeDataHelperStub(false)
         );
     }
@@ -91,11 +111,9 @@ final class ArticleServiceTest extends TestCase
     public function testCreateWithMediaSuccessWithoutFiles(): void
     {
         $dataHelper = $this->makeDataHelperStub(123);
+        $carouselDataHelper = $this->makeCarouselStub();
 
-        $carouselDataHelper = $this->createMock(CarouselDataHelper::class);
-        $carouselDataHelper->expects($this->never())->method('addOrUpdate');
-
-        $media = $this->createMock(MediaManager::class);
+        $media = $this->createMock(MediaManagerInterface::class);
         $media->expects($this->never())->method('uploadFile');
 
         $articleId = $this->makeService($carouselDataHelper, $media, $dataHelper)
@@ -105,32 +123,34 @@ final class ArticleServiceTest extends TestCase
         $this->assertSame([
             ['Article', ['Title' => 'Mon titre', 'Content' => 'Mon contenu', 'CreatedBy' => 42], []],
         ], $dataHelper->setCalls);
+        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
     }
 
     public function testCreateWithMediaSuccessWithEmptyFilesArray(): void
     {
         $dataHelper = $this->makeDataHelperStub(10);
-
-        $carouselDataHelper = $this->createMock(CarouselDataHelper::class);
-        $carouselDataHelper->expects($this->never())->method('addOrUpdate');
+        $carouselDataHelper = $this->makeCarouselStub();
 
         $articleId = $this->makeService($carouselDataHelper, null, $dataHelper)
             ->createWithMedia(7, [], 'Titre', 'Contenu');
 
         $this->assertSame(10, $articleId);
+        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
     }
 
     public function testCreateWithMediaUsesDefaultEmptyTitleAndContent(): void
     {
         $dataHelper = $this->makeDataHelperStub(5);
+        $carouselDataHelper = $this->makeCarouselStub();
 
-        $articleId = $this->makeService(null, null, $dataHelper)
+        $articleId = $this->makeService($carouselDataHelper, null, $dataHelper)
             ->createWithMedia(1);
 
         $this->assertSame(5, $articleId);
         $this->assertSame([
             ['Article', ['Title' => '', 'Content' => '', 'CreatedBy' => 1], []],
         ], $dataHelper->setCalls);
+        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
     }
 
     // -------------------------------------------------------------------------
@@ -155,6 +175,7 @@ final class ArticleServiceTest extends TestCase
     public function testCreateWithMediaUploadsValidFilesAndAddsToCarousel(): void
     {
         $dataHelper = $this->makeDataHelperStub(55);
+        $carouselDataHelper = $this->makeCarouselStub();
 
         $uploadResult = new UploadMediaResult(
             file: new UploadedMedia(
@@ -166,7 +187,7 @@ final class ArticleServiceTest extends TestCase
             ),
         );
 
-        $media = $this->createMock(MediaManager::class);
+        $media = $this->createMock(MediaManagerInterface::class);
         $media->expects($this->once())
             ->method('uploadFile')
             ->with($this->callback(function (UploadedFileInput $file) {
@@ -176,14 +197,6 @@ final class ArticleServiceTest extends TestCase
                     && $file->type === 'image/jpeg';
             }))
             ->willReturn($uploadResult);
-
-        $carouselDataHelper = $this->createMock(CarouselDataHelper::class);
-        $carouselDataHelper->expects($this->once())
-            ->method('addOrUpdate')
-            ->with(
-                ['idArticle' => 55],
-                'https://cdn.example.com/img1.jpg'
-            );
 
         $files = $this->makeFiles([
             [
@@ -199,17 +212,18 @@ final class ArticleServiceTest extends TestCase
             ->createWithMedia(42, $files, 'Titre', 'Contenu');
 
         $this->assertSame(55, $articleId);
+        $this->assertSame([
+            [['idArticle' => 55], 'https://cdn.example.com/img1.jpg'],
+        ], $carouselDataHelper->addOrUpdateCalls);
     }
 
     public function testCreateWithMediaSkipsFilesWithUploadError(): void
     {
         $dataHelper = $this->makeDataHelperStub(20);
+        $carouselDataHelper = $this->makeCarouselStub();
 
-        $media = $this->createMock(MediaManager::class);
+        $media = $this->createMock(MediaManagerInterface::class);
         $media->expects($this->never())->method('uploadFile');
-
-        $carouselDataHelper = $this->createMock(CarouselDataHelper::class);
-        $carouselDataHelper->expects($this->never())->method('addOrUpdate');
 
         $files = $this->makeFiles([
             [
@@ -223,11 +237,13 @@ final class ArticleServiceTest extends TestCase
             ->createWithMedia(1, $files);
 
         $this->assertSame(20, $articleId);
+        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
     }
 
     public function testCreateWithMediaHandlesMultipleFilesAndSkipsFailedOnes(): void
     {
         $dataHelper = $this->makeDataHelperStub(77);
+        $carouselDataHelper = $this->makeCarouselStub();
 
         $uploadResult1 = new UploadMediaResult(
             file: new UploadedMedia(
@@ -248,26 +264,10 @@ final class ArticleServiceTest extends TestCase
             ),
         );
 
-        $media = $this->createMock(MediaManager::class);
+        $media = $this->createMock(MediaManagerInterface::class);
         $media->expects($this->exactly(2))
             ->method('uploadFile')
             ->willReturnOnConsecutiveCalls($uploadResult1, $uploadResult2);
-
-        $carouselDataHelper = $this->createMock(CarouselDataHelper::class);
-
-        $expectedCalls = [
-            [['idArticle' => 77], 'https://cdn.example.com/a.jpg'],
-            [['idArticle' => 77], 'https://cdn.example.com/b.png'],
-        ];
-        $callIndex = 0;
-
-        $carouselDataHelper->expects($this->exactly(2))
-            ->method('addOrUpdate')
-            ->willReturnCallback(function (...$args) use (&$callIndex, $expectedCalls) {
-                $this->assertSame($expectedCalls[$callIndex], $args);
-                $callIndex++;
-                return 'ok';
-            });
 
         $files = $this->makeFiles([
             [
@@ -295,17 +295,19 @@ final class ArticleServiceTest extends TestCase
             ->createWithMedia(99, $files, 'Multi', 'Test');
 
         $this->assertSame(77, $articleId);
+        $this->assertSame([
+            [['idArticle' => 77], 'https://cdn.example.com/a.jpg'],
+            [['idArticle' => 77], 'https://cdn.example.com/b.png'],
+        ], $carouselDataHelper->addOrUpdateCalls);
     }
 
     public function testCreateWithMediaDoesNothingWhenFilesHasNoTmpNameKey(): void
     {
         $dataHelper = $this->makeDataHelperStub(30);
+        $carouselDataHelper = $this->makeCarouselStub();
 
-        $media = $this->createMock(MediaManager::class);
+        $media = $this->createMock(MediaManagerInterface::class);
         $media->expects($this->never())->method('uploadFile');
-
-        $carouselDataHelper = $this->createMock(CarouselDataHelper::class);
-        $carouselDataHelper->expects($this->never())->method('addOrUpdate');
 
         $files = [
             'error' => [UPLOAD_ERR_OK],
@@ -318,5 +320,6 @@ final class ArticleServiceTest extends TestCase
             ->createWithMedia(1, $files);
 
         $this->assertSame(30, $articleId);
+        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
     }
 }

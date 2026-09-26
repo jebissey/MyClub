@@ -6,16 +6,15 @@ namespace app\modules\Webmaster;
 
 use app\enums\ApplicationError;
 use app\helpers\Application;
-use app\helpers\ErrorManager;
+use app\helpers\interfaces\ErrorManagerInterface;
 use app\modules\Common\AbstractController;
 use app\modules\Webmaster\viewModels\MaintenanceViewModel;
 
 final class MaintenanceController extends AbstractController
 {
-
     public function __construct(
         Application $application,
-        protected ErrorManager $errorManager
+        protected ErrorManagerInterface $errorManager
     ) {
         parent::__construct($application);
     }
