@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use FilesystemIterator;
 use PDO;
 use PDOStatement;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use RuntimeException;
+use SplFileInfo;
 use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
@@ -19,6 +23,7 @@ final class Database
     private const SQLITE_DEST_PATH = __DIR__ . '/../../data/';
     private const SQLITE_FILE = 'MyClub.sqlite';
     private const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
+    private const MIGRATORS_DIR = __DIR__ . '/database/migrators';
     private const APPLICATION = 'MyClub';
     private const DB_VERSION = 86;              //Don't forget to update here and in Metadata when database structure is modified
 
@@ -89,9 +94,38 @@ final class Database
                 }
                 self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::DB_VERSION);
             }
+            // Reached only when the database is at the current version: either it has just been
+            // upgraded successfully (a failure ends the request in Application::unreachable above),
+            // or it was created from the template (new installation) or was already up to date.
+            $this->deleteMigratorsDirectory();
         } else {
             Application::unreachable('Empty Metadata table', __FILE__, __LINE__);
         }
+    }
+
+    /**
+     * The migrators are useless once the database is at the current version: remove them
+     * (they are shipped in FullInstall.zip). Skipped in a git working copy (development),
+     * where they are tracked source files.
+     */
+    private function deleteMigratorsDirectory(): void
+    {
+        if (!is_dir(self::MIGRATORS_DIR) || @file_exists(dirname(__DIR__, 3) . '/.git')) {
+            return;
+        }
+        $items = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(self::MIGRATORS_DIR, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+        /** @var SplFileInfo $item */
+        foreach ($items as $item) {
+            if ($item->isDir()) {
+                @rmdir($item->getPathname());
+            } else {
+                @unlink($item->getPathname());
+            }
+        }
+        @rmdir(self::MIGRATORS_DIR);
     }
 
     private function upgradeDatabase(PDO $pdo, int $from, int $to): void

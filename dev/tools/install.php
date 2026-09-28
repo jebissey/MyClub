@@ -18,9 +18,11 @@ declare(strict_types=1);
  *      de l'archive (on n'en a plus besoin, ça libère encore de la place)
  *   3. déplacement (rename, pas copie) des fichiers extraits vers la racine,
  *      SAUF le dossier "data" -> pas de duplication d'octets sur disque
- *   4. appel de la racine du site en HTTP pour laisser l'application copier
- *      le template dans data/ ou lancer les migrateurs
- *   5. suppression du dossier app/models/database/migrators
+ *
+ * La suite est prise en charge par l'application elle-même, à la première ouverture
+ * du site dans un navigateur : copie du template de base dans data/ (installation)
+ * ou exécution des migrateurs (mise à jour), puis suppression du dossier
+ * app/models/database/migrators.
  *
  * ATTENTION : en mode mise à jour, les anciens fichiers sont supprimés AVANT
  * que la nouvelle version soit en place. Si l'extraction échoue après coup
@@ -39,13 +41,12 @@ declare(strict_types=1);
 
 // Changez cette valeur avant de mettre le fichier en ligne. Laissez vide
 // pour désactiver la protection (déconseillé si le site est public).
-const INSTALL_SECRET = '';
+const INSTALL_SECRET = 'install1234';
 
 const ARCHIVE_NAME  = 'FullInstall.zip';
 const ROOT_DIR       = __DIR__;
 const TEMP_DIR        = ROOT_DIR . '/_install_tmp';
 const DATA_DIR        = ROOT_DIR . '/data';
-const MIGRATORS_DIR   = ROOT_DIR . '/app/models/database/migrators';
 
 // Convertit les warnings/notices PHP (ex: ZipArchive::extractTo en cas de
 // quota dépassé) en exceptions, pour un affichage propre au lieu d'un texte
@@ -186,26 +187,6 @@ function selfUrl(): string
     return $scheme . '://' . $host . $dir . '/';
 }
 
-function pingSiteRoot(string $url): array
-{
-    if (function_exists('curl_init')) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_TIMEOUT => 20,
-            CURLOPT_SSL_VERIFYPEER => false,
-        ]);
-        $body = curl_exec($ch);
-        $ok   = $body !== false;
-        $err  = $ok ? '' : curl_error($ch);
-        curl_close($ch);
-        return [$ok, $err];
-    }
-    $body = @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 20]]));
-    return [$body !== false, $body === false ? 'file_get_contents a échoué' : ''];
-}
-
 function checkSecret(): bool
 {
     if (INSTALL_SECRET === '') {
@@ -214,7 +195,7 @@ function checkSecret(): bool
     return isset($_REQUEST['key']) && hash_equals(INSTALL_SECRET, (string) $_REQUEST['key']);
 }
 
-function humanSize(int|float $bytes): string
+function humanSize(float $bytes): string
 {
     $units = ['o', 'Ko', 'Mo', 'Go'];
     $i = 0;
@@ -223,6 +204,55 @@ function humanSize(int|float $bytes): string
         $i++;
     }
     return round($bytes, 1) . ' ' . $units[$i];
+}
+
+/** Prérequis vérifiés AVANT toute action (affichage + exécution).
+ *  @return array<int, array{label: string, ok: bool, detail: string}> */
+function checkRequirements(): array
+{
+    return [
+        [
+            'label'  => 'PHP 8.4 ou supérieur',
+            'ok'     => PHP_VERSION_ID >= 80400,
+            'detail' => 'version détectée : ' . PHP_VERSION,
+        ],
+        [
+            'label'  => 'Extension pdo_sqlite',
+            'ok'     => extension_loaded('pdo_sqlite'),
+            'detail' => extension_loaded('pdo_sqlite') ? 'présente' : 'absente',
+        ],
+        [
+            'label'  => 'Extension intl',
+            'ok'     => extension_loaded('intl'),
+            'detail' => extension_loaded('intl') ? 'présente' : 'absente',
+        ],
+        [
+            'label'  => 'Extension zip (requise par ce script)',
+            'ok'     => class_exists('ZipArchive'),
+            'detail' => class_exists('ZipArchive') ? 'présente' : 'absente',
+        ],
+    ];
+}
+
+function requirementsMet(array $requirements): bool
+{
+    foreach ($requirements as $r) {
+        if (!$r['ok']) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function requirementsHtml(array $requirements): string
+{
+    $items = '';
+    foreach ($requirements as $r) {
+        $cls = $r['ok'] ? 'ok' : 'err';
+        $mark = $r['ok'] ? '✔' : '✘';
+        $items .= "<li class='$cls'>$mark " . htmlspecialchars($r['label'] . ' — ' . $r['detail']) . '</li>';
+    }
+    return "<p>Prérequis du serveur :</p><ul>$items</ul>";
 }
 
 function render(string $title, string $body): void
@@ -253,6 +283,8 @@ $keyParam = INSTALL_SECRET !== '' ? '?key=' . urlencode(INSTALL_SECRET) : '';
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || ($_POST['confirm'] ?? '') !== '1') {
     // --- Écran de confirmation ---
     $mode = detectMode();
+    $requirements = checkRequirements();
+    $reqOk = requirementsMet($requirements);
     $archivePath = ROOT_DIR . '/' . ARCHIVE_NAME;
     $archiveOk = is_file($archivePath);
 
@@ -275,8 +307,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || ($_POST['confirm'] ?? ''
         $archiveMsg = "<p class='err'>Archive " . ARCHIVE_NAME . " introuvable à la racine du site.</p>";
     }
 
-    $body = "<p>Mode détecté : <strong>$mode</strong></p>$warn$archiveMsg"
-        . ($archiveOk
+    $body = requirementsHtml($requirements) . "<p>Mode détecté : <strong>$mode</strong></p>$warn$archiveMsg"
+        . (!$reqOk
+            ? "<p class='err'>Prérequis non satisfaits : aucune opération ne sera lancée. Corrigez la configuration PHP de l'hébergement puis rechargez cette page.</p>"
+            : '')
+        . ($archiveOk && $reqOk
             ? "<form method='post' action='$keyParam' onsubmit=\"this.querySelector('button').disabled=true;this.querySelector('button').textContent='Traitement en cours, veuillez patienter…';document.body.style.cursor='wait';\">"
               . "<input type='hidden' name='confirm' value='1'>"
               . "<p><label><input type='checkbox' name='auto_delete' value='1' checked> "
@@ -290,7 +325,22 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || ($_POST['confirm'] ?? ''
 
 // --- Exécution ---
 $log = [];
+// Ne pas être interrompu si le navigateur se ferme ou si l'opération est longue.
+ignore_user_abort(true);
+@set_time_limit(0);
 try {
+    // Prérequis vérifiés avant TOUTE action (aucune suppression tant que non satisfaits).
+    $requirements = checkRequirements();
+    if (!requirementsMet($requirements)) {
+        $missing = [];
+        foreach ($requirements as $r) {
+            if (!$r['ok']) {
+                $missing[] = $r['label'] . ' (' . $r['detail'] . ')';
+            }
+        }
+        throw new RuntimeException('Prérequis non satisfaits, aucune action effectuée : ' . implode(', ', $missing));
+    }
+
     $archivePath = ROOT_DIR . '/' . ARCHIVE_NAME;
     if (!is_file($archivePath)) {
         throw new RuntimeException('Archive ' . ARCHIVE_NAME . ' introuvable.');
@@ -334,19 +384,9 @@ try {
     @rmdir(TEMP_DIR);
     $log[] = 'Dossier temporaire nettoyé.';
 
-    // 4) Laisser l'application faire son travail habituel de première visite.
+    // La migration de la base et la suppression de app/models/database/migrators sont
+    // faites par l'application à la première ouverture du site (voir Database.php).
     $url = selfUrl();
-    [$pingOk, $pingErr] = pingSiteRoot($url);
-    $log[] = $pingOk
-        ? "Appel de $url effectué (template/migrateurs déclenchés)."
-        : "Échec de l'appel automatique à $url ($pingErr) — ouvrez le site manuellement pour finaliser.";
-
-    // 5) Nettoyage des migrateurs.
-    if (is_dir(MIGRATORS_DIR)) {
-        rrmdirAll(MIGRATORS_DIR);
-        @rmdir(MIGRATORS_DIR);
-        $log[] = 'Dossier app/models/database/migrators supprimé.';
-    }
 
     // Suppression d'install.php dans CETTE MÊME requête si demandé : une fois
     // le .htaccess d'origine restauré, une requête ultérieure vers /install.php
@@ -363,8 +403,10 @@ try {
     }
 
     $items = '<ul><li>' . implode('</li><li>', array_map('htmlspecialchars', $log)) . '</li></ul>';
-    $body = "<p class='ok'>Opération terminée.</p>$items$deleteMsg"
-        . "<p><a href='$url'>Ouvrir le site</a></p>";
+    $status = "<p class='ok'>Fichiers installés.</p>"
+        . "<p>Ouvrez maintenant le site : la première visite finalise l'opération (migration de la base si nécessaire).</p>";
+    $body = "$status$items$deleteMsg"
+        . "<p><a href='$url'>Ouvrir le site et finaliser</a></p>";
 
     render('MyClub — Résultat', $body);
 } catch (Throwable $e) {

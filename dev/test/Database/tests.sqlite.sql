@@ -5550,7 +5550,7 @@ INSERT INTO "Test" VALUES (6428,8890,'GET','/api/event-availabilities/slot-event
 INSERT INTO "Test" VALUES (6429,8900,'GET','/api/event-availabilities/slot-events',NULL,NULL,'{"email":"homeDesigner@myclub.foo","password":"homeD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (6430,8910,'GET','/api/event-availabilities/slot-events',NULL,NULL,'{"email":"eventDesigner@myclub.foo","password":"eventD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (6431,8920,'GET','/api/event-availabilities/slot-events',NULL,NULL,'{"email":"visitorInsights@myclub.foo","password":"observator1234" }','403',NULL,NULL);
-INSERT INTO "Test" VALUES (6432,3100,'PUT','/api/event-availabilities/slot-events',NULL,NULL,'{"email":"kanbanDesigner@myclub.foo","password":"kanbanD1234" }','403',NULL,NULL);
+INSERT INTO "Test" VALUES (6432,3100,'GET','/api/event-availabilities/slot-events',NULL,NULL,'{"email":"kanbanDesigner@myclub.foo","password":"kanbanD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (6433,8930,'GET','/api/event-availabilities/slot-events',NULL,NULL,'{"email":"menuDesigner@myclub.foo","password":"menuD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (6434,8940,'GET','/api/event-availabilities/slot-events',NULL,NULL,'{"email":"kanbanDesigner@myclub.foo","password":"kanbanD1234" }','403',NULL,NULL);
 INSERT INTO "Test" VALUES (6435,8950,'GET','/api/event-availabilities/slot-events',NULL,NULL,'{"email":"translator@myclub.foo","password":"translator1234" }','403',NULL,NULL);
