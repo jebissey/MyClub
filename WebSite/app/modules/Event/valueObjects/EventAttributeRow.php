@@ -7,10 +7,10 @@ namespace app\modules\Event\valueObjects;
 final readonly class EventAttributeRow
 {
     public function __construct(
-        public readonly string $id,
-        public readonly string $name,
-        public readonly string $detail,
-        public readonly string $color,
+        public string $id,
+        public string $name,
+        public string $detail,
+        public string $color,
     ) {
     }
 

@@ -69,8 +69,8 @@
                                 <div class="input-group">
                                     <select id="availableAttributesSelect" class="form-control">
                                         {foreach $eventAttributes as $attribute}
-                                        <option value="{$attribute->Id}" data-color="{$attribute->Color}" data-detail="{$attribute->Detail}">
-                                            {$attribute->Name}
+                                        <option value="{$attribute->id}" data-color="{$attribute->color}" data-detail="{$attribute->detail}">
+                                            {$attribute->name}
                                         </option>
                                         {/foreach}
                                     </select>

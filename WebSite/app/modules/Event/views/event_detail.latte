@@ -74,8 +74,8 @@
                         {foreach $attributes as $attribute}
                         <span 
                             class="attribute-badge" 
-                            style="background-color: {$attribute->Color|noescape};"
-                            title="{$attribute->Name} - {$attribute->Detail}">
+                            style="background-color: {$attribute->color|noescape};"
+                            title="{$attribute->name} - {$attribute->detail}">
                         </span>
                         {/foreach}
                     </p>
@@ -102,8 +102,8 @@
                             <ul class="list-group">
                             {foreach $attributes as $attribute}
                                 <li class="list-group-item d-flex align-items-center">
-                                    <span class="me-2 d-inline-block rounded" style="width:20px; height:20px; background-color:{$attribute->Color|noescape};"></span>
-                                    <span><strong>{$attribute->Name}</strong> : {$attribute->Detail}</span>
+                                    <span class="me-2 d-inline-block rounded" style="width:20px; height:20px; background-color:{$attribute->color|noescape};"></span>
+                                    <span><strong>{$attribute->name}</strong> : {$attribute->detail}</span>
                                 </li>
                             {/foreach}
                             </ul>

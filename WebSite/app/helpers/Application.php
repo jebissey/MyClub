@@ -298,5 +298,10 @@ final class Application
 
             return $path;
         });
+
+        self::$latte->addFilter(
+            'readableDuration',
+            fn($duration) => TranslationManager::getReadableDuration($duration)
+        );
     }
 }
