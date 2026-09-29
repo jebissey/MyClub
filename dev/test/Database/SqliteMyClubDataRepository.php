@@ -6,9 +6,8 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 use RuntimeException;
-use test\Interfaces\MyClubDataRepositoryInterface;
 
-class SqliteMyClubDataRepository implements MyClubDataRepositoryInterface
+class SqliteMyClubDataRepository
 {
     private ?PDO $db = null;
     private string $dbPath;

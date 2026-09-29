@@ -9,10 +9,9 @@ use test\Core\ValueObjects\Route;
 use test\Core\ValueObjects\Simulation;
 use test\Core\ValueObjects\TestConfiguration;
 use test\Core\ValueObjects\TestResult;
-use test\Interfaces\AuthenticatorInterface;
+use test\Database\SqliteMyClubDataRepository;
+use test\Infrastructure\SessionAuthenticator;
 use test\Interfaces\HttpClientInterface;
-use test\Interfaces\MyclubDataRepositoryInterface;
-use test\Interfaces\ResponseValidatorInterface;
 use test\Interfaces\TestDataRepositoryInterface;
 use test\Interfaces\TestReporterInterface;
 
@@ -25,10 +24,10 @@ final class TestExecutor
 
     public function __construct(
         private TestDataRepositoryInterface $repo,
-        private MyclubDataRepositoryInterface $myClub,
-        private AuthenticatorInterface $authenticator,
+        private SqliteMyClubDataRepository $myClub,
+        private SessionAuthenticator $authenticator,
         private HttpClientInterface $http,
-        private ResponseValidatorInterface $responseValidator,
+        private ResponseValidator $responseValidator,
         private UrlBuilder $urlBuilder,
         private TestDataValidator $validator,
         private TestReporterInterface $reporter,

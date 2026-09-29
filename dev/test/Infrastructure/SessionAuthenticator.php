@@ -7,10 +7,9 @@ namespace test\Infrastructure;
 use Throwable;
 
 use test\Core\ValueObjects\AuthenticationResult;
-use test\Interfaces\AuthenticatorInterface;
 use test\Interfaces\HttpClientInterface;
 
-final class SessionAuthenticator implements AuthenticatorInterface
+final class SessionAuthenticator
 {
     public function __construct(
         private HttpClientInterface $httpClient,

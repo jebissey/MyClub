@@ -13,7 +13,6 @@ use test\Core\TestExecutor;
 use test\Core\ValueObjects\TestResult;
 use test\Core\ValueObjects\TestSummary;
 use test\Infrastructure\SimulationExtractor;
-use test\Interfaces\RouteExtractorInterface;
 use test\Interfaces\TestReporterInterface;
 
 final class RouteTestOrchestrator
@@ -21,7 +20,7 @@ final class RouteTestOrchestrator
     private ?TestSummary $lastSummary = null;
 
     public function __construct(
-        private RouteExtractorInterface $routeExtractor,
+        private FlightRouteExtractor $routeExtractor,
         private SimulationExtractor $simulationExtractor,
         private TestExecutor $executor,
         private TestReporterInterface $reporter,

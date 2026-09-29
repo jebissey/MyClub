@@ -7,9 +7,8 @@ namespace test\Infrastructure;
 use InvalidArgumentException;
 
 use test\Core\ValueObjects\Route;
-use test\Interfaces\RouteExtractorInterface;
 
-final class FlightRouteExtractor implements RouteExtractorInterface
+final class FlightRouteExtractor
 {
     private const REGEX_MAP_ROUTE = '/mapRoute\(\$flight,\s*[\'"]([^\'"]+)[\'"]\s*,/';
     private const REGEX_DIRECT_ROUTE = '/\$flight->route\(\s*[\'"]([^\'"]+)[\'"]/';
