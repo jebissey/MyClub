@@ -16,7 +16,7 @@ use test\Infrastructure\SimulationExtractor;
 use test\Interfaces\RouteExtractorInterface;
 use test\Interfaces\TestReporterInterface;
 
-class RouteTestOrchestrator
+final class RouteTestOrchestrator
 {
     private ?TestSummary $lastSummary = null;
 

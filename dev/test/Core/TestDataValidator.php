@@ -6,7 +6,7 @@ namespace test\Core;
 
 use test\Core\ValueObjects\Route;
 
-class TestDataValidator
+final class TestDataValidator
 {
     public function validate(Route $route, int $routeNumber, array $testData): array
     {

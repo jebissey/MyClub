@@ -6,7 +6,7 @@ namespace test\Core;
 
 use test\Core\ValueObjects\Route;
 
-class UrlBuilder
+final class UrlBuilder
 {
     public function __construct() {}
 

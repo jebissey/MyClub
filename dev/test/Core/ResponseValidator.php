@@ -7,7 +7,7 @@ namespace test\Core;
 use test\Core\ValueObjects\ValidationResult;
 use test\Interfaces\ResponseValidatorInterface;
 
-class ResponseValidator implements ResponseValidatorInterface
+final class ResponseValidator implements ResponseValidatorInterface
 {
     public function validate(int $actualResponseCode, int $expectedResponseCode): ValidationResult
     {

@@ -20,7 +20,7 @@ use test\Infrastructure\RouteTestOrchestrator;
 use test\Infrastructure\SessionAuthenticator;
 use test\Infrastructure\SimulationExtractor;
 
-class RouteTestFactory
+final class RouteTestFactory
 {
     public static function create(TestConfiguration $config, ?string $dbTestsPath = null, ?string $dbMyClubPath = null): RouteTestOrchestrator
     {

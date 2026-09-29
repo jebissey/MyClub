@@ -10,7 +10,7 @@ use test\Interfaces\TestDataRepositoryInterface;
 use RuntimeException;
 use Throwable;
 
-class SimulationExtractor
+final class SimulationExtractor
 {
     public function __construct(private TestDataRepositoryInterface $repo) {}
 

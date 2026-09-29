@@ -7,7 +7,7 @@ namespace test\Core;
 use test\Core\ValueObjects\TestSummary;
 use test\Interfaces\TestReporterInterface;
 
-class ConsoleTestReporter implements TestReporterInterface
+final class ConsoleTestReporter implements TestReporterInterface
 {
     public function displaySummary(TestSummary $summary): void
     {

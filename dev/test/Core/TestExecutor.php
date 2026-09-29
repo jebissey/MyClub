@@ -17,7 +17,7 @@ use test\Interfaces\TestDataRepositoryInterface;
 use test\Interfaces\TestReporterInterface;
 
 
-class TestExecutor
+final class TestExecutor
 {
     private array $parameterErrors = [];
     private array $responseErrors = [];

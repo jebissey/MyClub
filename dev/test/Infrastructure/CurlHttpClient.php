@@ -10,7 +10,7 @@ use test\Core\ValueObjects\HttpResponse;
 use test\Core\ValueObjects\TestConfiguration;
 use test\Interfaces\HttpClientInterface;
 
-class CurlHttpClient implements HttpClientInterface
+final class CurlHttpClient implements HttpClientInterface
 {
     private array $storedCookies = [];
 

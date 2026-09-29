@@ -10,7 +10,7 @@ use test\Core\ValueObjects\AuthenticationResult;
 use test\Interfaces\AuthenticatorInterface;
 use test\Interfaces\HttpClientInterface;
 
-class SessionAuthenticator implements AuthenticatorInterface
+final class SessionAuthenticator implements AuthenticatorInterface
 {
     public function __construct(
         private HttpClientInterface $httpClient,
