@@ -98,7 +98,7 @@ function buildConfiguration(array $options): TestConfiguration
 {
     return new TestConfiguration(
         baseUrl: $options['base-url'] ?? 'http://localhost:8000',
-        timeout: (int) ($options['timeout'] ?? 5)
+        timeout: (int) ($options['timeout'] ?? 10)
     );
 }
 
@@ -264,7 +264,7 @@ function printHelp(): void
 Usage: php FlightRouteTester.php [options]
 Options:
   --base-url=URL      Base URL (default: http://localhost:8000)
-  --timeout=SECONDS   Request timeout in seconds (default: 5)
+  --timeout=SECONDS   Request timeout in seconds (default: 10)
   --routes-file=FILE  File containing routes (default: WebSite/app/config/Routes.php)
   --db-path=PATH      Path of SQLite database (tests / site — see note in code)
   --export-json       Export results as JSON
