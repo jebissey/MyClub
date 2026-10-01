@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace test\TestCoverage;
 
+use FilesystemIterator;
 use ReflectionClass;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use SplFileInfo;
 use test\TestCoverage\ValueObjects\MissingTest;
 
 final class TestCoverageChecker
@@ -55,7 +57,10 @@ final class TestCoverageChecker
     private function scanClasses(string $dir): array
     {
         $classes = [];
-        $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+        $it = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
+        );
+        /** @var SplFileInfo $file */
         foreach ($it as $file) {
             if (!$file->isFile() || $file->getExtension() !== 'php') {
                 continue;
@@ -74,6 +79,9 @@ final class TestCoverageChecker
         return $classes;
     }
 
+    /**
+     * @param ReflectionClass<object> $rc
+     */
     private function requiresTest(ReflectionClass $rc): bool
     {
         if ($rc->isAbstract() || $rc->isInterface()) {

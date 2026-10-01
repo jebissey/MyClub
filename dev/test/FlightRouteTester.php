@@ -7,8 +7,10 @@ require_once __DIR__ . '/bootstrap.php';
 use test\Core\CsvTestExporter;
 use test\Core\JsonTestExporter;
 use test\Core\ValueObjects\TestConfiguration;
+use test\Core\ValueObjects\TestResult;
 use test\Infrastructure\CurrentWebSite;
 use test\Infrastructure\RouteTestFactory;
+
 
 function main(): int
 {
@@ -80,7 +82,7 @@ function main(): int
 /** @return array<string, string|false> */
 function parseOptions(): array
 {
-    return getopt('', [
+    $options = getopt('', [
         'base-url:',
         'timeout:',
         'routes-file:',
@@ -90,14 +92,26 @@ function parseOptions(): array
         'help',
         'simu:',
         'stop',
-    ]) ?: [];
+    ]);
+
+    if ($options === false) {
+        return [];
+    }
+
+    /** @var array<string, string|false> $options */
+    return $options;
 }
 
 /** @param array<string, string|false> $options */
 function buildConfiguration(array $options): TestConfiguration
 {
+    $baseUrl = $options['base-url'] ?? 'http://localhost:8000';
+    if (!is_string($baseUrl)) {
+        $baseUrl = 'http://localhost:8000';
+    }
+
     return new TestConfiguration(
-        baseUrl: $options['base-url'] ?? 'http://localhost:8000',
+        baseUrl: $baseUrl,
         timeout: (int) ($options['timeout'] ?? 10)
     );
 }
@@ -108,12 +122,14 @@ function buildConfiguration(array $options): TestConfiguration
  */
 function resolvePaths(array $options): array
 {
+    $routesFile = $options['routes-file'] ?? MYCLUB_WEBSITE_DIR . '/app/config/Routes.php';
+    $dbTests = $options['db-path'] ?? __DIR__ . '/Database/tests.sqlite';
     $dbWebSite = $options['db-path'] ?? MYCLUB_DB_PATH;
 
     return [
-        'routeFile' => $options['routes-file'] ?? MYCLUB_WEBSITE_DIR . '/app/config/Routes.php',
+        'routeFile' => is_string($routesFile) ? $routesFile : MYCLUB_WEBSITE_DIR . '/app/config/Routes.php',
         'routeDirectory' => MYCLUB_WEBSITE_DIR . '/app/config/routes',
-        'dbTests' => $options['db-path'] ?? __DIR__ . '/Database/tests.sqlite',
+        'dbTests' => is_string($dbTests) ? $dbTests : __DIR__ . '/Database/tests.sqlite',
         // Note: --db-path currently shared between tests DB and site DB (legacy).
         // Prefer dedicated options later if needed.
         'dbMyClub' => MYCLUB_DB_PATH,
@@ -247,7 +263,9 @@ function printFooter(float $totalTimeMs): void
     echo str_repeat('=', 60) . "\n";
 }
 
-/** @param list<mixed> $results */
+/**
+ * @param list<TestResult> $results
+ */
 function exportResults(array $results, bool $exportJson, bool $exportCsv): void
 {
     if ($exportJson) {
@@ -278,6 +296,7 @@ Options:
 EOT;
 }
 
-if (basename(__FILE__) === basename($_SERVER['SCRIPT_NAME'] ?? '')) {
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+if (is_string($scriptName) && basename(__FILE__) === basename($scriptName)) {
     exit(main());
 }

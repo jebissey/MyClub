@@ -19,59 +19,94 @@ final class FlightRouteExtractor
     private const EXCLUDED_PATHS = [
         '/.well-known/appspecific/com.chrome.devtools.json',
     ];
+
+    /** @var list<Route> */
     private array $routes = [];
 
+    /**
+     * @return list<Route>
+     */
     public function extractRoutes(string $filePath, string $directoryPath): array
     {
-        if (!file_exists($filePath)) throw new InvalidArgumentException("File $filePath doesn't exist");
+        if (!file_exists($filePath)) {
+            throw new InvalidArgumentException("File $filePath doesn't exist");
+        }
 
         $content = file_get_contents($filePath);
+        if ($content === false) {
+            throw new InvalidArgumentException("Unable to read file $filePath");
+        }
+
         $this->lookingForRoutes($content, self::REGEX_MAP_ROUTE);
         $this->lookingForRoutes($content, self::REGEX_DIRECT_ROUTE);
         $this->lookingForRoutes($content, self::REGEX_ICONS_ROUTE);
         $this->lookingForRoutes($content, self::REGEX_STATIC_ARRAY_ROUTE);
 
-        $files = array_filter(scandir($directoryPath), fn($file) => pathinfo($file, PATHINFO_EXTENSION) === 'php');
+        $files = array_filter(
+            scandir($directoryPath),
+            fn (string $file): bool => pathinfo($file, PATHINFO_EXTENSION) === 'php'
+        );
         foreach ($files as $file) {
-            $filePath = $directoryPath . DIRECTORY_SEPARATOR . $file;
-            $this->lookingForRoutes(file_get_contents($filePath), self::REGEX_NEW_ROUTE);
+            $path = $directoryPath . DIRECTORY_SEPARATOR . $file;
+            $fileContent = file_get_contents($path);
+            if ($fileContent === false) {
+                continue;
+            }
+            $this->lookingForRoutes($fileContent, self::REGEX_NEW_ROUTE);
         }
 
         $this->routes = array_values(array_filter(
             $this->routes,
-            fn(Route $r) => !in_array($r->path, self::EXCLUDED_PATHS, true)
+            fn (Route $r): bool => !in_array($r->path, self::EXCLUDED_PATHS, true)
         ));
 
-        usort($this->routes, fn(Route $a, Route $b) => strcmp($a->path, $b->path));
+        usort($this->routes, fn (Route $a, Route $b): int => strcmp($a->path, $b->path));
+
         return $this->routes;
     }
 
     #region Private functions
+
     private function lookingForRoutes(string $content, string $regex): void
     {
         preg_match_all($regex, $content, $matches);
         foreach ($matches[1] as $route) {
             $parsed = $this->parseRoute($route);
-            if ($parsed) $this->routes[] = $parsed;
+            if ($parsed !== null) {
+                $this->routes[] = $parsed;
+            }
         }
     }
 
     private function parseRoute(string $routeDefinition, string $defaultMethod = 'GET'): ?Route
     {
         $parts = preg_split('/\s+/', trim($routeDefinition), 2);
+        if ($parts === false) {
+            return null;
+        }
+
         if (count($parts) === 1) {
             $path = $parts[0];
-            if (!str_starts_with($path, '/')) return null;
+            if (!str_starts_with($path, '/')) {
+                return null;
+            }
+
             return new Route(
                 method: strtoupper($defaultMethod),
                 path: $path,
                 hasParameters: preg_match(self::REGEX_ROUTE_PARAM, $path) > 0,
             );
         }
-        if (count($parts) !== 2) return null;
+
+        if (count($parts) !== 2) {
+            return null;
+        }
+
         $method = strtoupper($parts[0]);
         $path = $parts[1];
-        if (!str_starts_with($path, '/')) return null;
+        if (!str_starts_with($path, '/')) {
+            return null;
+        }
 
         return new Route(
             method: $method,
@@ -79,5 +114,6 @@ final class FlightRouteExtractor
             hasParameters: preg_match(self::REGEX_ROUTE_PARAM, $path) > 0,
         );
     }
+
     #endregion
 }

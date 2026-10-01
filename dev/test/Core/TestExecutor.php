@@ -214,8 +214,8 @@ final class TestExecutor
         if ($errors !== []) {
             $results = [];
             foreach ($errors as $index => $error) {
-                $dbId = isset($testData[$index]['Id']) ? (int) $testData[$index]['Id'] : null;
-                $requestPath = (string) ($testData[$index]['Uri'] ?? $route->path);
+                $dbId = $this->intValue($testData[$index]['Id'] ?? null);
+                $requestPath = $this->stringValue($testData[$index]['Uri'] ?? null) ?? $route->path;
                 $result = TestResult::invalidTestParameters(
                     $route,
                     $routeNumber,
@@ -276,8 +276,8 @@ final class TestExecutor
      */
     private function runSingleTest(Route $route, int $routeNumber, array $test): TestResult
     {
-        $dbId = isset($test['Id']) ? (int) $test['Id'] : null;
-        $requestPath = (string) ($test['Uri'] ?? $route->path);
+        $dbId = $this->intValue($test['Id'] ?? null);
+        $requestPath = $this->stringValue($test['Uri'] ?? null) ?? $route->path;
 
         $this->http->clearSession();
 
@@ -292,7 +292,7 @@ final class TestExecutor
             'postfields' => $postParams,
         ]);
 
-        $expectedCode = (int) ($test['ExpectedResponseCode'] ?? 200);
+        $expectedCode = $this->intValue($test['ExpectedResponseCode'] ?? null) ?? 200;
         if ($response->httpCode !== $expectedCode) {
             return TestResult::responseCodeFailure(
                 $route,
@@ -304,11 +304,16 @@ final class TestExecutor
             );
         }
 
-        $query = $test['Query'] ?? null;
+        $query = $this->stringValue($test['Query'] ?? null);
         if ($query !== null && $query !== '') {
             $rows = $this->myClub->executeQuery($query);
+
             $actual = json_encode($rows, JSON_UNESCAPED_UNICODE);
-            $expected = (string) ($test['QueryExpectedResponse'] ?? '');
+            if ($actual === false) {
+                $actual = '';
+            }
+
+            $expected = $this->stringValue($test['QueryExpectedResponse'] ?? null) ?? '';
 
             if (!$this->jsonEqual($expected, $actual)) {
                 return TestResult::dataFailure(
@@ -342,7 +347,7 @@ final class TestExecutor
             return null;
         }
 
-        $user = json_decode((string) $jsonUser, true);
+        $user = json_decode($this->stringValue($jsonUser) ?? '', true);
         if (!is_array($user)) {
             return TestResult::authenticationFailure(
                 $route,
@@ -354,7 +359,15 @@ final class TestExecutor
             );
         }
 
-        $authResult = $this->authenticator->authenticate($user);
+        /** @var array<string, string> $credentials */
+        $credentials = [];
+        foreach ($user as $key => $value) {
+            if (is_string($key) && is_string($value)) {
+                $credentials[$key] = $value;
+            }
+        }
+
+        $authResult = $this->authenticator->authenticate($credentials);
         if (!$authResult->success) {
             $message = $authResult->error !== ''
                 ? $authResult->error
@@ -425,8 +438,9 @@ final class TestExecutor
     /** @param array<string, mixed> $postParams */
     private function displayTestResult(TestResult $result, array $postParams): void
     {
-        $httpCode = $result->response?->httpCode ?? 0;
-        $responseTimeMs = $result->response?->responseTimeMs ?? 0.0;
+        $httpCode = $result->response->httpCode ?? 0;
+        $responseTimeMs = $result->response->responseTimeMs ?? 0.0;
+
         $path = $result->requestPath !== ''
             ? $result->requestPath
             : $result->route->path;
@@ -440,7 +454,12 @@ final class TestExecutor
             return null;
         }
 
-        return json_decode((string) $json, true);
+        $asString = $this->stringValue($json);
+        if ($asString === null) {
+            return null;
+        }
+
+        return json_decode($asString, true);
     }
 
     private function jsonEqual(string $expected, string $actual): bool
@@ -453,5 +472,47 @@ final class TestExecutor
         }
 
         return $expectedDecoded === $actualDecoded;
+    }
+
+    /**
+     * Returns $value as a string if it is a scalar, null otherwise.
+     * Used to safely narrow values coming from `array<string, mixed>` rows.
+     */
+    private function stringValue(mixed $value): ?string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns $value as an int if it is numeric, null otherwise.
+     * Used to safely narrow values coming from `array<string, mixed>` rows.
+     */
+    private function intValue(mixed $value): ?int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_float($value)) {
+            return (int) $value;
+        }
+
+        if (is_string($value) && is_numeric($value)) {
+            return (int) $value;
+        }
+
+        return null;
     }
 }

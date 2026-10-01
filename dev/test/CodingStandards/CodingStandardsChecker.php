@@ -423,6 +423,9 @@ final class CodingStandardsChecker
         return $statements;
     }
 
+    /**
+     * @param list<mixed> $tokens
+     */
     private function nextMeaningfulIsContinuation(array $tokens, int $i, int $count): bool
     {
         $i = $this->skipTrivia($tokens, $i, $count);
@@ -608,6 +611,7 @@ final class CodingStandardsChecker
     }
 
     /**
+     * @param list<mixed> $tokens
      * @return array{0: list<mixed>, 1: int}
      */
     private function extractBody(array $tokens, int $i, int $count): array
@@ -652,6 +656,9 @@ final class CodingStandardsChecker
         return [$body, $i];
     }
 
+    /**
+     * @param list<mixed> $tokens
+     */
     private function skipTrivia(array $tokens, int $i, int $count): int
     {
         while ($i < $count && is_array($tokens[$i] ?? null) && in_array(
@@ -689,7 +696,7 @@ final class CodingStandardsChecker
     private function matchesTerminalCall(string $text): bool
     {
         $alternation = implode('|', array_map(
-            static fn(string $w): string => preg_quote($w, '/'),
+            static fn (string $w): string => preg_quote($w, '/'),
             self::TERMINAL_CALL_BASE_WORDS,
         ));
 
@@ -733,7 +740,17 @@ final class CodingStandardsChecker
         $text = '';
 
         foreach ($tokens as $t) {
-            $text .= is_array($t) ? $t[1] : $t;
+            if (is_array($t)) {
+                $piece = $t[1] ?? null;
+                if (is_string($piece)) {
+                    $text .= $piece;
+                }
+                continue;
+            }
+
+            if (is_string($t)) {
+                $text .= $t;
+            }
         }
 
         return $text;

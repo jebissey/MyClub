@@ -14,6 +14,8 @@
 
 require_once __DIR__ . '/bootstrap.php';
 
+use SplFileInfo;
+
 $scanDir = MYCLUB_WEBSITE_DIR . '/app';
 $sqlFile = MYCLUB_WEBSITE_DIR . '/app/models/database/MyClub.sqlite.sql';
 
@@ -70,6 +72,7 @@ function scanFiles(
         RegexIterator::MATCH
     );
 
+    /** @var SplFileInfo $fileInfo */
     foreach ($iterator as $fileInfo) {
         $filePath = $fileInfo->getPathname();
         $fileCount++;
@@ -139,6 +142,7 @@ function scanPhpTranslationArrays(string $dir, array &$usedKeys): array
         RegexIterator::MATCH
     );
 
+    /** @var SplFileInfo $fileInfo */
     foreach ($iterator as $fileInfo) {
         $filePath = $fileInfo->getPathname();
         $fileCount++;

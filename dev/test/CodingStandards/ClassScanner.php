@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace test\CodingStandards;
 
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
+
 use test\CodingStandards\ValueObjects\ClassInfo;
 
 final class ClassScanner
@@ -15,10 +20,11 @@ final class ClassScanner
     {
         $classes = [];
 
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
         );
 
+        /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
             if (!$file->isFile() || $file->getExtension() !== 'php') {
                 continue;
@@ -90,7 +96,6 @@ final class ClassScanner
                     }
 
                     $kind = match ($id) {
-                        T_CLASS => 'class',
                         T_INTERFACE => 'interface',
                         T_TRAIT => 'trait',
                         T_ENUM => 'enum',
@@ -156,14 +161,33 @@ final class ClassScanner
         return $results;
     }
 
+    /**
+     * @param list<mixed> $tokens
+     */
     private function previousMeaningfulToken(array $tokens, int $index): int|string|null
     {
         for ($i = $index - 1; $i >= 0; $i--) {
             $t = $tokens[$i];
-            if (is_array($t) && in_array($t[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
-                continue;
+
+            if (is_array($t)) {
+                $id = $t[0] ?? null;
+                if (!is_int($id)) {
+                    continue;
+                }
+
+                if (in_array($id, [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+                    continue;
+                }
+
+                return $id;
             }
-            return is_array($t) ? $t[0] : $t;
+
+            if (is_string($t)) {
+                return $t;
+            }
+
+            // Type inattendu (ne devrait pas arriver avec token_get_all) :
+            // on l'ignore comme du trivia.
         }
 
         return null;

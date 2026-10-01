@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-define('MYCLUB_ROOT', realpath(__DIR__ . '/../..'));
+define('MYCLUB_ROOT', __DIR__ . '/../..');
 define('MYCLUB_WEBSITE_DIR', MYCLUB_ROOT . '/WebSite');
 define('MYCLUB_DB_PATH', MYCLUB_WEBSITE_DIR . '/data/MyClub.sqlite');
 

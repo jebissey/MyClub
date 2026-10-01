@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace test\Core;
 
 use PDO;
+use PDOStatement;
+use RuntimeException;
+
 use test\Core\ValueObjects\Route;
 
 final class TestCoverageChecker
@@ -23,14 +26,18 @@ final class TestCoverageChecker
     private static function checkPutCoverage(PDO $pdo, array $routes): void
     {
         $expectedRoutes = array_values(array_unique(array_filter(array_map(
-            static fn(Route $r) => $r->method !== 'PUT' ? $r->path : null,
+            static fn (Route $r): ?string => $r->method !== 'PUT' ? $r->path : null,
             $routes
         ))));
 
-        $putUris = array_column(
-            $pdo->query('SELECT DISTINCT "Uri" FROM "Test" WHERE "Method" = \'PUT\'')->fetchAll(PDO::FETCH_ASSOC),
-            'Uri'
-        );
+        /** @var list<array<string, mixed>> $putRows */
+        $putRows = self::query(
+            $pdo,
+            'SELECT DISTINCT "Uri" FROM "Test" WHERE "Method" = \'PUT\''
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        /** @var list<string> $putUris */
+        $putUris = array_column($putRows, 'Uri');
 
         $missing = [];
         $duplicated = [];
@@ -40,7 +47,7 @@ final class TestCoverageChecker
             $regex = self::routePathToRegex($originalPath);
             $matches = array_values(array_filter(
                 $putUris,
-                static fn(string $uri) => preg_match($regex, $uri) === 1
+                static fn (string $uri): bool => preg_match($regex, $uri) === 1
             ));
 
             if ($matches === []) {
@@ -76,14 +83,16 @@ final class TestCoverageChecker
         $requiredContexts = self::deriveRequiredContexts($pdo);
 
         // Route matrix = Step IS NULL; user@ lives in simulations (Step IS NOT NULL)
-        $rows = $pdo->query(
+        /** @var list<array<string, mixed>> $rows */
+        $rows = self::query(
+            $pdo,
             'SELECT "Uri", "JsonConnectedUser" FROM "Test"
              WHERE "Method" != \'PUT\'
                AND ("Step" IS NULL OR "JsonConnectedUser" LIKE \'%"email":"user@myclub.foo"%\')'
         )->fetchAll(PDO::FETCH_ASSOC);
 
         $expectedRoutes = array_values(array_unique(array_map(
-            static fn(Route $r) => $r->path,
+            static fn (Route $r): string => $r->path,
             $routes
         )));
 
@@ -94,12 +103,20 @@ final class TestCoverageChecker
 
         $contextsByRoute = [];
         foreach ($rows as $row) {
-            $context = self::contextKey($row['JsonConnectedUser']);
+            $uri = $row['Uri'] ?? null;
+            if (!is_string($uri)) {
+                continue;
+            }
+
+            $jsonUser = $row['JsonConnectedUser'] ?? null;
+            $jsonUserString = is_string($jsonUser) ? $jsonUser : null;
+
+            $context = self::contextKey($jsonUserString);
             if (!in_array($context, $requiredContexts, true)) {
                 continue;
             }
             foreach ($regexByRoute as $originalPath => $regex) {
-                if (preg_match($regex, $row['Uri']) === 1) {
+                if (preg_match($regex, $uri) === 1) {
                     $contextsByRoute[$originalPath][$context] = true;
                 }
             }
@@ -136,38 +153,51 @@ final class TestCoverageChecker
         $contexts = [];
 
         // Anonymous
-        $hasAnonymous = (bool) $pdo->query(
+        $hasAnonymous = (bool) self::query(
+            $pdo,
             'SELECT 1 FROM "Test"
              WHERE "Step" IS NULL
                AND "Method" != \'PUT\'
                AND ("JsonConnectedUser" IS NULL OR TRIM("JsonConnectedUser") = \'\')
              LIMIT 1'
         )->fetchColumn();
+
         if ($hasAnonymous) {
             $contexts['(anonyme)'] = true;
         }
 
         // All accounts present on the route matrix (Step IS NULL)
-        $stmt = $pdo->query(
+        /** @var list<array<string, mixed>> $accountRows */
+        $accountRows = self::query(
+            $pdo,
             'SELECT DISTINCT "JsonConnectedUser" FROM "Test"
              WHERE "Step" IS NULL
                AND "Method" != \'PUT\'
                AND "JsonConnectedUser" IS NOT NULL
                AND TRIM("JsonConnectedUser") != \'\''
-        );
-        foreach ($stmt as $row) {
-            $email = self::contextKey($row['JsonConnectedUser']);
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($accountRows as $row) {
+            $jsonUser = $row['JsonConnectedUser'] ?? null;
+            if (!is_string($jsonUser)) {
+                continue;
+            }
+
+            $email = self::contextKey($jsonUser);
             if ($email !== '(anonyme)') {
                 $contexts[$email] = true;
             }
         }
 
         // No-privilege member (simulations)
-        if ($pdo->query(
+        $hasUserFoo = (bool) self::query(
+            $pdo,
             'SELECT 1 FROM "Test"
              WHERE "JsonConnectedUser" LIKE \'%"email":"user@myclub.foo"%\'
              LIMIT 1'
-        )->fetchColumn()) {
+        )->fetchColumn();
+
+        if ($hasUserFoo) {
             $contexts['user@myclub.foo'] = true;
         }
 
@@ -192,7 +222,27 @@ final class TestCoverageChecker
         if ($jsonConnectedUser === null || trim($jsonConnectedUser) === '') {
             return '(anonyme)';
         }
+
         $decoded = json_decode($jsonConnectedUser, true);
-        return $decoded['email'] ?? $jsonConnectedUser;
+        if (is_array($decoded) && isset($decoded['email']) && is_string($decoded['email'])) {
+            return $decoded['email'];
+        }
+
+        return $jsonConnectedUser;
+    }
+
+    /**
+     * Wrapper around PDO::query() that guarantees a PDOStatement.
+     * PDO::query() returns false only on error; with ERRMODE_EXCEPTION this
+     * should not happen, but PHPStan needs the guarantee.
+     */
+    private static function query(PDO $pdo, string $sql): PDOStatement
+    {
+        $stmt = $pdo->query($sql);
+        if ($stmt === false) {
+            throw new RuntimeException("Failed to execute query: {$sql}");
+        }
+
+        return $stmt;
     }
 }

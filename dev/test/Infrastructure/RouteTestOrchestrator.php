@@ -35,7 +35,7 @@ final class RouteTestOrchestrator
      * order given (routes are not tested).
      *
      * @param ?list<int> $simuSelection simulation numbers in execution order, null = everything
-     * @return list<mixed>
+     * @return list<TestResult>
      */
     public function runTests(
         string $routeFilePath,

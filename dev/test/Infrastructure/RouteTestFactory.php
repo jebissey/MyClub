@@ -32,6 +32,15 @@ final class RouteTestFactory
             );
         }
 
+        if ($dbMyClubPath === null || !file_exists($dbMyClubPath)) {
+            $hint = $dbMyClubPath !== null
+                ? "Specified path: {$dbMyClubPath} (exists: no)"
+                : 'No MyClub database path provided';
+            throw new \InvalidArgumentException(
+                "MyClub database is required but missing or not found. {$hint}"
+            );
+        }
+
         try {
             $testDataRepository = new SqliteTestDataRepository($dbTestsPath);
         } catch (Throwable $e) {

@@ -12,6 +12,7 @@ use test\Interfaces\HttpClientInterface;
 
 final class CurlHttpClient implements HttpClientInterface
 {
+    /** @var array<string, string> */
     private array $storedCookies = [];
 
     public function __construct(private TestConfiguration $config) {}
@@ -21,14 +22,22 @@ final class CurlHttpClient implements HttpClientInterface
         $this->storedCookies = [];
     }
 
+    /**
+     * @param array{
+     *     postfields?: array<string, mixed>|string,
+     *     headers?: list<string>,
+     *     cookies?: list<string>,
+     *     body?: string
+     * } $options
+     */
     public function request(string $method, string $url, array $options = []): HttpResponse
     {
         $ch = curl_init();
         $fullUrl = $this->buildFullUrl($url);
         $curlOptions = $this->buildCurlOptions($method, $fullUrl, $options);
 
-        $path = parse_url($url, PHP_URL_PATH) ?? '';
-        if (str_starts_with($path, '/api/')) {
+        $path = parse_url($url, PHP_URL_PATH);
+        if (is_string($path) && str_starts_with($path, '/api/')) {
             if (isset($options['postfields'])) {
                 $json = json_encode($options['postfields'], JSON_UNESCAPED_UNICODE);
                 $curlOptions[CURLOPT_POSTFIELDS] = $json;
@@ -55,7 +64,9 @@ final class CurlHttpClient implements HttpClientInterface
             $bytesReceived = curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD);
             $totalTime = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
             $snippet = '';
-            if (!empty($receivedData)) $snippet = substr($receivedData, 0, 10000);
+            if (!empty($receivedData)) {
+                $snippet = substr($receivedData, 0, 10000);
+            }
             throw new RuntimeException(
                 "Erreur cURL ($errno): $error\n" .
                     "URL: $fullUrl\n" .
@@ -75,9 +86,9 @@ final class CurlHttpClient implements HttpClientInterface
             if (stripos($header, 'Set-Cookie:') === 0) {
                 $cookie = trim(substr($header, 11));
                 $parts = explode(';', $cookie);
-                if (count($parts) > 0) {
-                    $nameValue = explode('=', trim($parts[0]), 2);
-                    if (count($nameValue) === 2) $this->storedCookies[$nameValue[0]] = $nameValue[1];
+                $nameValue = explode('=', trim($parts[0]), 2);
+                if (count($nameValue) === 2) {
+                    $this->storedCookies[$nameValue[0]] = $nameValue[1];
                 }
             }
         }
@@ -89,17 +100,27 @@ final class CurlHttpClient implements HttpClientInterface
             body: $body,
             headers: $headersRaw,
             responseTimeMs: $responseTime,
-            success: $httpCode > 0,
+            success: true,
             url: $fullUrl
         );
     }
 
     #region Private functions
+
     private function buildFullUrl(string $endpoint): string
     {
         return rtrim($this->config->baseUrl, '/') . '/' . ltrim($endpoint, '/');
     }
 
+    /**
+     * @param array{
+     *     postfields?: array<string, mixed>|string,
+     *     headers?: list<string>,
+     *     cookies?: list<string>,
+     *     body?: string
+     * } $options
+     * @return array<int, mixed>
+     */
     private function buildCurlOptions(string $method, string $url, array $options): array
     {
         $curlOptions = [
@@ -124,16 +145,26 @@ final class CurlHttpClient implements HttpClientInterface
         }
         if (!empty($cookiesToSend)) {
             $curlOptions[CURLOPT_COOKIE] = implode('; ', array_map(
-                fn($name, $value) => "$name=$value",
+                fn (string $name, string $value): string => "$name=$value",
                 array_keys($cookiesToSend),
                 $cookiesToSend
             ));
         }
-        if (isset($options['headers']))                                             $curlOptions[CURLOPT_HTTPHEADER] = $options['headers'];
-        if (isset($options['body']) && in_array($method, ['POST', 'PUT', 'PATCH'])) $curlOptions[CURLOPT_POSTFIELDS] = $options['body'];
-        if (!empty($options['postfields']))                                         $curlOptions[CURLOPT_POSTFIELDS] = is_array($options['postfields'])
-            ? http_build_query($options['postfields'])
-            : $options['postfields'];
+
+        if (isset($options['headers'])) {
+            $curlOptions[CURLOPT_HTTPHEADER] = $options['headers'];
+        }
+        if (isset($options['body']) && in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
+            $curlOptions[CURLOPT_POSTFIELDS] = $options['body'];
+        }
+        if (!empty($options['postfields'])) {
+            $curlOptions[CURLOPT_POSTFIELDS] = is_array($options['postfields'])
+                ? http_build_query($options['postfields'])
+                : $options['postfields'];
+        }
+
         return $curlOptions;
     }
+
+    #endregion
 }

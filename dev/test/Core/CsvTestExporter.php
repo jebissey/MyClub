@@ -4,29 +4,42 @@ declare(strict_types=1);
 
 namespace test\Core;
 
-use test\Core\ValueObjects\TestResult;
+use RuntimeException;
+
 use test\Interfaces\TestExporterInterface;
 
 class CsvTestExporter implements TestExporterInterface
 {
+    /**
+     * @param list<\test\Core\ValueObjects\TestResult> $results
+     */
     public function export(array $results, string $filename): void
     {
         $fp = fopen($filename, 'w');
+        if ($fp === false) {
+            throw new RuntimeException("Unable to open file for writing: {$filename}");
+        }
+
         fputcsv($fp, ['Method', 'Path', 'URL', 'HTTP Code', 'Response Time (ms)', 'Success']);
 
         foreach ($results as $result) {
-            if ($result instanceof TestResult) {
-                fputcsv($fp, [
-                    $result->route->method,
-                    $result->route->path,
-                    $result->response->url,
-                    $result->response->httpCode,
-                    $result->response->responseTimeMs,
-                    $result->response->success ? 'YES' : 'NO'
-                ]);
+            $response = $result->response;
+            if ($response === null) {
+                continue;
             }
+
+            fputcsv($fp, [
+                $result->route->method,
+                $result->route->path,
+                $response->url,
+                $response->httpCode,
+                $response->responseTimeMs,
+                $response->success ? 'YES' : 'NO',
+            ]);
         }
+
         fclose($fp);
         echo "Résultats exportés vers: $filename\n";
     }
 }
+

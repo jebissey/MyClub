@@ -48,7 +48,10 @@ final class SqliteTestDataRepository implements TestDataRepositoryInterface
             );
             $stmt->execute([$uri, $method]);
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            /** @var list<array<string, mixed>> $rows */
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $rows;
         } catch (PDOException $e) {
             throw new RuntimeException(
                 'Failed to fetch route test data: ' . $e->getMessage(),
@@ -71,7 +74,10 @@ final class SqliteTestDataRepository implements TestDataRepositoryInterface
             );
             $stmt->execute();
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            /** @var list<array<string, mixed>> $rows */
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $rows;
         } catch (PDOException $e) {
             throw new RuntimeException(
                 'Failed to fetch simulations: ' . $e->getMessage(),
@@ -102,8 +108,17 @@ final class SqliteTestDataRepository implements TestDataRepositoryInterface
         $stmt->execute([$method]);
 
         $matched = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            if (preg_match($regex, $row['Uri']) === 1) {
+
+        /** @var list<array<string, mixed>> $allRows */
+        $allRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($allRows as $row) {
+            $uri = $row['Uri'] ?? null;
+            if (!is_string($uri)) {
+                continue;
+            }
+
+            if (preg_match($regex, $uri) === 1) {
                 $matched[] = $row;
             }
         }

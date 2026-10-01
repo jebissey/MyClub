@@ -47,11 +47,15 @@ final class ConsoleTestReporter implements TestReporterInterface
         return "ERROR: {$message}";
     }
 
+    /**
+     * @param list<string> $errors
+     * @return list<string>
+     */
     public function validationErrors(array $errors): array
     {
         $formattedErrors = [];
         foreach ($errors as $err) {
-            $formattedErrors[] = $this->error((string) $err);
+            $formattedErrors[] = $this->error($err);
         }
 
         return $formattedErrors;
@@ -118,7 +122,7 @@ final class ConsoleTestReporter implements TestReporterInterface
         return implode("\n", $out) . "\n";
     }
 
-    /** @param list<string|array<mixed>> $errors */
+    /** @param list<string> $errors */
     private function displayErrorSection(string $title, array $errors): void
     {
         if ($errors === []) {
@@ -130,14 +134,7 @@ final class ConsoleTestReporter implements TestReporterInterface
         echo str_repeat('=', 80) . "\n";
 
         foreach ($errors as $error) {
-            if (is_array($error)) {
-                echo '  • ' . json_encode(
-                    $error,
-                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
-                ) . "\n";
-            } else {
-                echo "  • {$error}\n";
-            }
+            echo "  • {$error}\n";
         }
     }
 

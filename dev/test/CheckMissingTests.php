@@ -11,7 +11,7 @@ function main(): int
 {
     require_once MYCLUB_WEBSITE_DIR . '/vendor/autoload.php';
 
-    $projectRoot = MYCLUB_ROOT;
+    $projectRoot = realpath(MYCLUB_ROOT);
     $appDir = realpath(MYCLUB_WEBSITE_DIR . '/app');
     $testsDir = realpath(MYCLUB_ROOT . '/dev/tests');
     if ($projectRoot === false || $appDir === false || $testsDir === false) {

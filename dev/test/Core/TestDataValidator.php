@@ -37,11 +37,22 @@ final class TestDataValidator
 
     /**
      * NULL / '' / whitespace are accepted.
-     * Otherwise the value must be a valid JSON object or array.
+     * Non-string scalars are coerced to string (SQLite may return int/float).
+     * Anything else (array, object, bool) is rejected as invalid.
      */
-    private function checkJson(?string $json, string $fieldName, string $label): ?string
+    private function checkJson(mixed $json, string $fieldName, string $label): ?string
     {
-        if ($json === null || trim($json) === '') {
+        if ($json === null) {
+            return null;
+        }
+
+        if (is_int($json) || is_float($json)) {
+            $json = (string) $json;
+        } elseif (!is_string($json)) {
+            return "Invalid {$fieldName} for {$label}: expected a string, got " . get_debug_type($json);
+        }
+
+        if (trim($json) === '') {
             return null;
         }
 
