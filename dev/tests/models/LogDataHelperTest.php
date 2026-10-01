@@ -51,23 +51,28 @@ class LogDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT l.Who, l.CreatedAt, l.Os, l.Browser', $sql);
+        $this->assertStringContainsString(
+            'SELECT l.Who, l.CreatedAt, l.Os, l.Browser',
+            $sql,
+        );
         $this->assertStringContainsString('FROM Log l', $sql);
-        $this->assertStringContainsString('SELECT LOWER(Who) AS Who, MAX(CreatedAt) AS MaxCreatedAt', $sql);
-        $this->assertStringContainsString('WHERE LOWER(Who) IN (:e0, :e1)', $sql);
+        $this->assertStringContainsString(
+            'SELECT LOWER(Who) AS Who, MAX(CreatedAt) AS MaxCreatedAt',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'WHERE LOWER(Who) IN (:e0, :e1)',
+            $sql,
+        );
         $this->assertStringContainsString('GROUP BY LOWER(Who)', $sql);
-        $this->assertStringContainsString('ON LOWER(l.Who) = latest.Who', $sql);
-        $this->assertStringContainsString('AND l.CreatedAt = latest.MaxCreatedAt', $sql);
-    }
-
-    public function testGetVisitedPagesColumnsMatchLogSchema(): void
-    {
-        // getVisitedPages() builds its query via FluentPDO (Select object), not a raw
-        // SQL string, so there is no literal to prepare()/assert against here. Its
-        // selected columns are covered by testQueriedColumnsExistInDatabaseSchema()
-        // above (CreatedAt, Type, Browser, Os, Uri, Who, Code, Message, Duration all
-        // belong to the asserted Log column list).
-        $this->assertTrue(true);
+        $this->assertStringContainsString(
+            'ON LOWER(l.Who) = latest.Who',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'AND l.CreatedAt = latest.MaxCreatedAt',
+            $sql,
+        );
     }
 
     public function testGetPersonsBaseSqlIsValidAgainstTemplateSchema(): void
@@ -78,9 +83,15 @@ class LogDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT LOWER(i.Email) AS Email, i.FirstName, i.LastName', $sql);
+        $this->assertStringContainsString(
+            'SELECT LOWER(i.Email) AS Email, i.FirstName, i.LastName',
+            $sql,
+        );
         $this->assertStringContainsString('FROM Individual i', $sql);
-        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
+        $this->assertStringContainsString(
+            'INNER JOIN Member m ON m.Id = i.Id',
+            $sql,
+        );
     }
 
     public function testGetPersonsFilteredSqlIsValidAgainstTemplateSchema(): void
@@ -91,10 +102,19 @@ class LogDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT LOWER(i.Email) AS Email, i.FirstName, i.LastName', $sql);
+        $this->assertStringContainsString(
+            'SELECT LOWER(i.Email) AS Email, i.FirstName, i.LastName',
+            $sql,
+        );
         $this->assertStringContainsString('FROM Individual i', $sql);
-        $this->assertStringContainsString('INNER JOIN Member m ON m.Id = i.Id', $sql);
-        $this->assertStringContainsString('WHERE LOWER(i.Email) IN (?,?)', $sql);
+        $this->assertStringContainsString(
+            'INNER JOIN Member m ON m.Id = i.Id',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'WHERE LOWER(i.Email) IN (?,?)',
+            $sql,
+        );
     }
 
     public function testGetTopArticlesSqlIsValidAgainstTemplateSchema(): void
@@ -107,11 +127,23 @@ class LogDataHelperTest extends DataHelperTestCase
 
         $this->assertStringContainsString('CleanUri AS Uri', $sql);
         $this->assertStringContainsString('COUNT(*) AS visits', $sql);
-        $this->assertStringContainsString('ROUND(AVG(CASE WHEN Duration IS NOT NULL THEN Duration END), 2) AS avg_duration', $sql);
-        $this->assertStringContainsString('WHEN CleanUri LIKE "/article/%" THEN CAST(substr(CleanUri, 10) AS INTEGER)', $sql);
-        $this->assertStringContainsString('WHEN CleanUri LIKE "/menu/show/article/%" THEN CAST(substr(CleanUri, 20) AS INTEGER)', $sql);
+        $this->assertStringContainsString(
+            'ROUND(AVG(CASE WHEN Duration IS NOT NULL THEN Duration END), 2) AS avg_duration',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'WHEN CleanUri LIKE "/article/%" THEN CAST(substr(CleanUri, 10) AS INTEGER)',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'WHEN CleanUri LIKE "/menu/show/article/%" THEN CAST(substr(CleanUri, 20) AS INTEGER)',
+            $sql,
+        );
         $this->assertStringContainsString('FROM Log', $sql);
-        $this->assertStringContainsString("WHERE CreatedAt >= '2024-01-01'", $sql);
+        $this->assertStringContainsString(
+            "WHERE CreatedAt >= '2024-01-01'",
+            $sql,
+        );
         $this->assertStringContainsString('GROUP BY CleanUri', $sql);
         $this->assertStringContainsString('ORDER BY visits DESC', $sql);
         $this->assertStringContainsString('LIMIT :top', $sql);
@@ -127,9 +159,15 @@ class LogDataHelperTest extends DataHelperTestCase
 
         $this->assertStringContainsString('CleanUri AS Uri', $sql);
         $this->assertStringContainsString('COUNT(*) AS visits', $sql);
-        $this->assertStringContainsString('ROUND(AVG(CASE WHEN Duration IS NOT NULL THEN Duration END), 2) AS avg_duration', $sql);
+        $this->assertStringContainsString(
+            'ROUND(AVG(CASE WHEN Duration IS NOT NULL THEN Duration END), 2) AS avg_duration',
+            $sql,
+        );
         $this->assertStringContainsString('FROM Log', $sql);
-        $this->assertStringContainsString("WHERE CreatedAt >= '2024-01-01'", $sql);
+        $this->assertStringContainsString(
+            "WHERE CreatedAt >= '2024-01-01'",
+            $sql,
+        );
         $this->assertStringContainsString('GROUP BY CleanUri', $sql);
         $this->assertStringContainsString('ORDER BY visits DESC', $sql);
         $this->assertStringContainsString('LIMIT :limit', $sql);
@@ -143,9 +181,15 @@ class LogDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT Who, SUM(Count) as VisitCount', $sql);
+        $this->assertStringContainsString(
+            'SELECT Who, SUM(Count) as VisitCount',
+            $sql,
+        );
         $this->assertStringContainsString('FROM Log', $sql);
-        $this->assertStringContainsString('WHERE CreatedAt BETWEEN :start AND :end', $sql);
+        $this->assertStringContainsString(
+            'WHERE CreatedAt BETWEEN :start AND :end',
+            $sql,
+        );
         $this->assertStringContainsString('GROUP BY Who', $sql);
     }
 
@@ -157,17 +201,44 @@ class LogDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString("WHERE l2.IpAddress = Log.IpAddress", $sql);
-        $this->assertStringContainsString("AND l2.Uri LIKE '/api/lastVersion%'", $sql);
-        $this->assertStringContainsString("MAX(CreatedAt) as lastCheck", $sql);
-        $this->assertStringContainsString('COUNT(*) as checkCount', $sql);
-        $this->assertStringContainsString('GROUP_CONCAT(DISTINCT', $sql);
-        $this->assertStringContainsString('as webappVersions', $sql);
-        $this->assertStringContainsString('GROUP_CONCAT(DISTINCT Message) as phpVersions', $sql);
+        $this->assertStringContainsString(
+            "WHERE l2.IpAddress = Log.IpAddress",
+            $sql,
+        );
+        $this->assertStringContainsString(
+            "AND l2.Uri LIKE '/api/lastVersion%'",
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'MAX(CreatedAt) as lastCheck',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'COUNT(*) as checkCount',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'GROUP_CONCAT(DISTINCT',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'as webappVersions',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'GROUP_CONCAT(DISTINCT Message) as phpVersions',
+            $sql,
+        );
         $this->assertStringContainsString('FROM Log', $sql);
-        $this->assertStringContainsString("WHERE Uri LIKE '/api/lastVersion%'", $sql);
+        $this->assertStringContainsString(
+            "WHERE Uri LIKE '/api/lastVersion%'",
+            $sql,
+        );
         $this->assertStringContainsString('GROUP BY IpAddress', $sql);
-        $this->assertStringContainsString('ORDER BY MAX(CreatedAt) DESC', $sql);
+        $this->assertStringContainsString(
+            'ORDER BY MAX(CreatedAt) DESC',
+            $sql,
+        );
     }
 
     public function testGetCreationTimeDistributionSqlIsValidAgainstTemplateSchema(): void
@@ -178,13 +249,28 @@ class LogDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT CAST(Duration AS INTEGER) AS duration', $sql);
+        $this->assertStringContainsString(
+            'SELECT CAST(Duration AS INTEGER) AS duration',
+            $sql,
+        );
         $this->assertStringContainsString('FROM Log', $sql);
-        $this->assertStringContainsString('WHERE Uri LIKE :uri_pattern', $sql);
-        $this->assertStringContainsString('AND Duration IS NOT NULL', $sql);
+        $this->assertStringContainsString(
+            'WHERE Uri LIKE :uri_pattern',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'AND Duration IS NOT NULL',
+            $sql,
+        );
         $this->assertStringContainsString('AND Duration > 0', $sql);
-        $this->assertStringContainsString('AND CreatedAt BETWEEN :from AND :to', $sql);
-        $this->assertStringContainsString('ORDER BY duration ASC', $sql);
+        $this->assertStringContainsString(
+            'AND CreatedAt BETWEEN :from AND :to',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'ORDER BY duration ASC',
+            $sql,
+        );
     }
 
     public function testGetCreationTimeTrendSqlIsValidAgainstTemplateSchema(): void
@@ -195,20 +281,38 @@ class LogDataHelperTest extends DataHelperTestCase
         $stmt = $pdo->prepare($sql);
         $this->assertInstanceOf(PDOStatement::class, $stmt);
 
-        $this->assertStringContainsString('SELECT CAST(Duration AS INTEGER) AS duration,', $sql);
+        $this->assertStringContainsString(
+            'SELECT CAST(Duration AS INTEGER) AS duration,',
+            $sql,
+        );
         $this->assertStringContainsString('CreatedAt', $sql);
         $this->assertStringContainsString('FROM Log', $sql);
-        $this->assertStringContainsString('WHERE Uri LIKE :uri', $sql);
-        $this->assertStringContainsString('AND Duration IS NOT NULL', $sql);
+        $this->assertStringContainsString(
+            'WHERE Uri LIKE :uri',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'AND Duration IS NOT NULL',
+            $sql,
+        );
         $this->assertStringContainsString('AND Duration > 0', $sql);
-        $this->assertStringContainsString('AND CreatedAt BETWEEN :from AND :to', $sql);
-        $this->assertStringContainsString('ORDER BY CreatedAt ASC', $sql);
+        $this->assertStringContainsString(
+            'AND CreatedAt BETWEEN :from AND :to',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'ORDER BY CreatedAt ASC',
+            $sql,
+        );
     }
 
-    /** @param list<string> $placeholderNames without leading colon, e.g. ['e0', 'e1'] */
+    /** @param list<string> $placeholderNames Without leading colon, e.g. ['e0', 'e1']. */
     private function getLastVisitPerActivePersonSql(array $placeholderNames): string
     {
-        $placeholders = array_map(static fn(string $name): string => ':' . $name, $placeholderNames);
+        $placeholders = array_map(
+            static fn(string $name): string => ':' . $name,
+            $placeholderNames,
+        );
         $in = implode(', ', $placeholders);
 
         return "

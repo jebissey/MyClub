@@ -20,10 +20,15 @@ use PHPUnit\Framework\TestCase;
 class DataHelperTest extends TestCase
 {
     /**
-     * Dummy test to satisfy PHPUnit (no real tests needed here).
+     * No behavior is specific to DataHelper: its constructor only delegates
+     * to Data::__construct(). The generic methods of Data are covered by
+     * DataTest. This class exists solely to satisfy the one-class =>
+     * one-test-class convention enforced by the pre-commit hook.
      */
-    public function testDummy(): void
+    public function testNothingToTestHere(): void
     {
-        $this->assertTrue(true);
+        $this->markTestSkipped(
+            'DataHelper has no behavior of its own; see DataTest for the inherited methods.'
+        );
     }
 }

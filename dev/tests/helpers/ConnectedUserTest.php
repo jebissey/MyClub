@@ -29,7 +29,10 @@ use app\models\interfaces\MetadataDataHelperInterface;
  */
 final class ConnectedUserTest extends DataHelperTestCase
 {
+    /** @var array<string, mixed> */
     private array $server;
+
+    /** @var array<string, mixed> */
     private array $session;
 
     protected function setUp(): void
@@ -355,6 +358,7 @@ final class ConnectedUserTest extends DataHelperTestCase
 
         // On insère les données nécessaires
         $pdo = (new ReflectionClass($dataHelper))->getProperty('pdo')->getValue($dataHelper);
+        assert($pdo instanceof PDO);
         $pdo->exec("
             INSERT INTO Individual (Type, FirstName, LastName, Email, NickName, Avatar)
             VALUES ('Member', 'Jean', 'Dupont', 'known@example.com', NULL, NULL)
@@ -384,6 +388,7 @@ final class ConnectedUserTest extends DataHelperTestCase
         $this->assertTrue($user->isConnected());
         $this->assertTrue($user->isEditor());
         $this->assertFalse($user->isRedactor());
+        $this->assertInstanceOf(Person::class, $user->person);
         $this->assertSame('known@example.com', $user->person->Email);
     }
 

@@ -2,6 +2,7 @@ parameters:
     level: 9
     paths:
         - ../WebSite/app
+        - tests        
         - tools
     excludePaths:
     ignoreErrors:

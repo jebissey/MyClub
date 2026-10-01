@@ -1,11 +1,11 @@
 <?php
-// tests/modules/Common/services/ArticleServiceTest.php
 
 declare(strict_types=1);
 
 namespace tests\modules\Common\services;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use app\helpers\interfaces\MediaManagerInterface;
 use app\models\interfaces\CarouselDataHelperInterface;
 use app\models\Data;
@@ -13,7 +13,6 @@ use app\modules\Common\services\ArticleService;
 use app\modules\Common\valueObjects\UploadedFileInput;
 use app\modules\Common\valueObjects\UploadedMedia;
 use app\modules\Common\valueObjects\UploadMediaResult;
-use RuntimeException;
 
 /**
  * Double de Data (jamais DataHelper, qui est final) dont set() renvoie une
@@ -31,6 +30,7 @@ final class RecordingArticleDataStub extends Data
     public function set(string $table, array $fields, array $where = []): int|bool
     {
         $this->setCalls[] = [$table, $fields, $where];
+
         return $this->setReturn;
     }
 }
@@ -46,6 +46,7 @@ final class RecordingCarouselDataHelperStub implements CarouselDataHelperInterfa
     public function addOrUpdate(array $data, string $item): string
     {
         $this->addOrUpdateCalls[] = [$data, $item];
+
         return 'ok';
     }
 }
@@ -75,6 +76,14 @@ final class ArticleServiceTest extends TestCase
     }
 
     /**
+     * @param list<array{
+     *     tmp_name?: string,
+     *     error?: int,
+     *     name?: string,
+     *     type?: string,
+     *     size?: int
+     * }> $files
+     *
      * @return array{
      *     tmp_name: array<int, string>,
      *     error: array<int, int>,
@@ -87,18 +96,18 @@ final class ArticleServiceTest extends TestCase
     {
         $result = [
             'tmp_name' => [],
-            'error'    => [],
-            'name'     => [],
-            'type'     => [],
-            'size'     => [],
+            'error' => [],
+            'name' => [],
+            'type' => [],
+            'size' => [],
         ];
 
         foreach ($files as $index => $file) {
             $result['tmp_name'][$index] = $file['tmp_name'] ?? '/tmp/phpXXXXXX';
-            $result['error'][$index]    = $file['error'] ?? UPLOAD_ERR_OK;
-            $result['name'][$index]     = $file['name'] ?? 'file.jpg';
-            $result['type'][$index]     = $file['type'] ?? 'image/jpeg';
-            $result['size'][$index]     = $file['size'] ?? 1024;
+            $result['error'][$index] = $file['error'] ?? UPLOAD_ERR_OK;
+            $result['name'][$index] = $file['name'] ?? 'file.jpg';
+            $result['type'][$index] = $file['type'] ?? 'image/jpeg';
+            $result['size'][$index] = $file['size'] ?? 1024;
         }
 
         return $result;
@@ -121,7 +130,15 @@ final class ArticleServiceTest extends TestCase
 
         $this->assertSame(123, $articleId);
         $this->assertSame([
-            ['Article', ['Title' => 'Mon titre', 'Content' => 'Mon contenu', 'CreatedBy' => 42], []],
+            [
+                'Article',
+                [
+                    'Title' => 'Mon titre',
+                    'Content' => 'Mon contenu',
+                    'CreatedBy' => 42,
+                ],
+                [],
+            ],
         ], $dataHelper->setCalls);
         $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
     }
@@ -132,7 +149,12 @@ final class ArticleServiceTest extends TestCase
         $carouselDataHelper = $this->makeCarouselStub();
 
         $articleId = $this->makeService($carouselDataHelper, null, $dataHelper)
-            ->createWithMedia(7, [], 'Titre', 'Contenu');
+            ->createWithMedia(
+                7,
+                $this->makeFiles([]),
+                'Titre',
+                'Contenu'
+            );
 
         $this->assertSame(10, $articleId);
         $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
@@ -148,7 +170,15 @@ final class ArticleServiceTest extends TestCase
 
         $this->assertSame(5, $articleId);
         $this->assertSame([
-            ['Article', ['Title' => '', 'Content' => '', 'CreatedBy' => 1], []],
+            [
+                'Article',
+                [
+                    'Title' => '',
+                    'Content' => '',
+                    'CreatedBy' => 1,
+                ],
+                [],
+            ],
         ], $dataHelper->setCalls);
         $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
     }
@@ -190,7 +220,7 @@ final class ArticleServiceTest extends TestCase
         $media = $this->createMock(MediaManagerInterface::class);
         $media->expects($this->once())
             ->method('uploadFile')
-            ->with($this->callback(function (UploadedFileInput $file) {
+            ->with($this->callback(function (UploadedFileInput $file): bool {
                 return $file->name === 'photo.jpg'
                     && $file->tmpName === '/tmp/phpABC'
                     && $file->size === 2048
@@ -201,10 +231,10 @@ final class ArticleServiceTest extends TestCase
         $files = $this->makeFiles([
             [
                 'tmp_name' => '/tmp/phpABC',
-                'error'    => UPLOAD_ERR_OK,
-                'name'     => 'photo.jpg',
-                'type'     => 'image/jpeg',
-                'size'     => 2048,
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'photo.jpg',
+                'type' => 'image/jpeg',
+                'size' => 2048,
             ],
         ]);
 
@@ -228,8 +258,8 @@ final class ArticleServiceTest extends TestCase
         $files = $this->makeFiles([
             [
                 'tmp_name' => '/tmp/phpERR',
-                'error'    => UPLOAD_ERR_INI_SIZE,
-                'name'     => 'too-big.jpg',
+                'error' => UPLOAD_ERR_INI_SIZE,
+                'name' => 'too-big.jpg',
             ],
         ]);
 
@@ -254,6 +284,7 @@ final class ArticleServiceTest extends TestCase
                 type: 'image/jpeg',
             ),
         );
+
         $uploadResult2 = new UploadMediaResult(
             file: new UploadedMedia(
                 name: 'b.png',
@@ -272,22 +303,22 @@ final class ArticleServiceTest extends TestCase
         $files = $this->makeFiles([
             [
                 'tmp_name' => '/tmp/ok1',
-                'error'    => UPLOAD_ERR_OK,
-                'name'     => 'a.jpg',
-                'type'     => 'image/jpeg',
-                'size'     => 100,
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'a.jpg',
+                'type' => 'image/jpeg',
+                'size' => 100,
             ],
             [
                 'tmp_name' => '/tmp/fail',
-                'error'    => UPLOAD_ERR_PARTIAL,
-                'name'     => 'fail.jpg',
+                'error' => UPLOAD_ERR_PARTIAL,
+                'name' => 'fail.jpg',
             ],
             [
                 'tmp_name' => '/tmp/ok2',
-                'error'    => UPLOAD_ERR_OK,
-                'name'     => 'b.png',
-                'type'     => 'image/png',
-                'size'     => 200,
+                'error' => UPLOAD_ERR_OK,
+                'name' => 'b.png',
+                'type' => 'image/png',
+                'size' => 200,
             ],
         ]);
 
@@ -310,10 +341,11 @@ final class ArticleServiceTest extends TestCase
         $media->expects($this->never())->method('uploadFile');
 
         $files = [
+            'tmp_name' => [],
             'error' => [UPLOAD_ERR_OK],
-            'name'  => ['x.jpg'],
-            'type'  => ['image/jpeg'],
-            'size'  => [100],
+            'name' => ['x.jpg'],
+            'type' => ['image/jpeg'],
+            'size' => [100],
         ];
 
         $articleId = $this->makeService($carouselDataHelper, $media, $dataHelper)

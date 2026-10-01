@@ -26,6 +26,7 @@ abstract class DataHelperTestCase extends TestCase
         array $columns,
     ): void {
         $stmt = $pdo->query("PRAGMA table_info(\"$table\")");
+        $this->assertNotFalse($stmt);
 
         $existing = array_column(
             $stmt->fetchAll(PDO::FETCH_ASSOC),
@@ -51,7 +52,7 @@ abstract class DataHelperTestCase extends TestCase
             SELECT name
             FROM sqlite_master
             WHERE type = 'table'
-            AND name NOT LIKE 'sqlite_%'
+            AND name NOT LIKE 'sqlite\_%'
             ORDER BY name
             SQL,
         );
@@ -64,6 +65,10 @@ abstract class DataHelperTestCase extends TestCase
         return $tables;
     }
 
+    /**
+     * @param class-string<object> $class
+     * @param array<string, class-string<object>> $dependencies
+     */
     protected function makeHelper(
         string $class,
         PDO $pdo,
@@ -160,6 +165,7 @@ abstract class DataHelperTestCase extends TestCase
             @unlink($path . '-wal');
             @unlink($path . '-shm');
         }
+
         parent::tearDown();
     }
 }

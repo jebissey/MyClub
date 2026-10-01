@@ -16,7 +16,7 @@ class DataTest extends DataHelperTestCase
     {
         return new DataHelper(
             $pdo,
-            $this->createStub(ErrorManagerInterface::class)
+            $this->createStub(ErrorManagerInterface::class),
         );
     }
 
@@ -33,6 +33,8 @@ class DataTest extends DataHelperTestCase
         $record = $helper->get('Individual', ['LastName' => 'Dupont'], '*');
 
         $this->assertIsObject($record);
+
+        /** @var object{FirstName: string} $record */
         $this->assertSame('Jean', $record->FirstName);
     }
 
@@ -41,7 +43,13 @@ class DataTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDataHelper($pdo);
 
-        $this->assertFalse($helper->get('Individual', ['LastName' => 'NoSuchLastName'], '*'));
+        $this->assertFalse(
+            $helper->get(
+                'Individual',
+                ['LastName' => 'NoSuchLastName'],
+                '*',
+            ),
+        );
     }
 
     public function testGetEmailWhereIsCaseInsensitive(): void
@@ -50,9 +58,15 @@ class DataTest extends DataHelperTestCase
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'John', 'Doe', 'John.Doe@Example.com')");
         $helper = $this->makeDataHelper($pdo);
 
-        $record = $helper->get('Individual', ['Email' => 'john.doe@example.com'], '*');
+        $record = $helper->get(
+            'Individual',
+            ['Email' => 'john.doe@example.com'],
+            '*',
+        );
 
         $this->assertIsObject($record);
+
+        /** @var object{FirstName: string} $record */
         $this->assertSame('John', $record->FirstName);
     }
 
@@ -67,7 +81,11 @@ class DataTest extends DataHelperTestCase
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'B', 'SameLastName', 'b@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $rows = $helper->gets('Individual', ['LastName' => 'SameLastName'],'*');
+        $rows = $helper->gets(
+            'Individual',
+            ['LastName' => 'SameLastName'],
+            '*',
+        );
 
         $this->assertCount(2, $rows);
     }
@@ -96,10 +114,19 @@ class DataTest extends DataHelperTestCase
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDataHelper($pdo);
 
-        $rows = $helper->gets('Individual', ['LastName' => 'Keyed'], 'Id, FirstName', '', true);
+        $rows = $helper->gets(
+            'Individual',
+            ['LastName' => 'Keyed'],
+            'Id, FirstName',
+            '',
+            true,
+        );
 
         $this->assertArrayHasKey($id, $rows);
-        $this->assertSame('Kim', $rows[$id]->FirstName);
+
+        /** @var object{FirstName: string} $row */
+        $row = $rows[$id];
+        $this->assertSame('Kim', $row->FirstName);
     }
 
     public function testGetsWithKeyPairAndWildcardFieldsThrows(): void
@@ -121,14 +148,16 @@ class DataTest extends DataHelperTestCase
         $helper = $this->makeDataHelper($pdo);
 
         $newId = $helper->set('Individual', [
-            'Type'      => 'Member',
+            'Type' => 'Member',
             'FirstName' => 'Ines',
-            'LastName'  => 'Inserted',
-            'Email'     => 'ines.inserted@test.local',
+            'LastName' => 'Inserted',
+            'Email' => 'ines.inserted@test.local',
         ]);
 
         $this->assertIsInt($newId);
-        $stmt = $pdo->prepare('SELECT FirstName FROM Individual WHERE Id = :id');
+        $stmt = $pdo->prepare(
+            'SELECT FirstName FROM Individual WHERE Id = :id',
+        );
         $stmt->execute([':id' => $newId]);
         $this->assertSame('Ines', $stmt->fetchColumn());
     }
@@ -140,10 +169,16 @@ class DataTest extends DataHelperTestCase
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDataHelper($pdo);
 
-        $result = $helper->set('Individual', ['FirstName' => 'New'], ['Id' => $id]);
+        $result = $helper->set(
+            'Individual',
+            ['FirstName' => 'New'],
+            ['Id' => $id],
+        );
 
         $this->assertNotFalse($result);
-        $stmt = $pdo->prepare('SELECT FirstName FROM Individual WHERE Id = :id');
+        $stmt = $pdo->prepare(
+            'SELECT FirstName FROM Individual WHERE Id = :id',
+        );
         $stmt->execute([':id' => $id]);
         $this->assertSame('New', $stmt->fetchColumn());
     }
@@ -162,6 +197,8 @@ class DataTest extends DataHelperTestCase
         $record = $helper->last('Individual', ['LastName' => 'Chrono']);
 
         $this->assertIsObject($record);
+
+        /** @var object{FirstName: string} $record */
         $this->assertSame('Second', $record->FirstName);
     }
 
@@ -176,10 +213,17 @@ class DataTest extends DataHelperTestCase
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'ToDelete', 'B', 'todelete.b@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $deleted = $helper->delete('Individual', ['FirstName' => 'ToDelete']);
+        $deleted = $helper->delete(
+            'Individual',
+            ['FirstName' => 'ToDelete'],
+        );
 
         $this->assertSame(2, $deleted);
-        $stmt = $pdo->query("SELECT COUNT(*) FROM Individual WHERE FirstName = 'ToDelete'");
+
+        $stmt = $pdo->query(
+            "SELECT COUNT(*) FROM Individual WHERE FirstName = 'ToDelete'",
+        );
+        $this->assertNotFalse($stmt);
         $this->assertSame(0, (int) $stmt->fetchColumn());
     }
 
@@ -203,7 +247,11 @@ class DataTest extends DataHelperTestCase
         $helper = $this->makeDataHelper($pdo);
 
         $this->expectException(PDOException::class);
-        $helper->get('Individual', ['ThisColumnDoesNotExist' => 'x'], '*');
+        $helper->get(
+            'Individual',
+            ['ThisColumnDoesNotExist' => 'x'],
+            '*',
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -216,10 +264,17 @@ class DataTest extends DataHelperTestCase
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Raw', 'Query', 'raw.query@test.local')");
         $helper = $this->makeDataHelper($pdo);
 
-        $result = $helper->query('SELECT FirstName FROM Individual WHERE LastName = ?', ['Query']);
+        $result = $helper->query(
+            'SELECT FirstName FROM Individual WHERE LastName = ?',
+            ['Query'],
+        );
 
         $this->assertIsArray($result);
-        $this->assertSame('Raw', $result[0]->FirstName);
+        $this->assertNotEmpty($result);
+
+        /** @var object{FirstName: string} $row */
+        $row = $result[0];
+        $this->assertSame('Raw', $row->FirstName);
     }
 
     public function testQueryWithInvalidSqlReturnsFalseAndReportsError(): void
@@ -243,7 +298,10 @@ class DataTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDataHelper($pdo);
 
-        $this->assertSame('fallback', $helper->getSetting('Test_Setting_Missing_XYZ', 'fallback'));
+        $this->assertSame(
+            'fallback',
+            $helper->getSetting('Test_Setting_Missing_XYZ', 'fallback'),
+        );
     }
 
     public function testSetSettingThenGetSettingRoundTrips(): void
@@ -253,7 +311,10 @@ class DataTest extends DataHelperTestCase
 
         $helper->setSetting('Test_Setting_XYZ', 'Hello');
 
-        $this->assertSame('Hello', $helper->getSetting('Test_Setting_XYZ', 'fallback'));
+        $this->assertSame(
+            'Hello',
+            $helper->getSetting('Test_Setting_XYZ', 'fallback'),
+        );
     }
 
     public function testSetSettingUpdatesExistingSetting(): void
@@ -264,7 +325,10 @@ class DataTest extends DataHelperTestCase
         $helper->setSetting('Test_Setting_XYZ', 'First');
         $helper->setSetting('Test_Setting_XYZ', 'Second');
 
-        $this->assertSame('Second', $helper->getSetting('Test_Setting_XYZ', 'fallback'));
+        $this->assertSame(
+            'Second',
+            $helper->getSetting('Test_Setting_XYZ', 'fallback'),
+        );
     }
 
     // -------------------------------------------------------------------------

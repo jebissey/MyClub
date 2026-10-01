@@ -21,18 +21,38 @@ class AvailabilityDataHelperNormalizationTest extends TestCase
         $this->helper = $helper;
     }
 
+    /**
+     * @return list<array<string, string>>
+     */
     private function invokeNormalize(mixed $json): array
     {
-        $method = (new ReflectionClass($this->helper))->getMethod('normalizeAvailabilities');
+        $method = (new ReflectionClass($this->helper))
+            ->getMethod('normalizeAvailabilities');
         $method->setAccessible(true);
-        return $method->invoke($this->helper, $json);
+
+        $result = $method->invoke($this->helper, $json);
+
+        $this->assertIsArray($result);
+
+        /** @var list<array<string, string>> $result */
+        return $result;
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function invokeSanitize(mixed $slots): array
     {
-        $method = (new ReflectionClass($this->helper))->getMethod('sanitizeSlots');
+        $method = (new ReflectionClass($this->helper))
+            ->getMethod('sanitizeSlots');
         $method->setAccessible(true);
-        return $method->invoke($this->helper, $slots);
+
+        $result = $method->invoke($this->helper, $slots);
+
+        $this->assertIsArray($result);
+
+        /** @var array<string, string> $result */
+        return $result;
     }
 
     // --- normalizeAvailabilities ---
@@ -75,15 +95,16 @@ class AvailabilityDataHelperNormalizationTest extends TestCase
     public function testNormalizeIgnoresDayKeysOutOfRange(): void
     {
         $data = [
-            '7'  => ['morning' => 'on'],
+            '7' => ['morning' => 'on'],
             '-1' => ['evening' => 'on'],
-            '3'  => ['afternoon' => 'on'],
+            '3' => ['afternoon' => 'on'],
         ];
 
         $result = $this->invokeNormalize($data);
 
         $this->assertCount(7, $result);
         $this->assertSame(['afternoon' => 'on'], $result[3]);
+
         foreach ([0, 1, 2, 4, 5, 6] as $day) {
             $this->assertSame([], $result[$day]);
         }
@@ -107,6 +128,7 @@ class AvailabilityDataHelperNormalizationTest extends TestCase
         $result = $this->invokeNormalize('{not valid json');
 
         $this->assertCount(7, $result);
+
         foreach ($result as $day) {
             $this->assertSame([], $day);
         }
@@ -117,6 +139,7 @@ class AvailabilityDataHelperNormalizationTest extends TestCase
         $result = $this->invokeNormalize(42);
 
         $this->assertCount(7, $result);
+
         foreach ($result as $day) {
             $this->assertSame([], $day);
         }
@@ -133,15 +156,18 @@ class AvailabilityDataHelperNormalizationTest extends TestCase
     public function testSanitizeSlotsKeepsOnlyStringValues(): void
     {
         $slots = [
-            'morning'   => 'on',
+            'morning' => 'on',
             'afternoon' => 1,
-            'evening'   => 'on',
-            'extra'     => ['nested' => 'array'],
+            'evening' => 'on',
+            'extra' => ['nested' => 'array'],
         ];
 
         $result = $this->invokeSanitize($slots);
 
-        $this->assertSame(['morning' => 'on', 'evening' => 'on'], $result);
+        $this->assertSame([
+            'morning' => 'on',
+            'evening' => 'on',
+        ], $result);
     }
 
     public function testSanitizeSlotsCastsIntegerKeysToStrings(): void
@@ -150,6 +176,9 @@ class AvailabilityDataHelperNormalizationTest extends TestCase
 
         $result = $this->invokeSanitize($slots);
 
-        $this->assertSame(['0' => 'on', '1' => 'off'], $result);
+        $this->assertSame([
+            '0' => 'on',
+            '1' => 'off',
+        ], $result);
     }
 }

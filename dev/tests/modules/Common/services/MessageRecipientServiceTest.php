@@ -7,9 +7,9 @@ namespace tests\modules\Common\services;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use app\models\Data;
+use app\modules\Common\interfaces\RecipientResolverInterface;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Common\valueObjects\MessageContext;
-use app\modules\Common\interfaces\RecipientResolverInterface;
 use app\modules\Notifications\services\ArticleRecipientResolver;
 use app\modules\Notifications\services\EventRecipientResolver;
 use app\modules\Notifications\services\GroupRecipientResolver;
@@ -17,27 +17,55 @@ use app\modules\Notifications\services\GroupRecipientResolver;
 final class MessageRecipientServiceTest extends TestCase
 {
     /**
-     * Construit un stub de Data (jamais DataHelper, qui est final) dont gets()
-     * renvoie une valeur fixe, avec capture des arguments d'appel.
+     * @var list<array{0: string, 1: array<string, mixed>, 2: string}>
+     */
+    private array $getsCalls = [];
+
+    /**
+     * Construit un stub de Data dont gets() renvoie une valeur fixe.
      *
-     * @param array<int, object> $getsReturn
+     * @param list<object> $getsReturn
      */
     private function makeDataHelperStub(array $getsReturn): Data
     {
-        return new class ($getsReturn) extends Data {
-            /** @var list<array{0: string, 1: array<string, mixed>, 2: string}> */
-            public array $getsCalls = [];
+        $this->getsCalls = [];
+        $test = $this;
 
-            public function __construct(private array $getsReturn)
-            {
-            }
+        return new class($getsReturn, $test) extends Data {
+            /**
+             * @param list<object> $getsReturn
+             */
+            public function __construct(
+                private array $getsReturn,
+                private MessageRecipientServiceTest $test
+            ) {}
 
-            public function gets(string $table, array $where, string $fields, string $orderBy = '', bool $keyPair = false): array
-            {
-                $this->getsCalls[] = [$table, $where, $fields];
+            /**
+             * @return list<object>
+             */
+            public function gets(
+                string $table,
+                array $where,
+                string $fields,
+                string $orderBy = '',
+                bool $keyPair = false
+            ): array {
+                $this->test->recordGetsCall($table, $where, $fields);
+
                 return $this->getsReturn;
             }
         };
+    }
+
+    /**
+     * @param array<string, mixed> $where
+     */
+    public function recordGetsCall(
+        string $table,
+        array $where,
+        string $fields
+    ): void {
+        $this->getsCalls[] = [$table, $where, $fields];
     }
 
     private function makeService(?Data $dataHelper = null): MessageRecipientService
@@ -50,7 +78,7 @@ final class MessageRecipientServiceTest extends TestCase
     private function makeMember(int $id, ?string $notificationsJson): object
     {
         return (object) [
-            'Id'            => $id,
+            'Id' => $id,
             'Notifications' => $notificationsJson,
         ];
     }
@@ -95,7 +123,7 @@ final class MessageRecipientServiceTest extends TestCase
         $this->assertSame([], $result);
         $this->assertSame([
             ['Member', ['Inactivated' => 0], 'Id, Notifications'],
-        ], $dataHelper->getsCalls);
+        ], $this->getsCalls);
     }
 
     public function testGetRecipientsSkipsMembersWithEmptyPreferences(): void
@@ -132,7 +160,10 @@ final class MessageRecipientServiceTest extends TestCase
 
     public function testGetRecipientsReturnsMemberWhenAResolverMatches(): void
     {
-        $preferences = json_encode(['article' => true]);
+        $preferences = json_encode(
+            ['messageOnArticle' => 'on'],
+            JSON_THROW_ON_ERROR
+        );
 
         $dataHelper = $this->makeDataHelperStub([
             $this->makeMember(42, $preferences),
@@ -142,19 +173,19 @@ final class MessageRecipientServiceTest extends TestCase
             $this->makeArticleContext(articleId: 10)
         );
 
-        $this->assertIsArray($result);
-        foreach ($result as $id) {
-            $this->assertIsInt($id);
-        }
+        $this->assertContains(42, $result);
     }
 
     public function testGetRecipientsDoesNotDuplicateMemberWhenMultipleResolversMatch(): void
     {
-        $preferences = json_encode([
-            'article' => true,
-            'event'   => true,
-            'group'   => true,
-        ]);
+        $preferences = json_encode(
+            [
+                'messageOnArticle' => 'on',
+                'messageOnEvent'   => 'on',
+                'messageOnGroup'   => 'on',
+            ],
+            JSON_THROW_ON_ERROR
+        );
 
         $dataHelper = $this->makeDataHelperStub([
             $this->makeMember(7, $preferences),
@@ -164,13 +195,15 @@ final class MessageRecipientServiceTest extends TestCase
             $this->makeArticleContext()
         );
 
-        $this->assertIsArray($result);
         $this->assertSame($result, array_unique($result));
     }
 
     public function testGetRecipientsReturnsMultipleDistinctMembers(): void
     {
-        $preferences = json_encode(['article' => true]);
+        $preferences = json_encode(
+            ['messageOnArticle' => 'on'],
+            JSON_THROW_ON_ERROR
+        );
 
         $dataHelper = $this->makeDataHelperStub([
             $this->makeMember(10, $preferences),
@@ -182,8 +215,8 @@ final class MessageRecipientServiceTest extends TestCase
             $this->makeArticleContext(articleId: 5)
         );
 
-        $this->assertIsArray($result);
         $this->assertSame($result, array_unique($result));
+
         foreach ($result as $id) {
             $this->assertContains($id, [10, 20]);
         }
@@ -198,8 +231,9 @@ final class MessageRecipientServiceTest extends TestCase
         $service = $this->makeService();
 
         $reflection = new ReflectionClass($service);
-        $property   = $reflection->getProperty('resolvers');
+        $property = $reflection->getProperty('resolvers');
         $property->setAccessible(true);
+
         /** @var RecipientResolverInterface[] $resolvers */
         $resolvers = $property->getValue($service);
 
@@ -223,7 +257,7 @@ final class MessageRecipientServiceTest extends TestCase
 
         $this->assertSame([
             ['Member', ['Inactivated' => 0], 'Id, Notifications'],
-        ], $dataHelper->getsCalls);
+        ], $this->getsCalls);
     }
 
     // -------------------------------------------------------------------------

@@ -6,6 +6,7 @@ namespace tests\models;
 
 use Envms\FluentPDO\Query;
 use PDO;
+use PDOStatement;
 use RuntimeException;
 use app\enums\FilterInputRule;
 use app\exceptions\SqliteTableException;
@@ -31,9 +32,7 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
     }
 
     // -------------------------------------------------------------------------
-    // validateTableName() (comportement réel, pas de mirroring : c'est ici,
-    // via des noms de table fournis par le webmaster, que sa validation
-    // compte vraiment)
+    // validateTableName()
     // -------------------------------------------------------------------------
 
     public function testRejectsTableNameLongerThan64Characters(): void
@@ -175,10 +174,18 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $_POST = ['Type' => 'Member', 'FirstName' => 'Alice', 'LastName' => 'Martin', 'Email' => 'alice.martin@test.local'];
+        $_POST = [
+            'Type' => 'Member',
+            'FirstName' => 'Alice',
+            'LastName' => 'Martin',
+            'Email' => 'alice.martin@test.local',
+        ];
         $helper->createRecord('Individual');
 
-        $stmt = $pdo->query("SELECT FirstName FROM Individual WHERE LastName = 'Martin'");
+        $stmt = $pdo->query(
+            "SELECT FirstName FROM Individual WHERE LastName = 'Martin'",
+        );
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
         $this->assertSame('Alice', $stmt->fetchColumn());
     }
 
@@ -204,7 +211,11 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $_POST = ['Id' => $id + 1000, 'FirstName' => 'Marc-Updated', 'LastName' => 'Petit'];
+        $_POST = [
+            'Id' => $id + 1000,
+            'FirstName' => 'Marc-Updated',
+            'LastName' => 'Petit',
+        ];
         $helper->updateRecord('Individual', $id);
 
         $stmt = $pdo->prepare('SELECT FirstName FROM Individual WHERE Id = :id');
@@ -275,7 +286,12 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'B', 'Deux', 'b.deux@test.local')");
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        [$rows, $columns, $page, $totalPages, $filters] = $helper->showTable('Individual', 1, [], 1);
+        [$rows, $columns, $page, $totalPages, $filters] = $helper->showTable(
+            'Individual',
+            1,
+            [],
+            1,
+        );
 
         $this->assertCount(1, $rows);
         $this->assertContains('FirstName', $columns);
@@ -291,7 +307,12 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Zoe', 'SomeoneElse', 'zoe.other@test.local')");
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        [$rows] = $helper->showTable('Individual', 10, ['LastName' => 'UniqueFilteredLastName'], 1);
+        [$rows] = $helper->showTable(
+            'Individual',
+            10,
+            ['LastName' => 'UniqueFilteredLastName'],
+            1,
+        );
 
         $this->assertCount(1, $rows);
         $this->assertSame('UniqueFilteredLastName', $rows[0]->LastName);

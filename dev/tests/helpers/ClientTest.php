@@ -9,8 +9,13 @@ use app\helpers\Client;
 
 final class ClientTest extends TestCase
 {
+    /** @var array<string, mixed> */
     private array $server;
+
+    /** @var array<string, mixed> */
     private array $cookie;
+
+    /** @var array<string, mixed> */
     private array $session;
 
     protected function setUp(): void
@@ -90,9 +95,9 @@ final class ClientTest extends TestCase
 
         $client = new Client();
 
-        $this->assertIsString($client->getBrowser());
-        $this->assertIsString($client->getOS());
-        $this->assertIsString($client->getType());
+        $this->assertNotSame('', $client->getBrowser());
+        $this->assertNotSame('', $client->getOS());
+        $this->assertNotSame('', $client->getType());
     }
 
     // --- getIp() ---

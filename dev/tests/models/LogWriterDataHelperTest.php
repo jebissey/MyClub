@@ -42,9 +42,18 @@ class LogWriterDataHelperTest extends DataHelperTestCase
             'IpAddress, Referer, Os, Browser, ScreenResolution, Type, Uri, Token,',
             $sql,
         );
-        $this->assertStringContainsString('Who, Code, Message, Duration, CreatedAt', $sql);
-        $this->assertStringContainsString('VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,', $sql);
-        $this->assertStringContainsString("strftime('%Y-%m-%d %H:%M:%f', 'now')", $sql);
+        $this->assertStringContainsString(
+            'Who, Code, Message, Duration, CreatedAt',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,',
+            $sql,
+        );
+        $this->assertStringContainsString(
+            "strftime('%Y-%m-%d %H:%M:%f', 'now')",
+            $sql,
+        );
     }
 
     public function testAddInsertsAndReturnsLastInsertId(): void
@@ -70,9 +79,22 @@ class LogWriterDataHelperTest extends DataHelperTestCase
 
         $this->assertSame(1, (int) $pdo->lastInsertId());
 
-        $row = $pdo->query('SELECT IpAddress, Who, Code, Message FROM Log WHERE Id = 1')
-            ->fetch();
+        $stmt = $pdo->query(
+            'SELECT IpAddress, Who, Code, Message FROM Log WHERE Id = 1'
+        );
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
 
+        $row = $stmt->fetch();
+
+        $this->assertIsArray($row);
+
+        /** @var array{
+         *     IpAddress: string,
+         *     Who: string,
+         *     Code: string,
+         *     Message: string
+         * } $row
+         */
         $this->assertSame('127.0.0.1', $row['IpAddress']);
         $this->assertSame('someone@example.org', $row['Who']);
         $this->assertSame('200', $row['Code']);

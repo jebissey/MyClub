@@ -44,6 +44,8 @@ class CarouselDataHelperTest extends DataHelperTestCase
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $this->assertIsArray($row);
+
+        /** @var array{Item: string, IdArticle: int|string} $row */
         $this->assertSame('/media/carousel/image.jpg', $row['Item']);
         $this->assertSame(123, (int) $row['IdArticle']);
     }
@@ -85,6 +87,8 @@ class CarouselDataHelperTest extends DataHelperTestCase
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $this->assertIsArray($row);
+
+        /** @var array{Item: string, IdArticle: int|string} $row */
         $this->assertSame('/media/carousel/new.jpg', $row['Item']);
         $this->assertSame(123, (int) $row['IdArticle']);
     }

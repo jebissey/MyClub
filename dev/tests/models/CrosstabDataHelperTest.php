@@ -65,8 +65,11 @@ class CrosstabDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('GROUP BY i.Id, et.Id', $sql);
         $this->assertStringContainsString('ORDER BY i.LastName, i.FirstName', $sql);
 
-        $stmt->execute([':start' => '2026-01-01', ':end' => '2026-12-31']);
-        $this->assertIsArray($stmt->fetchAll());
+        $stmt->execute([
+            ':start' => '2026-01-01',
+            ':end' => '2026-12-31',
+        ]);
+        $stmt->fetchAll();
     }
 
     public function testGetPersonsBaseQuerySqlIsValidAgainstTemplateSchema(): void
@@ -84,7 +87,7 @@ class CrosstabDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('GROUP BY Uri, LOWER(Who)', $sql);
 
         $stmt->execute();
-        $this->assertIsArray($stmt->fetchAll());
+        $stmt->fetchAll();
     }
 
     public function testGetPersonsQueryWithUriFilterSqlIsValidAgainstTemplateSchema(): void
@@ -98,7 +101,7 @@ class CrosstabDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('AND Uri LIKE :uriFilter', $sql);
 
         $stmt->execute([':uriFilter' => '%/events%']);
-        $this->assertIsArray($stmt->fetchAll());
+        $stmt->fetchAll();
     }
 
     public function testGetPersonsQueryWithEmailFilterSqlIsValidAgainstTemplateSchema(): void
@@ -112,7 +115,7 @@ class CrosstabDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('AND Who LIKE :emailFilter', $sql);
 
         $stmt->execute([':emailFilter' => '%example.com%']);
-        $this->assertIsArray($stmt->fetchAll());
+        $stmt->fetchAll();
     }
 
     public function testGetPersonsQueryWithBothFiltersSqlIsValidAgainstTemplateSchema(): void
@@ -127,15 +130,15 @@ class CrosstabDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('AND Who LIKE :emailFilter', $sql);
 
         $stmt->execute([
-            ':uriFilter'   => '%/events%',
+            ':uriFilter' => '%/events%',
             ':emailFilter' => '%example.com%',
         ]);
-        $this->assertIsArray($stmt->fetchAll());
+        $stmt->fetchAll();
     }
 
     public function testGetPersonsQueryWithDefaultDateConditionSqlIsValidAgainstTemplateSchema(): void
     {
-        // Period::default() -> dateConditions() renvoie '1=1' (aucune restriction de date).
+        // Period::default() -> dateConditions() returns '1=1' (no date restriction).
         $pdo = $this->openDatabaseCopyOrSkip(self::LOG_DB_PATH);
         $sql = $this->getPersonsSql(dateCondition: '1=1');
 
@@ -145,7 +148,7 @@ class CrosstabDataHelperTest extends DataHelperTestCase
         $this->assertStringContainsString('WHERE 1=1', $sql);
 
         $stmt->execute();
-        $this->assertIsArray($stmt->fetchAll());
+        $stmt->fetchAll();
     }
 
     // -------------------------------------------------------------------------
@@ -183,7 +186,7 @@ class CrosstabDataHelperTest extends DataHelperTestCase
             SELECT 
                 Uri, 
                 LOWER(Who) AS Who, 
-                COUNT(*) as count   
+                COUNT(*) as count  
             FROM Log
             WHERE ' . $dateCondition . '
         ';
@@ -191,6 +194,7 @@ class CrosstabDataHelperTest extends DataHelperTestCase
         if ($uriFilter) {
             $sql .= ' AND Uri LIKE :uriFilter';
         }
+
         if ($emailFilter) {
             $sql .= ' AND Who LIKE :emailFilter';
         }
