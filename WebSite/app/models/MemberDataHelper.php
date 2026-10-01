@@ -231,6 +231,52 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
         return true;
     }
 
+    /**
+     * Informations pour l'annuaire (répertoire) de tous les membres actifs
+     * qui acceptent d'apparaître dans le répertoire.
+     *
+     * @return list<object{
+     *     Id: int,
+     *     LastName: string|null,
+     *     FirstName: string,
+     *     NickName: string|null,
+     *     Avatar: string|null,
+     *     Email: string,
+     *     UseGravatar: mixed,
+     *     InPresentationDirectory: mixed,
+     *     ShowPhoneInPresentationDirectory: mixed,
+     *     ShowEmailInPresentationDirectory: mixed,
+     *     Location: string|null
+     * }&\stdClass>
+     */
+    public function getActiveMembersDirectoryInfo(): array
+    {
+        $sql = "
+            SELECT
+                Individual.Id,
+                Individual.LastName,
+                Individual.FirstName,
+                Individual.NickName,
+                Individual.Avatar,
+                Individual.Email,
+                Member.UseGravatar,
+                Member.InPresentationDirectory,
+                Member.ShowPhoneInPresentationDirectory,
+                Member.ShowEmailInPresentationDirectory,
+                Member.Location
+            FROM Member
+            INNER JOIN Individual ON Individual.Id = Member.Id
+            WHERE Member.InPresentationDirectory = 1
+            AND Member.Inactivated = 0
+            ORDER BY Individual.FirstName, Individual.LastName
+        ";
+        $stmt = $this->pdo->query($sql);
+        if ($stmt === false) {
+            return [];
+        }
+        return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+    }
+
     public function setRememberToken(int $id, string $token): void
     {
         $this->set('Member', ['Token' => $token], ['Id' => $id]);

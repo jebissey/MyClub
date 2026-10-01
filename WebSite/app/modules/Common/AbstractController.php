@@ -15,12 +15,12 @@ use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MetadataDataHelper;
+use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Common\valueObjects\Person;
 
@@ -368,5 +368,17 @@ abstract class AbstractController
         }
         flush();
         Flight::stop();
+    }
+
+    protected function renderInfo(string $content, int $timer): void
+    {
+        $viewModel = new InfoViewModel(
+            content: $content,
+            hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
+            timer: $timer,
+            previousPage: false,
+            layoutParams: $this->getAllParams([]),
+        );
+        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 }

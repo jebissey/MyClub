@@ -114,7 +114,7 @@ final class ExerciseController extends TableController
 
         $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
         if (!$exercise) {
-            $this->raiseBadRequest("Exercise ({$id}) not found",__FILE__, __LINE__);
+            $this->raiseBadRequest("Exercise ({$id}) not found", __FILE__, __LINE__);
             return;
         }
 

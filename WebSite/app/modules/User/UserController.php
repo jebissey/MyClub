@@ -14,7 +14,6 @@ use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
-use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\User\viewModels\UserSetPasswordViewModel;
 use app\modules\User\viewModels\UserSignInViewModel;
 
@@ -128,18 +127,5 @@ final class UserController extends AbstractController
         $this->authService->signOut();
         $this->application->getConnectedUser()->get();
         $this->redirect('/', ApplicationError::Ok, "Sign out succeeded for {$userEmail}");
-    }
-
-
-    private function renderInfo(string $content, int $timer): void
-    {
-        $viewModel = new InfoViewModel(
-            content: $content,
-            hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
-            timer: $timer,
-            previousPage: false,
-            layoutParams: $this->getAllParams([]),
-        );
-        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 }

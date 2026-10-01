@@ -121,6 +121,7 @@ final class ControllerFactory
         private KanbanDataHelper $kanbanDataHelper,
         private LoanDataHelper $loanDataHelper,
         private LogDataHelper $logDataHelper,
+        private MemberDataHelper $memberDataHelper,
         private MembershipDataHelper $membershipDataHelper,
         private MessageDataHelper $messageDataHelper,
         private MetadataDataHelper $metadataDataHelper,
@@ -459,7 +460,8 @@ final class ControllerFactory
             $this->application,
             $this->personDataHelper,
             $this->groupDataHelper,
-            $this->personGroupDataHelper
+            $this->personGroupDataHelper,
+            $this->memberDataHelper
         );
     }
 
@@ -525,7 +527,7 @@ final class ControllerFactory
             $this->participantDataHelper,
             new DistributionCalculator(),
             $this->messageDataHelper,
-            new MemberDataHelper($this->application),
+            $this->memberDataHelper
         );
     }
 
@@ -543,6 +545,7 @@ final class ControllerFactory
             $this->crosstabDataHelper,
             new LogAnalyticsDataHelper($this->application),
             new LogStatisticsDataHelper($this->application),
+            $this->memberDataHelper
         );
     }
 

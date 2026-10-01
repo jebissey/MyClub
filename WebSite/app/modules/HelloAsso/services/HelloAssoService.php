@@ -63,13 +63,22 @@ final class HelloAssoService
     // ─── Public API ───────────────────────────────────────────────────────────
 
     /**
-     * Returns true if client_id and client_secret are both configured.
+     * Returns true if the service is fully usable:
+     * credentials (client_id + client_secret) AND org_slug are all set.
+     * Never throws — safe to call before any API call.
      */
-    public function isConfigured(): bool
+    public function isReady(): bool
     {
         $credentials = CredentialService::getInstance();
-        return !empty($credentials->get('helloasso', 'client_id'))
-            && !empty($credentials->get('helloasso', 'client_secret'));
+
+        if (
+            empty($credentials->get('helloasso', 'client_id'))
+            || empty($credentials->get('helloasso', 'client_secret'))
+        ) {
+            return false;
+        }
+
+        return !empty($this->dataHelper->getSetting('HelloAsso_OrgSlug', ''));
     }
 
     /**

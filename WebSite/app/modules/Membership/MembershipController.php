@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Membership;
 
+use Flight;
+use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\models\MembershipDataHelper;
 use app\modules\Common\AbstractController;
@@ -31,6 +33,15 @@ final class MembershipController extends AbstractController
             return;
         }
 
+        // ── HelloAsso must be fully configured (credentials + org_slug) ────────
+        $helloAsso = HelloAssoService::getInstance($this->dataHelper);
+        if (!$helloAsso->isReady()) {
+            Flight::set('message', 'HelloAsso is not configured');
+            Flight::set('code', ApplicationError::Error->value);
+            $this->renderInfo(($this->t)('message_helloasso_not_configured'), 30000);
+            return;
+        }
+
         $user     = $this->application->getConnectedUser();
         $personId = (int)($user->person->Id ?? 0);
         $season   = $this->membershipDataHelper->currentSeason();
@@ -44,7 +55,7 @@ final class MembershipController extends AbstractController
         // ── HelloAsso widget URL ──────────────────────────────────────────────
         $widgetUrl = null;
         if (!$current || $current->Status !== 'paid') {
-            $widgetUrl = HelloAssoService::getInstance($this->dataHelper)->getWidgetUrl(
+            $widgetUrl = $helloAsso->getWidgetUrl(
                 formType: 'adhesions',
                 formSlug: 'saison-2026-2027',
                 options: [

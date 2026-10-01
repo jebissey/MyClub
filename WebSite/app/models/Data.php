@@ -68,14 +68,18 @@ abstract class Data
 
     protected function validateTableName(string $table): void
     {
+        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] ?? null;
+        $file = $caller['file'] ?? __FILE__;
+        $line = $caller['line'] ?? __LINE__;
+
         if (strlen($table) > 64) {
-            throw new SqliteTableException('Table name too long (max 64) in file ' . __FILE__ . ' at line ' . __LINE__);
+            throw new SqliteTableException("Table name too long (max 64) in file $file at line $line");
         }
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
-            throw new SqliteTableException('Invalid table name in file ' . __FILE__ . ' at line ' . __LINE__);
+            throw new SqliteTableException("Invalid table name in file $file at line $line");
         }
         if (!in_array($table, $this->tables)) {
-            throw new SqliteTableException("Table '$table' not found in file " . __FILE__ . ' at line ' . __LINE__);
+            throw new SqliteTableException("Table '$table' not found in file $file at line $line");
         }
     }
 

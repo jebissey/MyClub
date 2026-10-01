@@ -8348,9 +8348,10 @@ INSERT INTO "Languages" VALUES (1167,'astronomy.position_unavailable','Unable to
 INSERT INTO "Languages" VALUES (1168,'astronomy.my_position','My position','Ma position','Moja pozycja');
 INSERT INTO "Languages" VALUES (1169,'astronomy.invalid_coordinates','Invalid coordinates','Coordonnées invalides','Nieprawidłowe współrzędne');
 INSERT INTO "Languages" VALUES (1170,'astronomy.cookie_save_failed','Unable to save location cookie','Impossible d’enregistrer le cookie de localisation','Nie można zapisać ciasteczka lokalizacji');
+INSERT INTO "Languages" VALUES (1171,'message_helloasso_not_configured','HelloAsso is not configured','HelloAsso n''est pas configuré','HelloAsso nie jest skonfigurowane');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL);
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',86,0,NULL,10,36,6,1000000,NULL,0,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',87,0,NULL,10,36,6,1000000,NULL,0,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title');
 INSERT INTO "Settings" VALUES (2,'LegalNotices','LegalNotices');
 INSERT INTO "Settings" VALUES (3,'SpotlightArticle','');

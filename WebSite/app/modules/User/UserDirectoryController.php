@@ -9,6 +9,7 @@ use app\helpers\Application;
 use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
+use app\models\MemberDataHelper;
 use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
@@ -40,6 +41,7 @@ final class UserDirectoryController extends AbstractController
         private PersonDataHelper $personDataHelper,
         private GroupDataHelper $groupDataHelper,
         private PersonGroupDataHelper $personGroupDataHelper,
+        private MemberDataHelper $memberDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -55,24 +57,18 @@ final class UserDirectoryController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         $groupParam = $this->flight->request()->query['group'] ?? null;
         $selectedGroup = null;
         if (is_string($groupParam) && ctype_digit($groupParam)) {
             $selectedGroup = (int) $groupParam;
         }
+
         if ($selectedGroup) {
             $persons = $this->personDataHelper->getPersonsInGroupForDirectory($selectedGroup);
         } else {
-            $persons = $this->dataHelper->gets(
-                'Person',
-                [
-                    'InPresentationDirectory' => 1,
-                    'Inactivated' => 0
-                ],
-                'Id, LastName, FirstName, NickName, UseGravatar, Avatar, Email, '
-                    . 'InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory, Location',
-                'FirstName, LastName'
-            );
+            $persons = $this->memberDataHelper->getActiveMembersDirectoryInfo();
+
             $gravatarHandler = new GravatarHandler();
             foreach ($persons as $person_) {
                 /** @var PersonRow $personRow */
@@ -81,7 +77,11 @@ final class UserDirectoryController extends AbstractController
             }
         }
 
-        $loggedPersonRow = $this->dataHelper->get('Member', ['Id' => $person->Id], 'InPresentationDirectory');
+        $loggedPersonRow = $this->dataHelper->get(
+            'Member',
+            ['Id' => $person->Id],
+            'InPresentationDirectory'
+        );
         /** @var object{InPresentationDirectory: bool|int|string|null}|false $loggedPersonRow */
         $loggedPersonInPresentationDirectory = $loggedPersonRow !== false
             ? (bool)($loggedPersonRow->InPresentationDirectory ?? false)
@@ -100,16 +100,16 @@ final class UserDirectoryController extends AbstractController
             ], '*')),
             userIsInGroup: $this->personGroupDataHelper->isPersonInGroup($person->Id, $selectedGroup ?? 0),
             countOfLocatedMembers: count($persons),
-            numberOfPublicMembers: count($this->dataHelper->gets('Person', [
+            numberOfPublicMembers: count($this->dataHelper->gets('Member', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0,
                 'MyPublicDataInPresentationDirectory IS NOT NULL AND MyPublicDataInPresentationDirectory != ""' => null
             ], 'Id')),
-            totalWithPresentation: count($this->dataHelper->gets('Person', [
+            totalWithPresentation: count($this->dataHelper->gets('Member', [
                 'InPresentationDirectory' => 1,
                 'Inactivated' => 0
             ], 'Id')),
-            totalPersons: count($this->dataHelper->gets('Person', [
+            totalPersons: count($this->dataHelper->gets('Member', [
                 'Inactivated' => 0
             ], 'Id')),
             layoutParams: $this->getAllParams([]),

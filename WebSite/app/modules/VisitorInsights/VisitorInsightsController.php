@@ -14,6 +14,7 @@ use app\models\CrosstabDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogAnalyticsDataHelper;
 use app\models\LogStatisticsDataHelper;
+use app\models\MemberDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\TableController;
 use app\modules\Common\viewModels\InfoViewModel;
@@ -55,6 +56,7 @@ final class VisitorInsightsController extends TableController
         private CrosstabDataHelper $crosstabDataHelper,
         private LogAnalyticsDataHelper $logDataAnalyticsHelper,
         private LogStatisticsDataHelper $logDataStatisticsHelper,
+        private MemberDataHelper $memberDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -327,7 +329,7 @@ final class VisitorInsightsController extends TableController
             return;
         }
 
-        $activePersons = array_values($this->dataHelper->gets('Member', ['Inactivated' => 0], '*'));
+        $activePersons = $this->memberDataHelper->getActiveMembersBasicInfo();
 
         $viewModel = new LastVisitsViewModel(
             lastVisits: $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),

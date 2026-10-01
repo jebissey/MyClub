@@ -678,6 +678,7 @@ final class Routes
             new KanbanDataHelper($this->application),
             $dataHelpers['loanDataHelper'],
             $dataHelpers['logDataHelper'],
+            new MemberDataHelper($this->application),
             $dataHelpers['membershipDataHelper'],
             $dataHelpers['messageDataHelper'],
             new MetadataDataHelper($this->application),
