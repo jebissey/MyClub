@@ -14,18 +14,23 @@ final class SimulationExtractor
 {
     public function __construct(private TestDataRepositoryInterface $repo) {}
 
-    public function extract(?int $start): array
+    /**
+     * Extracts every simulation (Step IS NOT NULL) from the test database.
+     * The simulation number is the value of the Step column.
+     *
+     * @return list<Simulation>
+     */
+    public function extract(): array
     {
-        $data = $this->repo->getSimulations($start);
+        $data = $this->repo->getSimulations();
         $simulations = [];
         foreach ($data as $row) {
             try {
                 $simulations[] = new Simulation(
                     route: new Route(
                         method: $row['Method'],
-                        originalPath: $row['Uri'],
+                        path: $row['Uri'],
                         hasParameters: str_contains($row['Uri'], '@'),
-                        testedPath: $row['Uri']
                     ),
                     number: (int) $row['Step'],
                     getParams: json_decode($row['JsonGetParameters'] ?? '[]', true),
@@ -36,9 +41,10 @@ final class SimulationExtractor
                     queryExpectedResponse: $row['QueryExpectedResponse'],
                 );
             } catch (Throwable $e) {
-                throw new RuntimeException('error: ' .  $e->getMessage() . ' on Step ' . $row['Step'] . ' ' . $row['Method'] . ' ' . $row['Uri']);
+                throw new RuntimeException('error: ' . $e->getMessage() . ' on Step ' . $row['Step'] . ' ' . $row['Method'] . ' ' . $row['Uri']);
             }
         }
+
         return $simulations;
     }
 }

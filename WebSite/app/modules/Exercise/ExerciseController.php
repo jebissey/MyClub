@@ -106,6 +106,28 @@ final class ExerciseController extends TableController
         ]));
     }
 
+    public function play(int $id): void
+    {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
+            return;
+        }
+
+        $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
+        if (!$exercise) {
+            $this->raiseBadRequest("Exercise ({$id}) not found",__FILE__, __LINE__);
+            return;
+        }
+
+        $exercises = json_decode($exercise->Content ?? '[]', true) ?? [];
+
+        $this->render('Exercise/views/player.latte', $this->getAllParams([
+            'articleId' => $id,
+            'title'     => $exercise->Title ?? '',
+            'exercises' => $exercises,
+            'i18n' => $this->doTranslations(),
+        ]));
+    }
+
     public function save(int $id): void
     {
         if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isExerciseDesigner(), __FILE__, __LINE__)) {
@@ -143,28 +165,6 @@ final class ExerciseController extends TableController
 
         $_SESSION['success'] = ($this->t)('exercise.msg.saved');
         $this->redirect('/exercise/edit/' . $id);
-    }
-
-    public function play(int $id): void
-    {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
-            return;
-        }
-
-        $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
-        if (!$exercise) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        $exercises = json_decode($exercise->Content ?? '[]', true) ?? [];
-
-        $this->render('Exercise/views/player.latte', $this->getAllParams([
-            'articleId' => $id,
-            'title'     => $exercise->Title ?? '',
-            'exercises' => $exercises,
-            'i18n' => $this->doTranslations(),
-        ]));
     }
 
     #region Private functions

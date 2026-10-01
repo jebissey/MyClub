@@ -8,40 +8,53 @@ use test\Core\ValueObjects\Route;
 
 final class TestDataValidator
 {
+    /**
+     * @param list<array<string, mixed>> $testData
+     * @return list<string> fixture / test-data errors (empty = OK)
+     */
     public function validate(Route $route, int $routeNumber, array $testData): array
     {
         $errors = [];
-        $validateJson = function (?string $json, string $fieldName) use ($routeNumber) {
-            $decoded = json_decode($json ?? '', true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return [null, "Invalid {$fieldName} for test {$routeNumber}"];
+
+        foreach ($testData as $index => $test) {
+            $label = "test {$routeNumber}" . (count($testData) > 1 ? " [#{$index}]" : '');
+
+            $fields = ['JsonGetParameters'];
+            if (in_array($route->method, ['POST', 'PUT', 'PATCH'], true)) {
+                $fields[] = 'JsonPostParameters';
             }
-            return [$decoded, null];
-        };
-        if ($route->method === 'GET') {
-            if ($route->hasParameters) {
-                foreach ($testData as $test) {
-                    [$getParams, $error] = $validateJson($test['JsonGetParameters'], 'JsonGetParameters');
-                    if ($error) {
-                        $errors[] = $error;
-                        continue;
-                    }
-                    preg_match_all('/@(\w+)(?::[^\s\/]+)?/', $route->originalPath, $matches);
-                    foreach ($matches[1] as $param) {
-                        if (!array_key_exists($param, $getParams)) {
-                            $errors[] = "Missing GET param '{$param}' for test {$routeNumber}";
-                        }
-                    }
-                }
-            }
-        } elseif ($route->method === 'POST') {
-            foreach ($testData as $test) {
-                [, $error] = $validateJson($test['JsonPostParameters'], 'JsonPostParameters');
-                if ($error) {
+
+            foreach ($fields as $field) {
+                $error = $this->checkJson($test[$field] ?? null, $field, $label);
+                if ($error !== null) {
                     $errors[] = $error;
                 }
             }
         }
+
         return $errors;
+    }
+
+    /**
+     * NULL / '' / whitespace are accepted.
+     * Otherwise the value must be a valid JSON object or array.
+     */
+    private function checkJson(?string $json, string $fieldName, string $label): ?string
+    {
+        if ($json === null || trim($json) === '') {
+            return null;
+        }
+
+        $decoded = json_decode($json, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return "Invalid {$fieldName} for {$label}: " . json_last_error_msg();
+        }
+
+        if (!is_array($decoded)) {
+            return "Invalid {$fieldName} for {$label}: expected JSON object or array";
+        }
+
+        return null;
     }
 }

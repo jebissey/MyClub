@@ -12,7 +12,7 @@ final class UrlBuilder
 
     public function build(Route $route, array $getParameters = []): string
     {
-        $url = $route->originalPath;
+        $url = $route->path;
         foreach ($getParameters as $key => $value) {
             $url = preg_replace('/@' . preg_quote($key, '/') . '(?::[^\s\/]+)?/', (string)$value, $url);
         }

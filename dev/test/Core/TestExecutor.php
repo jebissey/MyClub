@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace test\Core;
 
-use test\Core\ValueObjects\HttpResponse;
+use test\Core\Enums\TestResultStatus;
 use test\Core\ValueObjects\Route;
 use test\Core\ValueObjects\Simulation;
 use test\Core\ValueObjects\TestConfiguration;
@@ -15,11 +15,18 @@ use test\Interfaces\HttpClientInterface;
 use test\Interfaces\TestDataRepositoryInterface;
 use test\Interfaces\TestReporterInterface;
 
-
 final class TestExecutor
 {
+    /** @var list<string> Invalid / missing JSON GET-POST parameters (test DB fixtures). */
     private array $parameterErrors = [];
+
+    /** @var list<string> HTTP status mismatches (ambiguous: fixture vs application). */
     private array $responseErrors = [];
+
+    /** @var list<string> SQL Query result mismatches (ambiguous: fixture vs application). */
+    private array $dataErrors = [];
+
+    /** @var list<string> Authentication failures (usually bad credentials in test DB). */
     private array $testErrors = [];
 
     public function __construct(
@@ -27,137 +34,424 @@ final class TestExecutor
         private SqliteMyClubDataRepository $myClub,
         private SessionAuthenticator $authenticator,
         private HttpClientInterface $http,
-        private ResponseValidator $responseValidator,
-        private UrlBuilder $urlBuilder,
         private TestDataValidator $validator,
         private TestReporterInterface $reporter,
         private TestConfiguration $config
     ) {}
 
-    public function testRoutes(array $routes, ?int $testFilter, bool $stop): array
+    /**
+     * @param list<Route> $routes
+     * @return list<TestResult>
+     */
+    public function testRoutes(array $routes, bool $stop): array
     {
         $totalRoutes = count($routes);
         $results = [];
+
         foreach ($routes as $i => $route) {
             $routeNumber = $i + 1;
-            if ($testFilter === null || $testFilter === $routeNumber) {
-                $this->reporter->displayTest($routeNumber, $totalRoutes, $route->method, $route->originalPath);
-                $tests = $this->runRouteTests($route, $routeNumber, null, $stop);
-                $results = array_merge($results, $tests);
-                foreach ($tests as $test) {
-                    $this->reporter->displayResult($test->route->testedPath, $test->response->httpCode, $test->response->responseTimeMs, []);
-                }
-                usleep($this->config->requestDelay);
+
+            $this->reporter->displayTest($routeNumber, $totalRoutes, $route->method, $route->path);
+            $tests = $this->runRouteTests($route, $routeNumber, null, $stop);
+            $results = array_merge($results, $tests);
+
+            foreach ($tests as $test) {
+                $this->displayTestResult($test, []);
             }
+
+            if ($stop && $this->batchHasFailure($tests)) {
+                break;
+            }
+
+            usleep($this->config->requestDelay);
         }
+
         return $results;
     }
 
-    public function testSimulations(array $simulations, ?int $simuFilter, ?int $startFilter, bool $stop): array
+    /**
+     * Plays simulations. With a selection, only the requested simulation
+     * numbers are played, in the order of the selection. A requested number
+     * that does not exist is reported as an error.
+     *
+     * @param list<Simulation> $simulations
+     * @param ?list<int> $simuSelection simulation numbers in execution order, null = all (extraction order)
+     * @return list<TestResult>
+     */
+    public function testSimulations(array $simulations, ?array $simuSelection, bool $stop): array
     {
         $totalSimulations = count($simulations);
         $results = [];
-        foreach ($simulations as $i =>  $simulation) {
-            $simuNumber = $i + 1;
-            if ($simuFilter !== null) {
-                if ($simuNumber !== $simuFilter) continue;
-            }
-            if ($startFilter !== null) {
-                if ($simuNumber < $startFilter) continue;
-            }
-            $this->reporter->displayTest($simuNumber, $totalSimulations, $simulation->route->method, $simulation->route->originalPath);
-            $tests = $this->runRouteTests($simulation->route, $simulation->number, $simulation, $stop);
-            $results = array_merge($results, $tests);
-            if ($tests === []) {
-                $this->reporter->error("No result produced for simulation {$simulation->number}: {$simulation->route->method} {$simulation->route->originalPath}");
+
+        foreach ($this->planSimulations($simulations, $simuSelection) as $item) {
+            if (is_int($item)) {
+                $this->parameterErrors[] = $this->reporter->error("Simulation {$item} not found");
+                if ($stop) {
+                    break;
+                }
                 continue;
             }
-            $this->reporter->displayResult($tests[0]->route->testedPath, $tests[0]->response->httpCode, $tests[0]->response->responseTimeMs, $simulation->postParams);
+
+            $simulation = $item['simulation'];
+
+            // Displayed as position/total (e.g. 16/327); the Step is the test number in error messages.
+            $this->reporter->displayTest(
+                $item['position'],
+                $totalSimulations,
+                $simulation->route->method,
+                $simulation->route->path
+            );
+
+            $tests = $this->runRouteTests($simulation->route, $simulation->number, $simulation, $stop);
+            $results = array_merge($results, $tests);
+
+            if ($tests === []) {
+                $this->reporter->error(
+                    "No result produced for simulation {$simulation->number}: "
+                    . "{$simulation->route->method} {$simulation->route->path}"
+                );
+                continue;
+            }
+
+            $this->displayTestResult($tests[0], $simulation->postParams);
+
+            if ($stop && $this->batchHasFailure($tests)) {
+                break;
+            }
         }
+
         return $results;
     }
 
+    /** @return list<string> */
     public function getParameterErrors(): array
     {
         return $this->parameterErrors;
     }
 
+    /** @return list<string> */
     public function getResponseErrors(): array
     {
         return $this->responseErrors;
     }
 
+    /** @return list<string> */
+    public function getDataErrors(): array
+    {
+        return $this->dataErrors;
+    }
+
+    /** @return list<string> */
     public function getTestErrors(): array
     {
         return $this->testErrors;
     }
 
-    #region Private functions
+    // -------------------------------------------------------------------------
+    // Private
+    // -------------------------------------------------------------------------
+
+    /**
+     * Builds the execution plan: the simulations themselves (no selection),
+     * or, for each requested number in order, the matching simulations.
+     * A number with no match is kept as a bare int so it can be reported.
+     * "position" is the 1-based rank of the simulation in the full list.
+     *
+     * @param list<Simulation> $simulations
+     * @param ?list<int> $simuSelection
+     * @return list<array{position: int, simulation: Simulation}|int>
+     */
+    private function planSimulations(array $simulations, ?array $simuSelection): array
+    {
+        $byNumber = [];
+        $all = [];
+        foreach ($simulations as $i => $simulation) {
+            $entry = ['position' => $i + 1, 'simulation' => $simulation];
+            $all[] = $entry;
+            $byNumber[$simulation->number][] = $entry;
+        }
+
+        if ($simuSelection === null) {
+            return $all;
+        }
+
+        $plan = [];
+        foreach ($simuSelection as $number) {
+            if (!isset($byNumber[$number])) {
+                $plan[] = $number;
+                continue;
+            }
+            foreach ($byNumber[$number] as $entry) {
+                $plan[] = $entry;
+            }
+        }
+
+        return $plan;
+    }
+
+    /**
+     * @return list<TestResult>
+     */
     private function runRouteTests(Route $route, int $routeNumber, ?Simulation $simulation, bool $stop): array
     {
-        if ($simulation == null) {
-            $testData = $this->repo->getTestDataForRoute($route->originalPath, $route->method);
+        if ($simulation === null) {
+            $testData = $this->repo->getTestDataForRoute($route->path, $route->method);
             if ($route->hasParameters && $testData === []) {
-                $this->parameterErrors[] = $this->reporter->error("No data found for {$route->originalPath} ({$routeNumber}) ");
-                return [];
+                $result = TestResult::invalidTestParameters(
+                    $route,
+                    $routeNumber,
+                    "No test data found for {$route->path} ({$routeNumber})"
+                );
+                $this->recordFailure($result);
+
+                return [$result];
             }
-        } else $testData[] = $simulation->toArray();
+        } else {
+            $testData = [$simulation->toArray()];
+        }
+
         $errors = $this->validator->validate($route, $routeNumber, $testData);
-        if ($errors) {
-            foreach ($errors as $error) {
-                $this->responseErrors[] = $this->reporter->error("Validation error-> {$error}\n");
+        if ($errors !== []) {
+            $results = [];
+            foreach ($errors as $index => $error) {
+                $dbId = isset($testData[$index]['Id']) ? (int) $testData[$index]['Id'] : null;
+                $requestPath = (string) ($testData[$index]['Uri'] ?? $route->path);
+                $result = TestResult::invalidTestParameters(
+                    $route,
+                    $routeNumber,
+                    $error,
+                    $dbId,
+                    $requestPath
+                );
+                $results[] = $result;
+                $this->recordFailure($result);
             }
 
-            return [];
+            return $results;
         }
-        $results = [];
+
+        // Smoke test: non-parameterized route with no fixture rows
         if ($testData === []) {
-            $response = $this->http->request($route->method, $route->originalPath, []);
-            $results[] = new TestResult($route, $response, $routeNumber);
-        } else {
-            foreach ($testData as $test) {
-                $this->http->clearSession();
-                if (!$this->authenticateIfNeeded($test, $routeNumber)) continue;
-                $route->testedPath = $url = $this->urlBuilder->build($route, json_decode($test['JsonGetParameters'] ?? '', true) ?? []);
-                $response = $this->http->request($route->method, $url, [
-                    'postfields' => json_decode($test['JsonPostParameters'] ?? '', true)
-                ]);
-                $this->validateResponse($routeNumber, $test, $response, $stop);
-                $results[] = new TestResult($route, $response, $routeNumber);
-                if ($test['Query'] != null) {
-                    $response = $this->myClub->executeQuery($test['Query']);
-                    $jsonResponse = json_encode($response, JSON_UNESCAPED_UNICODE);
-                    if ($jsonResponse != $test['QueryExpectedResponse']) {
-                        $this->responseErrors[] = $this->reporter->error("Unexpected query response for test {$routeNumber}: {$test['Method']} {$test['Uri']}  \nexpected: {$test['QueryExpectedResponse']} \nreceived: {$jsonResponse}");
-                        if ($stop) throw new StopRequestedException();
-                    }
+            $response = $this->http->request($route->method, $route->path, []);
+
+            if ($response->httpCode >= 400) {
+                $result = TestResult::responseCodeFailure(
+                    $route,
+                    $routeNumber,
+                    $response,
+                    200,
+                    requestPath: $route->path
+                );
+                $this->recordFailure($result);
+
+                return [$result];
+            }
+
+            return [
+                TestResult::success($route, $routeNumber, $response, requestPath: $route->path),
+            ];
+        }
+
+        $results = [];
+        foreach ($testData as $test) {
+            $result = $this->runSingleTest($route, $routeNumber, $test);
+            $results[] = $result;
+
+            if ($result->isFailure()) {
+                $this->recordFailure($result);
+                if ($stop) {
+                    return $results;
                 }
             }
         }
+
         return $results;
     }
 
-    private function authenticateIfNeeded(array $test, int $routeNumber): bool
+    /**
+     * Result-style pipeline (short-circuit on first failure):
+     *   Auth? → HTTP status → SQL Query? → Success
+     *
+     * @param array<string, mixed> $test
+     */
+    private function runSingleTest(Route $route, int $routeNumber, array $test): TestResult
     {
-        if ($test['JsonConnectedUser'] != null) {
-            $user = json_decode($test['JsonConnectedUser'], true);
-            $authResult = $this->authenticator->authenticate($user);
+        $dbId = isset($test['Id']) ? (int) $test['Id'] : null;
+        $requestPath = (string) ($test['Uri'] ?? $route->path);
 
-            if (!$authResult->success) {
-                $this->reporter->error("Auth failed for test {$routeNumber}");
-                return false;
-            }
-            $_SESSION['user'] = $user['email'];
+        $this->http->clearSession();
+
+        $authFailure = $this->authenticate($route, $routeNumber, $test, $dbId, $requestPath);
+        if ($authFailure !== null) {
+            return $authFailure;
         }
-        return true;
+
+        $postParams = $this->decodeJsonValue($test['JsonPostParameters'] ?? null);
+
+        $response = $this->http->request($route->method, $requestPath, [
+            'postfields' => $postParams,
+        ]);
+
+        $expectedCode = (int) ($test['ExpectedResponseCode'] ?? 200);
+        if ($response->httpCode !== $expectedCode) {
+            return TestResult::responseCodeFailure(
+                $route,
+                $routeNumber,
+                $response,
+                $expectedCode,
+                $dbId,
+                $requestPath
+            );
+        }
+
+        $query = $test['Query'] ?? null;
+        if ($query !== null && $query !== '') {
+            $rows = $this->myClub->executeQuery($query);
+            $actual = json_encode($rows, JSON_UNESCAPED_UNICODE);
+            $expected = (string) ($test['QueryExpectedResponse'] ?? '');
+
+            if (!$this->jsonEqual($expected, $actual)) {
+                return TestResult::dataFailure(
+                    $route,
+                    $routeNumber,
+                    $response,
+                    $expected,
+                    $actual,
+                    $dbId,
+                    $requestPath
+                );
+            }
+        }
+
+        return TestResult::success($route, $routeNumber, $response, $dbId, $requestPath);
     }
 
-    private function validateResponse(int $routeNumber, array $test, HttpResponse $response, bool $stop): void
-    {
-        $result = $this->responseValidator->validate($response->httpCode, (int)$test['ExpectedResponseCode']);
-        if (!$result->isValid) {
-            $this->responseErrors[] = $this->reporter->error("Unexpected response for test {$routeNumber}: {$test['Method']} {$test['Uri']} ; expected: {$test['ExpectedResponseCode']}, received: {$response->httpCode}");
-            if ($stop) throw new StopRequestedException();
+    /**
+     * @param array<string, mixed> $test
+     * @return TestResult|null null when auth is not required or succeeds
+     */
+    private function authenticate(
+        Route $route,
+        int $routeNumber,
+        array $test,
+        ?int $dbId,
+        string $requestPath
+    ): ?TestResult {
+        $jsonUser = $test['JsonConnectedUser'] ?? null;
+        if ($jsonUser === null || $jsonUser === '') {
+            return null;
         }
+
+        $user = json_decode((string) $jsonUser, true);
+        if (!is_array($user)) {
+            return TestResult::authenticationFailure(
+                $route,
+                $routeNumber,
+                'Invalid JsonConnectedUser JSON in test database',
+                response: null,
+                dbId: $dbId,
+                requestPath: $requestPath
+            );
+        }
+
+        $authResult = $this->authenticator->authenticate($user);
+        if (!$authResult->success) {
+            $message = $authResult->error !== ''
+                ? $authResult->error
+                : "Authentication failed for test {$routeNumber}";
+
+            return TestResult::authenticationFailure(
+                $route,
+                $routeNumber,
+                $message,
+                response: null,
+                dbId: $dbId,
+                requestPath: $requestPath
+            );
+        }
+
+        return null;
+    }
+
+    private function recordFailure(TestResult $result): void
+    {
+        $label = match ($result->status) {
+            TestResultStatus::AuthenticationFailure => 'AUTH',
+            TestResultStatus::InvalidTestParameters  => 'PARAMS',
+            TestResultStatus::ResponseCodeFailure    => 'RESPONSE',
+            TestResultStatus::DataFailure            => 'DATA',
+            TestResultStatus::Success                => 'OK',
+        };
+
+        $path = $result->requestPath !== ''
+            ? $result->requestPath
+            : $result->route->path;
+
+        $dbIdPart = $result->dbId !== null ? "dbId={$result->dbId}, " : '';
+
+        $detail = $result->message;
+        if (
+            $result->status === TestResultStatus::DataFailure
+            && ($result->expected !== null || $result->actual !== null)
+        ) {
+            $detail .= "\nexpected: {$result->expected}\nreceived: {$result->actual}";
+        }
+
+        $message = $this->reporter->error(
+            "[{$label}] {$dbIdPart}test {$result->testId}: {$result->route->method} {$path} — {$detail}"
+        );
+
+        match ($result->status) {
+            TestResultStatus::AuthenticationFailure => $this->testErrors[] = $message,
+            TestResultStatus::InvalidTestParameters => $this->parameterErrors[] = $message,
+            TestResultStatus::ResponseCodeFailure   => $this->responseErrors[] = $message,
+            TestResultStatus::DataFailure           => $this->dataErrors[] = $message,
+            TestResultStatus::Success               => null,
+        };
+    }
+
+    /** @param list<TestResult> $tests */
+    private function batchHasFailure(array $tests): bool
+    {
+        foreach ($tests as $test) {
+            if ($test->isFailure()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** @param array<string, mixed> $postParams */
+    private function displayTestResult(TestResult $result, array $postParams): void
+    {
+        $httpCode = $result->response?->httpCode ?? 0;
+        $responseTimeMs = $result->response?->responseTimeMs ?? 0.0;
+        $path = $result->requestPath !== ''
+            ? $result->requestPath
+            : $result->route->path;
+
+        $this->reporter->displayResult($path, $httpCode, $responseTimeMs, $postParams);
+    }
+
+    private function decodeJsonValue(mixed $json): mixed
+    {
+        if ($json === null || $json === '') {
+            return null;
+        }
+
+        return json_decode((string) $json, true);
+    }
+
+    private function jsonEqual(string $expected, string $actual): bool
+    {
+        $expectedDecoded = json_decode($expected, true);
+        $actualDecoded = json_decode($actual, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || ($expectedDecoded === null && $expected !== 'null')) {
+            return $expected === $actual;
+        }
+
+        return $expectedDecoded === $actualDecoded;
     }
 }

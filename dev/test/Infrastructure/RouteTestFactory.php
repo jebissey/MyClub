@@ -7,40 +7,41 @@ namespace test\Infrastructure;
 use Throwable;
 
 use test\Core\ConsoleTestReporter;
-use test\Core\ResponseValidator;
-use test\Core\ValueObjects\TestConfiguration;
-use test\Core\TestExecutor;
 use test\Core\TestDataValidator;
-use test\Core\UrlBuilder;
+use test\Core\TestExecutor;
+use test\Core\ValueObjects\TestConfiguration;
 use test\Database\SqliteMyClubDataRepository;
 use test\Database\SqliteTestDataRepository;
-use test\Infrastructure\CurlHttpClient;
-use test\Infrastructure\FlightRouteExtractor;
-use test\Infrastructure\RouteTestOrchestrator;
-use test\Infrastructure\SessionAuthenticator;
-use test\Infrastructure\SimulationExtractor;
 
 final class RouteTestFactory
 {
-    public static function create(TestConfiguration $config, ?string $dbTestsPath = null, ?string $dbMyClubPath = null): RouteTestOrchestrator
-    {
+    public static function create(
+        TestConfiguration $config,
+        ?string $dbTestsPath = null,
+        ?string $dbMyClubPath = null
+    ): RouteTestOrchestrator {
         $httpClient = new CurlHttpClient($config);
         $reporter = new ConsoleTestReporter();
 
-        $testDataRepository = null;
-        if ($dbTestsPath && file_exists($dbTestsPath)) {
-            try {
-                $testDataRepository = new SqliteTestDataRepository($dbTestsPath);
-            } catch (Throwable $e) {
-                echo "Erreur de connexion à la base de données: " . $e->getMessage() . "\n";
-            }
-        } else {
-            echo "Aucune base de données configurée ou fichier introuvable\n";
-            if ($dbTestsPath) {
-                echo "Chemin spécifié: $dbTestsPath\n";
-                echo "Fichier existe: " . (file_exists($dbTestsPath) ? 'OUI' : 'NON') . "\n";
-            }
+        if ($dbTestsPath === null || !file_exists($dbTestsPath)) {
+            $hint = $dbTestsPath !== null
+                ? "Specified path: {$dbTestsPath} (exists: no)"
+                : 'No tests database path provided';
+            throw new \InvalidArgumentException(
+                "Tests database is required but missing or not found. {$hint}"
+            );
         }
+
+        try {
+            $testDataRepository = new SqliteTestDataRepository($dbTestsPath);
+        } catch (Throwable $e) {
+            throw new \RuntimeException(
+                'Failed to connect to tests database: ' . $e->getMessage(),
+                0,
+                $e
+            );
+        }
+
         $myClubDataRepository = new SqliteMyClubDataRepository($dbMyClubPath);
 
         return new RouteTestOrchestrator(
@@ -51,8 +52,6 @@ final class RouteTestFactory
                 $myClubDataRepository,
                 new SessionAuthenticator($httpClient, '/user/sign/in'),
                 $httpClient,
-                new ResponseValidator(),
-                new UrlBuilder(),
                 new TestDataValidator(),
                 $reporter,
                 $config

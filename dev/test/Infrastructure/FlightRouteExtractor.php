@@ -39,10 +39,10 @@ final class FlightRouteExtractor
 
         $this->routes = array_values(array_filter(
             $this->routes,
-            fn(Route $r) => !in_array($r->originalPath, self::EXCLUDED_PATHS, true)
+            fn(Route $r) => !in_array($r->path, self::EXCLUDED_PATHS, true)
         ));
 
-        usort($this->routes, fn(Route $a, Route $b) => strcmp($a->originalPath, $b->originalPath));
+        usort($this->routes, fn(Route $a, Route $b) => strcmp($a->path, $b->path));
         return $this->routes;
     }
 
@@ -64,9 +64,8 @@ final class FlightRouteExtractor
             if (!str_starts_with($path, '/')) return null;
             return new Route(
                 method: strtoupper($defaultMethod),
-                originalPath: $path,
+                path: $path,
                 hasParameters: preg_match(self::REGEX_ROUTE_PARAM, $path) > 0,
-                testedPath: ''
             );
         }
         if (count($parts) !== 2) return null;
@@ -76,9 +75,8 @@ final class FlightRouteExtractor
 
         return new Route(
             method: $method,
-            originalPath: $path,
+            path: $path,
             hasParameters: preg_match(self::REGEX_ROUTE_PARAM, $path) > 0,
-            testedPath: ''
         );
     }
     #endregion

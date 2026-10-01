@@ -18,7 +18,7 @@ class CsvTestExporter implements TestExporterInterface
             if ($result instanceof TestResult) {
                 fputcsv($fp, [
                     $result->route->method,
-                    $result->route->originalPath,
+                    $result->route->path,
                     $result->response->url,
                     $result->response->httpCode,
                     $result->response->responseTimeMs,

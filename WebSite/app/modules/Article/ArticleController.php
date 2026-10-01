@@ -210,17 +210,13 @@ final class ArticleController extends TableController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
-        if (!$article) {
-            $msg = str_replace(
-                '{id}',
-                (string)$id,
-                ($this->t)('article.error.not_found')
-            );
-            $this->raiseBadRequest($msg, __FILE__, __LINE__);
+
+        $connectedUser = $this->application->getConnectedUser();
+        if ($connectedUser->person === null || !$connectedUser->isRedactor()) {
+            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        $connectedUser = $this->application->getConnectedUser();
+
         $article = $this->articleDataHelper->getLatestArticle([$id]);
         if ($article === null) {
             $msg = str_replace(
@@ -232,17 +228,9 @@ final class ArticleController extends TableController
             return;
         }
 
-        if ($connectedUser->person === null) {
+        if ((int)$connectedUser->person->Id !== (int)$article->CreatedBy) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
-        } elseif ($connectedUser->person->Id !== $article->CreatedBy) {
-            if ($this->authorizationService->canRead($id, $connectedUser)) {
-                $this->show($id);
-                return;
-            } else {
-                $this->raiseForbidden(__FILE__, __LINE__);
-                return;
-            }
         }
 
         $viewModel = new ArticleEditViewModel(

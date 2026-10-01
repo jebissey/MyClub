@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace test\Core\ValueObjects;
 
-readonly class Simulation
+final readonly class Simulation
 {
     public function __construct(
         public Route $route,
@@ -21,7 +21,7 @@ readonly class Simulation
     {
         return [
             'Method' => $this->route->method,
-            'Uri' => $this->route->originalPath,
+            'Uri' => $this->route->path,
             'Step' => $this->number,
             'JsonGetParameters' => json_encode($this->getParams),
             'JsonPostParameters' => json_encode($this->postParams),

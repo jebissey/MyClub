@@ -13,16 +13,24 @@ final class ConsoleTestReporter implements TestReporterInterface
     {
         echo $this->formatSummary($summary);
 
-        echo "\nBreakdown by status code:\n";
+        echo "\nBreakdown by HTTP status code:\n";
         foreach ($summary->statusCodes as $code => $count) {
-            $color = $this->getStatusColor($code);
-            echo sprintf("  %s%d%s: %d\n", $color, $code, Color::Reset->value, $count);
+            $httpCode = (int) $code;
+            $color = $this->getStatusColor($httpCode);
+            echo sprintf(
+                "  %s%d%s: %d\n",
+                $color,
+                $httpCode,
+                Color::Reset->value,
+                $count
+            );
         }
 
         if ($summary->hasDatabase) {
-            $this->displayErrorSection("RESPONSE ERRORS", $summary->responseErrors);
-            $this->displayErrorSection("AUTHENTIFICATION ERRORS", $summary->testErrors);
-            $this->displayErrorSection("PARAMETER ERRORS", $summary->parameterErrors);
+            $this->displayErrorSection('PARAMETER ERRORS', $summary->parameterErrors);
+            $this->displayErrorSection('RESPONSE ERRORS', $summary->responseErrors);
+            $this->displayErrorSection('DATA ERRORS', $summary->dataErrors);
+            $this->displayErrorSection('AUTHENTICATION ERRORS', $summary->testErrors);
         }
     }
 
@@ -34,14 +42,14 @@ final class ConsoleTestReporter implements TestReporterInterface
 
     public function error(string $message): string
     {
-        echo Color::Red->value . "ERROR: {$message}" . Color::Reset->value;
+        echo Color::Red->value . "ERROR: {$message}" . Color::Reset->value . PHP_EOL;
+
         return "ERROR: {$message}";
     }
 
     public function validationErrors(array $errors): array
     {
         $formattedErrors = [];
-
         foreach ($errors as $err) {
             $formattedErrors[] = $this->error((string) $err);
         }
@@ -52,7 +60,7 @@ final class ConsoleTestReporter implements TestReporterInterface
     public function displayTest(int $testNumber, int $totalTests, string $method, string $path): void
     {
         echo sprintf(
-            "[%d/%d] Testing %s %s ",
+            "[%d/%d] Testing %s %s\n",
             $testNumber,
             $totalTests,
             $method,
@@ -60,10 +68,16 @@ final class ConsoleTestReporter implements TestReporterInterface
         );
     }
 
-    public function displayResult(string $testedPath, int $httpCode, float $responseTimeMs, array $postParams): void
-    {
-        $strPostParams = '';
-        if ($postParams != []) $strPostParams = ' with ' . json_encode($postParams, JSON_UNESCAPED_UNICODE);
+    public function displayResult(
+        string $testedPath,
+        int $httpCode,
+        float $responseTimeMs,
+        array $postParams
+    ): void {
+        $strPostParams = $postParams !== []
+            ? ' with ' . json_encode($postParams, JSON_UNESCAPED_UNICODE)
+            : '';
+
         echo sprintf(
             " => %s%s -> %s%d %s%s (%.2fms)\n",
             $testedPath,
@@ -76,30 +90,35 @@ final class ConsoleTestReporter implements TestReporterInterface
         );
     }
 
-    #region Private functions
+    // -------------------------------------------------------------------------
+    // Private
+    // -------------------------------------------------------------------------
+
     private function formatSummary(TestSummary $summary): string
     {
         $out = [];
         $out[] = "\n" . str_repeat('=', 80);
-        $out[] = "TEST SUMMARY";
+        $out[] = 'TEST SUMMARY';
         $out[] = str_repeat('=', 80);
         $out[] = "Total tests executed: {$summary->totalTests}";
-        $out[] = "Success (2xx-3xx): {$summary->successful}";
-        $out[] = "HTTP errors (5xx): {$summary->errors}";
-        $out[] = "Others: " . ($summary->totalTests - $summary->successful - $summary->errors);
+        $out[] = "Success: {$summary->successful}";
+        $out[] = "Failures: {$summary->errors}";
+        $out[] = 'Others: ' . max(0, $summary->totalTests - $summary->successful - $summary->errors);
 
         if ($summary->hasDatabase) {
             $out[] = "\n" . str_repeat('=', 80);
-            $out[] = "VALIDATION ERRORS:";
+            $out[] = 'VALIDATION ERRORS:';
             $out[] = str_repeat('=', 80);
-            $out[] = "Parameter errors: " . count($summary->parameterErrors);
-            $out[] = "Response errors: " . count($summary->responseErrors);
-            $out[] = "Authentification error: " . count($summary->testErrors);
+            $out[] = 'Parameter errors: ' . count($summary->parameterErrors);
+            $out[] = 'Response errors: ' . count($summary->responseErrors);
+            $out[] = 'Data errors: ' . count($summary->dataErrors);
+            $out[] = 'Authentication errors: ' . count($summary->testErrors);
         }
 
         return implode("\n", $out) . "\n";
     }
 
+    /** @param list<string|array<mixed>> $errors */
     private function displayErrorSection(string $title, array $errors): void
     {
         if ($errors === []) {
@@ -107,7 +126,7 @@ final class ConsoleTestReporter implements TestReporterInterface
         }
 
         echo str_repeat('=', 80);
-        echo "\n$title:\n";
+        echo "\n{$title}:\n";
         echo str_repeat('=', 80) . "\n";
 
         foreach ($errors as $error) {
@@ -135,7 +154,8 @@ final class ConsoleTestReporter implements TestReporterInterface
 
     private function getStatusText(int $code): string
     {
-        $statuses = [
+        return match ($code) {
+            0   => 'N/A',
             200 => 'OK',
             201 => 'Created',
             204 => 'No Content',
@@ -150,8 +170,8 @@ final class ConsoleTestReporter implements TestReporterInterface
             405 => 'Method Not Allowed',
             500 => 'Internal Server Error',
             502 => 'Bad Gateway',
-            503 => 'Service Unavailable'
-        ];
-        return $statuses[$code] ?? 'Unknown';
+            503 => 'Service Unavailable',
+            default => 'Unknown',
+        };
     }
 }

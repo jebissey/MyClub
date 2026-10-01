@@ -23,7 +23,7 @@ final class TestCoverageChecker
     private static function checkPutCoverage(PDO $pdo, array $routes): void
     {
         $expectedRoutes = array_values(array_unique(array_filter(array_map(
-            static fn(Route $r) => $r->method !== 'PUT' ? $r->originalPath : null,
+            static fn(Route $r) => $r->method !== 'PUT' ? $r->path : null,
             $routes
         ))));
 
@@ -38,7 +38,10 @@ final class TestCoverageChecker
 
         foreach ($expectedRoutes as $originalPath) {
             $regex = self::routePathToRegex($originalPath);
-            $matches = array_values(array_filter($putUris, static fn(string $uri) => preg_match($regex, $uri) === 1));
+            $matches = array_values(array_filter(
+                $putUris,
+                static fn(string $uri) => preg_match($regex, $uri) === 1
+            ));
 
             if ($matches === []) {
                 $missing[] = $originalPath;
@@ -54,12 +57,16 @@ final class TestCoverageChecker
 
         if ($missing || $extra || $duplicated) {
             $lines = [];
-            if ($missing) $lines[] = '  Route sans test PUT : ' . implode(', ', $missing);
-            if ($extra) $lines[] = "  PUT ne correspondant à aucune route : " . implode(', ', $extra);
-            foreach ($duplicated as $route => $uris) {
-                $lines[] = "  Route testée par plusieurs PUT ($route) : " . implode(', ', $uris);
+            if ($missing) {
+                $lines[] = '  Routes without PUT test: ' . implode(', ', $missing);
             }
-            throw new TestCoverageException("Couverture PUT incomplète :\n" . implode("\n", $lines));
+            if ($extra) {
+                $lines[] = '  PUT not matching any route: ' . implode(', ', $extra);
+            }
+            foreach ($duplicated as $route => $uris) {
+                $lines[] = "  Route matched by multiple PUT tests ({$route}): " . implode(', ', $uris);
+            }
+            throw new TestCoverageException("Incomplete PUT coverage:\n" . implode("\n", $lines));
         }
     }
 
@@ -68,11 +75,17 @@ final class TestCoverageChecker
     {
         $requiredContexts = self::deriveRequiredContexts($pdo);
 
+        // Route matrix = Step IS NULL; user@ lives in simulations (Step IS NOT NULL)
         $rows = $pdo->query(
-            'SELECT "Uri", "JsonConnectedUser" FROM "Test" WHERE "Step" > 1900 AND "Method" != \'PUT\''
+            'SELECT "Uri", "JsonConnectedUser" FROM "Test"
+             WHERE "Method" != \'PUT\'
+               AND ("Step" IS NULL OR "JsonConnectedUser" LIKE \'%"email":"user@myclub.foo"%\')'
         )->fetchAll(PDO::FETCH_ASSOC);
 
-        $expectedRoutes = array_values(array_unique(array_map(static fn(Route $r) => $r->originalPath, $routes)));
+        $expectedRoutes = array_values(array_unique(array_map(
+            static fn(Route $r) => $r->path,
+            $routes
+        )));
 
         $regexByRoute = [];
         foreach ($expectedRoutes as $originalPath) {
@@ -95,55 +108,65 @@ final class TestCoverageChecker
         $report = [];
         foreach ($expectedRoutes as $originalPath) {
             $missing = array_diff($requiredContexts, array_keys($contextsByRoute[$originalPath] ?? []));
-            if ($missing) {
+            if ($missing !== []) {
                 $report[$originalPath] = $missing;
             }
         }
 
-        if ($report) {
+        if ($report !== []) {
             $lines = [];
             foreach ($report as $uri => $missing) {
-                $lines[] = "  $uri : " . implode(', ', $missing);
+                $lines[] = "  {$uri} : " . implode(', ', $missing);
             }
             throw new TestCoverageException(
-                'Couverture par autorisation incomplète (référence = '
-                    . count($requiredContexts) . " autorisations) :\n" . implode("\n", $lines)
+                'Incomplete authorization coverage (reference = '
+                . count($requiredContexts) . " contexts):\n" . implode("\n", $lines)
             );
         }
     }
 
-    /** @return string[] emails des comptes de base (un par autorisation, + le compte sans droit) */
+    /**
+     * Required contexts = anonymous + every distinct account used in Step IS NULL tests
+     * + user@myclub.foo (no-privilege reference, usually only in simulations).
+     *
+     * @return list<string>
+     */
     private static function deriveRequiredContexts(PDO $pdo): array
     {
         $contexts = [];
 
+        // Anonymous
+        $hasAnonymous = (bool) $pdo->query(
+            'SELECT 1 FROM "Test"
+             WHERE "Step" IS NULL
+               AND "Method" != \'PUT\'
+               AND ("JsonConnectedUser" IS NULL OR TRIM("JsonConnectedUser") = \'\')
+             LIMIT 1'
+        )->fetchColumn();
+        if ($hasAnonymous) {
+            $contexts['(anonyme)'] = true;
+        }
+
+        // All accounts present on the route matrix (Step IS NULL)
         $stmt = $pdo->query(
-            "SELECT \"JsonPostParameters\" FROM \"Test\"
-         WHERE \"Step\" BETWEEN 1000 AND 1900 AND \"Uri\" LIKE '/person/edit/%'"
+            'SELECT DISTINCT "JsonConnectedUser" FROM "Test"
+             WHERE "Step" IS NULL
+               AND "Method" != \'PUT\'
+               AND "JsonConnectedUser" IS NOT NULL
+               AND TRIM("JsonConnectedUser") != \'\''
         );
         foreach ($stmt as $row) {
-            $params = json_decode($row['JsonPostParameters'] ?? '', true) ?? [];
-            if (isset($params['email'])) {
-                $contexts[$params['email']] = true;
+            $email = self::contextKey($row['JsonConnectedUser']);
+            if ($email !== '(anonyme)') {
+                $contexts[$email] = true;
             }
         }
 
-        $webmaster = $pdo->query(
-            "SELECT \"JsonPostParameters\" FROM \"Test\"
-         WHERE \"Uri\" = '/user/sign/in' AND \"ExpectedResponseCode\" = '200'
-         ORDER BY \"Step\" LIMIT 1"
-        )->fetch(PDO::FETCH_ASSOC);
-        if ($webmaster) {
-            $params = json_decode($webmaster['JsonPostParameters'], true) ?? [];
-            if (isset($params['email'])) {
-                $contexts[$params['email']] = true;
-            }
-        }
-
-        // Membre sans autorisation : compte de référence pour vérifier le comportement
-        // "connecté mais sans droit" sur toutes les routes.
+        // No-privilege member (simulations)
         if ($pdo->query(
-            "SELECT 1 FROM \"Test\" WHERE \"JsonConnectedUser\" LIKE '%\"email\":\"user@myclub.foo\"%' LIMIT 1"
+            'SELECT 1 FROM "Test"
+             WHERE "JsonConnectedUser" LIKE \'%"email":"user@myclub.foo"%\'
+             LIMIT 1'
         )->fetchColumn()) {
             $contexts['user@myclub.foo'] = true;
         }
@@ -166,7 +189,7 @@ final class TestCoverageChecker
 
     private static function contextKey(?string $jsonConnectedUser): string
     {
-        if ($jsonConnectedUser === null) {
+        if ($jsonConnectedUser === null || trim($jsonConnectedUser) === '') {
             return '(anonyme)';
         }
         $decoded = json_decode($jsonConnectedUser, true);

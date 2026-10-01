@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace test\Core\ValueObjects;
 
-readonly class TestConfiguration
+final readonly class TestConfiguration
 {
     public function __construct(
         public string $baseUrl = 'http://localhost:8000',
