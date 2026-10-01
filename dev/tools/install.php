@@ -63,6 +63,13 @@ ini_set('display_errors', '0');
 // Utilitaires
 // ------------------------------------------------------------------
 
+/** Lit le secret via une fonction (type de retour natif string) : évite que
+ *  PHPStan traite la constante comme un littéral figé dans les comparaisons. */
+function installSecret(): string
+{
+    return INSTALL_SECRET;
+}
+
 function rrmdirAll(string $dir): void
 {
     if (!is_dir($dir)) {
@@ -82,6 +89,7 @@ function rrmdirAll(string $dir): void
     }
 }
 
+/** @param list<string> $exclude */
 function cleanRootExcept(string $dir, array $exclude): void
 {
     foreach (scandir($dir) as $item) {
@@ -120,7 +128,9 @@ function rcopyAll(string $src, string $dst): void
 /** Déplace (rename) le contenu de $src vers $dst, sans dupliquer d'octets sur
  *  disque (contrairement à une copie). Ne descend en récursif que si la cible
  *  existe déjà (cas de fusion, normalement rare puisque l'ancien contenu a
- *  été supprimé au préalable). */
+ *  été supprimé au préalable).
+ *
+ *  @param list<string> $excludeTopLevel */
 function rmoveAll(string $src, string $dst, array $excludeTopLevel = []): void
 {
     if (!is_dir($dst)) {
@@ -182,17 +192,22 @@ function detectMode(): string
 function selfUrl(): string
 {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $dir    = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
+    $hostRaw   = $_SERVER['HTTP_HOST'] ?? null;
+    $scriptRaw = $_SERVER['SCRIPT_NAME'] ?? null;
+    $host   = is_string($hostRaw) ? $hostRaw : 'localhost';
+    $script = is_string($scriptRaw) ? $scriptRaw : '/';
+    $dir    = rtrim(str_replace('\\', '/', dirname($script)), '/');
     return $scheme . '://' . $host . $dir . '/';
 }
 
 function checkSecret(): bool
 {
-    if (INSTALL_SECRET === '') {
+    $secret = installSecret();
+    if ($secret === '') {
         return true;
     }
-    return isset($_REQUEST['key']) && hash_equals(INSTALL_SECRET, (string) $_REQUEST['key']);
+    $key = $_REQUEST['key'] ?? null;
+    return is_string($key) && hash_equals($secret, $key);
 }
 
 function humanSize(float $bytes): string
@@ -207,7 +222,7 @@ function humanSize(float $bytes): string
 }
 
 /** Prérequis vérifiés AVANT toute action (affichage + exécution).
- *  @return array<int, array{label: string, ok: bool, detail: string}> */
+ *  @return list<array{label: string, ok: bool, detail: string}> */
 function checkRequirements(): array
 {
     return [
@@ -234,6 +249,7 @@ function checkRequirements(): array
     ];
 }
 
+/** @param list<array{label: string, ok: bool, detail: string}> $requirements */
 function requirementsMet(array $requirements): bool
 {
     foreach ($requirements as $r) {
@@ -244,6 +260,7 @@ function requirementsMet(array $requirements): bool
     return true;
 }
 
+/** @param list<array{label: string, ok: bool, detail: string}> $requirements */
 function requirementsHtml(array $requirements): string
 {
     $items = '';
@@ -278,7 +295,7 @@ if (!checkSecret()) {
     exit;
 }
 
-$keyParam = INSTALL_SECRET !== '' ? '?key=' . urlencode(INSTALL_SECRET) : '';
+$keyParam = installSecret() !== '' ? '?key=' . urlencode(installSecret()) : '';
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || ($_POST['confirm'] ?? '') !== '1') {
     // --- Écran de confirmation ---
@@ -298,7 +315,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || ($_POST['confirm'] ?? ''
     $archiveMsg = '';
     if ($archiveOk) {
         $archiveSize = filesize($archivePath);
-        $archiveMsg = "<p class='ok'>Archive trouvée : " . ARCHIVE_NAME . ' (' . humanSize($archiveSize) . ')</p>'
+        $archiveMsg = "<p class='ok'>Archive trouvée : " . ARCHIVE_NAME . ' (' . humanSize($archiveSize !== false ? $archiveSize : 0) . ')</p>'
             . "<p class='warn'>Sur un hébergement mutualisé à quota limité, l'espace réellement disponible pour "
             . "votre compte n'est pas mesurable depuis PHP (<code>disk_free_space()</code> ne reflète que la "
             . "partition physique du serveur). Si une erreur \"quota dépassé\" survient malgré tout, videz "
