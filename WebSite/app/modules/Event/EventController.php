@@ -155,7 +155,7 @@ final class EventController extends AbstractController
             period: $period->value,
             dateRange: $dateRange,
             availablePeriods: Period::gets($this->languagesDataHelper),
-            navbarTemplate: '../../Webmaster/views/navbar/eventManager.latte',
+            navbarTemplate: '../../Event/views/navbar/eventManager.latte',
             title: "Animateurs vs type d'événement",
             totalLabels: ['événements', 'participants'],
             layoutParams: $this->getAllParams([

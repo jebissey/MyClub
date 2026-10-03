@@ -111,6 +111,11 @@ const pData = window.participationChartData;
 if (pData && pData.labels) {
     const pCtx = document.getElementById('participationChart');
     if (pCtx) {
+        const averagesBySlot = {
+            morning: pData.morningAvg,
+            afternoon: pData.afternoonAvg,
+            evening: pData.eveningAvg,
+        };
         const totalsBySlot = {
             morning: pData.morningTotal,
             afternoon: pData.afternoonTotal,
@@ -122,7 +127,13 @@ if (pData && pData.labels) {
             evening: pData.eveningCount,
         };
 
-        // Plugin personnalisé : dessine "moyenne" puis "(total)" centrés sur chaque barre
+        // 'average' | 'total'
+        let mode = document.querySelector('input[name="participationMode"]:checked')?.value ?? 'average';
+
+        const valuesFor = (slotKey) =>
+            mode === 'total' ? totalsBySlot[slotKey] : averagesBySlot[slotKey];
+
+        // Valeur principale = celle des barres ; valeur entre parenthèses = l'autre
         const centeredValuePlugin = {
             id: 'centeredValuePlugin',
             afterDatasetsDraw(chart) {
@@ -135,7 +146,9 @@ if (pData && pData.labels) {
                         const value = dataset.data[index];
                         if (!value || value <= 0) return;
 
-                        const total = totalsBySlot[dataset.slotKey][index];
+                        const other = mode === 'total'
+                            ? averagesBySlot[dataset.slotKey][index]
+                            : totalsBySlot[dataset.slotKey][index];
                         const { x, y } = bar.getCenterPoint();
 
                         ctx.save();
@@ -147,7 +160,7 @@ if (pData && pData.labels) {
                         ctx.fillText(String(value), x, y - 7);
 
                         ctx.font = 'normal 11px sans-serif';
-                        ctx.fillText(`(${total})`, x, y + 7);
+                        ctx.fillText(`(${other})`, x, y + 7);
 
                         ctx.restore();
                     });
@@ -163,7 +176,7 @@ if (pData && pData.labels) {
                 datasets: [
                     {
                         label: (window.i18n && window.i18n.morning) || 'Matin',
-                        data: pData.morningAvg,
+                        data: valuesFor('morning'),
                         backgroundColor: 'rgba(54, 162, 235, 0.85)',
                         borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 1,
@@ -171,7 +184,7 @@ if (pData && pData.labels) {
                     },
                     {
                         label: (window.i18n && window.i18n.afternoon) || 'Après-midi',
-                        data: pData.afternoonAvg,
+                        data: valuesFor('afternoon'),
                         backgroundColor: 'rgba(255, 193, 7, 0.85)',
                         borderColor: 'rgba(255, 193, 7, 1)',
                         borderWidth: 1,
@@ -179,7 +192,7 @@ if (pData && pData.labels) {
                     },
                     {
                         label: (window.i18n && window.i18n.evening) || 'Soir',
-                        data: pData.eveningAvg,
+                        data: valuesFor('evening'),
                         backgroundColor: 'rgba(108, 117, 125, 0.85)',
                         borderColor: 'rgba(108, 117, 125, 1)',
                         borderWidth: 1,
@@ -196,18 +209,20 @@ if (pData && pData.labels) {
                 },
                 plugins: {
                     legend: { position: 'top' },
-                    datalabels: { display: false }, // désactivé : remplacé par centeredValuePlugin
+                    datalabels: { display: false },
                     tooltip: {
                         callbacks: {
                             label(ctx) {
-                                const total = totalsBySlot[ctx.dataset.slotKey][ctx.dataIndex];
-                                const count = countsBySlot[ctx.dataset.slotKey][ctx.dataIndex];
+                                const slot = ctx.dataset.slotKey;
+                                const avg = averagesBySlot[slot][ctx.dataIndex];
+                                const total = totalsBySlot[slot][ctx.dataIndex];
+                                const count = countsBySlot[slot][ctx.dataIndex];
                                 const avgLabel = (window.i18n && window.i18n.average) || 'Moyenne';
                                 const totalLabel = (window.i18n && window.i18n.total) || 'Total';
                                 const eventsLabel = (window.i18n && window.i18n.events) || 'Événements';
                                 return [
                                     `${ctx.dataset.label}`,
-                                    `${avgLabel}: ${ctx.raw}`,
+                                    `${avgLabel}: ${avg}`,
                                     `${totalLabel}: ${total}`,
                                     `${eventsLabel}: ${count}`
                                 ];
@@ -216,6 +231,18 @@ if (pData && pData.labels) {
                     }
                 }
             }
+        });
+
+        // --- Toggle moyenne / total ---
+        document.querySelectorAll('input[name="participationMode"]').forEach((radio) => {
+            radio.addEventListener('change', (e) => {
+                if (!e.target.checked) return;
+                mode = e.target.value;
+                participationChart.data.datasets.forEach((dataset) => {
+                    dataset.data = valuesFor(dataset.slotKey);
+                });
+                participationChart.update();
+            });
         });
 
         // --- Clic sur une barre : ouvre la liste des événements du jour/créneau ---
@@ -229,7 +256,7 @@ if (pData && pData.labels) {
             if (!points.length) return;
 
             const { datasetIndex, index } = points[0];
-            const slotKey = participationChart.data.datasets[datasetIndex].slotKey; // morning/afternoon/evening
+            const slotKey = participationChart.data.datasets[datasetIndex].slotKey;
             const dayLabel = pData.labels[index];
 
             eventDetailModal.open(
