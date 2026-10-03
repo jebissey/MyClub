@@ -18,12 +18,12 @@ abstract class TableController extends AbstractController
     }
 
     /**
-     * @param array<string,string> $filters
+     * @param array<string,string|null> $filters
      * @return array{
      *     items: array<int, object>,
      *     currentPage: int,
      *     totalPages: int,
-     *     filters: array<string,string>
+     *     filters: array<string,string|null>
      * }
      */
     protected function prepareTableData(Select $query, array $filters = [], bool $usePdoForLog = false): array

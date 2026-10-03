@@ -6,6 +6,7 @@ namespace test\CodingStandards;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use SplFileInfo;
 
 final class JsVersionChecker
 {
@@ -49,7 +50,7 @@ final class JsVersionChecker
             new RecursiveDirectoryIterator($this->appDir, RecursiveDirectoryIterator::SKIP_DOTS)
         );
         foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isFile() && $fileInfo->getExtension() === 'latte') {
+            if ($fileInfo instanceof SplFileInfo && $fileInfo->isFile() && $fileInfo->getExtension() === 'latte') {
                 $files[] = $fileInfo->getPathname();
             }
         }

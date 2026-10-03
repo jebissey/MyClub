@@ -72,7 +72,7 @@ final class TestExecutor
     /**
      * Plays simulations. With a selection, only the requested simulation
      * numbers are played, in the order of the selection. A requested number
-     * that does not exist is reported as an error.
+     * that does not exist is silently skipped (gaps in the sequence are normal).
      *
      * @param list<Simulation> $simulations
      * @param ?list<int> $simuSelection simulation numbers in execution order, null = all (extraction order)
@@ -84,14 +84,6 @@ final class TestExecutor
         $results = [];
 
         foreach ($this->planSimulations($simulations, $simuSelection) as $item) {
-            if (is_int($item)) {
-                $this->parameterErrors[] = $this->reporter->error("Simulation {$item} not found");
-                if ($stop) {
-                    break;
-                }
-                continue;
-            }
-
             $simulation = $item['simulation'];
 
             // Displayed as position/total (e.g. 16/327); the Step is the test number in error messages.
