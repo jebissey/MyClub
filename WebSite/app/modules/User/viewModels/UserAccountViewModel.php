@@ -12,6 +12,7 @@ final readonly class UserAccountViewModel extends LayoutViewModel
      * @param list<string> $emojis
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
+     * @param list<array{key: string, label: string, inputType: string, value: string}> $customFields
      */
     public function __construct(
         public bool $readOnly,
@@ -27,7 +28,8 @@ final readonly class UserAccountViewModel extends LayoutViewModel
         public string $layout,
         public ?string $alert = null,
         public ?string $memberInfo = null,
-        array $layoutParams = []
+        public array $customFields = [],
+        array $layoutParams = [],
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),

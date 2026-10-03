@@ -9,6 +9,7 @@ use app\enums\FilterInputRule;
 use app\enums\PersonStatus;
 use app\exceptions\QueryException;
 use app\helpers\Application;
+use app\helpers\MemberCustomFields;
 use app\helpers\MyClubDateTime;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
@@ -68,14 +69,18 @@ final class PersonController extends TableController
             $member = $this->dataHelper->get(
                 'Member',
                 ['Id' => $id],
-                'Imported, Alert, MemberInfo'
+                'Imported, Alert, MemberInfo, CustomFields'
             );
             if ($individual === false || $member === false) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
             /** @var object{Id: int|string, Email: string, FirstName: string|null, LastName: string|null} $individual */
-            /** @var object{Imported: bool|int|string|null, Alert: string|null, MemberInfo: string|null} $member */
+            /** @var object{Imported: bool|int|string|null, Alert: string|null, MemberInfo: string|null, CustomFields: string|null} $member */
+
+            $definitions = MemberCustomFields::parseDefinitions(
+                $this->dataHelper->getSetting(MemberCustomFields::SETTING_KEY, '[]')
+            );
 
             $viewModel = new UserAccountViewModel(
                 readOnly: (bool)($member->Imported ?? false),
@@ -96,6 +101,10 @@ final class PersonController extends TableController
                 layout: $this->getLayout(),
                 alert: $member->Alert ?? '',
                 memberInfo: $member->MemberInfo ?? '',
+                customFields: MemberCustomFields::toFormFields(
+                    $definitions,
+                    MemberCustomFields::decodeValues($member->CustomFields)
+                ),
                 layoutParams: $this->getAllParams([]),
             );
 
@@ -111,13 +120,13 @@ final class PersonController extends TableController
                 ['Id' => $id],
                 'Id, Email, FirstName, LastName'
             );
-            $member = $this->dataHelper->get('Member', ['Id' => $id], 'Imported');
+            $member = $this->dataHelper->get('Member', ['Id' => $id], 'Imported, CustomFields');
             if ($individual === false || $member === false) {
                 $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
             /** @var object{Id: int|string, Email: string, FirstName: string|null, LastName: string|null} $individual */
-            /** @var object{Imported: bool|int|string|null} $member */
+            /** @var object{Imported: bool|int|string|null, CustomFields: string|null} $member */
             $personId = (int)$individual->Id;
             $personEmail = $individual->Email;
             $personFirstName = $individual->FirstName;
@@ -205,11 +214,23 @@ final class PersonController extends TableController
             }
 
             if ($this->application->getConnectedUser()->isPersonManager()) {
+                $postData = $this->flight->request()->data->getData();
+                $rawCustom = is_array($postData['custom'] ?? null) ? $postData['custom'] : [];
+                $definitions = MemberCustomFields::parseDefinitions(
+                    $this->dataHelper->getSetting(MemberCustomFields::SETTING_KEY, '[]')
+                );
+                $customValues = MemberCustomFields::mergeValues(
+                    $definitions,
+                    MemberCustomFields::decodeValues($member->CustomFields),
+                    $rawCustom
+                );
+
                 $this->dataHelper->set(
                     'Member',
                     [
                         'Alert' => $input['alert'] ?? '',
-                        'MemberInfo' => $input['memberInfo'] ?? ''
+                        'MemberInfo' => $input['memberInfo'] ?? '',
+                        'CustomFields' => MemberCustomFields::encodeValues($customValues),
                     ],
                     ['Id' => $personId]
                 );

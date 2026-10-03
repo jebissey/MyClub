@@ -51,6 +51,7 @@ use app\config\routes\LoanApi;
 use app\config\routes\Maintenance;
 use app\config\routes\Media;
 use app\config\routes\MediaApi;
+use app\config\routes\MemberFields;
 use app\config\routes\Membership;
 use app\config\routes\MenuItem;
 use app\config\routes\MenuItemApi;
@@ -275,6 +276,7 @@ final class Routes
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new MemberFields($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Membership($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MenuItem($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MenuItemApi($this->apiFactory))->get());

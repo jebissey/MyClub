@@ -111,6 +111,14 @@
                     <label for="memberInfo" class="form-label">{='account.form.member_info.label'|translate}</label>
                     <textarea class="form-control" id="memberInfo" name="memberInfo" rows="3">{$memberInfo}</textarea>
                 </div>
+                    {foreach $customFields as $field}
+                <div class="mb-3">
+                    <label for="custom_{$field['key']}" class="form-label">{$field['label']}</label>
+                    <input type="{$field['inputType']}" class="form-control" id="custom_{$field['key']}"
+                        name="custom[{$field['key']}]" value="{$field['value']}"
+                        {if $field['inputType'] === 'number'}step="any"{/if}>
+                </div>
+                    {/foreach}
                 {/if}
 
                 <button class="btn btn-secondary" onclick="history.back()">{='account.form.cancel'|translate}</button>

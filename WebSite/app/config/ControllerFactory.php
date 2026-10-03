@@ -70,6 +70,7 @@ use app\modules\Loan\LoanController;
 use app\modules\Membership\MembershipController;
 use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
+use app\modules\PersonManager\MemberFieldController;
 use app\modules\PersonManager\PersonController;
 use app\modules\PersonManager\RegistrationController;
 use app\modules\Pwa\PwaController;
@@ -345,6 +346,14 @@ final class ControllerFactory
             $this->messageDataHelper,
         );
     }
+
+    public function makeMemberFieldController(): MemberFieldController
+    {
+        return new MemberFieldController(
+            $this->application,
+        );
+    }
+
 
     public function makeMembershipController(): MembershipController
     {

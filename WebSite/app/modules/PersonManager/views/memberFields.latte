@@ -1,0 +1,72 @@
+{extends $layout}
+
+{block content}
+    <form method="POST" class="needs-validation" data-form="memberFields">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <h3>{='custom_fields.title'|translate}</h3>
+                <p class="text-muted small">{='custom_fields.help'|translate}</p>
+
+                <div id="fieldList">
+                    {foreach $fields as $i => $field}
+                        <div class="row g-2 mb-2 field-row">
+                            <input type="hidden" name="fields[{$i}][key]" value="{$field['key']}">
+                            <div class="col-7">
+                                <input type="text" class="form-control" name="fields[{$i}][label]"
+                                       value="{$field['label']}" maxlength="100" required
+                                       placeholder="{='custom_fields.label'|translate}">
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select" name="fields[{$i}][type]">
+                                    {foreach $types as $t}
+                                        <option value="{$t['value']}" {if $field['type'] === $t['value']}selected{/if}>{$t['label']}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                            <div class="col-1">
+                                <button type="button" class="btn btn-outline-danger remove-field" aria-label="{='custom_fields.remove'|translate}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {/foreach}
+                </div>
+
+                <template id="fieldRowTemplate">
+                    <div class="row g-2 mb-2 field-row">
+                        <input type="hidden" name="fields[__INDEX__][key]" value="">
+                        <div class="col-7">
+                            <input type="text" class="form-control" name="fields[__INDEX__][label]"
+                                   maxlength="100" required placeholder="{='custom_fields.label'|translate}">
+                        </div>
+                        <div class="col-4">
+                            <select class="form-select" name="fields[__INDEX__][type]">
+                                {foreach $types as $t}
+                                    <option value="{$t['value']}">{$t['label']}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-1">
+                            <button type="button" class="btn btn-outline-danger remove-field" aria-label="{='custom_fields.remove'|translate}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <button type="button" id="addField" class="btn btn-outline-primary mb-3">
+                    <i class="bi bi-plus-lg"></i> {='custom_fields.add'|translate}
+                </button>
+
+                <div>
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">{='account.form.cancel'|translate}</button>
+                    <button type="submit" class="btn btn-primary">{='account.form.submit'|translate}</button>
+                </div>
+            </div>
+        </div>
+    </form>
+{/block}
+
+{block scripts}
+    <script type="module" src="{='/app/modules/PersonManager/js/memberFields.js'|version}"></script>
+{/block}

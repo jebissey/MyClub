@@ -108,7 +108,7 @@ final class TestExecutor
             if ($tests === []) {
                 $this->reporter->error(
                     "No result produced for simulation {$simulation->number}: "
-                    . "{$simulation->route->method} {$simulation->route->path}"
+                        . "{$simulation->route->method} {$simulation->route->path}"
                 );
                 continue;
             }
@@ -152,14 +152,14 @@ final class TestExecutor
     // -------------------------------------------------------------------------
 
     /**
-     * Builds the execution plan: the simulations themselves (no selection),
-     * or, for each requested number in order, the matching simulations.
-     * A number with no match is kept as a bare int so it can be reported.
-     * "position" is the 1-based rank of the simulation in the full list.
+     * Builds the execution plan.
+     * - null selection  → all simulations (extraction order)
+     * - list of numbers → only those that exist, in the order of the selection
+     *   (missing numbers are silently skipped — gaps are normal)
      *
      * @param list<Simulation> $simulations
      * @param ?list<int> $simuSelection
-     * @return list<array{position: int, simulation: Simulation}|int>
+     * @return list<array{position: int, simulation: Simulation}>
      */
     private function planSimulations(array $simulations, ?array $simuSelection): array
     {
@@ -178,7 +178,7 @@ final class TestExecutor
         $plan = [];
         foreach ($simuSelection as $number) {
             if (!isset($byNumber[$number])) {
-                $plan[] = $number;
+                // Trous dans la séquence : on ignore silencieusement
                 continue;
             }
             foreach ($byNumber[$number] as $entry) {

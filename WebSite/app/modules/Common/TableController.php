@@ -39,10 +39,11 @@ abstract class TableController extends AbstractController
         $values = [];
 
         foreach ($filters as $key => $value) {
-            if ($value !== '') {
-                $query = $query->where("$key LIKE ?");
-                $values[] = "%$value%";
+            if ($value === null || $value === '') {
+                continue;
             }
+            $query = $query->where("$key LIKE ?");
+            $values[] = "%$value%";
         }
 
         $totalItems = $this->count($query->getQuery(), $pdo, $values);
