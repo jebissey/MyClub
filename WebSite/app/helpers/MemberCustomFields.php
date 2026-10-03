@@ -148,6 +148,38 @@ final class MemberCustomFields
         return $fields;
     }
 
+    /**
+     * Valeurs brutes (non vides) d'une ligne CSV, indexées par clé de champ.
+     * Les dates JJ/MM/AAAA sont converties en AAAA-MM-JJ.
+     *
+     * @param list<CustomFieldDefinition> $definitions
+     * @param array<string, int> $customMapping clé du champ => index de colonne
+     * @param array<int, string|null> $row
+     * @return array<string, string>
+     */
+    public static function extractFromRow(array $definitions, array $customMapping, array $row): array
+    {
+        $input = [];
+        foreach ($definitions as $definition) {
+            $index = $customMapping[$definition->key] ?? null;
+            if ($index === null) {
+                continue;
+            }
+            $cell = trim((string)($row[$index] ?? ''));
+            if ($cell === '') {
+                continue; // une cellule vide n'efface pas la valeur existante
+            }
+            if ($definition->type === CustomFieldType::Date) {
+                $french = DateTimeImmutable::createFromFormat('!d/m/Y', $cell);
+                if ($french !== false && $french->format('d/m/Y') === $cell) {
+                    $cell = $french->format('Y-m-d');
+                }
+            }
+            $input[$definition->key] = $cell;
+        }
+        return $input;
+    }
+
     public static function normalizeValue(CustomFieldType $type, mixed $raw): string|int|float|null
     {
         if (!is_string($raw) && !is_int($raw) && !is_float($raw)) {

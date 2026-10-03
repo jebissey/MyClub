@@ -13,11 +13,13 @@ use Throwable;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
+use app\helpers\MemberCustomFields;
 use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\valueObjects\EmailMessage;
+use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
 use app\modules\User\valueObjects\EventRegistrationRow;
 
 /**
@@ -48,7 +50,8 @@ use app\modules\User\valueObjects\EventRegistrationRow;
  *     email: int|string,
  *     firstName: int|string,
  *     lastName: int|string,
- *     phone: int|string
+ *     phone: int|string,
+ *     custom?: array<string, int>
  * }
  * @phpstan-type CsvImportResults array{
  *     created: int,
@@ -546,13 +549,15 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
      * ...
      * @param CsvColumnMapping $mapping
      * @param array<string, int> $existingPersons
+     * @param callable(string): string $t Translator used for user-facing messages
      * @return CsvImportResults
      */
     public function importFromCsvFile(
         string $filePath,
         int $headerRow,
         array $mapping,
-        array $existingPersons
+        array $existingPersons,
+        callable $t
     ): array {
         foreach (['email', 'firstName', 'lastName', 'phone'] as $key) {
             if (!array_key_exists($key, $mapping)) {
@@ -576,6 +581,13 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
             'messages'        => [],
         ];
 
+        $definitions = $this->loadCustomFieldDefinitions();
+        $definitionsByKey = [];
+        foreach ($definitions as $definition) {
+            $definitionsByKey[$definition->key] = $definition;
+        }
+        $customMapping = $mapping['custom'] ?? [];
+
         $this->pdo->beginTransaction();
 
         try {
@@ -597,6 +609,9 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
                     Inactivated = 0
             ");
 
+            $stmtReadCustom = $this->pdo->prepare('SELECT CustomFields FROM Member WHERE Id = :id');
+            $stmtWriteCustom = $this->pdo->prepare('UPDATE Member SET CustomFields = :customFields WHERE Id = :id');
+
             $processedEmailKeys = [];
             $currentRow = 0;
             while (($data = fgetcsv($file, 0, ',', '"', '')) !== false) {
@@ -604,10 +619,15 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
                 if ($currentRow <= $headerRow) {
                     continue;
                 }
-                $email = filter_var($data[$mapping['email']] ?? '', FILTER_VALIDATE_EMAIL);
+                $rawEmail = $data[$mapping['email']] ?? '';
+                $email = filter_var($rawEmail, FILTER_VALIDATE_EMAIL);
                 if ($email === false) {
                     $results['errors']++;
-                    $results['messages'][] = "Ligne $currentRow : adresse email invalide {$data[$mapping['email']]}.";
+                    $results['messages'][] = str_replace(
+                        ['{line}', '{email}'],
+                        [(string)$currentRow, (string)$rawEmail],
+                        $t('import.error.invalid_email')
+                    );
                     continue;
                 }
                 $phone = preg_replace('/[^\d\s+\-()\.]/', '', $data[$mapping['phone']] ?? '');
@@ -641,6 +661,35 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
                 }
 
                 $stmtUpsertMember->execute([':id' => $id]);
+
+                if ($definitions !== [] && $customMapping !== []) {
+                    $rawCustom = MemberCustomFields::extractFromRow($definitions, $customMapping, $data);
+                    /** @var array<string, string|int|float> $importedCustom */
+                    $importedCustom = [];
+                    foreach ($rawCustom as $key => $raw) {
+                        $definition = $definitionsByKey[$key];
+                        $normalized = MemberCustomFields::normalizeValue($definition->type, $raw);
+                        if ($normalized === null) {
+                            $results['messages'][] = str_replace(
+                                ['{line}', '{value}', '{field}'],
+                                [(string)$currentRow, $raw, $definition->label],
+                                $t('import.error.invalid_custom_value')
+                            );
+                            continue;
+                        }
+                        $importedCustom[$key] = $normalized;
+                    }
+                    if ($importedCustom !== []) {
+                        $stmtReadCustom->execute([':id' => $id]);
+                        $json = $stmtReadCustom->fetchColumn();
+                        $current = MemberCustomFields::decodeValues(is_string($json) ? $json : null);
+                        // L'import l'emporte pour les clés fournies ; les autres valeurs sont conservées.
+                        $stmtWriteCustom->execute([
+                            ':id' => $id,
+                            ':customFields' => MemberCustomFields::encodeValues($importedCustom + $current),
+                        ]);
+                    }
+                }
 
                 if ($existingId !== null) {
                     $results['updated']++;
@@ -680,6 +729,16 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
             fclose($file);
         }
         return $results;
+    }
+
+    /** @return list<CustomFieldDefinition> */
+    private function loadCustomFieldDefinitions(): array
+    {
+        $stmt = $this->pdo->prepare('SELECT Value FROM Settings WHERE Name = :name');
+        $stmt->execute([':name' => MemberCustomFields::SETTING_KEY]);
+        $json = $stmt->fetchColumn();
+
+        return MemberCustomFields::parseDefinitions(is_string($json) ? $json : '[]');
     }
 
     public function sendRegistrationLink(

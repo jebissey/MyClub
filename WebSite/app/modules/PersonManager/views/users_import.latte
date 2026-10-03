@@ -2,22 +2,22 @@
 
 {block content}
     <div class="container-fluid">
-        <h2>Import CSV</h2>
-        
+        <h2>{='import.title'|translate}</h2>
+
         {if $results}
             <div class="container-fluid">
                 {if $results['errors'] > 0}
                     <div class="alert alert-danger alert-dismissible">
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         <div class="alert alert-warning">
-                            <h4>Résultat de l'import :</h4>
+                            <h4>{='import.result.title'|translate}</h4>
                             <ul>
-                                <li>Nouveaux enregistrements : {$results['created']}</li>
-                                <li>Enregistrements mis à jour : {$results['updated']}</li>
-                                <li>Enregistrements inactivé : {$results['deactivated']}</li>
-                                <li>Erreurs : {$results['errors']}</li>
+                                <li>{='import.result.created'|translate} {$results['created']}</li>
+                                <li>{='import.result.updated'|translate} {$results['updated']}</li>
+                                <li>{='import.result.deactivated'|translate} {$results['deactivated']}</li>
+                                <li>{='import.result.errors'|translate} {$results['errors']}</li>
                             </ul>
-                            <h4>Détail des erreurs :</h4>
+                            <h4>{='import.result.errors_detail'|translate}</h4>
                             <ul>
                                 {foreach $results['messages'] as $message}
                                     <li>{$message}</li>
@@ -28,21 +28,21 @@
                 {else}
                     <div class="alert alert-success alert-dismissible">
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        <h4>Import terminé avec succès :</h4>
+                        <h4>{='import.result.success'|translate}</h4>
                         <ul>
-                            <li>Nouveaux enregistrements : {$results['created']}</li>
-                            <li>Enregistrements mis à jour : {$results['updated']}</li>
-                            <li>Enregistrements inactivés : {$results['deactivated']}</li>
-                            {if $results['messages']}
-                            <hr>
-                            <h5>Détails :</h5>
-                            <ul>
-                            {foreach $results['messages'] as $message}
-                                <li>{$message}</li>
-                            {/foreach}
-                            </ul>
-                            {/if}
+                            <li>{='import.result.created'|translate} {$results['created']}</li>
+                            <li>{='import.result.updated'|translate} {$results['updated']}</li>
+                            <li>{='import.result.deactivated'|translate} {$results['deactivated']}</li>
                         </ul>
+                        {if $results['messages']}
+                            <hr>
+                            <h5>{='import.result.details'|translate}</h5>
+                            <ul>
+                                {foreach $results['messages'] as $message}
+                                    <li>{$message}</li>
+                                {/foreach}
+                            </ul>
+                        {/if}
                     </div>
                 {/if}
             </div>
@@ -50,52 +50,65 @@
 
         <form method="post" enctype="multipart/form-data" class="mb-4" id="importForm">
             <div class="mb-3">
-                <label for="csvFile" class="form-label">Fichier CSV</label>
+                <label for="csvFile" class="form-label">{='import.form.csv_file'|translate}</label>
                 <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required>
             </div>
 
             <div id="headerRow" class="mb-3" style="display: none;">
-                <label for="headerRow" class="form-label">Ligne des en-têtes</label>
+                <label for="headerRowInput" class="form-label">{='import.form.header_row'|translate}</label>
                 <input type="number" class="form-control w-auto" name="headerRow" id="headerRowInput"
                     value="{$importSettings['headerRow']}" min="1" required>
             </div>
 
             <div id="mappingSection" style="display: none;">
-                <h4 class="mt-4">Mapping des colonnes</h4>
-                
+                <h4 class="mt-4">{='import.form.mapping_title'|translate}</h4>
+
                 <div class="mb-3 d-flex align-items-end">
-                    <label for="emailColumn" class="form-label me-2">Email</label>
+                    <label for="emailColumn" class="form-label me-2">{='import.form.email'|translate}</label>
                     <select class="form-select w-auto" id="emailColumn" name="emailColumn" required>
-                        <option value="">Sélectionnez une colonne</option>
+                        <option value="">{='import.form.select_column'|translate}</option>
                     </select>
                 </div>
 
                 <div class="mb-3 d-flex align-items-end">
-                    <label for="firstNameColumn" class="form-label me-2">Prénom</label>
+                    <label for="firstNameColumn" class="form-label me-2">{='import.form.firstname'|translate}</label>
                     <select class="form-select w-auto" id="firstNameColumn" name="firstNameColumn" required>
-                        <option value="">Sélectionnez une colonne</option>
+                        <option value="">{='import.form.select_column'|translate}</option>
                     </select>
                 </div>
 
                 <div class="mb-3 d-flex align-items-end">
-                    <label for="lastNameColumn" class="form-label me-2">Nom</label>
+                    <label for="lastNameColumn" class="form-label me-2">{='import.form.lastname'|translate}</label>
                     <select class="form-select w-auto" id="lastNameColumn" name="lastNameColumn" required>
-                        <option value="">Sélectionnez une colonne</option>
+                        <option value="">{='import.form.select_column'|translate}</option>
                     </select>
                 </div>
 
                 <div class="mb-3 d-flex align-items-end">
-                    <label for="phoneColumn" class="form-label me-2">Téléphone</label>
+                    <label for="phoneColumn" class="form-label me-2">{='import.form.phone'|translate}</label>
                     <select class="form-select w-auto" id="phoneColumn" name="phoneColumn">
-                        <option value="">Sélectionnez une colonne</option>
+                        <option value="">{='import.form.select_column'|translate}</option>
                     </select>
                 </div>
+
+                {if $customFields}
+                    <h5 class="mt-4">{='import.form.custom_fields_title'|translate}</h5>
+                    {foreach $customFields as $field}
+                        <div class="mb-3 d-flex align-items-end">
+                            <label for="customColumn_{$field['key']}" class="form-label me-2">{$field['label']}</label>
+                            <select class="form-select w-auto" id="customColumn_{$field['key']}"
+                                    name="customColumn[{$field['key']}]" data-custom-key="{$field['key']}">
+                                <option value="">{='import.form.select_column'|translate}</option>
+                            </select>
+                        </div>
+                    {/foreach}
+                {/if}
             </div>
             <div id="emailColumnWarning" class="alert alert-warning py-1 px-2 mt-1" style="display: none;">
-                ⚠️ La colonne sélectionnée n'a pas de nom d'en-tête. L'email est obligatoire pour l'import.
+                {='import.form.email_header_warning'|translate}
             </div>
 
-            <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Importer</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">{='import.form.submit'|translate}</button>
         </form>
     </div>
 {/block}
@@ -103,7 +116,15 @@
 {block scripts}
     <script>
         const importSettings = {$importSettings};
+        window.i18n ??= {};
+        window.i18n['import.form.select_column'] = {='import.form.select_column'|translate};
+        window.i18n['import.form.submitting'] = {='import.form.submitting'|translate};
+        window.i18n['import.js.invalid_extension'] = {='import.js.invalid_extension'|translate};
+        window.i18n['import.js.invalid_type'] = {='import.js.invalid_type'|translate};
+        window.i18n['import.js.file_too_large'] = {='import.js.file_too_large'|translate};
+        window.i18n['import.js.unknown_error'] = {='import.js.unknown_error'|translate};
+        window.i18n['import.js.read_error'] = {='import.js.read_error'|translate};
+        window.i18n['import.js.column_option'] = {='import.js.column_option'|translate};
     </script>
     <script type="module" src="{='/app/modules/PersonManager/js/importForm.js'|version}"></script>
 {/block}
- 

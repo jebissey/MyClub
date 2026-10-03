@@ -6,14 +6,20 @@ namespace app\modules\PersonManager;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\MemberCustomFields;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\PersonManager\viewModels\UsersImportViewModel;
+use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
 
+/**
+ * @phpstan-import-type ImportSettings from UsersImportViewModel
+ * @phpstan-import-type ImportResults from UsersImportViewModel
+ */
 final class ImportController extends AbstractController
 {
-    /** @var array{headerRow: int, mapping: array{email: int|null, firstName: int|null, lastName: int|null, phone: int|null}} */
+    /** @var ImportSettings */
     private array $importSettings;
 
     /** @var array{errors: int, messages: array<int, string>, inactivated: int} */
@@ -30,15 +36,7 @@ final class ImportController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             $this->loadSettings();
-
-            $viewModel = new UsersImportViewModel(
-                importSettings: $this->importSettings,
-                results: $this->results ?? null,
-                layout: $this->getLayout(),
-                layoutParams: $this->getAllParams([]),
-            );
-
-            $this->render('PersonManager/views/users_import.latte', $viewModel->toArray());
+            $this->renderImportForm($this->results ?? null);
         }
     }
 
@@ -47,6 +45,7 @@ final class ImportController extends AbstractController
         if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             return;
         }
+        $this->loadSettings();
         $this->results = array_merge([
             'errors' => 0,
             'messages' => [],
@@ -56,16 +55,8 @@ final class ImportController extends AbstractController
         $file = $this->getUploadedFile('csvFile');
         if ($file === null || ($file['error'] ?? 1) !== 0) {
             $this->results['errors']++;
-            $this->results['messages'][] = 'Veuillez sélectionner un fichier CSV valide';
-
-            $viewModel = new UsersImportViewModel(
-                importSettings: $this->importSettings,
-                results: $this->results,
-                layout: $this->getLayout(),
-                layoutParams: $this->getAllParams([]),
-            );
-
-            $this->render('PersonManager/views/users_import.latte', $viewModel->toArray());
+            $this->results['messages'][] = ($this->t)('import.error.invalid_file');
+            $this->renderImportForm($this->results);
             return;
         }
 
@@ -79,12 +70,23 @@ final class ImportController extends AbstractController
         /** @var array{headerRow: int|null, emailColumn: int|null, firstNameColumn: int|null, lastNameColumn: int|null, phoneColumn: int|null} $input */
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
 
+        $postData = $this->flight->request()->data->getData();
+        $rawColumns = is_array($postData['customColumn'] ?? null) ? $postData['customColumn'] : [];
+        $customMapping = [];
+        foreach ($this->loadCustomDefinitions() as $definition) {
+            $column = $rawColumns[$definition->key] ?? '';
+            if (is_string($column) && ctype_digit($column)) {
+                $customMapping[$definition->key] = (int)$column;
+            }
+        }
+
         $headerRow = $input['headerRow'] ?? 1;
         $mapping = [
             'email' => $input['emailColumn'] ?? 0,
             'firstName' => $input['firstNameColumn'] ?? 0,
             'lastName' => $input['lastNameColumn'] ?? 0,
             'phone' => $input['phoneColumn'] ?? 0,
+            'custom' => $customMapping,
         ];
 
         $this->importSettings['headerRow'] = $headerRow;
@@ -94,30 +96,37 @@ final class ImportController extends AbstractController
 
         $path = $file['tmp_name'] ?? null;
         if (!is_string($path) || $path === '') {
-            $this->results['messages'][] = 'Veuillez sélectionner un fichier CSV valide';
-
-            $viewModel = new UsersImportViewModel(
-                importSettings: $this->importSettings,
-                results: $this->results,
-                layout: $this->getLayout(),
-                layoutParams: $this->getAllParams([]),
-            );
-
-            $this->render('PersonManager/views/users_import.latte', $viewModel->toArray());
+            $this->results['messages'][] = ($this->t)('import.error.invalid_file');
+            $this->renderImportForm($this->results);
             return;
         }
 
+        $this->renderImportForm(
+            $this->personDataHelper->importFromCsvFile(
+                $path,
+                $headerRow,
+                $mapping,
+                $this->personDataHelper->getAllPersons(),
+                $this->t
+            )
+        );
+    }
+
+    #region Private functions
+    /** @param ImportResults|null $results */
+    private function renderImportForm(?array $results): void
+    {
         $viewModel = new UsersImportViewModel(
             importSettings: $this->importSettings,
-            results: $this->personDataHelper->importFromCsvFile($path, $headerRow, $mapping, $this->personDataHelper->getAllPersons()),
+            results: $results,
             layout: $this->getLayout(),
+            customFields: $this->customFieldsForView(),
             layoutParams: $this->getAllParams([]),
         );
 
         $this->render('PersonManager/views/users_import.latte', $viewModel->toArray());
     }
 
-    #region Private functions
     private function loadSettings(): void
     {
         $row = $this->dataHelper->get('Settings', ['Name' => 'ImportPersonParameters'], 'Value');
@@ -130,12 +139,20 @@ final class ImportController extends AbstractController
 
     /**
      * @param array<mixed> $data
-     * @return array{headerRow: int, mapping: array{email: int|null, firstName: int|null, lastName: int|null, phone: int|null}}
+     * @return ImportSettings
      */
     private function buildImportSettings(array $data): array
     {
         $headerRow = isset($data['headerRow']) && is_int($data['headerRow']) ? $data['headerRow'] : 1;
         $mappingData = isset($data['mapping']) && is_array($data['mapping']) ? $data['mapping'] : [];
+        $customData = isset($mappingData['custom']) && is_array($mappingData['custom']) ? $mappingData['custom'] : [];
+
+        $custom = [];
+        foreach ($customData as $key => $index) {
+            if (is_int($index)) {
+                $custom[(string)$key] = $index;
+            }
+        }
 
         return [
             'headerRow' => $headerRow,
@@ -144,8 +161,26 @@ final class ImportController extends AbstractController
                 'firstName' => isset($mappingData['firstName']) && is_int($mappingData['firstName']) ? $mappingData['firstName'] : null,
                 'lastName' => isset($mappingData['lastName']) && is_int($mappingData['lastName']) ? $mappingData['lastName'] : null,
                 'phone' => isset($mappingData['phone']) && is_int($mappingData['phone']) ? $mappingData['phone'] : null,
+                'custom' => $custom,
             ],
         ];
+    }
+
+    /** @return list<CustomFieldDefinition> */
+    private function loadCustomDefinitions(): array
+    {
+        return MemberCustomFields::parseDefinitions(
+            $this->dataHelper->getSetting(MemberCustomFields::SETTING_KEY, '[]')
+        );
+    }
+
+    /** @return list<array{key: string, label: string}> */
+    private function customFieldsForView(): array
+    {
+        return array_map(
+            static fn(CustomFieldDefinition $d) => ['key' => $d->key, 'label' => $d->label],
+            $this->loadCustomDefinitions()
+        );
     }
 
     /**

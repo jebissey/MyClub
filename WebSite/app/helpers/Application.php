@@ -25,7 +25,7 @@ use app\modules\Common\valueObjects\CompactSettingsRow;
 
 final class Application
 {
-    public const VERSION = '0.93';
+    public const VERSION = '0.94';
 
     // @formatter:off
     public const  EMOJI_LIST = [

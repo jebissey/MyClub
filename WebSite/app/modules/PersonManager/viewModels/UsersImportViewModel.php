@@ -9,7 +9,13 @@ use app\modules\Common\viewModels\LayoutViewModel;
 /**
  * @phpstan-type ImportSettings array{
  *     headerRow: int,
- *     mapping: array{email: int|null, firstName: int|null, lastName: int|null, phone: int|null}
+ *     mapping: array{
+ *         email: int|null,
+ *         firstName: int|null,
+ *         lastName: int|null,
+ *         phone: int|null,
+ *         custom: array<string, int>
+ *     }
  * }
  * @phpstan-type ImportResults array{
  *     errors?: int,
@@ -26,12 +32,14 @@ final readonly class UsersImportViewModel extends LayoutViewModel
     /**
      * @param ImportSettings $importSettings
      * @param ImportResults|null $results
+     * @param list<array{key: string, label: string}> $customFields
      * @param array<string, mixed> $layoutParams Full output of Params::getAll()
      */
     public function __construct(
         public array $importSettings,
         public ?array $results,
         public string $layout,
+        public array $customFields = [],
         array $layoutParams = []
     ) {
         parent::__construct(

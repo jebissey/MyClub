@@ -1,5 +1,11 @@
 import ApiClient from '../../Common/js/ApiClient.js';
 
+const t = (key, params = {}) =>
+    Object.entries(params).reduce(
+        (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
+        window.i18n?.[key] ?? key
+    );
+
 document.addEventListener('DOMContentLoaded', () => {
     const api = new ApiClient();
 
@@ -15,22 +21,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function validateFile(file) {
         const allowedTypes = ['text/csv', 'application/vnd.ms-excel'];
-        const maxSize = 2 * 1024 * 1024; // 2MB
+        const maxSizeMb = 2;
+        const maxSize = maxSizeMb * 1024 * 1024;
 
         if (!file) return false;
 
         if (!file.name.toLowerCase().endsWith('.csv')) {
-            alert('Le fichier doit être au format .csv');
+            alert(t('import.js.invalid_extension'));
             return false;
         }
 
         if (!allowedTypes.includes(file.type) && file.type !== '') {
-            alert('Type de fichier non autorisé.');
+            alert(t('import.js.invalid_type'));
             return false;
         }
 
         if (file.size > maxSize) {
-            alert('Fichier trop volumineux (max 2MB)');
+            alert(t('import.js.file_too_large', { max: `${maxSizeMb} MB` }));
             return false;
         }
 
@@ -82,6 +89,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    function fillSelect(select, headers, savedValue) {
+        select.innerHTML = '';
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = t('import.form.select_column');
+        select.appendChild(placeholder);
+
+        headers.forEach((header, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = t('import.js.column_option', { header, index: index + 1 });
+            select.appendChild(option);
+        });
+
+        if (savedValue !== undefined && savedValue !== null) {
+            select.value = savedValue;
+        }
+    }
+
     async function updateHeaders() {
         if (csvFileInput.files.length === 0) return;
 
@@ -98,30 +125,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await api.postFormData('/api/import/headers', formData);
 
             if (!response || response.error) {
-                throw new Error(response?.error || 'Erreur inconnue');
+                throw new Error(response?.error || t('import.js.unknown_error'));
             }
 
             const headers = response.data.headers;
             currentHeaders = headers;
-            const selects = ['emailColumn', 'firstNameColumn', 'lastNameColumn', 'phoneColumn'];
 
-            selects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                select.innerHTML = '<option value="">Sélectionnez une colonne</option>';
+            ['emailColumn', 'firstNameColumn', 'lastNameColumn', 'phoneColumn'].forEach(selectId => {
+                fillSelect(
+                    document.getElementById(selectId),
+                    headers,
+                    importSettings?.mapping?.[selectId.replace('Column', '')]
+                );
+            });
 
-                headers.forEach((header, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = `${header} (colonne ${index + 1})`;
-                    select.appendChild(option);
-                });
-
-                if (importSettings?.mapping) {
-                    const mappingKey = selectId.replace('Column', '');
-                    if (importSettings.mapping[mappingKey] !== undefined) {
-                        select.value = importSettings.mapping[mappingKey];
-                    }
-                }
+            document.querySelectorAll('select[data-custom-key]').forEach(select => {
+                fillSelect(select, headers, importSettings?.mapping?.custom?.[select.dataset.customKey]);
             });
 
             mappingSection.style.display = 'block';
@@ -130,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error(error);
-            alert('Erreur lors de la lecture du fichier.');
+            alert(t('import.js.read_error'));
         } finally {
             headerRowInput.disabled = false;
         }
@@ -138,6 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('importForm').addEventListener('submit', () => {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Import en cours...';
+        submitBtn.textContent = t('import.form.submitting');
     });
 });
