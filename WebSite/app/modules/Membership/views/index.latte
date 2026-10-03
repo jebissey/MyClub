@@ -163,7 +163,7 @@
 <script n:syntax="off">
 	window.haWidget = {widgetUrl: {=$widgetUrl !== null ? json_encode($widgetUrl) : 'null'|noescape}};
 </script>
-<script type="module" src="/app/modules/Membership/js/membership.js"></script>
+<script type="module" src="{='/app/modules/Membership/js/membership.js'|version}"></script>
 {/block}
 
 {/block}

@@ -106,6 +106,10 @@ jobs:
         working-directory: WebSite
         run: php ../dev/test/CheckCodingStandards.php
 
+      - name: Check JS cache busting (|version)
+        working-directory: WebSite
+        run: php ../dev/test/CheckJs.php
+
   route-tests:
     name: FlightRouteTester
     runs-on: ubuntu-latest

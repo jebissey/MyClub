@@ -118,12 +118,12 @@
 {block scripts}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
+<script src="{='/app/modules/Common/js/tinymce/tinymce.min.js'|version}"></script>
 
 {* window.validationMsg doit être défini avant le module car il n'utilise pas d'import *}
 <script>
     window.validationMsg = {$validationMsg};
     const mapMaxZoom = {$maxZoom};
 </script>
-<script type="module" src="/app/modules/User/js/edit_presentation.js"></script>
+<script type="module" src="{='/app/modules/User/js/edit_presentation.js'|version}"></script>
 {/block}

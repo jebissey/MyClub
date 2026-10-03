@@ -239,8 +239,8 @@
 {/block}
 
 {block scripts}
-    <script src="/app/modules/Common/js/tinymce/tinymce.min.js"></script>
-    <script src="/app/modules/Communication/js/tinymceInsertButtonPlugin.js"></script>
+    <script src="{='/app/modules/Common/js/tinymce/tinymce.min.js'|version}"></script>
+    <script src="{='/app/modules/Communication/js/tinymceInsertButtonPlugin.js'|version}"></script>
     <script type="module">
         import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
         initTinyMCE('#tinymce-email', {
@@ -255,5 +255,5 @@
     {/if}
         window.connectedPersonId = {$connectedPersonId};
     </script>
-    <script type="module" src="/app/modules/Communication/js/main.js"></script>
+    <script type="module" src="{='/app/modules/Communication/js/main.js'|version}"></script>
 {/block}
