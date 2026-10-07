@@ -8,7 +8,7 @@ use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
-final class Communication implements RouteInterface
+final class Export implements RouteInterface
 {
     /**
      * @var array<int, Route>
@@ -24,10 +24,10 @@ final class Communication implements RouteInterface
      */
     public function get(): array
     {
-        $communicationController = fn() => $this->controllerFactory->makeCommunicationController();
+        $exportController = fn() => $this->controllerFactory->makeExportController();
 
-        $this->routes[] = new Route('GET  /communication', $communicationController, 'edit');
-        $this->routes[] = new Route('GET  /help/communication', $communicationController, 'help');
+        $this->routes[] = new Route('GET /export', $exportController, 'showExportForm');
+        $this->routes[] = new Route('GET /export/download', $exportController, 'download');
 
         return $this->routes;
     }

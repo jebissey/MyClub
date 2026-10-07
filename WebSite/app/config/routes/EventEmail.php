@@ -28,6 +28,7 @@ final class EventEmail implements RouteInterface
 
         $this->routes[] = new Route('GET  /emails', $eventEmailController, 'fetchEmails');
         $this->routes[] = new Route('POST /emails', $eventEmailController, 'copyEmails');
+        $this->routes[] = new Route('GET  /emails/help', $eventEmailController, 'help');
 
         return $this->routes;
     }

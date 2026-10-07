@@ -28,19 +28,26 @@ final class Event implements RouteInterface
 
         $this->routes[] = new Route('GET  /eventManager', $eventController, 'home');
         $this->routes[] = new Route('GET  /eventManager/help', $eventController, 'help');
-        $this->routes[] = new Route('GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
+        
         $this->routes[] = new Route('GET  /event/@id:[0-9]+', $eventController, 'show');
         $this->routes[] = new Route('GET  /event/@id:[0-9]+/register', $eventController, 'registerSet');
         $this->routes[] = new Route('GET  /event/@id:[0-9]+/unregister', $eventController, 'registerUnset');
         $this->routes[] = new Route('GET  /event/@id:[0-9]+/@token:[a-f0-9]+', $eventController, 'registerSet');
-        $this->routes[] = new Route('GET  /events/crosstab', $eventController, 'showEventCrosstab');
-        $this->routes[] = new Route('GET  /nextEvents', $eventController, 'nextEvents');
-        $this->routes[] = new Route('GET  /weekEvents', $eventController, 'weekEvents');
 
+        $this->routes[] = new Route('GET  /event/chat/@id:[0-9]+', $eventController, 'showEventChat');
+
+        $this->routes[] = new Route('GET  /events/crosstab', $eventController, 'showEventCrosstab');
+        $this->routes[] = new Route('GET  /events/crossTab/help', $eventController, 'events_crossTab_help');
+        
+        $this->routes[] = new Route('GET  /nextEvents', $eventController, 'nextEvents');
         $this->routes[] = new Route('GET  /nextEvents/help', $eventController, 'nextEventsHelp');
-        $this->routes[] = new Route('GET  /events/events/guest/help', $eventController, 'events_guest_help');
-        $this->routes[] = new Route('GET  /emails/help', $eventController, 'emails_help');
-        $this->routes[] = new Route('GET  /events/events/crossTab/help', $eventController, 'events_crossTab_help');
+        
+        $this->routes[] = new Route('GET  /weekEvents', $eventController, 'weekEvents');
+        $this->routes[] = new Route('GET  /weekEvents/help', $eventController, 'nextEventsHelp');
+
+
+
+        $this->routes[] = new Route('GET  /events/guest/help', $eventController, 'events_guest_help');
 
         return $this->routes;
     }

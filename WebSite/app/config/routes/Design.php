@@ -26,9 +26,10 @@ final class Design implements RouteInterface
     {
         $designController = fn() => $this->controllerFactory->makeDesignController();
 
-        $this->routes[] = new Route('GET  /designs', $designController, 'index');
         $this->routes[] = new Route('GET  /design/create', $designController, 'create');
         $this->routes[] = new Route('POST /design/save', $designController, 'save');
+        $this->routes[] = new Route('GET  /designs', $designController, 'index');
+        $this->routes[] = new Route('GET  /designs/help', $designController, 'help');
 
         return $this->routes;
     }

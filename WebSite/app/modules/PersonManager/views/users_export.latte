@@ -1,0 +1,77 @@
+{extends $layout}
+
+{block content}
+    <style>
+        .ods-drop-zone {
+            border: 2px dashed #adb5bd;
+            border-radius: .5rem;
+            cursor: pointer;
+            transition: background-color .15s, border-color .15s;
+        }
+        .ods-drop-zone.drag-over, .ods-drop-zone:hover, .ods-drop-zone:focus {
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <h2>{='export.title'|translate}</h2>
+        <p class="text-muted">{='export.help'|translate}</p>
+
+        <form id="exportForm" class="mb-4" data-url="/export/download">
+            <div class="mb-3">
+                <label for="fileName" class="form-label">{='export.form.file_name'|translate}</label>
+                <div class="input-group" style="max-width: 32rem;">
+                    <input type="text" class="form-control" id="fileName" name="fileName"
+                           value="{$defaultFileName}" maxlength="100" required>
+                    <span class="input-group-text">.ods</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="exportBtn">{='export.form.submit'|translate}</button>
+            <div id="exportStatus" class="mt-3" role="status"></div>
+        </form>
+
+        <p class="small text-muted" id="exportFallbackNote" style="display: none;">
+            {='export.form.fallback_note'|translate}
+        </p>
+
+        <hr class="my-4">
+
+        <h3>{='export.import.title'|translate}</h3>
+        <p class="text-muted">{='export.import.help'|translate}</p>
+
+        <div id="odsDropZone" class="ods-drop-zone text-center p-5 mb-3" role="button" tabindex="0">
+            <div style="font-size: 2.5rem;">📂</div>
+            <div>{='export.import.drop'|translate}</div>
+        </div>
+        <input type="file" id="odsFileInput" class="d-none"
+               accept=".ods,application/vnd.oasis.opendocument.spreadsheet">
+        <div id="odsImportResults" role="status"></div>
+    </div>
+{/block}
+
+{block scripts}
+    <script>
+        window.i18n ??= {};
+        window.i18n['export.form.submit'] = {='export.form.submit'|translate};
+        window.i18n['export.form.submitting'] = {='export.form.submitting'|translate};
+        window.i18n['export.js.done'] = {='export.js.done'|translate};
+        window.i18n['export.js.error'] = {='export.js.error'|translate};
+        window.i18n['export.js.file_type'] = {='export.js.file_type'|translate};
+        window.i18n['export.import.confirm'] = {='export.import.confirm'|translate};
+        window.i18n['export.import.no_change'] = {='export.import.no_change'|translate};
+        window.i18n['export.import.result.applied'] = {='export.import.result.applied'|translate};
+        window.i18n['export.import.result.reactivated'] = {='export.import.result.reactivated'|translate};
+        window.i18n['export.import.error.wrong_type'] = {='export.import.error.wrong_type'|translate};
+        window.i18n['export.import.error.generic'] = {='export.import.error.generic'|translate};
+        window.i18n['import.js.file_too_large'] = {='import.js.file_too_large'|translate};
+        window.i18n['import.form.submitting'] = {='import.form.submitting'|translate};
+        window.i18n['import.result.created'] = {='import.result.created'|translate};
+        window.i18n['import.result.updated'] = {='import.result.updated'|translate};
+        window.i18n['import.result.deactivated'] = {='import.result.deactivated'|translate};
+        window.i18n['import.result.errors'] = {='import.result.errors'|translate};
+        window.i18n['import.result.details'] = {='import.result.details'|translate};
+    </script>
+    <script type="module" src="{='/app/modules/PersonManager/js/exportForm.js'|version}"></script>
+{/block}

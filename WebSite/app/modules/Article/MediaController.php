@@ -96,17 +96,7 @@ final class MediaController extends AbstractController
 
     public function help(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $lang = TranslationManager::getCurrentLanguage();
-            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Media_list'], $lang);
-            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-            $viewModel = new InfoViewModel(
-                content: $content,
-                timer: 0,
-                layoutParams: $this->getAllParams([]),
-            );
-            $this->render('Common/views/info.latte', $viewModel->toArray());
-        }
+        $this->renderHelp('Help_Media_list', fn($u) => $u->isRedactor(), __FILE__, __LINE__);
     }
 
     public function listFiles(): void

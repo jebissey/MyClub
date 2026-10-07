@@ -242,21 +242,7 @@ final class PersonController extends TableController
 
     public function help(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $lang = TranslationManager::getCurrentLanguage();
-            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_PersonManager'], $lang);
-            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-
-            $viewModel = new InfoViewModel(
-                content: $content,
-                timer: 0,
-                hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
-                previousPage: true,
-                layoutParams: $this->getAllParams([]),
-            );
-
-            $this->render('Common/views/info.latte', $viewModel->toArray());
-        }
+        $this->renderHelp('Help_PersonManager', fn($u) => $u->isPersonManager(), __FILE__, __LINE__);
     }
 
     public function home(): void
@@ -344,7 +330,9 @@ final class PersonController extends TableController
             resetUrl: '/persons',
             status: $status,
             extraParams: $status !== PersonStatus::Active->value ? ['status' => $status] : [],
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('PersonManager/views/users_index.latte', $viewModel->toArray());

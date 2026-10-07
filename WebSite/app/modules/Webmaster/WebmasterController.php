@@ -78,36 +78,12 @@ final class WebmasterController extends AbstractController
 
     public function helpAdmin(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator(), __FILE__, __LINE__)) {
-            $lang = TranslationManager::getCurrentLanguage();
-            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Admin'], $lang);
-            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-
-            $viewModel = new InfoViewModel(
-                content: $content,
-                timer: 0,
-                layoutParams: $this->getAllParams([]),
-            );
-            $this->render('Common/views/info.latte', $viewModel->toArray());
-        }
+        $this->renderHelp('Help_Admin', fn($u) => $u->isAdministrator(), __FILE__, __LINE__);
     }
 
     public function helpWebmaster(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $lang = TranslationManager::getCurrentLanguage();
-            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Webmaster'], $lang);
-            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-
-            $viewModel = new InfoViewModel(
-                content: $content,
-                timer: 0,
-                hasAuthorization: $this->application->getConnectedUser()->isWebmaster(),
-                previousPage: true,
-                layoutParams: $this->getAllParams([]),
-            );
-            $this->render('Common/views/info.latte', $viewModel->toArray());
-        }
+        $this->renderHelp('Help_Webmaster', fn($u) => $u->isWebmaster(), __FILE__, __LINE__);
     }
 
     public function homeAdmin(): void

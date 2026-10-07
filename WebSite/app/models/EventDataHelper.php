@@ -914,6 +914,11 @@ final class EventDataHelper extends Data implements NewsProviderInterface
     /** @return array<int, array<string, mixed>> */
     private function getPassedEvents(?Person $person, int $offset): array
     {
+        $params = [
+            ':idperson' => $person->Id ?? 0,
+            ':offset'   => $offset,
+        ];
+
         $sql = "
             SELECT
                 e.*,
@@ -925,22 +930,28 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             LEFT JOIN EventType et   ON et.Id = e.IdEventType
             LEFT JOIN Participant p  ON p.IdEvent = e.Id AND p.IdIndividual = :idperson
             LEFT JOIN Message m      ON m.EventId = e.Id AND m.\"From\" = 'User'
-            LEFT JOIN MemberGroup mg ON mg.IdGroup = et.IdGroup AND mg.IdMember = :idperson
             WHERE et.Inactivated = 0
-              AND (et.IdGroup IS NULL OR mg.IdMember IS NOT NULL)
-              AND e.StartTime < :now
-            GROUP BY e.Id
-            ORDER BY e.StartTime DESC
-            LIMIT :limit 
-            OFFSET :offset
+            AND datetime(replace(e.StartTime, 'T', ' ')) < DATETIME('now')
         ";
+
+        if ($person === null) {
+            $sql .= " AND e.Audience = :audience AND et.IdGroup IS NULL";
+            $params[':audience'] = EventAudience::ForAll->value;
+        } else {
+            $sql .= " AND (et.IdGroup IS NULL OR et.IdGroup IN (
+            SELECT IdGroup FROM MemberGroup WHERE IdMember = :idperson
+        ))";
+        }
+
+        $sql .= "
+            GROUP BY e.Id
+            ORDER BY datetime(replace(e.StartTime, 'T', ' ')) DESC
+            LIMIT 10 OFFSET :offset
+        ";
+
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':idperson' => $person->Id ?? 0,
-            ':now'      => date('Y-m-d H:i:s'),
-            ':limit'    => 10,
-            ':offset'   => $offset
-        ]);
+        $stmt->execute($params);
+
         return $this->events($stmt->fetchAll(PDO::FETCH_OBJ));
     }
 

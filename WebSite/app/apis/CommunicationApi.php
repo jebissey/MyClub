@@ -26,9 +26,9 @@ final class CommunicationApi extends AbstractApi
         PersonDataHelper $personDataHelper,
         private readonly EmailService $emailService,
         private readonly ?EmailQuotaTrackerInterface $quotaTracker,
-        private readonly LanguagesDataHelper $languagesDataHelper,
+        protected LanguagesDataHelper $languagesDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function getQuota(): void

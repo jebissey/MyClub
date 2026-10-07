@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use Closure;
 use Flight;
 use JsonException;
 use Latte\Engine as LatteEngine;
@@ -13,6 +14,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
 use app\models\DataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\PersonDataHelper;
 
@@ -21,11 +23,13 @@ abstract class AbstractApi
     protected LatteEngine $latte;
     protected DataHelper $dataHelper;
     private LogWriterDataHelper $logWriterDataHelper;
+    protected Closure $t;
 
     public function __construct(
         protected Application $application,
         protected ConnectedUser $connectedUser,
-        protected PersonDataHelper $personDataHelper
+        protected PersonDataHelper $personDataHelper,
+        protected LanguagesDataHelper $languagesDataHelper,
     ) {
         $this->dataHelper = new DataHelper(
             $application->getPdo(),
@@ -34,6 +38,7 @@ abstract class AbstractApi
         );
         $this->latte = $application->getLatte();
         $this->logWriterDataHelper = new LogWriterDataHelper($application, $application->getErrorManager());
+        $this->t = fn(string $key): string => $this->languagesDataHelper->translate($key);
     }
 
     /**

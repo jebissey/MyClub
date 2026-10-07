@@ -1,5 +1,38 @@
 User-agent: *
 Disallow: /
+
+# Home
 Allow: /$
+
+# Articles
 Allow: /article/
-Allow: /articles/
+Allow: /articles$
+Allow: /articles?
+Allow: /articles-rss.xml
+
+# Events
+Allow: /event/
+Allow: /events-rss.xml
+Allow: /nextEvents
+Allow: /weekEvents
+Allow: /contact/event/
+
+# Public pages
+Allow: /astronomy$
+Allow: /astronomy?
+Allow: /contact$
+Allow: /emails/help$
+Allow: /exercises$
+Allow: /help$
+Allow: /legal/notice$
+Allow: /signpost$
+Allow: /webCard$
+Allow: /user/directory/public/map$
+
+# Games
+Allow: /game/karaoke/
+Allow: /game/leapfrog
+
+# Static files
+Allow: /manifest.json$
+Allow: /sitemap.xml$

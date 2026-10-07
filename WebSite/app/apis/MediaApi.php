@@ -10,6 +10,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\MediaManager;
 use app\helpers\To;
+use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\UploadedFileInput;
 
@@ -18,10 +19,11 @@ final class MediaApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
         private MediaManager $mediaManager
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function deleteFile(int $year, int $month, string $filename): void

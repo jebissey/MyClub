@@ -10,6 +10,7 @@ use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\viewModels\InfoViewModel;
 
 final class EventEmailController extends AbstractController
 {
@@ -18,25 +19,6 @@ final class EventEmailController extends AbstractController
         private PersonDataHelper $personDataHelper,
     ) {
         parent::__construct($application);
-    }
-
-    public function fetchEmails(): void
-    {
-        if (!$this->application->getConnectedUser()->isEventManager()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $this->render('Event/views/getEmails.latte', $this->getAllParams([
-            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'weekdayNames' => TranslationManager::getWeekdayNames(),
-            'timeOptions' => $this->getAllLabels(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
     }
 
     public function copyEmails(): void
@@ -87,5 +69,29 @@ final class EventEmailController extends AbstractController
                 'copyError'   => ($this->t)('event.copy_emails.clipboard.error'),
             ],
         ]));
+    }
+
+    public function fetchEmails(): void
+    {
+        if (!$this->application->getConnectedUser()->isEventManager()) {
+            $this->raiseForbidden(__FILE__, __LINE__);
+            return;
+        }
+        if (WebApp::getRequestMethod() !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+        $this->render('Event/views/getEmails.latte', $this->getAllParams([
+            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
+            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
+            'weekdayNames' => TranslationManager::getWeekdayNames(),
+            'timeOptions' => $this->getAllLabels(),
+            'page' => $this->application->getConnectedUser()->getPage(),
+        ]));
+    }
+
+    public function help(): void
+    {
+        $this->renderHelp('Help_Event_Email', fn($u) => $u->isEventManager(), __FILE__, __LINE__);
     }
 }

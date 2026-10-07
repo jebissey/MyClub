@@ -18,6 +18,7 @@ use app\helpers\WebApp;
 use app\modules\Event\interfaces\AuthorizationServiceInterface;
 use app\modules\Common\interfaces\EventServiceInterface;
 use app\models\EventDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
@@ -42,9 +43,10 @@ final class EventApi extends AbstractApi
         private MessageDataHelper $messageDataHelper,
         private EmailService $emailService,
         ConnectedUser $connectedUser,
-        PersonDataHelper $personDataHelper
+        PersonDataHelper $personDataHelper,
+        LanguagesDataHelper $languagesDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function deleteEvent(int $id): void

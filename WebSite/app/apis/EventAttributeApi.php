@@ -11,6 +11,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\AttributeDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 
 final class EventAttributeApi extends AbstractApi
@@ -19,9 +20,10 @@ final class EventAttributeApi extends AbstractApi
         Application $application,
         private AttributeDataHelper $attributeDataHelper,
         ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function createAttribute(): void

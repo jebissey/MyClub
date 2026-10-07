@@ -11,6 +11,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
 use app\helpers\To;
 use app\helpers\WebApp;
+use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
 use app\models\MemberDataHelper;
 use app\models\MessageDataHelper;
@@ -24,13 +25,14 @@ final class ChatApi extends AbstractApi
     public function __construct(
         Application $application,
         protected ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
         private LogDataHelper $logDataHelper,
         private GravatarHandler $gravatarHandler,
         private MessageDataHelper $messageDataHelper,
         private MemberDataHelper $memberDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function getActiveUsers(): void

@@ -69,23 +69,6 @@ final class KanbanController extends AbstractController
 
     public function help(): void
     {
-        if (!$this->application->getConnectedUser()->isKanbanDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        $lang    = TranslationManager::getCurrentLanguage();
-        $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_KanbanDesigner'], $lang);
-        $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-
-        $viewModel = new InfoViewModel(
-            content: $content,
-            timer: 0,
-            hasAuthorization: $this->application->getConnectedUser()->isRedactor(),
-            previousPage: true,
-            layoutParams: $this->getAllParams([]),
-        );
-
-        $this->render('Common/views/info.latte', $viewModel->toArray());
+        $this->renderHelp('Help_KanbanDesigner', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__);
     }
 }

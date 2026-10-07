@@ -15,6 +15,7 @@ use app\models\MetadataDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\viewModels\HomeViewModel;
 
 final class HomeController extends AbstractController
 {
@@ -36,26 +37,33 @@ final class HomeController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
+
         $_SESSION['navbar'] = '';
         $userPendingSurveys = $userPendingDesigns = [];
         $userEmail = is_string($_SESSION['user'] ?? null) ? $_SESSION['user'] : '';
+        $news = false;
 
         $lang = TranslationManager::getCurrentLanguage();
         $connectedUser = $this->application->getConnectedUser();
+
         if ($userEmail) {
             if ($connectedUser->person === null) {
                 unset($_SESSION['user']);
                 $this->raiseBadRequest("Unknown user with this email address {$userEmail}", __FILE__, __LINE__);
+                return;
             }
+
             $pendingSurveyResponses = $this->surveyDataHelper->getPendingSurveyResponses();
-            $userPendingSurveys = array_filter($pendingSurveyResponses, function ($item) use ($userEmail) {
-                return strcasecmp($item->Email, $userEmail) === 0;
-            });
+            $userPendingSurveys = array_values(array_filter(
+                $pendingSurveyResponses,
+                static fn($item) => strcasecmp($item->Email, $userEmail) === 0
+            ));
 
             $pendingDesignResponses = $this->designDataHelper->getPendingDesignResponses();
-            $userPendingDesigns = array_filter($pendingDesignResponses, function ($item) use ($userEmail) {
-                return strcasecmp($item->Email, $userEmail) === 0;
-            });
+            $userPendingDesigns = array_values(array_filter(
+                $pendingDesignResponses,
+                static fn($item) => strcasecmp($item->Email, $userEmail) === 0
+            ));
 
             $news = $this->news->anyNews($connectedUser);
         } else {
@@ -77,12 +85,13 @@ final class HomeController extends AbstractController
                         PHP_URL_PATH
                     ),
                     'isMyclubWebSite'    => WebApp::isMyClubWebSite(),
-                    'navbarBgColor'   => $defaultColors['navbarBgColor'],
-                    'navbarInkColor'  => $defaultColors['navbarInkColor'],
-                    'navbarIconColor' => $defaultColors['navbarIconColor'],
+                    'navbarBgColor'      => $defaultColors['navbarBgColor'],
+                    'navbarInkColor'     => $defaultColors['navbarInkColor'],
+                    'navbarIconColor'    => $defaultColors['navbarIconColor'],
                 ],
                 $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl())
-                    ? $prodSiteUrl : null,
+                    ? $prodSiteUrl
+                    : null,
                 $connectedUser->person?->Alert
             );
         }
@@ -91,96 +100,113 @@ final class HomeController extends AbstractController
         $homeHeader          = $this->dataHelper->get('Languages', ['Name' => 'Home_Header'], $lang)->$lang ?? '';
         $homeFooter          = $this->dataHelper->get('Languages', ['Name' => 'Home_Footer'], $lang)->$lang ?? '';
         $articles            = $this->articleDataHelper->getLatestArticles($userEmail, $latestArticlesCount);
-        $latestArticle       = $articles['latestArticle'];
-        if ($featuredArticleId > 0) {
-            if ($this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $featuredArticleId)) {
-                $featured = $this->articleDataHelper->getWithAuthor($featuredArticleId);
-                if ($featured != null) {
-                    $latestArticle = $featured;
-                }
-            }
+
+        $latestArticle = null;
+        $displayArticleId = 0;
+
+        if (
+            $featuredArticleId > 0
+            && $this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $featuredArticleId)
+        ) {
+            $displayArticleId = $featuredArticleId;
         } else {
             $spotlight = $this->articleDataHelper->getSpotlightArticle();
             if ($spotlight !== null) {
                 /** @var array{articleId: int, spotlightUntil: string} $spotlight */
-                $articleId = $spotlight['articleId'];
-                if ($this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $articleId)) {
-                    if (strtotime($spotlight['spotlightUntil']) >= strtotime(date('Y-m-d'))) {
-                        $latestArticle = $this->articleDataHelper->getWithAuthor((int) $articleId);
-                    }
+                $articleId = (int) $spotlight['articleId'];
+                if (
+                    $this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $articleId)
+                    && strtotime($spotlight['spotlightUntil']) >= strtotime(date('Y-m-d'))
+                ) {
+                    $displayArticleId = $articleId;
                 }
             }
         }
 
-        $footerArticleId = (int) ($this->dataHelper->get('Settings', ['Name' => 'Home_FooterArticleId'], 'Value')->Value ?? 0);
-        $footerArticle   = $footerArticleId > 0
-            ? $this->dataHelper->get('Article', ['Id' => $footerArticleId], 'Title, content')
+        if ($displayArticleId > 0) {
+            $latestArticle = $this->articleDataHelper->getWithAuthor($displayArticleId) ?: null;
+        }
+
+        if ($latestArticle === null && isset($articles['latestArticle'])) {
+            $latestArticle = $this->articleDataHelper->getWithAuthor(
+                $articles['latestArticle']->Id
+            ) ?: null;
+        }
+
+        $footerArticleId = (int) (
+            $this->dataHelper->get(
+                'Settings',
+                ['Name' => 'Home_FooterArticleId'],
+                'Value'
+            )->Value ?? 0
+        );
+
+        $footerArticle = $footerArticleId > 0
+            ? $this->dataHelper->get('Article', ['Id' => $footerArticleId], 'Title, Content') ?: null
             : null;
 
-        $this->render('Common/views/home.latte', $this->getAllParams([
-            'latestArticle'          => $latestArticle,
-            'latestArticles'         => $articles['latestArticles'],
-            'latestArticlesCount'    => $latestArticlesCount,
-            'homeHeader'             => $homeHeader,
-            'homeFooter'             => $homeFooter,
-            'navItems'               => $this->getNavItems($connectedUser->person),
-            'sidebarMenu'            => $this->getSidebarMenuItems($connectedUser->person),
-            'publishedBy'            => $articles['latestArticle']
-                && $articles['latestArticle']->PublishedBy != $articles['latestArticle']->CreatedBy
-                ? $this->personDataHelper->getPublisher($articles['latestArticle']->PublishedBy) : '',
-            'latestArticleHasSurvey' => $this->surveyDataHelper->articleHasSurveyNotClosed($articles['latestArticle']->Id ?? 0),
-            'pendingSurveys'         => $userPendingSurveys,
-            'pendingDesigns'         => $userPendingDesigns,
-            'news'                   => $news ?? false,
-            'page'                   => $this->application->getConnectedUser()->getPage(),
-            'carouselItems'          => $latestArticle ? $this->dataHelper->gets(
-                'Carousel',
-                ['IdArticle' => $latestArticle->Id],
-                'Item'
-            ) : [],
-            'homeParagraphsCount'    => (int) ($this->dataHelper->get(
-                'Settings',
-                ['Name' => 'Home_FeaturedArticleParagraphs'],
-                'Value'
-            )->Value ?? 1),
-            'footerArticle'          => $footerArticle,
-        ]));
+        $publishedBy = '';
+
+        if (
+            $latestArticle !== null
+            && $latestArticle->PublishedBy !== $latestArticle->CreatedBy
+        ) {
+            $publishedBy = $this->personDataHelper->getPublisher(
+                $latestArticle->PublishedBy
+            ) ?? '';
+        }
+
+        $latestArticleHasSurvey = $latestArticle !== null
+            && (bool) $this->surveyDataHelper->articleHasSurveyNotClosed($latestArticle->Id);
+
+        $carouselItems = $latestArticle !== null
+            ? array_values(
+                $this->dataHelper->gets(
+                    'Carousel',
+                    ['IdArticle' => $latestArticle->Id],
+                    'Item'
+                )
+            )
+            : [];
+
+        $viewModel = new HomeViewModel(
+            latestArticle: $latestArticle,
+            latestArticles: $articles['latestArticles'],
+            latestArticlesCount: $latestArticlesCount,
+            homeHeader: $homeHeader,
+            homeFooter: $homeFooter,
+            navItems: $this->getNavItems($connectedUser->person),
+            sidebarMenu: $this->getSidebarMenuItems($connectedUser->person),
+            publishedBy: $publishedBy,
+            latestArticleHasSurvey: $latestArticleHasSurvey,
+            pendingSurveys: $userPendingSurveys,
+            pendingDesigns: $userPendingDesigns,
+            news: $news,
+            carouselItems: $carouselItems,
+            homeParagraphsCount: (int) (
+                $this->dataHelper->get(
+                    'Settings',
+                    ['Name' => 'Home_FeaturedArticleParagraphs'],
+                    'Value'
+                )->Value ?? 1
+            ),
+            footerArticle: $footerArticle,
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+
+        $this->render('Common/views/home.latte', $viewModel->toArray());
     }
 
-    public function helpHome(): void
+    public function help(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $lang = TranslationManager::getCurrentLanguage();
-        $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Home'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-            'currentVersion' => Application::VERSION,
-            'timer' => 0,
-            'previousPage' => true,
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-        ]));
+        $this->renderHelp('Help_Home', fn($u) => $u->isAnybody(), __FILE__, __LINE__);
     }
 
     public function legalNotice(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $lang = TranslationManager::getCurrentLanguage();
-
-        $this->render('Common/views/info.latte', $this->getAllParams([
-            'content' => $this->dataHelper->get('Languages', ['Name' => 'LegalNotices'], $lang)->$lang ?? '',
-            'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-            'currentVersion' => Application::VERSION,
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'timer' => 0,
-            'btn_HistoryBack' => true,
-        ]));
+        $this->renderHelp('LegalNotices', fn($u) => $u->isAnybody(), __FILE__, __LINE__);
     }
 
     public function signpost(): void

@@ -143,6 +143,11 @@ final class ConnectedUser
         );
     }
 
+    public function isAnybody(): bool
+    {
+        return true;
+    }
+
     public function isConnected(): bool
     {
         return $this->user !== null;

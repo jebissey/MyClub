@@ -68,6 +68,7 @@ use app\modules\Games\Solfege\SolfegeController;
 use app\modules\Kanban\KanbanController;
 use app\modules\Loan\LoanController;
 use app\modules\Membership\MembershipController;
+use app\modules\PersonManager\ExportController;
 use app\modules\PersonManager\GroupController;
 use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\MemberFieldController;
@@ -259,6 +260,14 @@ final class ControllerFactory
             $this->application,
             $this->eventTypeDataHelper,
             $this->tableControllerDataHelper,
+        );
+    }
+
+    public function makeExportController(): ExportController
+    {
+        return new ExportController(
+            $this->application,
+            $this->personDataHelper
         );
     }
 

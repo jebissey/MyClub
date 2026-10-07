@@ -1,0 +1,28 @@
+# MyClub
+
+> MyClub est une application web libre et gratuite destinée aux associations. Elle permet de gérer les membres, les événements, la communication, les articles et plusieurs outils du quotidien associatif, sur un hébergement mutualisé ordinaire (OVH, AlwaysData...).
+
+MyClub est développé en PHP (Flight PHP, templates Latte, SQLite, Bootstrap 5) avec une architecture modulaire. Le code source est public et le projet est maintenu par un développeur indépendant. L'application est multilingue : elle est disponible en français, anglais et polonais, et ajouter une langue consiste à ajouter une colonne à la table de traductions puis à la compléter (une IA suffit pour obtenir une traduction de bonne qualité).
+
+## Le site
+
+- [Accueil](https://myclub.ovh/): présentation du projet
+- [Articles](https://myclub.ovh/articles): articles et documentation publiés sur le site
+
+## Code source et installation
+
+- [Dépôt GitHub](https://github.com/jebissey/MyClub): code source, suivi des tickets
+- [Versions publiées](https://github.com/jebissey/MyClub/releases): archive d'installation complète (FullInstall.zip) et notes de version
+
+## Fonctionnalités
+
+- Gestion des membres : import et export, champs personnalisés, groupes et autorisations
+- Événements, communication par courriel (envoi groupé), notifications Web Push
+- Modules complémentaires : prêt de matériel, kanban, karaoké, messagerie instantanée, astronomie, ...
+- Adhésions et paiements en ligne via HelloAsso
+- Gestionnaire de médias et éditeur de page d'accueil
+- Interface multilingue (français, anglais, polonais) et extensible à d'autres langues
+
+## Optional
+
+- [Licence et contribution](https://github.com/jebissey/MyClub): voir le dépôt pour la licence et les modalités de contribution

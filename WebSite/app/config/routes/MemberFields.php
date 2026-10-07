@@ -26,8 +26,8 @@ final class MemberFields implements RouteInterface
     {
         $memberFieldController = fn() => $this->controllerFactory->makeMemberFieldController();
 
-        $this->routes[] = new Route('GET /personManager/memberFields', $memberFieldController, 'edit');
-        $this->routes[] = new Route('POST /personManager/memberFields', $memberFieldController, 'save');
+        $this->routes[] = new Route('GET /memberFields-settings', $memberFieldController, 'edit');
+        $this->routes[] = new Route('POST /memberFields-settings', $memberFieldController, 'save');
 
         return $this->routes;
     }

@@ -16,16 +16,9 @@ final class DesignerController extends AbstractController
         parent::__construct($application);
     }
 
-    public function helpDesigner(): void
+    public function help(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
-            $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Designer'], $lang)->$lang ?? '',
-                'timer' => 0,
-                'btn_HistoryBack' => true,
-            ]));
-        }
+        $this->renderHelp('Help_Designer', fn($u) => $u->isDesigner(), __FILE__, __LINE__);
     }
 
     public function homeDesigner(): void

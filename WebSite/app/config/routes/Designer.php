@@ -27,7 +27,7 @@ final class Designer implements RouteInterface
         $designerController = fn() => $this->controllerFactory->makeDesignerController();
 
         $this->routes[] = new Route('GET  /designer', $designerController, 'homeDesigner');
-        $this->routes[] = new Route('GET  /designer/help', $designerController, 'helpDesigner');
+        $this->routes[] = new Route('GET  /designer/help', $designerController, 'help');
 
         return $this->routes;
     }

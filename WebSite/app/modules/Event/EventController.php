@@ -47,26 +47,19 @@ final class EventController extends AbstractController
 
     public function nextEventsHelp(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $lang = TranslationManager::getCurrentLanguage();
-        if ($this->application->getConnectedUser()->isEventManager()) {
-            $content = $this->dataHelper->get('Languages', ['Name' => 'Help_NextEvents_EventManager'], $lang)->$lang ?? '';
-        } else {
-            $content = $this->dataHelper->get('Languages', ['Name' => 'Help_NextEvents'], $lang)->$lang ?? '';
-        }
+        $user = $this->application->getConnectedUser();
+        $helpName = $user->isEventManager() ? 'Help_NextEvents_EventManager' : 'Help_NextEvents';
 
-        $viewModel = new InfoViewModel(
-            content: $content,
-            timer: 0,
-            hasAuthorization: $this->application->getConnectedUser()->isRedactor(),
-            previousPage: true,
-            layoutParams: $this->getAllParams([]),
+        $this->renderHelp(
+            $helpName,
+            fn($u) => $u->isAnybody(),
+            __FILE__,
+            __LINE__,
+            [
+                'hasAuthorization' => $user->isRedactor(),
+                'previousPage' => true,
+            ]
         );
-
-        $this->render('Common/views/info.latte', $viewModel->toArray());
     }
 
     public function nextEvents(): void
@@ -347,21 +340,7 @@ final class EventController extends AbstractController
 
     public function help(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
-            return;
-        }
-
-        $lang = TranslationManager::getCurrentLanguage();
-
-        $viewModel = new InfoViewModel(
-            content: $this->dataHelper->get('Languages', ['Name' => 'Help_EventManager'], $lang)->$lang ?? '',
-            timer: 0,
-            hasAuthorization: $this->application->getConnectedUser()->isRedactor(),
-            previousPage: true,
-            layoutParams: $this->getAllParams([]),
-        );
-
-        $this->render('Common/views/info.latte', $viewModel->toArray());
+        $this->renderHelp('Help_EventManager', fn($u) => $u->isEventManager(), __FILE__, __LINE__);
     }
 
     public function home(): void
@@ -382,20 +361,17 @@ final class EventController extends AbstractController
 
     public function showEventChat(int $eventId): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary, Id, StartTime, Duration, Location');
         if ($event === false) {
             $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
             return;
         }
-        $person = $this->application->getConnectedUser()->person;
+        $person = $this->application->getConnectedUser(true)->person;
         $lastLogId = isset($_SESSION['last_log_id']) && is_int($_SESSION['last_log_id'])
             ? $_SESSION['last_log_id']
             : 0;

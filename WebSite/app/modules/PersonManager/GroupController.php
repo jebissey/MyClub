@@ -172,7 +172,9 @@ final class GroupController extends AbstractController
                 groups: $this->groupDataHelper->getGroupsWithAuthorizations($connectedUser),
                 layout: $this->getLayout(),
                 navItems: $this->getNavItems($connectedUser->person),
-                layoutParams: $this->getAllParams([]),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
             );
 
             $this->render('PersonManager/views/groups_index.latte', $viewModel->toArray());

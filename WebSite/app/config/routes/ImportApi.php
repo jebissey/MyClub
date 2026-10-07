@@ -27,6 +27,7 @@ final class ImportApi implements RouteInterface
         $importApi = fn() => $this->apiFactory->makeImportApi();
 
         $this->routes[] = new Route('POST /api/import/headers', $importApi, 'getHeadersFromCSV');
+        $this->routes[] = new Route('POST /api/import/ods', $importApi, 'importOds');
 
         return $this->routes;
     }

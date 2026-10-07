@@ -92,19 +92,9 @@ final class DesignController extends AbstractController
         $this->redirect('/designs');
     }
 
-    public function helpDesigner(): void
+    public function help(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
-            $lang = TranslationManager::getCurrentLanguage();
-            $this->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $this->dataHelper->get('Languages', ['Name' => 'Help_Designer'], $lang)->$lang ?? '',
-                'hasAuthorization' => $this->application->getConnectedUser()->isDesigner(),
-                'currentVersion' => Application::VERSION,
-                'timer' => 0,
-                'previousPage' => true,
-                'page' => $this->application->getConnectedUser()->getPage()
-            ]));
-        }
+        $this->renderHelp('Help_Designer', fn($u) => $u->isDesigner(), __FILE__, __LINE__);
     }
 
     public function homeDesigner(): void

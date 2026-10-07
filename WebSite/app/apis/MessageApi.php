@@ -15,6 +15,7 @@ use app\helpers\MediaManager;
 use app\helpers\NotificationSender;
 use app\helpers\To;
 use app\helpers\WebApp;
+use app\models\LanguagesDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\MessageRecipientService;
@@ -47,14 +48,15 @@ final class MessageApi extends AbstractApi
 
     public function __construct(
         Application $application,
-        private MessageDataHelper $messageDataHelper,
         ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
+        private MessageDataHelper $messageDataHelper,
         private MessageRecipientService $messageRecipientService,
         private NotificationSender $notificationSender,
         private MediaManager $mediaManager
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function addMessage(): void

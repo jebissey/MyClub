@@ -320,19 +320,10 @@ final class ArticleController extends TableController
         $this->redirect('/article/' . $idArticle);
     }
 
+
     public function help(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $lang = TranslationManager::getCurrentLanguage();
-            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Redactor'], $lang);
-            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-            $viewModel = new InfoViewModel(
-                content: $content,
-                timer: 0,
-                layoutParams: $this->getAllParams([]),
-            );
-            $this->render('Common/views/info.latte', $viewModel->toArray());
-        }
+        $this->renderHelp('Help_Redactor', fn($u) => $u->isRedactor(), __FILE__, __LINE__);
     }
 
     public function home(): void
@@ -628,10 +619,7 @@ final class ArticleController extends TableController
                 layoutParams: $layoutParams,
             );
 
-            $this->render(
-                'Article/views/article_show.latte',
-                $viewModel->toArray()
-            );
+            $this->render('Article/views/article_show.latte', $viewModel->toArray());
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }

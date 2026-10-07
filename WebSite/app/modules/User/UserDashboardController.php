@@ -20,26 +20,7 @@ final class UserDashboardController extends AbstractController
 
     public function help(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $lang = TranslationManager::getCurrentLanguage();
-        $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_User'], $lang);
-        $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-
-        $viewModel = new InfoViewModel(
-            content: $content,
-            hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
-            timer: 0,
-            previousPage: true,
-            layoutParams: $this->getAllParams([]),
-        );
-        $this->render('Common/views/info.latte', $viewModel->toArray());
+        $this->renderHelp('Help_User', fn($u) => $u->isConnected(), __FILE__, __LINE__);
     }
 
     public function user(): void

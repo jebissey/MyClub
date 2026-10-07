@@ -102,6 +102,7 @@ final class ApiFactory
         return new ArticleApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->designDataHelper,
         );
@@ -112,6 +113,7 @@ final class ApiFactory
         return new CarouselApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->authorizationDataHelper,
             $this->carouselDataHelper
@@ -123,6 +125,7 @@ final class ApiFactory
         return new ChatApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->logDataHelper,
             new GravatarHandler(),
@@ -154,7 +157,8 @@ final class ApiFactory
             $this->messageDataHelper,
             $this->emailService,
             $this->connectedUser,
-            $this->personDataHelper
+            $this->personDataHelper,
+            $this->languagesDataHelper,
         );
     }
 
@@ -164,6 +168,7 @@ final class ApiFactory
             $this->application,
             $this->attributeDataHelper,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper
         );
     }
@@ -173,6 +178,7 @@ final class ApiFactory
         return new EventAvailabilitiesApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->availabilityDataHelper,
         );
@@ -185,6 +191,7 @@ final class ApiFactory
             $this->eventNeedDataHelper,
             $this->eventDataHelper,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper
         );
     }
@@ -196,6 +203,7 @@ final class ApiFactory
             $this->needDataHelper,
             $this->needTypeDataHelper,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper
         );
     }
@@ -206,6 +214,7 @@ final class ApiFactory
             $this->application,
             $this->eventDataHelper,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper
         );
     }
@@ -215,6 +224,7 @@ final class ApiFactory
         return new ExerciseApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
         );
     }
@@ -224,6 +234,7 @@ final class ApiFactory
         return new GroupApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper
         );
     }
@@ -233,6 +244,7 @@ final class ApiFactory
         return new HelloAssoApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->membershipDataHelper
         );
@@ -243,7 +255,8 @@ final class ApiFactory
         return new ImportApi(
             $this->application,
             $this->connectedUser,
-            $this->personDataHelper
+            $this->personDataHelper,
+            $this->languagesDataHelper
         );
     }
 
@@ -252,6 +265,7 @@ final class ApiFactory
         return new KanbanApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->kanbanDataHelper
         );
@@ -262,6 +276,7 @@ final class ApiFactory
         return new KaraokeApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->karaokeDataHelper
         );
@@ -272,6 +287,7 @@ final class ApiFactory
         return new LeapfrogApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->logWriterDataHelper
         );
@@ -282,6 +298,7 @@ final class ApiFactory
         return new LoanApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->loanDataHelper
         );
@@ -292,6 +309,7 @@ final class ApiFactory
         return new MediaApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->mediaManager,
         );
@@ -303,6 +321,7 @@ final class ApiFactory
             $this->application,
             $this->menuItemDataHelper,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper
         );
     }
@@ -311,9 +330,10 @@ final class ApiFactory
     {
         return new MessageApi(
             $this->application,
-            $this->messageDataHelper,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
+            $this->messageDataHelper,
             $this->messageRecipientService,
             $this->notificationSender,
             $this->mediaManager
@@ -325,6 +345,7 @@ final class ApiFactory
         return new NotificationApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper
         );
     }
@@ -335,7 +356,7 @@ final class ApiFactory
             $this->application,
             $this->connectedUser,
             $this->personDataHelper,
-            new LanguagesDataHelper($this->application, $this->application->getErrorManager())
+            $this->languagesDataHelper
         );
     }
 
@@ -344,6 +365,7 @@ final class ApiFactory
         return new VisitorInsightsApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->logDataHelper
         );
@@ -354,6 +376,7 @@ final class ApiFactory
         return new WebmasterApi(
             $this->application,
             $this->connectedUser,
+            $this->languagesDataHelper,
             $this->personDataHelper,
             $this->logWriterDataHelper,
             CredentialService::getInstance()

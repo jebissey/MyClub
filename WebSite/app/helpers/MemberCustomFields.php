@@ -149,6 +149,25 @@ final class MemberCustomFields
     }
 
     /**
+     * Cellules d'export (une par champ défini) : nombres en nombres, dates en dates.
+     *
+     * @param list<CustomFieldDefinition> $definitions
+     * @param array<string, string|int|float> $values
+     * @return list<string|int|float|DateTimeImmutable|null>
+     */
+    public static function toExportCells(array $definitions, array $values): array
+    {
+        $cells = [];
+        foreach ($definitions as $definition) {
+            $normalized = self::normalizeValue($definition->type, $values[$definition->key] ?? null);
+            $cells[] = ($definition->type === CustomFieldType::Date && is_string($normalized))
+                ? new DateTimeImmutable($normalized)
+                : $normalized;
+        }
+        return $cells;
+    }
+
+    /**
      * Valeurs brutes (non vides) d'une ligne CSV, indexées par clé de champ.
      * Les dates JJ/MM/AAAA sont converties en AAAA-MM-JJ.
      *

@@ -14,7 +14,10 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
 use app\helpers\MemberCustomFields;
+use app\helpers\OdsReader;
+use app\helpers\OdsWriter;
 use app\helpers\PersonPreferences;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Common\services\EmailService;
@@ -252,6 +255,33 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
             ORDER BY clubMember
         ";
         return $this->queryOrFail($sql)->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * @return list<object{
+     *     Id: int|string,
+     *     Inactivated: int|bool|string|null,
+     *     Email: string,
+     *     FirstName: string|null,
+     *     LastName: string|null,
+     *     Phone: string|null,
+     *     CustomFields: string|null
+     * }>
+     */
+    public function getMembersForExport(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT i.Id, i.Email, i.FirstName, i.LastName, i.Phone, m.CustomFields, m.Inactivated
+            FROM Individual i
+            JOIN Member m ON m.Id = i.Id
+            ORDER BY i.LastName, i.FirstName
+        ");
+        if ($stmt === false) {
+            throw new RuntimeException("Impossible de lire les membres pour l'export");
+        }
+        /** @var list<object{Id: int|string, Inactivated: int|bool|string|null, Email: string, FirstName: string|null, LastName: string|null, Phone: string|null, CustomFields: string|null}> $members */
+        $members = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $members;
     }
 
     /**
@@ -619,23 +649,31 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
                 if ($currentRow <= $headerRow) {
                     continue;
                 }
-                $rawEmail = $data[$mapping['email']] ?? '';
+                $rawEmail  = trim((string)($data[$mapping['email']] ?? ''));
+                $firstName = mb_substr(trim((string)($data[$mapping['firstName']] ?? '')), 0, 100);
+                $lastName  = mb_substr(trim((string)($data[$mapping['lastName']] ?? '')), 0, 100);
+                $phoneRaw  = preg_replace('/[^\d\s+\-()\.]/', '', (string)($data[$mapping['phone']] ?? ''));
+                $phone     = mb_substr(is_string($phoneRaw) ? $phoneRaw : '', 0, 20);
+
                 $email = filter_var($rawEmail, FILTER_VALIDATE_EMAIL);
                 if ($email === false) {
-                    $results['errors']++;
+                    // Ligne totalement vide : on l'ignore (sinon on créerait un membre fantôme)
+                    if ($rawEmail === '' && $firstName === '' && $lastName === '' && $phone === '') {
+                        continue;
+                    }
+                    $email = self::fictiveEmail($firstName, $lastName, $phone, $rawEmail);
                     $results['messages'][] = str_replace(
                         ['{line}', '{email}'],
-                        [(string)$currentRow, (string)$rawEmail],
-                        $t('import.error.invalid_email')
+                        [(string)$currentRow, $email],
+                        $t('import.warning.fictive_email')
                     );
-                    continue;
                 }
-                $phone = preg_replace('/[^\d\s+\-()\.]/', '', $data[$mapping['phone']] ?? '');
+
                 $personData = [
                     'email'     => $email,
-                    'firstName' => mb_substr(trim($data[$mapping['firstName']] ?? ''), 0, 100),
-                    'lastName'  => mb_substr(trim($data[$mapping['lastName']] ?? ''), 0, 100),
-                    'phone'     => mb_substr(is_string($phone) ? $phone : '', 0, 20),
+                    'firstName' => $firstName,
+                    'lastName'  => $lastName,
+                    'phone'     => $phone,
                 ];
 
                 $emailKey   = strtolower($personData['email']);
@@ -729,6 +767,433 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
             fclose($file);
         }
         return $results;
+    }
+
+    /**
+     * Synchronise les membres avec un fichier .ods produit par l'export.
+     * - ligne sans Id : nouveau membre ; Id déjà présent plusieurs fois : la ligne dont l'email correspond
+     *   à la base (sinon la première) met à jour le membre, les autres sont ajoutées ;
+     * - Id absent du fichier, ou colonne Actif différente de ☑ : membre désactivé ;
+     * - $dryRun : tout est exécuté puis annulé (aperçu des compteurs).
+     *
+     * @param callable(string): string $t Traducteur des messages affichés à l'utilisateur
+     * @return array{created: int, updated: int, deactivated: int, reactivated: int, errors: int, messages: list<string>}
+     */
+    public function importFromOdsFile(string $filePath, callable $t, bool $dryRun = false): array
+    {
+        $results = [
+            'created' => 0,
+            'updated' => 0,
+            'deactivated' => 0,
+            'reactivated' => 0,
+            'errors' => 0,
+            'messages' => [],
+        ];
+        $fail = static function (string $message) use (&$results): void {
+            $results['errors']++;
+            $results['messages'][] = $message;
+        };
+
+        $sheet = OdsReader::readFirstSheet($filePath);
+        $headerLine = array_key_first($sheet);
+        if ($headerLine === null) {
+            $fail($t('import.ods.error.empty'));
+            return $results;
+        }
+        $headerCells = $sheet[$headerLine];
+        unset($sheet[$headerLine]);
+
+        // Colonnes repérées par leur titre
+        $idCol = $this->findOdsColumn($headerCells, ['Id']);
+        $activeCol = $this->findOdsColumn($headerCells, $this->languageAliases('export.column.active'));
+        $emailCol = $this->findOdsColumn($headerCells, $this->languageAliases('import.form.email'));
+        if ($idCol === null || $activeCol === null || $emailCol === null) {
+            $missing = [];
+            if ($idCol === null) {
+                $missing[] = 'Id';
+            }
+            if ($activeCol === null) {
+                $missing[] = $t('export.column.active');
+            }
+            if ($emailCol === null) {
+                $missing[] = $t('import.form.email');
+            }
+            $fail(str_replace('{column}', implode(', ', $missing), $t('import.ods.error.missing_column')));
+            return $results;
+        }
+        $firstNameCol = $this->findOdsColumn($headerCells, $this->languageAliases('import.form.firstname'));
+        $lastNameCol = $this->findOdsColumn($headerCells, $this->languageAliases('import.form.lastname'));
+        $phoneCol = $this->findOdsColumn($headerCells, $this->languageAliases('import.form.phone'));
+
+        $definitions = $this->loadCustomFieldDefinitions();
+        $customMapping = [];
+        foreach ($definitions as $definition) {
+            $column = $this->findOdsColumn($headerCells, [$definition->label]);
+            if ($column !== null) {
+                $customMapping[$definition->key] = $column;
+            }
+        }
+
+        // État actuel de la base
+        /** @var array<int, array{email: string, firstName: string, lastName: string, phone: string, imported: bool, inactivated: bool, customFields: string|null}> $members */
+        $members = [];
+        /** @var array<string, int> $idByEmail */
+        $idByEmail = [];
+        $stmt = $this->pdo->query('
+            SELECT i.Id, i.Email, i.FirstName, i.LastName, i.Phone, m.Imported, m.Inactivated, m.CustomFields
+            FROM Individual i
+            JOIN Member m ON m.Id = i.Id
+        ');
+        if ($stmt === false) {
+            throw new RuntimeException("Impossible de lire les membres pour l'import");
+        }
+        /** @var list<array<string, mixed>> $dbRows */
+        $dbRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($dbRows as $dbRow) {
+            $memberId = To::int($dbRow['Id']);
+            $customJson = $dbRow['CustomFields'] ?? null;
+            $members[$memberId] = [
+                'email' => To::str($dbRow['Email'] ?? ''),
+                'firstName' => To::str($dbRow['FirstName'] ?? ''),
+                'lastName' => To::str($dbRow['LastName'] ?? ''),
+                'phone' => To::str($dbRow['Phone'] ?? ''),
+                'imported' => To::bool($dbRow['Imported'] ?? false),
+                'inactivated' => To::bool($dbRow['Inactivated'] ?? false),
+                'customFields' => is_string($customJson) ? $customJson : null,
+            ];
+            $idByEmail[strtolower(To::str($dbRow['Email'] ?? ''))] = $memberId;
+        }
+
+        // Première passe : lecture des lignes, regroupement par Id
+        /** @var list<array{line: int, id: int|null, duplicateOf: int|null, cells: array<int, string>}> $rows */
+        $rows = [];
+        /** @var array<int, list<int>> $rowsById */
+        $rowsById = [];
+        /** @var array<int, true> $seenIds */
+        $seenIds = [];
+        foreach ($sheet as $line => $cells) {
+            $rawId = $cells[$idCol] ?? '';
+            $id = null;
+            if ($rawId !== '') {
+                $numeric = str_replace(',', '.', $rawId);
+                if (!is_numeric($numeric) || (float)$numeric < 1 || (float)$numeric !== floor((float)$numeric)) {
+                    $fail(str_replace(['{line}', '{value}'], [(string)$line, $rawId], $t('import.ods.error.invalid_id')));
+                    continue;
+                }
+                $id = (int)$numeric;
+                $seenIds[$id] = true;
+                $rowsById[$id][] = count($rows);
+            }
+            $rows[] = ['line' => $line, 'id' => $id, 'duplicateOf' => null, 'cells' => $cells];
+        }
+        if ($rows === []) {
+            if ($results['errors'] === 0) {
+                $fail($t('import.ods.error.empty'));
+            }
+            return $results; // aucune ligne exploitable : on ne désactive personne
+        }
+
+        // Id en double (ligne copiée/collée) : une seule ligne garde l'Id, les autres deviennent des ajouts
+        foreach ($rowsById as $id => $indexes) {
+            if (count($indexes) < 2) {
+                continue;
+            }
+            $original = $indexes[0];
+            $databaseEmail = isset($members[$id]) ? strtolower($members[$id]['email']) : '';
+            if ($databaseEmail !== '') {
+                foreach ($indexes as $index) {
+                    if (strtolower(trim($rows[$index]['cells'][$emailCol] ?? '')) === $databaseEmail) {
+                        $original = $index;
+                        break;
+                    }
+                }
+            }
+            foreach ($indexes as $index) {
+                if ($index !== $original) {
+                    $rows[$index]['id'] = null;
+                    $rows[$index]['duplicateOf'] = $id;
+                }
+            }
+        }
+
+        $stmtInsertIndividual = $this->pdo->prepare("
+            INSERT INTO Individual (Type, Email, FirstName, LastName, Phone)
+            VALUES ('Member', :email, :firstName, :lastName, :phone)
+        ");
+        $stmtInsertMember = $this->pdo->prepare('
+            INSERT INTO Member (Id, Imported, Inactivated, CustomFields)
+            VALUES (:id, 0, :inactivated, :customFields)
+        ');
+        $stmtUpdateIndividual = $this->pdo->prepare('
+            UPDATE Individual
+            SET Email = :email, FirstName = :firstName, LastName = :lastName, Phone = :phone
+            WHERE Id = :id
+        ');
+        $stmtUpdateMember = $this->pdo->prepare('
+            UPDATE Member SET Inactivated = :inactivated, CustomFields = :customFields WHERE Id = :id
+        ');
+        $stmtDeactivate = $this->pdo->prepare('UPDATE Member SET Inactivated = 1 WHERE Id = :id');
+
+        $this->pdo->beginTransaction();
+        try {
+            foreach ($rows as $row) {
+                if (!isset($row['line'], $row['cells'])) {
+                    continue;
+                }
+                $line = $row['line'];
+                $cells = $row['cells'];
+                $id = $row['id'];
+
+                $cellEmail = trim($cells[$emailCol] ?? '');
+                $validEmail = $cellEmail === '' ? false : filter_var($cellEmail, FILTER_VALIDATE_EMAIL);
+                $emailKey = $validEmail === false ? '' : strtolower($validEmail);
+                $firstName = $firstNameCol === null ? null : mb_substr(trim($cells[$firstNameCol] ?? ''), 0, 100);
+                $lastName = $lastNameCol === null ? null : mb_substr(trim($cells[$lastNameCol] ?? ''), 0, 100);
+                $phone = $phoneCol === null
+                    ? null
+                    : mb_substr((string)preg_replace('/[^\d\s+\-()\.]/', '', $cells[$phoneCol] ?? ''), 0, 20);
+                $activeCell = str_replace("\u{FE0F}", '', trim($cells[$activeCol] ?? ''));
+
+                if ($id !== null) {
+                    // --- Membre existant ---
+                    if (!isset($members[$id])) {
+                        $fail(str_replace(['{line}', '{id}'], [(string)$line, (string)$id], $t('import.ods.error.unknown_id')));
+                        continue;
+                    }
+                    $current = $members[$id];
+
+                    $newEmail = $current['email'];
+                    if ($cellEmail !== '') {
+                        if ($validEmail === false) {
+                            $fail(str_replace(['{line}', '{email}'], [(string)$line, $cellEmail], $t('import.ods.error.invalid_email')));
+                            continue;
+                        }
+                        // L'email est la clé de synchronisation des enregistrements importés : jamais modifié
+                        if (!$current['imported'] && strtolower($current['email']) !== $emailKey) {
+                            if (isset($idByEmail[$emailKey]) && $idByEmail[$emailKey] !== $id) {
+                                $fail(str_replace(
+                                    ['{line}', '{email}', '{id}'],
+                                    [(string)$line, $validEmail, (string)$idByEmail[$emailKey]],
+                                    $t('import.ods.error.email_exists')
+                                ));
+                                continue;
+                            }
+                            $newEmail = $validEmail;
+                        }
+                    }
+                    $newFirstName = $firstName ?? $current['firstName'];
+                    $newLastName = $lastName ?? $current['lastName'];
+                    $newPhone = $phone ?? $current['phone'];
+
+                    $currentCustom = MemberCustomFields::decodeValues($current['customFields']);
+                    $newCustom = $this->applyOdsCustomFields(
+                        $definitions,
+                        $customMapping,
+                        $cells,
+                        $currentCustom,
+                        $line,
+                        $results['messages'],
+                        $t
+                    );
+                    $newCustomJson = MemberCustomFields::encodeValues($newCustom);
+                    $changedCustom = $newCustomJson !== MemberCustomFields::encodeValues($currentCustom);
+
+                    $changedIdentity = $newEmail !== $current['email']
+                        || $newFirstName !== $current['firstName']
+                        || $newLastName !== $current['lastName']
+                        || $newPhone !== $current['phone'];
+
+                    // Actif = ☑ sinon le membre est désactivé (le membre 1 ne l'est jamais)
+                    $wantInactive = $id !== 1 && !self::isOdsChecked($activeCell);
+
+                    if ($changedIdentity) {
+                        $stmtUpdateIndividual->execute([
+                            ':id' => $id,
+                            ':email' => $newEmail,
+                            ':firstName' => $newFirstName,
+                            ':lastName' => $newLastName,
+                            ':phone' => $newPhone,
+                        ]);
+                        if (strtolower($newEmail) !== strtolower($current['email'])) {
+                            unset($idByEmail[strtolower($current['email'])]);
+                            $idByEmail[strtolower($newEmail)] = $id;
+                        }
+                    }
+                    if ($changedCustom || $wantInactive !== $current['inactivated']) {
+                        $stmtUpdateMember->execute([
+                            ':id' => $id,
+                            ':inactivated' => $wantInactive ? 1 : 0,
+                            ':customFields' => $newCustomJson,
+                        ]);
+                    }
+                    if ($changedIdentity || $changedCustom) {
+                        $results['updated']++;
+                    }
+                    if ($wantInactive && !$current['inactivated']) {
+                        $results['deactivated']++;
+                        $results['messages'][] = '(-) ' . $newEmail;
+                    } elseif (!$wantInactive && $current['inactivated']) {
+                        $results['reactivated']++;
+                        $results['messages'][] = '(↑) ' . $newEmail;
+                    }
+                    continue;
+                }
+
+                // --- Nouveau membre (pas d'Id, ou ligne en double) ---
+                if ($validEmail === false) {
+                    $fail(str_replace(['{line}', '{email}'], [(string)$line, $cellEmail], $t('import.ods.error.invalid_email')));
+                    continue;
+                }
+                if (isset($idByEmail[$emailKey])) {
+                    $fail(str_replace(
+                        ['{line}', '{email}', '{id}'],
+                        [(string)$line, $validEmail, (string)$idByEmail[$emailKey]],
+                        $t('import.ods.error.email_exists')
+                    ));
+                    continue;
+                }
+                $newCustom = $this->applyOdsCustomFields(
+                    $definitions,
+                    $customMapping,
+                    $cells,
+                    [],
+                    $line,
+                    $results['messages'],
+                    $t
+                );
+                $stmtInsertIndividual->execute([
+                    ':email' => $validEmail,
+                    ':firstName' => $firstName ?? '',
+                    ':lastName' => $lastName ?? '',
+                    ':phone' => $phone ?? '',
+                ]);
+                $newId = (int)$this->pdo->lastInsertId();
+                $stmtInsertMember->execute([
+                    ':id' => $newId,
+                    // un nouveau membre est actif, sauf si la case est explicitement décochée (☐)
+                    ':inactivated' => $activeCell === OdsWriter::UNCHECKED ? 1 : 0,
+                    ':customFields' => MemberCustomFields::encodeValues($newCustom),
+                ]);
+                $idByEmail[$emailKey] = $newId;
+                $results['created']++;
+                $results['messages'][] = '(+) ' . $validEmail;
+                if ($row['duplicateOf'] !== null) {
+                    $results['messages'][] = str_replace(
+                        ['{line}', '{id}'],
+                        [(string)$line, (string)$row['duplicateOf']],
+                        $t('import.ods.warning.duplicate_id')
+                    );
+                }
+            }
+
+            // Id disparus du fichier : membres désactivés
+            foreach ($members as $memberId => $member) {
+                if ($memberId === 1 || isset($seenIds[$memberId]) || $member['inactivated']) {
+                    continue;
+                }
+                $stmtDeactivate->execute([':id' => $memberId]);
+                $results['deactivated']++;
+                $results['messages'][] = '(-) ' . $member['email'];
+            }
+
+            if ($dryRun) {
+                $this->pdo->rollBack();
+            } else {
+                $this->pdo->commit();
+            }
+        } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        return $results;
+    }
+
+    /**
+     * Applique les champs personnalisés d'une ligne : cellule vide = valeur effacée,
+     * valeur invalide = signalée et valeur actuelle conservée, colonne absente = champ non touché.
+     *
+     * @param list<CustomFieldDefinition> $definitions
+     * @param array<string, int> $customMapping
+     * @param array<int, string> $cells
+     * @param array<string, string|int|float> $current
+     * @param list<string> $messages
+     * @param callable(string): string $t
+     * @return array<string, string|int|float>
+     */
+    private function applyOdsCustomFields(
+        array $definitions,
+        array $customMapping,
+        array $cells,
+        array $current,
+        int $line,
+        array &$messages,
+        callable $t
+    ): array {
+        if ($customMapping === []) {
+            return $current;
+        }
+        $extracted = MemberCustomFields::extractFromRow($definitions, $customMapping, $cells);
+        $applicable = [];
+        $input = [];
+        foreach ($definitions as $definition) {
+            if (!isset($customMapping[$definition->key])) {
+                continue;
+            }
+            if (isset($extracted[$definition->key])) {
+                $raw = $extracted[$definition->key];
+                if (MemberCustomFields::normalizeValue($definition->type, $raw) === null) {
+                    $messages[] = str_replace(
+                        ['{line}', '{value}', '{field}'],
+                        [(string)$line, $raw, $definition->label],
+                        $t('import.error.invalid_custom_value')
+                    );
+                    continue;
+                }
+                $input[$definition->key] = $raw;
+            }
+            $applicable[] = $definition;
+        }
+        return MemberCustomFields::mergeValues($applicable, $current, $input);
+    }
+
+    /**
+     * @param array<int, string> $headerCells
+     * @param list<string> $aliases
+     */
+    private function findOdsColumn(array $headerCells, array $aliases): ?int
+    {
+        $wanted = array_map(static fn(string $alias): string => mb_strtolower(trim($alias)), $aliases);
+        foreach ($headerCells as $index => $title) {
+            if (in_array(mb_strtolower(trim($title)), $wanted, true)) {
+                return $index;
+            }
+        }
+        return null;
+    }
+
+    /** @return list<string> Libellé d'une clé de traduction dans toutes les langues */
+    private function languageAliases(string $key): array
+    {
+        $stmt = $this->pdo->prepare('SELECT en_US, fr_FR, pl_PL FROM Languages WHERE Name = :name');
+        $stmt->execute([':name' => $key]);
+        $row = $stmt->fetch(PDO::FETCH_NUM);
+        $aliases = [];
+        if (is_array($row)) {
+            foreach ($row as $label) {
+                if (is_string($label) && $label !== '') {
+                    $aliases[] = $label;
+                }
+            }
+        }
+        return $aliases;
+    }
+
+    private static function isOdsChecked(string $cell): bool
+    {
+        return $cell === OdsWriter::CHECKED || $cell === '✅';
     }
 
     /** @return list<CustomFieldDefinition> */
@@ -826,5 +1291,18 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
             )
         ");
         $stmt->execute($params);
+    }
+
+    /**
+     * Adresse fictive déterministe : une même personne sans email reçoit toujours
+     * la même adresse, ce qui évite les doublons et les désactivations à chaque réimport.
+     */
+    private static function fictiveEmail(string $firstName, string $lastName, string $phone, string $rawEmail): string
+    {
+        $seed = ($firstName !== '' || $lastName !== '')
+            ? mb_strtolower($firstName . '|' . $lastName)
+            : mb_strtolower($rawEmail . '|' . $phone);
+
+        return substr(sha1($seed), 0, 32) . '@myclub.foo';
     }
 }

@@ -12,6 +12,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DesignDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\OrderReplyDataHelper;
 use app\models\PersonDataHelper;
 use app\models\ReplyDataHelper;
@@ -26,10 +27,11 @@ final class ArticleApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
         private DesignDataHelper $designDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
         $this->replyDataHelper = new ReplyDataHelper($application);
         $this->orderReplyDataHelper = new OrderReplyDataHelper($application);
     }

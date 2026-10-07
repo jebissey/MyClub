@@ -9,6 +9,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
+use app\models\LanguagesDataHelper;
 use app\models\LogDataHelper;
 use app\models\PersonDataHelper;
 
@@ -17,10 +18,11 @@ final class VisitorInsightsApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
         private LogDataHelper $logDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function getCreationTimeDistribution(): void

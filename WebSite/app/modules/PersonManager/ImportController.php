@@ -121,7 +121,9 @@ final class ImportController extends AbstractController
             results: $results,
             layout: $this->getLayout(),
             customFields: $this->customFieldsForView(),
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('PersonManager/views/users_import.latte', $viewModel->toArray());

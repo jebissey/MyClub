@@ -63,26 +63,13 @@ final class VisitorInsightsController extends TableController
 
     public function helpPage(string $section): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__)) {
-            return;
-        }
-
         $languageKey = self::HELP_KEYS[$section] ?? null;
         if ($languageKey === null) {
             $this->flight->notFound();
             return;
         }
 
-        $lang = TranslationManager::getCurrentLanguage();
-        $helpRow = $this->dataHelper->get('Languages', ['Name' => $languageKey], $lang);
-        $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-
-        $viewModel = new InfoViewModel(
-            content: $content,
-            timer: 0,
-            layoutParams: $this->getAllParams([]),
-        );
-        $this->render('Common/views/info.latte', $viewModel->toArray());
+        $this->renderHelp($languageKey, fn($u) => $u->isVisitorInsights(), __FILE__, __LINE__);
     }
 
     public function index(): void

@@ -21,9 +21,9 @@ final class TranslatorApi extends AbstractApi
         Application $application,
         ConnectedUser $connectedUser,
         PersonDataHelper $personDataHelper,
-        private LanguagesDataHelper $languagesDataHelper
+        protected LanguagesDataHelper $languagesDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function save(): void

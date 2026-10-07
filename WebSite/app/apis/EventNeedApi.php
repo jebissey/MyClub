@@ -10,6 +10,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
 
@@ -20,9 +21,10 @@ final class EventNeedApi extends AbstractApi
         private EventNeedDataHelper $eventNeedDataHelper,
         private EventDataHelper $eventDataHelper,
         ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function deleteNeed(int $id): void

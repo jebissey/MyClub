@@ -8,6 +8,31 @@ use RuntimeException;
 
 final class To
 {
+    public static function bool(mixed $value, bool $default = false): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (bool) $value;
+        }
+
+        if (is_string($value)) {
+            $normalized = strtolower(trim($value));
+
+            if (in_array($normalized, ['1', 'true', 'yes', 'on'], true)) {
+                return true;
+            }
+
+            if (in_array($normalized, ['0', 'false', 'no', 'off', ''], true)) {
+                return false;
+            }
+        }
+
+        return $default;
+    }
+
     public static function float(mixed $value): float
     {
         if (is_int($value) || is_float($value)) {
@@ -26,6 +51,6 @@ final class To
 
     public static function str(mixed $value, string $default = ''): string
     {
-        return is_scalar($value) ? (string)$value : $default;
+        return is_scalar($value) ? (string) $value : $default;
     }
 }

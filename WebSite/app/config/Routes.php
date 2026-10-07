@@ -33,6 +33,7 @@ use app\config\routes\EventSupplyApi;
 use app\config\routes\EventType;
 use app\config\routes\Exercise;
 use app\config\routes\ExerciseApi;
+use app\config\routes\Export;
 use app\config\routes\Ffa;
 use app\config\routes\Group;
 use app\config\routes\GroupApi;
@@ -258,6 +259,7 @@ final class Routes
         $this->routes = array_merge($this->routes, (new EventType($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Exercise($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new ExerciseApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new Export($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Ffa($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Group($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new GroupApi($this->apiFactory))->get());

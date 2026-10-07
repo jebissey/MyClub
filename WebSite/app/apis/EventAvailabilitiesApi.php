@@ -9,6 +9,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\AvailabilityDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 
 final class EventAvailabilitiesApi extends AbstractApi
@@ -26,10 +27,11 @@ final class EventAvailabilitiesApi extends AbstractApi
     public function __construct(
         Application $application,
         protected ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
         private AvailabilityDataHelper $availabilityDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function getSlotEvents(): void

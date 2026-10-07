@@ -55,19 +55,8 @@ final class CommunicationController extends AbstractController
         }
     }
 
-    public function helpCommunication(): void
+    public function help(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
-            $lang = TranslationManager::getCurrentLanguage();
-            $helpRow = $this->dataHelper->get('Languages', ['Name' => 'Help_Communication'], $lang);
-            $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
-
-            $viewModel = new InfoViewModel(
-                content: $content,
-                timer: 0,
-                layoutParams: $this->getAllParams([]),
-            );
-            $this->render('Common/views/info.latte', $viewModel->toArray());
-        }
+        $this->renderHelp('Help_Communication', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__);
     }
 }

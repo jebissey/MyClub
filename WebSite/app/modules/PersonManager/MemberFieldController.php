@@ -34,7 +34,9 @@ final class MemberFieldController extends AbstractController
                     'delete_confirm' => ($this->t)('custom_fields.delete_confirm'),
                 ],
                 layout: $this->getLayout(),
-                layoutParams: $this->getAllParams([]),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
             );
 
             $this->render('PersonManager/views/memberFields.latte', $viewModel->toArray());

@@ -27,7 +27,7 @@ final class Home implements RouteInterface
         $homeController = fn() => $this->controllerFactory->makeHomeController();
 
         $this->routes[] = new Route('GET  /', $homeController, 'home');
-        $this->routes[] = new Route('GET  /help', $homeController, 'helpHome');
+        $this->routes[] = new Route('GET  /help', $homeController, 'help');
         $this->routes[] = new Route('GET  /legal/notice', $homeController, 'legalNotice');
         $this->routes[] = new Route('GET  /signpost', $homeController, 'signpost');
 

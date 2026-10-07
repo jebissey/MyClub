@@ -154,7 +154,7 @@
             <div class="card-header">
                 <h2 class="card-title">{$latestArticle->Title}</h2>
                 <small class="text-muted">
-                    {='created_by'|translate} {$latestArticle->FirstName} {$latestArticle->LastName}
+                    {='created_by'|translate} {$latestArticle->Author?->displayName() ?? ''}
                     {='on'|translate} {=$latestArticle->Timestamp|shortDate}
                     {$publishedBy}
                     {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}

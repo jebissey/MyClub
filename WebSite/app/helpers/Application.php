@@ -22,10 +22,11 @@ use app\models\LogWriterDataHelper;
 use app\models\MetadataDataHelper;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\valueObjects\CompactSettingsRow;
+use app\modules\Common\valueObjects\Person;
 
 final class Application
 {
-    public const VERSION = '0.94';
+    public const VERSION = '0.95';
 
     // @formatter:off
     public const  EMOJI_LIST = [
@@ -109,8 +110,23 @@ final class Application
         return self::$instance;
     }
 
-    public function getConnectedUser(): ConnectedUser
+    /**
+     * Returns the connected user.
+     *
+     * When $requirePerson is true, the caller asserts that a person is connected
+     * (typically after an isConnected() check). A LogicException is thrown otherwise,
+     * and static analysis sees ConnectedUser::$person as Person instead of Person|null.
+     *
+     * @param bool $requirePerson Whether a connected person is mandatory
+     * @return ($requirePerson is true ? ConnectedUser&object{person: Person} : ConnectedUser)
+     * @throws LogicException If $requirePerson is true and nobody is connected
+     */
+    public function getConnectedUser(bool $requirePerson = false): ConnectedUser
     {
+        if ($requirePerson && $this->connectedUser->person === null) {
+            throw new LogicException('No connected person: isConnected() must be checked before requiring one.');
+        }
+
         return $this->connectedUser;
     }
 

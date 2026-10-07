@@ -15,6 +15,7 @@ enum ApplicationError: int
     case PageNotFound = 404;
     case MethodNotAllowed = 405;
     case Gone = 410;
+    case UnprocessableEntity = 422;
     case InvalidSetting = 444;
     case Error = 500;
     case ServiceUnavailable = 503;

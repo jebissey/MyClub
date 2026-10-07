@@ -12,6 +12,7 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\KanbanDataHelper;
+use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 
 final class KanbanApi extends AbstractApi
@@ -19,10 +20,11 @@ final class KanbanApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
         private KanbanDataHelper $kanbanDataHelper,
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     #region Card

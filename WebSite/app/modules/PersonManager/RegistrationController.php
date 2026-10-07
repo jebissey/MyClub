@@ -66,7 +66,9 @@ final class RegistrationController extends TableController
                     'errorLoadGroups' => ($this->t)('person_manager.registration.error.load_groups'),
                     'errorGeneric'    => ($this->t)('person_manager.registration.error.generic'),
                 ],
-                layoutParams: $this->getAllParams([]),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
             );
 
             $this->render('PersonManager/views/registration_groups_index.latte', $viewModel->toArray());

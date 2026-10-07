@@ -14,6 +14,7 @@ use app\enums\TimeOfDay;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\To;
+use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
@@ -316,7 +317,13 @@ abstract class AbstractController
             $this->raiseMethodNotAllowed($file, $line);
             return false;
         }
+
         $connectedUser = $this->application->getConnectedUser();
+        if ($permissionCheck($connectedUser)) {
+            return true;
+        }
+
+        // Anonymous visitor: try the "remember me" auto sign-in first
         if ($connectedUser->person === null) {
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
@@ -328,13 +335,11 @@ abstract class AbstractController
                 return true;
             }
         }
-        if ($connectedUser->person === null || !$permissionCheck($connectedUser)) {
-            $this->raiseForbidden($file, $line);
-            return false;
-        }
-        return true;
-    }
 
+        // Permission check failed and auto sign-in did not help
+        $this->raiseForbidden($file, $line);
+        return false;
+    }
 
     /**
      * @param array<string, mixed> $context
@@ -354,7 +359,6 @@ abstract class AbstractController
         return is_string($value) ? $value : null;
     }
 
-    #region Public functions
     /**
      * @param object|array<string,mixed> $params
      */
@@ -370,6 +374,35 @@ abstract class AbstractController
         Flight::stop();
     }
 
+    /**
+     * @param array<string,mixed> $viewModelOptions Extra named arguments forwarded to InfoViewModel
+     */
+    protected function renderHelp(
+        string $helpName,
+        callable $isAllowed,
+        string $file,
+        int $line,
+        array $viewModelOptions = []
+    ): void {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', $isAllowed, $file, $line)) {
+            return;
+        }
+
+        $lang = TranslationManager::getCurrentLanguage();
+        $helpRow = $this->dataHelper->get('Languages', ['Name' => $helpName], $lang);
+        $content = ($helpRow !== false && isset($helpRow->$lang))
+            ? $helpRow->$lang
+            : $this->languagesDataHelper->translate('help_missing');
+
+        $viewModel = new InfoViewModel(
+            content: $content,
+            timer: 0,
+            layoutParams: $this->getAllParams($viewModelOptions),
+        );
+
+        $this->render('Common/views/info.latte', $viewModel->toArray());
+    }
+
     protected function renderInfo(string $content, int $timer): void
     {
         $viewModel = new InfoViewModel(
@@ -380,5 +413,24 @@ abstract class AbstractController
             layoutParams: $this->getAllParams([]),
         );
         $this->render('Common/views/info.latte', $viewModel->toArray());
+    }
+
+    protected function renderOds(string $content, string $fileName): void
+    {
+        ini_set('zlib.output_compression', '0');
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        $asciiName = preg_replace('/[^A-Za-z0-9._-]/', '_', $fileName) ?? 'export.ods';
+
+        header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
+        header('Content-Disposition: attachment; filename="' . $asciiName . '"; filename*=UTF-8\'\'' . rawurlencode($fileName));
+        header('Content-Length: ' . strlen($content));
+        header('Cache-Control: private, no-store');
+
+        echo $content;
+        flush();
+        Flight::stop();
     }
 }

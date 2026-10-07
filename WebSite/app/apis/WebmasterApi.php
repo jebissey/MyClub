@@ -11,6 +11,7 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
+use app\models\LanguagesDataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\CredentialService;
@@ -25,11 +26,12 @@ final class WebmasterApi extends AbstractApi
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
+        LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
         private LogWriterDataHelper $logWriterDataHelper,
         private CredentialService $credentials
     ) {
-        parent::__construct($application, $connectedUser, $personDataHelper);
+        parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
 
         $this->vapid = [
             'subject'    => Application::$root,
