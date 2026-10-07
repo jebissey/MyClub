@@ -30,10 +30,10 @@ final class WebmasterController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private LogDataHelper $logDataHelper,
-        private ArticleDataHelper $articleDataHelper,
-        private NotificationSender $notificationSender,
-        private CredentialService $credentials
+        private readonly LogDataHelper $logDataHelper,
+        private readonly ArticleDataHelper $articleDataHelper,
+        private readonly NotificationSender $notificationSender,
+        private readonly CredentialService $credentials
     ) {
         parent::__construct($application);
     }

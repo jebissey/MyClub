@@ -24,7 +24,7 @@ final class EventSupplyApi extends AbstractApi
 {
     public function __construct(
         Application $application,
-        private EventDataHelper $eventDataHelper,
+        private readonly EventDataHelper $eventDataHelper,
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,

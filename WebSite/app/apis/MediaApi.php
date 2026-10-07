@@ -21,7 +21,7 @@ final class MediaApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private MediaManager $mediaManager
+        private readonly MediaManager $mediaManager
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

@@ -7,7 +7,7 @@ namespace app\modules\Event\services;
 use app\helpers\ConnectedUser;
 use app\modules\Event\interfaces\AuthorizationServiceInterface;
 
-final class AuthorizationService implements AuthorizationServiceInterface
+final readonly class AuthorizationService implements AuthorizationServiceInterface
 {
     public function __construct(private ConnectedUser $connectedUser)
     {

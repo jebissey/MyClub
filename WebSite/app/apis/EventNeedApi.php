@@ -18,8 +18,8 @@ final class EventNeedApi extends AbstractApi
 {
     public function __construct(
         Application $application,
-        private EventNeedDataHelper $eventNeedDataHelper,
-        private EventDataHelper $eventDataHelper,
+        private readonly EventNeedDataHelper $eventNeedDataHelper,
+        private readonly EventDataHelper $eventDataHelper,
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper

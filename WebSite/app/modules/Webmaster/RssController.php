@@ -21,8 +21,8 @@ final class RssController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private ArticleDataHelper $articleDataHelper,
-        private EventDataHelper $eventDataHelper
+        private readonly ArticleDataHelper $articleDataHelper,
+        private readonly EventDataHelper $eventDataHelper
     ) {
         parent::__construct($application);
     }

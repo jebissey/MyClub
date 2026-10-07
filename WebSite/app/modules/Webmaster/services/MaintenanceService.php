@@ -6,7 +6,7 @@ namespace app\modules\Webmaster\services;
 
 use app\models\Data;
 
-final class MaintenanceService
+final readonly class MaintenanceService
 {
     private const MAINTENANCE_UNSET = '/maintenance/unset';
 

@@ -9,8 +9,8 @@ use app\modules\Common\interfaces\EmailQuotaTrackerInterface;
 
 final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
 {
-    private string $today;
-    private string $thisMonth;
+    private readonly string $today;
+    private readonly string $thisMonth;
 
     /** @var array{day: string, month: string, daily: int, monthly: int} */
     private array $data;

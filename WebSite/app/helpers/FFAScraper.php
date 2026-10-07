@@ -14,7 +14,7 @@ use DOMXPath;
 final class FFAScraper
 {
     private string $baseUrl = 'https://bases.athle.fr/asp.net/liste.aspx';
-    private Client $client;
+    private readonly Client $client;
 
     public function __construct()
     {

@@ -15,7 +15,7 @@ use app\modules\Article\valueObjects\SurveyWithCreatorRow;
 
 final class SurveyDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
+    public function __construct(Application $application, private readonly AuthorizationDataHelper $authorizationDataHelper)
     {
         parent::__construct(
             $application->getPdo(),

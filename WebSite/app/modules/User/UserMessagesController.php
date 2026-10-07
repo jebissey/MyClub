@@ -14,7 +14,7 @@ final class UserMessagesController extends AbstractShowController
 {
     public function __construct(
         Application $application,
-        private MessageDataHelper $messageDataHelper,
+        private readonly MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application);
     }

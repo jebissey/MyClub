@@ -20,7 +20,7 @@ final class VisitorInsightsApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private LogDataHelper $logDataHelper,
+        private readonly LogDataHelper $logDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

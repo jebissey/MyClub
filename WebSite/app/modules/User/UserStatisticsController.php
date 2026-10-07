@@ -24,12 +24,12 @@ final class UserStatisticsController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private PersonStatisticsDataHelper $personalStatisticsDataHelper,
-        private LogDataHelper $logDataHelper,
-        private ParticipantDataHelper $participantDataHelper,
-        private DistributionCalculator $distributionCalculator,
-        private MessageDataHelper $messageDataHelper,
-        private MemberDataHelper $memberDataHelper
+        private readonly PersonStatisticsDataHelper $personalStatisticsDataHelper,
+        private readonly LogDataHelper $logDataHelper,
+        private readonly ParticipantDataHelper $participantDataHelper,
+        private readonly DistributionCalculator $distributionCalculator,
+        private readonly MessageDataHelper $messageDataHelper,
+        private readonly MemberDataHelper $memberDataHelper
     ) {
         parent::__construct($application);
     }

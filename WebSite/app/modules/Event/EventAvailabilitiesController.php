@@ -23,7 +23,7 @@ final class EventAvailabilitiesController extends AbstractController
 
     public function __construct(
         Application $application,
-        private AvailabilityDataHelper $availabilityDataHelper,
+        private readonly AvailabilityDataHelper $availabilityDataHelper,
     ) {
         parent::__construct($application);
     }

@@ -21,15 +21,15 @@ final class WebmasterApi extends AbstractApi
     private const SERVICE = 'vapid';
 
     /** @var array{subject: string, publicKey: string, privateKey: string} */
-    private array $vapid;
+    private readonly array $vapid;
 
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private LogWriterDataHelper $logWriterDataHelper,
-        private CredentialService $credentials
+        private readonly LogWriterDataHelper $logWriterDataHelper,
+        private readonly CredentialService $credentials
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
 

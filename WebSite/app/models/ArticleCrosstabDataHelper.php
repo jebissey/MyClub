@@ -9,7 +9,7 @@ use app\models\CrosstabDataHelper;
 
 final class ArticleCrosstabDataHelper extends Data
 {
-    public function __construct(Application $application, private CrosstabDataHelper $crosstabDataHelper)
+    public function __construct(Application $application, private readonly CrosstabDataHelper $crosstabDataHelper)
     {
         parent::__construct(
             $application->getPdo(),

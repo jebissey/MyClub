@@ -10,7 +10,7 @@ use app\models\Data;
 use app\modules\Common\valueObjects\UploadedFileInput;
 use RuntimeException;
 
-final class ArticleService
+final readonly class ArticleService
 {
     public function __construct(
         private CarouselDataHelperInterface $carouselDataHelper,

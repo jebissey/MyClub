@@ -14,7 +14,7 @@ final class MaintenanceController extends AbstractController
 {
     public function __construct(
         Application $application,
-        protected ErrorManagerInterface $errorManager
+        protected readonly ErrorManagerInterface $errorManager
     ) {
         parent::__construct($application);
     }

@@ -16,8 +16,8 @@ final class UserGroupsController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private PersonGroupDataHelper $personGroupDataHelper,
-        private GroupDataHelper $groupDataHelper
+        private readonly PersonGroupDataHelper $personGroupDataHelper,
+        private readonly GroupDataHelper $groupDataHelper
     ) {
         parent::__construct($application);
     }

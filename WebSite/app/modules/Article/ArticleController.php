@@ -42,19 +42,19 @@ use app\modules\Common\viewModels\TopItemsByPeriodViewModel;
 final class ArticleController extends TableController
 {
     private const TOP = 50;
-    private ArticleAuthorizationService $authorizationService;
+    private readonly ArticleAuthorizationService $authorizationService;
 
     public function __construct(
         Application $application,
-        private ArticleDataHelper $articleDataHelper,
-        private ArticleTableDataHelper $articleTableDataHelper,
-        private PersonDataHelper $personDataHelper,
-        private Backup $backup,
-        private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
-        private MessageDataHelper $messageDataHelper,
-        private EmailService $emailService,
-        private LogDataHelper $logDataHelper,
-        private ArticleService $articleService
+        private readonly ArticleDataHelper $articleDataHelper,
+        private readonly ArticleTableDataHelper $articleTableDataHelper,
+        private readonly PersonDataHelper $personDataHelper,
+        private readonly Backup $backup,
+        private readonly ArticleCrosstabDataHelper $articleCrosstabDataHelper,
+        private readonly MessageDataHelper $messageDataHelper,
+        private readonly EmailService $emailService,
+        private readonly LogDataHelper $logDataHelper,
+        private readonly ArticleService $articleService
     ) {
         parent::__construct($application);
         $this->authorizationService = new ArticleAuthorizationService(

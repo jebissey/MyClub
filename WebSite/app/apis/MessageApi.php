@@ -51,10 +51,10 @@ final class MessageApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private MessageDataHelper $messageDataHelper,
-        private MessageRecipientService $messageRecipientService,
-        private NotificationSender $notificationSender,
-        private MediaManager $mediaManager
+        private readonly MessageDataHelper $messageDataHelper,
+        private readonly MessageRecipientService $messageRecipientService,
+        private readonly NotificationSender $notificationSender,
+        private readonly MediaManager $mediaManager
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

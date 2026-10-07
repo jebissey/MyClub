@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace app\modules\Communication;
 
 use app\helpers\Application;
-use app\helpers\TranslationManager;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
 use app\modules\Communication\viewModels\CommunicationEditViewModel;
-use app\modules\Common\viewModels\InfoViewModel;
 
 final class CommunicationController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private EmailService $emailService
+        private readonly EmailService $emailService
     ) {
         parent::__construct($application);
     }

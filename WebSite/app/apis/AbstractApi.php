@@ -22,7 +22,7 @@ abstract class AbstractApi
 {
     protected LatteEngine $latte;
     protected DataHelper $dataHelper;
-    private LogWriterDataHelper $logWriterDataHelper;
+    private readonly LogWriterDataHelper $logWriterDataHelper;
     protected Closure $t;
 
     public function __construct(

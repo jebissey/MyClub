@@ -19,8 +19,8 @@ final class EventGuestController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private EventDataHelper $eventDataHelper,
-        private EmailService $emailService,
+        private readonly EventDataHelper $eventDataHelper,
+        private readonly EmailService $emailService,
     ) {
         parent::__construct($application);
     }

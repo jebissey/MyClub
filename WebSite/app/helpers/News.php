@@ -6,7 +6,7 @@ namespace app\helpers;
 
 use app\modules\Common\interfaces\NewsProviderInterface;
 
-final class News
+final readonly class News
 {
     /**
      * @param array<int, NewsProviderInterface> $providers

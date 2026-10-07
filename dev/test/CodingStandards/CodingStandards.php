@@ -16,7 +16,7 @@ function main(): int
         return 1;
     }
 
-    $violations = (new CodingStandardsChecker($appDir))->check();
+    $violations = CodingStandardsChecker::create($appDir)->check();
 
     if ($violations === []) {
         fwrite(STDERR, "✅ Toutes les classes respectent les conventions.\n");

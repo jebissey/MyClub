@@ -100,7 +100,7 @@ use app\modules\Webmaster\MaintenanceController;
 use app\modules\Webmaster\RssController;
 use app\modules\Webmaster\WebmasterController;
 
-final class ControllerFactory
+final readonly class ControllerFactory
 {
     public function __construct(
         private Application $application,

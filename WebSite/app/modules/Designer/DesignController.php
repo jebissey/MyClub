@@ -16,7 +16,7 @@ final class DesignController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private DesignDataHelper $designDataHelper
+        private readonly DesignDataHelper $designDataHelper
     ) {
         parent::__construct($application);
     }

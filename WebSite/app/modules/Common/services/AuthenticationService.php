@@ -19,7 +19,7 @@ use app\modules\User\valueObjects\AuthResult;
 /**
  * @phpstan-import-type PersonRow from Person
  */
-final class AuthenticationService
+final readonly class AuthenticationService
 {
     public function __construct(
         private MemberDataHelperInterface $memberDataHelper,

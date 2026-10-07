@@ -17,7 +17,7 @@ final class ExportController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private PersonDataHelper $personDataHelper
+        private readonly PersonDataHelper $personDataHelper
     ) {
         parent::__construct($application);
     }

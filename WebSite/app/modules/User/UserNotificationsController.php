@@ -17,9 +17,9 @@ final class UserNotificationsController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private GroupDataHelper $groupDataHelper,
-        private NotificationSender $notificationSender,
-        private CredentialService $credentials
+        private readonly GroupDataHelper $groupDataHelper,
+        private readonly NotificationSender $notificationSender,
+        private readonly CredentialService $credentials
     ) {
         parent::__construct($application);
     }

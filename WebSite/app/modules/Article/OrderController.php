@@ -21,7 +21,7 @@ use app\modules\Common\valueObjects\IdRow;
 
 final class OrderController extends AbstractController
 {
-    public function __construct(Application $application, private OrderDataHelper $orderDataHelper)
+    public function __construct(Application $application, private readonly OrderDataHelper $orderDataHelper)
     {
         parent::__construct($application);
     }

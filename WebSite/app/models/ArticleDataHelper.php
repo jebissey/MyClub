@@ -22,7 +22,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(
         Application $application,
-        private AuthorizationDataHelper $authorizationDataHelper
+        private readonly AuthorizationDataHelper $authorizationDataHelper
     ) {
         parent::__construct(
             $application->getPdo(),

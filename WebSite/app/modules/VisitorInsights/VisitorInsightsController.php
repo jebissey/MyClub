@@ -51,12 +51,12 @@ final class VisitorInsightsController extends TableController
 
     public function __construct(
         Application $application,
-        private PersonDataHelper $personDataHelper,
-        private LogDataHelper $logDataHelper,
-        private CrosstabDataHelper $crosstabDataHelper,
-        private LogAnalyticsDataHelper $logDataAnalyticsHelper,
-        private LogStatisticsDataHelper $logDataStatisticsHelper,
-        private MemberDataHelper $memberDataHelper,
+        private readonly PersonDataHelper $personDataHelper,
+        private readonly LogDataHelper $logDataHelper,
+        private readonly CrosstabDataHelper $crosstabDataHelper,
+        private readonly LogAnalyticsDataHelper $logDataAnalyticsHelper,
+        private readonly LogStatisticsDataHelper $logDataStatisticsHelper,
+        private readonly MemberDataHelper $memberDataHelper,
     ) {
         parent::__construct($application);
     }

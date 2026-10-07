@@ -19,18 +19,17 @@ use app\modules\Article\viewModels\MediaListViewModel;
 use app\modules\Article\viewModels\MediaUploadViewModel;
 use app\modules\Article\viewModels\MediaUsesInArticlesViewModel;
 use app\modules\Article\viewModels\MediaUsesInMessagesViewModel;
-use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Common\viewModels\PageViewModel;
 
 final class MediaController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private ArticleDataHelper $articleDataHelper,
-        private CarouselDataHelper $carouselDataHelper,
-        private PersonGroupDataHelper $personGroupDataHelper,
-        private SharedFileDataHelper $sharedFileDataHelper,
-        private MessageDataHelper $messageDataHelper,
+        private readonly ArticleDataHelper $articleDataHelper,
+        private readonly CarouselDataHelper $carouselDataHelper,
+        private readonly PersonGroupDataHelper $personGroupDataHelper,
+        private readonly SharedFileDataHelper $sharedFileDataHelper,
+        private readonly MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application);
     }

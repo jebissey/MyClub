@@ -16,7 +16,7 @@ use app\helpers\To;
 
 final class LogDataHelper extends Data
 {
-    public function __construct(Application $application, private DataHelper $dataHelper)
+    public function __construct(Application $application, private readonly DataHelper $dataHelper)
     {
         parent::__construct(
             $application->getPdo(),

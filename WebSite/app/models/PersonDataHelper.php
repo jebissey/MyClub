@@ -75,8 +75,8 @@ final class PersonDataHelper extends Data implements NewsProviderInterface
 
     public function __construct(
         Application $application,
-        private PersonPreferences $personPreferences,
-        private EmailService $emailService
+        private readonly PersonPreferences $personPreferences,
+        private readonly EmailService $emailService
     ) {
         parent::__construct(
             $application->getPdo(),

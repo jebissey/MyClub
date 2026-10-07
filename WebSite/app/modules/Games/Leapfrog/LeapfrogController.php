@@ -14,7 +14,7 @@ final class LeapfrogController extends TableController
 {
     public function __construct(
         Application $application,
-        private TableControllerDataHelper $tableControllerDataHelper,
+        private readonly TableControllerDataHelper $tableControllerDataHelper,
     ) {
         parent::__construct($application);
     }

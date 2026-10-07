@@ -20,7 +20,7 @@ use app\modules\Event\valueObjects\EventParticipant;
 
 final class MessageDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application, private LanguagesDataHelper $languagesDataHelper)
+    public function __construct(Application $application, private readonly LanguagesDataHelper $languagesDataHelper)
     {
         parent::__construct(
             $application->getPdo(),

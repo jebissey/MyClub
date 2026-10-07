@@ -24,7 +24,7 @@ final class KaraokeApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private KaraokeDataHelper $karaokeDataHelper
+        private readonly KaraokeDataHelper $karaokeDataHelper
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

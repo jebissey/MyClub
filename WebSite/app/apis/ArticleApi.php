@@ -21,15 +21,15 @@ use app\modules\Article\valueObjects\QuestionRow;
 
 final class ArticleApi extends AbstractApi
 {
-    private OrderReplyDataHelper $orderReplyDataHelper;
-    private ReplyDataHelper $replyDataHelper;
+    private readonly OrderReplyDataHelper $orderReplyDataHelper;
+    private readonly ReplyDataHelper $replyDataHelper;
 
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private DesignDataHelper $designDataHelper,
+        private readonly DesignDataHelper $designDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
         $this->replyDataHelper = new ReplyDataHelper($application);

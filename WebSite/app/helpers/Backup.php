@@ -10,12 +10,12 @@ final class Backup
     private const SQLITE_FILE = 'MyClub.sqlite';
     private const BACKUP_PATH = __DIR__ . '/../../backup';
 
-    private string $backupRoot;
-    private string $sourceFile;
+    private readonly string $backupRoot;
+    private readonly string $sourceFile;
     /** @var array<int, string> */
-    private array $monthFolders;
+    private readonly array $monthFolders;
     /** @var array<int, string> */
-    private array $weekDays;
+    private readonly array $weekDays;
     private static ?string $lastBackupFolder = null;
 
     public function __construct(string $backupRoot = self::BACKUP_PATH, string $sourceFile = self::SQLITE_PATH . self::SQLITE_FILE)

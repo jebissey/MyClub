@@ -13,7 +13,7 @@ final class UserNewsController extends AbstractShowController
 {
     public function __construct(
         Application $application,
-        private News $news,
+        private readonly News $news,
     ) {
         parent::__construct($application);
     }

@@ -21,7 +21,7 @@ final class LeapfrogApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private LogWriterDataHelper $logWriterDataHelper,
+        private readonly LogWriterDataHelper $logWriterDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

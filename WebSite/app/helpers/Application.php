@@ -52,10 +52,10 @@ final class Application
     private static LatteEngine $latte;
     public static string $root;
 
-    private PDO $pdo;
-    private PDO $pdoForLog;
-    private ErrorManager $errorManager;
-    private ConnectedUser $connectedUser;
+    private readonly PDO $pdo;
+    private readonly PDO $pdoForLog;
+    private readonly ErrorManager $errorManager;
+    private readonly ConnectedUser $connectedUser;
     private AuthenticationService $authenticationService;
 
     private function __construct()

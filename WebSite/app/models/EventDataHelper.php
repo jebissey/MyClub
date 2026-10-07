@@ -40,7 +40,7 @@ use app\modules\Common\valueObjects\Person;
  */
 final class EventDataHelper extends Data implements NewsProviderInterface
 {
-    private PersonPreferences $personPreferences;
+    private readonly PersonPreferences $personPreferences;
 
 
     public function __construct(Application $application, DataHelper $dataHelper)

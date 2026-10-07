@@ -17,7 +17,7 @@ final class DbBrowserController extends TableController
 {
     public function __construct(
         Application $application,
-        private DbBrowserDataHelper $dbBrowserDataHelper
+        private readonly DbBrowserDataHelper $dbBrowserDataHelper
     ) {
         parent::__construct($application);
     }

@@ -22,9 +22,9 @@ final class GroupController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private GroupDataHelper $groupDataHelper,
-        private PersonGroupDataHelper $personGroupDataHelper,
-        private MessageDataHelper $messageDataHelper,
+        private readonly GroupDataHelper $groupDataHelper,
+        private readonly PersonGroupDataHelper $personGroupDataHelper,
+        private readonly MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application);
     }

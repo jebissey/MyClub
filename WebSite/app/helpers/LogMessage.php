@@ -11,7 +11,7 @@ final class LogMessage
 
     /** @var array<int, string> */
     private array $messages = [];
-    private string $separator;
+    private readonly string $separator;
 
     private function __construct(?string $code, string $message, string $separator)
     {

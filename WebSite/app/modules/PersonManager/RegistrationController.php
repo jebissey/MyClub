@@ -19,8 +19,8 @@ final class RegistrationController extends TableController
 {
     public function __construct(
         Application $application,
-        private TableControllerDataHelper $tableControllerDataHelper,
-        private GroupDataHelper $groupDataHelper,
+        private readonly TableControllerDataHelper $tableControllerDataHelper,
+        private readonly GroupDataHelper $groupDataHelper,
     ) {
         parent::__construct($application);
     }

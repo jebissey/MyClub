@@ -35,8 +35,8 @@ abstract class AbstractController
     protected LanguagesDataHelper $languagesDataHelper;
     protected MenuItemDataHelper $menuItemDataHelper;
     protected AuthorizationDataHelper $authorizationDataHelper;
-    private MetadataDataHelper $metadataDataHelper;
-    private ?string $prodSiteUrl;
+    private readonly MetadataDataHelper $metadataDataHelper;
+    private readonly ?string $prodSiteUrl;
     protected Closure $t;
 
     public function __construct(protected Application $application)

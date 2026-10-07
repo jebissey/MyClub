@@ -36,12 +36,12 @@ final class EventApi extends AbstractApi
 {
     public function __construct(
         Application $application,
-        private AuthorizationServiceInterface $authService,
-        private EventDataHelper $eventDataHelper,
-        private EventServiceInterface $eventService,
-        private ParticipantDataHelper $participantDataHelper,
-        private MessageDataHelper $messageDataHelper,
-        private EmailService $emailService,
+        private readonly AuthorizationServiceInterface $authService,
+        private readonly EventDataHelper $eventDataHelper,
+        private readonly EventServiceInterface $eventService,
+        private readonly ParticipantDataHelper $participantDataHelper,
+        private readonly MessageDataHelper $messageDataHelper,
+        private readonly EmailService $emailService,
         ConnectedUser $connectedUser,
         PersonDataHelper $personDataHelper,
         LanguagesDataHelper $languagesDataHelper

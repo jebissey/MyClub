@@ -18,7 +18,7 @@ final class EventAttributeApi extends AbstractApi
 {
     public function __construct(
         Application $application,
-        private AttributeDataHelper $attributeDataHelper,
+        private readonly AttributeDataHelper $attributeDataHelper,
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper

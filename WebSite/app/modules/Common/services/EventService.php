@@ -9,7 +9,7 @@ use app\modules\Common\interfaces\EventServiceInterface;
 use app\models\EventDataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
 
-final class EventService implements EventServiceInterface
+final readonly class EventService implements EventServiceInterface
 {
     public function __construct(private EventDataHelper $eventDataHelper)
     {

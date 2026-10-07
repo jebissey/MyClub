@@ -10,7 +10,7 @@ use Throwable;
 use app\models\DataHelper;
 use app\modules\Common\services\CredentialService;
 
-final class NotificationSender
+final readonly class NotificationSender
 {
     private const SERVICE = 'vapid';
 

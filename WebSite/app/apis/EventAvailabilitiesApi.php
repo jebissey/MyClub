@@ -29,7 +29,7 @@ final class EventAvailabilitiesApi extends AbstractApi
         protected ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private AvailabilityDataHelper $availabilityDataHelper,
+        private readonly AvailabilityDataHelper $availabilityDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

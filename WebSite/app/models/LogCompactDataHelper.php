@@ -13,7 +13,7 @@ use app\helpers\To;
 
 final class LogCompactDataHelper extends Data
 {
-    public function __construct(private Application $application)
+    public function __construct(private readonly Application $application)
     {
         parent::__construct(
             $application->getPdo(),

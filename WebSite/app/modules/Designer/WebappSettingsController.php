@@ -14,7 +14,7 @@ use app\modules\Common\AbstractController;
 
 final class WebappSettingsController extends AbstractController
 {
-    private MetadataDataHelper $metadataDataHelper;
+    private readonly MetadataDataHelper $metadataDataHelper;
 
     /**
      * @var array<string, string>

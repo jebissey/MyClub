@@ -150,13 +150,13 @@ final class Routes
     private array $routes;
     private ControllerFactory $controllerFactory;
     private ApiFactory $apiFactory;
-    private JsonEmailQuotaTracker $quotaTracker;
-    private DataHelper $dataHelper;
+    private readonly JsonEmailQuotaTracker $quotaTracker;
+    private readonly DataHelper $dataHelper;
 
     /**
      * @param Engine<object> $flight
      */
-    public function __construct(private Application $application, private Engine $flight)
+    public function __construct(private readonly Application $application, private readonly Engine $flight)
     {
         $this->quotaTracker = new JsonEmailQuotaTracker(dirname(__DIR__, 2) . '/data/email_quota.json');
         $this->dataHelper = new DataHelper(

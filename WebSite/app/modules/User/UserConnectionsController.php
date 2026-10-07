@@ -19,7 +19,7 @@ final class UserConnectionsController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private ParticipantDataHelper $participantDataHelper,
+        private readonly ParticipantDataHelper $participantDataHelper,
     ) {
         parent::__construct($application);
     }

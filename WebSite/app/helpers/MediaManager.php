@@ -17,7 +17,7 @@ use app\modules\Common\valueObjects\UploadedFileInput;
 use app\modules\Common\valueObjects\UploadedMedia;
 use app\modules\Common\valueObjects\UploadMediaResult;
 
-final class MediaManager implements MediaManagerInterface
+final readonly class MediaManager implements MediaManagerInterface
 {
     private const MEDIA_PATH = __DIR__ . '/../../data/media/';
 

@@ -18,7 +18,7 @@ final class LoanApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private LoanDataHelper $loanDataHelper,
+        private readonly LoanDataHelper $loanDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

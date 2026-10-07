@@ -23,7 +23,7 @@ abstract class Data
     protected Query $fluentForLog;
 
     /** @var array<int, string> */
-    private array $tables;
+    private readonly array $tables;
 
     public function __construct(
         PDO $pdo,

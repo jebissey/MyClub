@@ -17,8 +17,8 @@ final class EventTypeController extends TableController
 {
     public function __construct(
         Application $application,
-        private EventTypeDataHelper $eventTypeDataHelper,
-        private TableControllerDataHelper $tableControllerDataHelper,
+        private readonly EventTypeDataHelper $eventTypeDataHelper,
+        private readonly TableControllerDataHelper $tableControllerDataHelper,
     ) {
         parent::__construct($application);
     }

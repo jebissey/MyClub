@@ -22,7 +22,7 @@ final class KanbanApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private KanbanDataHelper $kanbanDataHelper,
+        private readonly KanbanDataHelper $kanbanDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

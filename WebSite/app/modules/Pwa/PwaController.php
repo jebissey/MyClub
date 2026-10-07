@@ -13,7 +13,7 @@ final class PwaController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private ArticleService $articleService,
+        private readonly ArticleService $articleService,
     ) {
         parent::__construct($application);
     }

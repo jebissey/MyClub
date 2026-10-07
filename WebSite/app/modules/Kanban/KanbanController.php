@@ -17,7 +17,7 @@ final class KanbanController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private KanbanDataHelper $kanbanDataHelper,
+        private readonly KanbanDataHelper $kanbanDataHelper,
     ) {
         parent::__construct($application);
     }

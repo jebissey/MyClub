@@ -20,7 +20,7 @@ use app\modules\Common\valueObjects\IdRow;
 
 final class SurveyController extends AbstractController
 {
-    public function __construct(Application $application, private SurveyDataHelper $surveyDataHelper)
+    public function __construct(Application $application, private readonly SurveyDataHelper $surveyDataHelper)
     {
         parent::__construct($application);
     }

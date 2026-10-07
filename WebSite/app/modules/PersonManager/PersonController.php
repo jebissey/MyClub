@@ -26,8 +26,8 @@ final class PersonController extends TableController
 {
     public function __construct(
         Application $application,
-        private TableControllerDataHelper $tableControllerDataHelper,
-        private PersonDataHelper $personDataHelper,
+        private readonly TableControllerDataHelper $tableControllerDataHelper,
+        private readonly PersonDataHelper $personDataHelper,
     ) {
         parent::__construct($application);
     }

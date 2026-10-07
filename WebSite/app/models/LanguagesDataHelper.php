@@ -16,7 +16,7 @@ final class LanguagesDataHelper extends Data
     private array $allowedLanguages = [];
     private string $defaultLanguage = 'fr_FR';
 
-    public function __construct(protected Application $application, ErrorManagerInterface $errorManager)
+    public function __construct(protected readonly Application $application, ErrorManagerInterface $errorManager)
     {
         parent::__construct(
             $application->getPdo(),

@@ -14,7 +14,7 @@ use app\modules\Common\valueObjects\Person;
 
 final class MenuItemDataHelper extends Data
 {
-    public function __construct(Application $application, private AuthorizationDataHelper $authorizationDataHelper)
+    public function __construct(Application $application, private readonly AuthorizationDataHelper $authorizationDataHelper)
     {
         parent::__construct(
             $application->getPdo(),

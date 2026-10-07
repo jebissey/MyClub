@@ -19,7 +19,7 @@ final class MenuItemApi extends AbstractApi
 {
     public function __construct(
         Application $application,
-        private MenuItemDataHelper $menuItemDataHelper,
+        private readonly MenuItemDataHelper $menuItemDataHelper,
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper

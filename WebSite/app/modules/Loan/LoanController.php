@@ -18,7 +18,7 @@ final class LoanController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private LoanDataHelper $loanDataHelper,
+        private readonly LoanDataHelper $loanDataHelper,
     ) {
         parent::__construct($application);
     }

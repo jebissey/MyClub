@@ -16,7 +16,7 @@ final class ExerciseController extends TableController
 {
     public function __construct(
         Application $application,
-        private ExerciseTableDataHelper $exerciseTableDataHelper,
+        private readonly ExerciseTableDataHelper $exerciseTableDataHelper,
     ) {
         parent::__construct($application);
     }

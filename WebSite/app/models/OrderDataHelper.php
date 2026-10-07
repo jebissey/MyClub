@@ -36,8 +36,8 @@ final class OrderDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(
         Application $application,
-        private ArticleDataHelper $articleDataHelper,
-        private AuthorizationDataHelper $authorizationDataHelper
+        private readonly ArticleDataHelper $articleDataHelper,
+        private readonly AuthorizationDataHelper $authorizationDataHelper
     ) {
         parent::__construct(
             $application->getPdo(),

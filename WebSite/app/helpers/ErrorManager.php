@@ -11,7 +11,7 @@ use app\models\LanguagesDataHelper;
 use app\models\LogWriterDataHelper;
 use app\modules\Common\EmptyController;
 
-final class ErrorManager implements ErrorManagerInterface
+final readonly class ErrorManager implements ErrorManagerInterface
 {
     private DataHelper $dataHelper;
     private LanguagesDataHelper $languagesDataHelper;

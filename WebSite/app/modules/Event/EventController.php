@@ -13,7 +13,6 @@ use app\enums\FilterInputRule;
 use app\enums\Period;
 use app\exceptions\QueryException;
 use app\helpers\Application;
-use app\helpers\TranslationManager;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
@@ -21,7 +20,6 @@ use app\models\EventDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\MessageDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Event\viewModels\EventChatViewModel;
 use app\modules\Event\viewModels\EventCrosstabViewModel;
 use app\modules\Event\viewModels\EventDetailViewModel;
@@ -37,10 +35,10 @@ final class EventController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private EventDataHelper $eventDataHelper,
-        private CrosstabDataHelper $crosstabDataHelper,
-        private ParticipantDataHelper $participantDataHelper,
-        private MessageDataHelper $messageDataHelper,
+        private readonly EventDataHelper $eventDataHelper,
+        private readonly CrosstabDataHelper $crosstabDataHelper,
+        private readonly ParticipantDataHelper $participantDataHelper,
+        private readonly MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application);
     }

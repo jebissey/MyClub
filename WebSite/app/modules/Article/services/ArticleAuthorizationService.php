@@ -10,7 +10,7 @@ use app\models\Data;
 use app\modules\Article\valueObjects\ArticleAccessRow;
 use app\modules\Article\valueObjects\ArticleOwnershipRow;
 
-final class ArticleAuthorizationService
+final readonly class ArticleAuthorizationService
 {
     public function __construct(
         private Data $dataHelper,

@@ -62,7 +62,7 @@ use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Event\services\AuthorizationService;
 
-final class ApiFactory
+final readonly class ApiFactory
 {
     public function __construct(
         private Application $application,

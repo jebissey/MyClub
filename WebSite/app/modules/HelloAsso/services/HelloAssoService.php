@@ -37,7 +37,7 @@ final class HelloAssoService
     // ─── Singleton ────────────────────────────────────────────────────────────
 
     private function __construct(
-        private DataHelper $dataHelper,
+        private readonly DataHelper $dataHelper,
     ) {
     }
 

@@ -21,8 +21,8 @@ final class UserController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private AuthenticationService $authService,
-        private EmailService $emailService
+        private readonly AuthenticationService $authService,
+        private readonly EmailService $emailService
     ) {
         parent::__construct($application);
     }

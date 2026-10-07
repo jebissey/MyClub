@@ -38,10 +38,10 @@ final class UserDirectoryController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private PersonDataHelper $personDataHelper,
-        private GroupDataHelper $groupDataHelper,
-        private PersonGroupDataHelper $personGroupDataHelper,
-        private MemberDataHelper $memberDataHelper,
+        private readonly PersonDataHelper $personDataHelper,
+        private readonly GroupDataHelper $groupDataHelper,
+        private readonly PersonGroupDataHelper $personGroupDataHelper,
+        private readonly MemberDataHelper $memberDataHelper,
     ) {
         parent::__construct($application);
     }

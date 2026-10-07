@@ -26,10 +26,10 @@ final class ContactController extends AbstractController
 
     public function __construct(
         Application $application,
-        private EmailService $emailService,
-        private PersonDataHelper $personDataHelper,
-        private WebApp $webApp,
-        private CredentialService $credentials
+        private readonly EmailService $emailService,
+        private readonly PersonDataHelper $personDataHelper,
+        private readonly WebApp $webApp,
+        private readonly CredentialService $credentials
     ) {
         parent::__construct($application);
     }

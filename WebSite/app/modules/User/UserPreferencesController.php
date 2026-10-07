@@ -14,7 +14,7 @@ use app\modules\User\viewModels\UserPreferencesViewModel;
 
 final class UserPreferencesController extends AbstractController
 {
-    public function __construct(Application $application, private EventTypeDataHelper $eventTypeDataHelper)
+    public function __construct(Application $application, private readonly EventTypeDataHelper $eventTypeDataHelper)
     {
         parent::__construct($application);
     }

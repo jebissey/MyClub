@@ -8438,7 +8438,71 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1257,'export.import.error.no_file','No file received.','Aucun fichier reçu.','Nie otrzymano pliku.'),
  (1258,'export.import.error.wrong_type','Only .ods files are accepted.','Seuls les fichiers .ods sont acceptés.','Akceptowane są tylko pliki .ods.'),
  (1259,'export.import.error.invalid_file','The file is not a valid .ods file.','Le fichier n''est pas un fichier .ods valide.','Plik nie jest prawidłowym plikiem .ods.'),
- (1260,'export.import.error.generic','The import failed.','L''import a échoué.','Import nie powiódł się.');
+ (1260,'export.import.error.generic','The import failed.','L''import a échoué.','Import nie powiódł się.'),
+ (1261,'help_missing','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-secondary">🤝 No help here (yet)</h1>
+
+    <p class="mt-3">
+      The help for this section doesn’t exist yet...<br>
+      but it’s up to <strong>you</strong> to change that!
+    </p>
+
+    <p class="fw-bold">
+      💡 MyClub is a community project. If you know how this page works, share your knowledge with the webmaster: the next person will thank you.
+    </p>
+
+    <hr class="my-4">
+
+    <p>
+      ➡️ Not sure where to start? <strong>Tell the webmaster what you would have liked to find here.</strong>
+    </p>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
+  </div>
+</div>','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-secondary">🤝 Pas encore d’aide ici</h1>
+
+    <p class="mt-3">
+      L’aide pour cette rubrique n’existe pas encore...<br>
+      mais il ne tient qu’à <strong>vous</strong> d’y remédier !
+    </p>
+
+    <p class="fw-bold">
+      💡 MyClub est un projet communautaire. Si vous savez comment fonctionne cette page, partagez vos connaissances avec le webmaster : la prochaine personne vous remerciera.
+    </p>
+
+    <hr class="my-4">
+
+    <p>
+      ➡️ Pas sûr(e) par où commencer ? <strong>Dites au webmaster ce que vous auriez aimé trouver ici.</strong>
+    </p>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
+  </div>
+</div>','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-secondary">🤝 Brak pomocy (jeszcze)</h1>
+
+    <p class="mt-3">
+      Pomoc dla tej sekcji jeszcze nie istnieje...<br>
+      ale to od <strong>Ciebie</strong> zależy, czy się to zmieni!
+    </p>
+
+    <p class="fw-bold">
+      💡 MyClub to projekt społecznościowy. Jeśli wiesz, jak działa ta strona, podziel się swoją wiedzą z webmasterem: kolejna osoba Ci za to podziękuje.
+    </p>
+
+    <hr class="my-4">
+
+    <p>
+      ➡️ Nie wiesz, od czego zacząć? <strong>Napisz do webmastera, czego chciał(a)byś tu znaleźć.</strong>
+    </p>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Powrót do strony głównej</a>
+  </div>
+</div>');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
 INSERT INTO "Metadata" VALUES (1,'MyClub',90,0,NULL,10,36,6,1000000,NULL,0,NULL);

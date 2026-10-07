@@ -27,10 +27,10 @@ final class ChatApi extends AbstractApi
         protected ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private LogDataHelper $logDataHelper,
-        private GravatarHandler $gravatarHandler,
-        private MessageDataHelper $messageDataHelper,
-        private MemberDataHelper $memberDataHelper,
+        private readonly LogDataHelper $logDataHelper,
+        private readonly GravatarHandler $gravatarHandler,
+        private readonly MessageDataHelper $messageDataHelper,
+        private readonly MemberDataHelper $memberDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

@@ -12,7 +12,7 @@ final class EventNeedController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private NeedDataHelper $needDataHelper,
+        private readonly NeedDataHelper $needDataHelper,
     ) {
         parent::__construct($application);
     }

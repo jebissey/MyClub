@@ -16,7 +16,7 @@ final class MembershipController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private MembershipDataHelper $membershipDataHelper,
+        private readonly MembershipDataHelper $membershipDataHelper,
     ) {
         parent::__construct($application);
     }

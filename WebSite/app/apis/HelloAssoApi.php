@@ -21,7 +21,7 @@ final class HelloAssoApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private MembershipDataHelper $membershipDataHelper,
+        private readonly MembershipDataHelper $membershipDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }

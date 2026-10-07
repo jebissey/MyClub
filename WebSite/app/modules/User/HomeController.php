@@ -21,12 +21,12 @@ final class HomeController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private ArticleDataHelper $articleDataHelper,
-        private SurveyDataHelper $surveyDataHelper,
-        private DesignDataHelper $designDataHelper,
-        private News $news,
-        private PersonDataHelper $personDataHelper,
-        private MetadataDataHelper $metadataDataHelper,
+        private readonly ArticleDataHelper $articleDataHelper,
+        private readonly SurveyDataHelper $surveyDataHelper,
+        private readonly DesignDataHelper $designDataHelper,
+        private readonly News $news,
+        private readonly PersonDataHelper $personDataHelper,
+        private readonly MetadataDataHelper $metadataDataHelper,
     ) {
         parent::__construct($application);
     }

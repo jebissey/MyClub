@@ -11,7 +11,7 @@ use app\modules\Notifications\services\EventRecipientResolver;
 use app\modules\Notifications\services\GroupRecipientResolver;
 use app\modules\Common\valueObjects\MessageContext;
 
-final class MessageRecipientService
+final readonly class MessageRecipientService
 {
     /** @var RecipientResolverInterface[] */
     private array $resolvers;

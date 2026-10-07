@@ -24,8 +24,8 @@ final class CarouselApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private AuthorizationDataHelper $authorizationDataHelper,
-        private CarouselDataHelper $carouselDataHelper
+        private readonly AuthorizationDataHelper $authorizationDataHelper,
+        private readonly CarouselDataHelper $carouselDataHelper
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
