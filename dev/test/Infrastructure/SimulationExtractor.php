@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace test\Infrastructure;
 
+use RuntimeException;
+use Throwable;
+
 use test\Core\ValueObjects\Route;
 use test\Core\ValueObjects\Simulation;
 use test\Interfaces\TestDataRepositoryInterface;
-use RuntimeException;
-use Throwable;
 
 final class SimulationExtractor
 {
@@ -16,7 +17,8 @@ final class SimulationExtractor
 
     /**
      * Extracts every simulation (Step IS NOT NULL) from the test database.
-     * The simulation number is the value of the Step column.
+     * The simulation number is the value of the Step column (unique);
+     * the dbId is the Id of the row, used to find it back in the database.
      *
      * @return list<Simulation>
      */
@@ -26,6 +28,7 @@ final class SimulationExtractor
         $simulations = [];
 
         /** @var array{
+         *     Id: int|string,
          *     Method: string,
          *     Uri: string,
          *     Step: int|string,
@@ -45,6 +48,7 @@ final class SimulationExtractor
                         path: $row['Uri'],
                         hasParameters: str_contains($row['Uri'], '@'),
                     ),
+                    dbId: (int) $row['Id'],
                     number: (int) $row['Step'],
                     getParams: $this->decodeArray($row['JsonGetParameters'] ?? null),
                     postParams: $this->decodeArray($row['JsonPostParameters'] ?? null),
@@ -56,9 +60,9 @@ final class SimulationExtractor
             } catch (Throwable $e) {
                 throw new RuntimeException(
                     'error: ' . $e->getMessage()
-                        . ' on Step ' . $row['Step']
-                        . ' ' . $row['Method']
-                        . ' ' . $row['Uri']
+                    . ' on dbId ' . $row['Id']
+                    . ' (Step ' . $row['Step'] . ') '
+                    . $row['Method'] . ' ' . $row['Uri']
                 );
             }
         }
@@ -75,6 +79,7 @@ final class SimulationExtractor
             return [];
         }
         $decoded = json_decode($json, true);
+
         return is_array($decoded) ? $decoded : [];
     }
 

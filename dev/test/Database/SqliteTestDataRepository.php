@@ -13,6 +13,12 @@ use test\Interfaces\TestDataRepositoryInterface;
 
 final class SqliteTestDataRepository implements TestDataRepositoryInterface
 {
+    /** Explicit column list of the Test table (no SELECT *). */
+    private const TEST_COLUMNS = <<<'SQL'
+        Id, Step, Method, Uri, JsonGetParameters, JsonPostParameters,
+        JsonConnectedUser, ExpectedResponseCode, Query, QueryExpectedResponse
+        SQL;
+
     private PDO $db;
 
     public function __construct(string $dbPath)
@@ -42,7 +48,8 @@ final class SqliteTestDataRepository implements TestDataRepositoryInterface
             }
 
             $stmt = $this->db->prepare(
-                'SELECT * FROM Test
+                'SELECT ' . self::TEST_COLUMNS . '
+                 FROM Test
                  WHERE Uri = ? AND Method = ? AND Step IS NULL
                  ORDER BY JsonConnectedUser IS NOT NULL, JsonConnectedUser'
             );
@@ -63,6 +70,7 @@ final class SqliteTestDataRepository implements TestDataRepositoryInterface
 
     /**
      * Load Step IS NOT NULL rows (simulations), ordered by Step.
+     * Step is UNIQUE, so there is at most one row per simulation number.
      *
      * @return list<array<string, mixed>>
      */
@@ -70,7 +78,10 @@ final class SqliteTestDataRepository implements TestDataRepositoryInterface
     {
         try {
             $stmt = $this->db->prepare(
-                'SELECT * FROM Test WHERE Step IS NOT NULL ORDER BY Step'
+                'SELECT ' . self::TEST_COLUMNS . '
+                 FROM Test
+                 WHERE Step IS NOT NULL
+                 ORDER BY Step'
             );
             $stmt->execute();
 
@@ -101,7 +112,8 @@ final class SqliteTestDataRepository implements TestDataRepositoryInterface
         $regex = $this->routePathToRegex($routePath);
 
         $stmt = $this->db->prepare(
-            'SELECT * FROM Test
+            'SELECT ' . self::TEST_COLUMNS . '
+             FROM Test
              WHERE Method = ? AND Step IS NULL
              ORDER BY JsonConnectedUser IS NOT NULL, JsonConnectedUser, Uri'
         );

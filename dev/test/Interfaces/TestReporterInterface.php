@@ -20,7 +20,18 @@ interface TestReporterInterface
      */
     public function validationErrors(array $errors): array;
 
+    /** Announces a route test (Step IS NULL). */
     public function displayTest(int $testNumber, int $totalTests, string $method, string $path): void;
+
+    /** Announces a simulation (Step IS NOT NULL): its unique Step and the Id of its row. */
+    public function displaySimulation(
+        int $position,
+        int $totalSimulations,
+        int $step,
+        int $dbId,
+        string $method,
+        string $path
+    ): void;
 
     /**
      * @param array<string, mixed> $postParams
@@ -29,6 +40,7 @@ interface TestReporterInterface
         string $testedPath,
         int $httpCode,
         float $responseTimeMs,
-        array $postParams
+        array $postParams,
+        ?int $dbId = null
     ): void;
 }

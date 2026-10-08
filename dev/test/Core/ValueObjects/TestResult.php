@@ -94,6 +94,27 @@ final readonly class TestResult
         );
     }
 
+    /**
+     * Smoke test of a route that has no row in the tests database.
+     * There is no dbId, because there is no row: a fixture must be added.
+     */
+    public static function missingFixture(
+        Route $route,
+        int $testId,
+        HttpResponse $response,
+        string $requestPath = ''
+    ): self {
+        return new self(
+            $route,
+            $testId,
+            TestResultStatus::ResponseCodeFailure,
+            $response,
+            "No fixture in test database (smoke test): got HTTP {$response->httpCode}",
+            actual: (string) $response->httpCode,
+            requestPath: $requestPath
+        );
+    }
+
     public static function dataFailure(
         Route $route,
         int $testId,

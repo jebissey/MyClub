@@ -77,7 +77,12 @@ final class TestCoverageChecker
         }
     }
 
-    /** @param Route[] $routes */
+    /**
+     * Every route (HTTP method AND path) must be tested with every required context.
+     * The method is part of the route identity: GET /x and POST /x are different routes.
+     *
+     * @param Route[] $routes
+     */
     private static function checkAuthorizationCoverage(PDO $pdo, array $routes): void
     {
         $requiredContexts = self::deriveRequiredContexts($pdo);
@@ -86,27 +91,30 @@ final class TestCoverageChecker
         /** @var list<array<string, mixed>> $rows */
         $rows = self::query(
             $pdo,
-            'SELECT "Uri", "JsonConnectedUser" FROM "Test"
+            'SELECT "Method", "Uri", "JsonConnectedUser" FROM "Test"
              WHERE "Method" != \'PUT\'
                AND ("Step" IS NULL OR "JsonConnectedUser" LIKE \'%"email":"user@myclub.foo"%\')'
         )->fetchAll(PDO::FETCH_ASSOC);
 
-        $expectedRoutes = array_values(array_unique(array_map(
-            static fn (Route $r): string => $r->path,
-            $routes
-        )));
-
-        $regexByRoute = [];
-        foreach ($expectedRoutes as $originalPath) {
-            $regexByRoute[$originalPath] = self::routePathToRegex($originalPath);
+        // A route is identified by its method and its path, e.g. "POST /memberFields-settings".
+        /** @var array<string, array{method: string, regex: string}> $routesByKey */
+        $routesByKey = [];
+        foreach ($routes as $route) {
+            $method = strtoupper($route->method);
+            $routesByKey["{$method} {$route->path}"] = [
+                'method' => $method,
+                'regex' => self::routePathToRegex($route->path),
+            ];
         }
 
         $contextsByRoute = [];
         foreach ($rows as $row) {
+            $method = $row['Method'] ?? null;
             $uri = $row['Uri'] ?? null;
-            if (!is_string($uri)) {
+            if (!is_string($method) || !is_string($uri)) {
                 continue;
             }
+            $method = strtoupper($method);
 
             $jsonUser = $row['JsonConnectedUser'] ?? null;
             $jsonUserString = is_string($jsonUser) ? $jsonUser : null;
@@ -115,25 +123,26 @@ final class TestCoverageChecker
             if (!in_array($context, $requiredContexts, true)) {
                 continue;
             }
-            foreach ($regexByRoute as $originalPath => $regex) {
-                if (preg_match($regex, $uri) === 1) {
-                    $contextsByRoute[$originalPath][$context] = true;
+
+            foreach ($routesByKey as $key => $definition) {
+                if ($definition['method'] === $method && preg_match($definition['regex'], $uri) === 1) {
+                    $contextsByRoute[$key][$context] = true;
                 }
             }
         }
 
         $report = [];
-        foreach ($expectedRoutes as $originalPath) {
-            $missing = array_diff($requiredContexts, array_keys($contextsByRoute[$originalPath] ?? []));
+        foreach (array_keys($routesByKey) as $key) {
+            $missing = array_diff($requiredContexts, array_keys($contextsByRoute[$key] ?? []));
             if ($missing !== []) {
-                $report[$originalPath] = $missing;
+                $report[$key] = $missing;
             }
         }
 
         if ($report !== []) {
             $lines = [];
-            foreach ($report as $uri => $missing) {
-                $lines[] = "  {$uri} : " . implode(', ', $missing);
+            foreach ($report as $key => $missing) {
+                $lines[] = "  {$key} : " . implode(', ', $missing);
             }
             throw new TestCoverageException(
                 'Incomplete authorization coverage (reference = '

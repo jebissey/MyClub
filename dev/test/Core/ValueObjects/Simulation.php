@@ -7,12 +7,15 @@ namespace test\Core\ValueObjects;
 final readonly class Simulation
 {
     /**
+     * @param int                       $dbId   Id of the row in the Test table
+     * @param int                       $number Value of the Step column (unique)
      * @param array<string, mixed>      $getParams
      * @param array<string, mixed>      $postParams
      * @param array<string, mixed>|null $connectedUser
      */
     public function __construct(
         public Route $route,
+        public int $dbId,
         public int $number,
         public array $getParams,
         public array $postParams,
@@ -24,6 +27,7 @@ final readonly class Simulation
 
     /**
      * @return array{
+     *     Id: int,
      *     Method: string,
      *     Uri: string,
      *     Step: int,
@@ -38,6 +42,7 @@ final readonly class Simulation
     public function toArray(): array
     {
         return [
+            'Id' => $this->dbId,
             'Method' => $this->route->method,
             'Uri' => $this->route->path,
             'Step' => $this->number,

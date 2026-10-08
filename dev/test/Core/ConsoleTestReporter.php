@@ -72,25 +72,47 @@ final class ConsoleTestReporter implements TestReporterInterface
         );
     }
 
+    public function displaySimulation(
+        int $position,
+        int $totalSimulations,
+        int $step,
+        int $dbId,
+        string $method,
+        string $path
+    ): void {
+        echo sprintf(
+            "[%d/%d] Testing %s %s (step %d, dbId=%d)\n",
+            $position,
+            $totalSimulations,
+            $method,
+            $path,
+            $step,
+            $dbId
+        );
+    }
+
     public function displayResult(
         string $testedPath,
         int $httpCode,
         float $responseTimeMs,
-        array $postParams
+        array $postParams,
+        ?int $dbId = null
     ): void {
         $strPostParams = $postParams !== []
             ? ' with ' . json_encode($postParams, JSON_UNESCAPED_UNICODE)
             : '';
+        $dbIdLabel = $dbId !== null ? " [dbId={$dbId}]" : '';
 
         echo sprintf(
-            " => %s%s -> %s%d %s%s (%.2fms)\n",
+            " => %s%s -> %s%d %s%s (%.2fms)%s\n",
             $testedPath,
             $strPostParams,
             $this->getStatusColor($httpCode),
             $httpCode,
             $this->getStatusText($httpCode),
             Color::Reset->value,
-            $responseTimeMs
+            $responseTimeMs,
+            $dbIdLabel
         );
     }
 

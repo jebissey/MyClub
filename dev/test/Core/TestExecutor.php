@@ -29,6 +29,13 @@ final class TestExecutor
     /** @var list<string> Authentication failures (usually bad credentials in test DB). */
     private array $testErrors = [];
 
+    /**
+     * Kind of test currently running, used to label error messages:
+     * 'route' = position of the route in the extracted list (Step IS NULL),
+     * 'step'  = value of the Step column (Step IS NOT NULL).
+     */
+    private string $testKind = 'route';
+
     public function __construct(
         private TestDataRepositoryInterface $repo,
         private SqliteMyClubDataRepository $myClub,
@@ -45,6 +52,8 @@ final class TestExecutor
      */
     public function testRoutes(array $routes, bool $stop): array
     {
+        $this->testKind = 'route';
+
         $totalRoutes = count($routes);
         $results = [];
 
@@ -80,16 +89,20 @@ final class TestExecutor
      */
     public function testSimulations(array $simulations, ?array $simuSelection, bool $stop): array
     {
+        $this->testKind = 'step';
+
         $totalSimulations = count($simulations);
         $results = [];
 
         foreach ($this->planSimulations($simulations, $simuSelection) as $item) {
             $simulation = $item['simulation'];
 
-            // Displayed as position/total (e.g. 16/327); the Step is the test number in error messages.
-            $this->reporter->displayTest(
+            // Displayed as position/total (e.g. 16/336), followed by the Step and the row Id.
+            $this->reporter->displaySimulation(
                 $item['position'],
                 $totalSimulations,
+                $simulation->number,
+                $simulation->dbId,
                 $simulation->route->method,
                 $simulation->route->path
             );
@@ -99,7 +112,7 @@ final class TestExecutor
 
             if ($tests === []) {
                 $this->reporter->error(
-                    "No result produced for simulation {$simulation->number}: "
+                    "No result produced for simulation {$simulation->number} (dbId={$simulation->dbId}): "
                         . "{$simulation->route->method} {$simulation->route->path}"
                 );
                 continue;
@@ -149,6 +162,8 @@ final class TestExecutor
      * - list of numbers → only those that exist, in the order of the selection
      *   (missing numbers are silently skipped — gaps are normal)
      *
+     * Step is UNIQUE in the tests database, so a number matches at most one simulation.
+     *
      * @param list<Simulation> $simulations
      * @param ?list<int> $simuSelection
      * @return list<array{position: int, simulation: Simulation}>
@@ -160,7 +175,7 @@ final class TestExecutor
         foreach ($simulations as $i => $simulation) {
             $entry = ['position' => $i + 1, 'simulation' => $simulation];
             $all[] = $entry;
-            $byNumber[$simulation->number][] = $entry;
+            $byNumber[$simulation->number] = $entry;
         }
 
         if ($simuSelection === null) {
@@ -169,12 +184,8 @@ final class TestExecutor
 
         $plan = [];
         foreach ($simuSelection as $number) {
-            if (!isset($byNumber[$number])) {
-                // Trous dans la séquence : on ignore silencieusement
-                continue;
-            }
-            foreach ($byNumber[$number] as $entry) {
-                $plan[] = $entry;
+            if (isset($byNumber[$number])) {
+                $plan[] = $byNumber[$number];
             }
         }
 
@@ -227,12 +238,11 @@ final class TestExecutor
             $response = $this->http->request($route->method, $route->path, []);
 
             if ($response->httpCode >= 400) {
-                $result = TestResult::responseCodeFailure(
+                $result = TestResult::missingFixture(
                     $route,
                     $routeNumber,
                     $response,
-                    200,
-                    requestPath: $route->path
+                    $route->path
                 );
                 $this->recordFailure($result);
 
@@ -363,7 +373,7 @@ final class TestExecutor
         if (!$authResult->success) {
             $message = $authResult->error !== ''
                 ? $authResult->error
-                : "Authentication failed for test {$routeNumber}";
+                : "Authentication failed for {$this->testKind} {$routeNumber}";
 
             return TestResult::authenticationFailure(
                 $route,
@@ -403,7 +413,7 @@ final class TestExecutor
         }
 
         $message = $this->reporter->error(
-            "[{$label}] {$dbIdPart}test {$result->testId}: {$result->route->method} {$path} — {$detail}"
+            "[{$label}] {$dbIdPart}{$this->testKind} {$result->testId}: {$result->route->method} {$path} — {$detail}"
         );
 
         match ($result->status) {
@@ -437,7 +447,7 @@ final class TestExecutor
             ? $result->requestPath
             : $result->route->path;
 
-        $this->reporter->displayResult($path, $httpCode, $responseTimeMs, $postParams);
+        $this->reporter->displayResult($path, $httpCode, $responseTimeMs, $postParams, $result->dbId);
     }
 
     private function decodeJsonValue(mixed $json): mixed
