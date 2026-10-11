@@ -662,4 +662,40 @@ final class LogDataHelper extends Data
 
         return max(1, (int) ($niceStep * $magnitude));
     }
+
+    #region Backups
+
+    /**
+     * Returns the most recent backups (date and email only), read from the logs.
+     *
+     * @return array<int, array{date: string, email: string}>
+     */
+    public function getLastBackups(int $limit = 10): array
+    {
+        $sql = "
+            SELECT CreatedAt, Who
+            FROM Log
+            WHERE Uri LIKE '/backupAll/download%'
+            AND Code = ''
+            ORDER BY CreatedAt DESC
+            LIMIT :limit
+        ";
+
+        $stmt = $this->pdoForLog->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $result = [];
+
+        foreach ($rows as $row) {
+            $result[] = [
+                'date'  => (string) $row->CreatedAt,
+                'email' => (string) ($row->Who ?? ''),
+            ];
+        }
+
+        return $result;
+    }
 }

@@ -108,6 +108,7 @@ final class ConnectedUser
                 ),
                 'userEmail' => $this->person->Email,
                 'isAdmin' => $this->isAdministrator(),
+                'isBackupManager' => $this->isBackupManager(),
                 'isCommunicationManager' => $this->isCommunicationManager(),
                 'isDesigner' => $this->isDesigner(),
                 'isEditor' => $this->isEditor(),
@@ -146,6 +147,11 @@ final class ConnectedUser
     public function isAnybody(): bool
     {
         return true;
+    }
+
+    public function isBackupManager(): bool
+    {
+        return $this->user?->isBackupManager() ?? false;
     }
 
     public function isConnected(): bool

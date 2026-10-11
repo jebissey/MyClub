@@ -99,6 +99,7 @@ final class Params
             'userImg' => '👻',
             'userEmail' => '',
             'isAdmin' => false,
+            'isBackupManager' => false,
             'isCommunicationManager' => false,
             'isEditor' => false,
             'isEventDesigner' => false,

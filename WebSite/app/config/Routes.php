@@ -11,6 +11,7 @@ use app\config\routes\Article;
 use app\config\routes\ArticleApi;
 use app\config\routes\Arward;
 use app\config\routes\Astronomy;
+use app\config\routes\Backup as BackupAllData;
 use app\config\routes\CarouselApi;
 use app\config\routes\ChatApi;
 use app\config\routes\Communication;
@@ -237,6 +238,7 @@ final class Routes
         $this->routes = array_merge($this->routes, (new ArticleApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Arward($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Astronomy($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new BackupAllData($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new CarouselApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new ChatApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Communication($this->controllerFactory))->get());

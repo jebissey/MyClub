@@ -29,7 +29,8 @@ final readonly class ConnectedUser
 
     public function isAdministrator(): bool
     {
-        return $this->isCommunicationManager()
+        return $this->isBackupManager()
+            || $this->isCommunicationManager()
             || $this->isDesigner()
             || $this->isEditor()
             || $this->isEventManager()
@@ -39,6 +40,11 @@ final readonly class ConnectedUser
             || $this->isTranslator()
             || $this->isVisitorInsights()
             || $this->isWebmaster();
+    }
+
+    public function isBackupManager(): bool
+    {
+        return $this->hasAuthorization(Authorization::BackupManager);
     }
 
     public function isCommunicationManager(): bool

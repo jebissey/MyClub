@@ -392,6 +392,7 @@ CREATE TABLE IF NOT EXISTS "Metadata" (
 	"ThisIsProdSiteUrl"	TEXT,
 	"ThisIsTestSite"	INTEGER NOT NULL DEFAULT 0 CHECK("ThisIsTestSite" IN (0, 1)),
 	"ThisIsForcedLanguage"	TEXT,
+	"Backup_lastDate"	TEXT CHECK("Backup_lastDate" IS NULL OR ("Backup_lastDate" LIKE '____-__-__ __:__:__' AND datetime("Backup_lastDate") IS NOT NULL)),
 	PRIMARY KEY("Id")
 );
 CREATE TABLE IF NOT EXISTS "Need" (
@@ -508,7 +509,8 @@ INSERT INTO "Authorization" VALUES (1,'Webmaster'),
  (12,'CommunicationManager'),
  (13,'LoanDesigner'),
  (14,'LoanManager'),
- (15,'ExerciseDesigner');
+ (15,'ExerciseDesigner'),
+ (16,'BackupManager');
 INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
 INSERT INTO "Individual" VALUES (1,'Member','webmaster@myclub.foo','my first name','my last name','my nick name or nothing',NULL,NULL,'2026-09-14 13:04:32');
@@ -8505,7 +8507,7 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
 </div>');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',90,0,NULL,10,36,6,1000000,NULL,0,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',91,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

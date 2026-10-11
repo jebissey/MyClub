@@ -6,6 +6,7 @@ namespace app\enums;
 
 enum Authorization: string
 {
+    case BackupManager = 'BackupManager';
     case CommunicationManager = 'CommunicationManager';
     case Editor = 'Editor';
     case EventDesigner = 'EventDesigner';

@@ -433,4 +433,32 @@ abstract class AbstractController
         flush();
         Flight::stop();
     }
+
+    protected function renderZip(string $content, string $fileName): void
+    {
+        ini_set('zlib.output_compression', '0');
+
+        // Discard any stray output but keep Flight's own buffer open,
+        // otherwise Flight::stop() calls ob_get_clean() on a missing buffer.
+        while (ob_get_level() > 1) {
+            ob_end_clean();
+        }
+        if (ob_get_level() === 1) {
+            ob_clean();
+        }
+
+        $asciiName = preg_replace('/[^A-Za-z0-9._-]/', '_', $fileName) ?? 'backup.zip';
+
+        Flight::response()
+            ->header('Content-Type', 'application/zip')
+            ->header(
+                'Content-Disposition',
+                'attachment; filename="' . $asciiName
+                    . '"; filename*=UTF-8\'\'' . rawurlencode($fileName)
+            )
+            ->header('Cache-Control', 'private, no-store')
+            ->write($content);
+
+        Flight::stop();
+    }
 }

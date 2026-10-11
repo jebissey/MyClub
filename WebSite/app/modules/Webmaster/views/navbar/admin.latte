@@ -38,7 +38,19 @@
 
                             {if $isWebmaster}
                             <li class="nav-item">
-                                <a class="nav-link" href="/webmaster" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.admin.webmaster'|translate}"><h2>🛠️</h2></a>
+                                <a class="nav-link" href="/webmaster" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.admin.webmaster'|translate}">
+                                    <h2>🛠️</h2>
+                                </a>
+                            </li>
+                            {/if}
+
+                            {if $isBackupManager}
+                            <li class="nav-item">
+                                <a class="nav-link {if $page == 'backupAll'}active{/if}" 
+                                    href="/backupAll" 
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='navbar.admin.backup_manager'|translate}">
+                                    <h2>💾</h2>
+                                </a>
                             </li>
                             {/if}
 

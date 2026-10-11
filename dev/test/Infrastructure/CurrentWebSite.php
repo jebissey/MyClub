@@ -127,7 +127,8 @@ INSERT INTO "Group" VALUES
  (13,'Loan designer',0,0),
  (14,'Loan manager',0,0),
  (15,'Exercice designer',0,0),
- (16,'Deleteble group',0,0);
+ (16,'Backup',0,0),
+ (99,'Deleteble group',0,0);
 
 INSERT INTO "GroupAuthorization" VALUES
  (2,2,2),
@@ -143,7 +144,9 @@ INSERT INTO "GroupAuthorization" VALUES
  (12,12,12),
  (13,13,13),
  (14,14,14),
- (15,15,15);
+ (15,15,15),
+ (16,16,16);
+ 
 
 INSERT INTO "Individual" VALUES
  (2,'Member','personmanager@myclub.foo','Person','Manager',NULL,NULL,NULL,'2026-09-29 07:26:43'),
@@ -159,7 +162,9 @@ INSERT INTO "Individual" VALUES
  (12,'Member','communicationmanager@myclub.foo','Communication','Manager',NULL,NULL,NULL,'2026-09-29 07:26:46'),
  (13,'Member','loandesigner@myclub.foo','Loan','Designer',NULL,NULL,NULL,'2026-09-29 07:26:46'),
  (14,'Member','loanmanager@myclub.foo','Loan','Manager',NULL,NULL,NULL,'2026-09-29 07:26:46'),
- (15,'Member','exercisedesigner@myclub.foo','Exercise','Designer',NULL,NULL,NULL,'2026-09-29 07:26:47');
+ (15,'Member','exercisedesigner@myclub.foo','Exercise','Designer',NULL,NULL,NULL,'2026-09-29 07:26:47'),
+ (16,'Member','backup@myclub.foo','Exercise','Designer',NULL,NULL,NULL,'2026-10-09 13:33:00'),
+ (99,'Member','foo@myclub.foo','foo','foo',NULL,NULL,NULL,'2026-10-09 13:33:00');
 
 INSERT INTO "Member" VALUES
  (2,'9ec71e403dace1e462f2d788450fcae3492e8c759a78e3e036b1cab1c6a77281',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2026-09-29 07:26:43',0,NULL,'2026-09-29 07:29:40',NULL,NULL,'',0,0,'',NULL,NULL,'{}'),
@@ -175,7 +180,9 @@ INSERT INTO "Member" VALUES
  (12,'b1330d491756f1259358d3fbd283da22a8109fc901be575a241fe3cc6c50b23e',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2026-09-29 07:26:46',0,NULL,'2026-09-29 07:29:39',NULL,NULL,'',0,0,'',NULL,NULL,'{}'),
  (13,'edb3acb0e5a20eb0c6b21a403ee427c01c4f12b7a81466d9caf57fd9aa6de97b',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2026-09-29 07:26:46',0,NULL,'2026-09-29 07:29:39',NULL,NULL,'',0,0,'',NULL,NULL,'{}'),
  (14,'9c50f9ef79a4b371317c5923c286b0695222ddfecd4695ba5e7ec0f548587154',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2026-09-29 07:26:46',0,NULL,'2026-09-29 07:29:39',NULL,NULL,'',0,0,'',NULL,NULL,'{}'),
- (15,'a3ec9066e25deb463d5b90a2a87c364dfc89665bde799720b0d50177ed67d9c4',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2026-09-29 07:26:47',0,NULL,'2026-09-29 07:29:39',NULL,NULL,'',0,0,'',NULL,NULL,'{}');
+ (15,'a3ec9066e25deb463d5b90a2a87c364dfc89665bde799720b0d50177ed67d9c4',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2026-09-29 07:26:47',0,NULL,'2026-09-29 07:29:39',NULL,NULL,'',0,0,'',NULL,NULL,'{}'),
+ (16,'0400cbf4ca27bf6a40c7c304d74e550c3ac09a89fdcf6aeac24df22cb97e58d4',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2026-09-29 07:26:47',0,NULL,'2026-09-29 07:29:39',NULL,NULL,'',0,0,'',NULL,NULL,'{}'),
+ (99,'?',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2026-09-29 07:26:47',0,NULL,'2026-09-29 07:29:39',NULL,NULL,'',0,0,'',NULL,NULL,'{}');
 
 INSERT INTO "MemberGroup" VALUES
  (3,2,2),
@@ -191,7 +198,8 @@ INSERT INTO "MemberGroup" VALUES
  (13,12,12),
  (14,13,13),
  (15,14,14),
- (16,15,15);
+ (16,15,15),
+ (17,16,16);
 
 INSERT INTO "Article" VALUES (1,'','',4,'2026-10-01 18:41:29',NULL,NULL,'2026-10-01 18:41:29',1,'fr_FR');
 INSERT INTO "Article" VALUES (2,'','',4,'2026-10-01 18:41:29',NULL,NULL,'2026-10-01 18:41:29',1,'fr_FR');

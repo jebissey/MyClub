@@ -46,6 +46,7 @@ use app\modules\Article\MediaController;
 use app\modules\Article\OrderController;
 use app\modules\Article\SurveyController;
 use app\modules\Astronomy\AstronomyController;
+use app\modules\Backup\BackupController;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\CredentialService;
@@ -166,6 +167,14 @@ final readonly class ControllerFactory
     public function makeAstronomyController(): AstronomyController
     {
         return new AstronomyController($this->application);
+    }
+
+    public function makeBackupController(): BackupController
+    {
+        return new BackupController(
+            $this->application,
+            $this->logDataHelper
+        );
     }
 
     public function makeDbBrowserController(): DbBrowserController
