@@ -164,7 +164,7 @@ INSERT INTO "Individual" VALUES
  (14,'Member','loanmanager@myclub.foo','Loan','Manager',NULL,NULL,NULL,'2026-09-29 07:26:46'),
  (15,'Member','exercisedesigner@myclub.foo','Exercise','Designer',NULL,NULL,NULL,'2026-09-29 07:26:47'),
  (16,'Member','backup@myclub.foo','Exercise','Designer',NULL,NULL,NULL,'2026-10-09 13:33:00'),
- (99,'Member','foo@myclub.foo','foo','foo',NULL,NULL,NULL,'2026-10-09 13:33:00');
+ (99,'Member','foo@myclub.foo','fake','user',NULL,NULL,NULL,'2026-10-09 13:33:00');
 
 INSERT INTO "Member" VALUES
  (2,'9ec71e403dace1e462f2d788450fcae3492e8c759a78e3e036b1cab1c6a77281',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2026-09-29 07:26:43',0,NULL,'2026-09-29 07:29:40',NULL,NULL,'',0,0,'',NULL,NULL,'{}'),

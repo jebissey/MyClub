@@ -96,7 +96,6 @@ final class FlightRouteTester
             'base-url:',
             'timeout:',
             'routes-file:',
-            'db-path:',
             'export-json',
             'export-csv',
             'help',
@@ -133,17 +132,13 @@ final class FlightRouteTester
     private function resolvePaths(array $options): array
     {
         $routesFile = $options['routes-file'] ?? MYCLUB_WEBSITE_DIR . '/app/config/Routes.php';
-        $dbTests = $options['db-path'] ?? __DIR__ . '/Database/tests.sqlite';
-        $dbWebSite = $options['db-path'] ?? MYCLUB_DB_PATH;
 
         return [
             'routeFile' => is_string($routesFile) ? $routesFile : MYCLUB_WEBSITE_DIR . '/app/config/Routes.php',
             'routeDirectory' => MYCLUB_WEBSITE_DIR . '/app/config/routes',
-            'dbTests' => is_string($dbTests) ? $dbTests : __DIR__ . '/Database/tests.sqlite',
-            // Note: --db-path currently shared between tests DB and site DB (legacy).
-            // Prefer dedicated options later if needed.
+            'dbTests' => __DIR__ . '/Database/tests.sqlite',
             'dbMyClub' => MYCLUB_DB_PATH,
-            'dbWebSite' => is_string($dbWebSite) ? $dbWebSite : MYCLUB_DB_PATH,
+            'dbWebSite' => MYCLUB_DB_PATH,
         ];
     }
 
@@ -294,7 +289,6 @@ Options:
   --base-url=URL      Base URL (default: http://localhost:8000)
   --timeout=SECONDS   Request timeout in seconds (default: 10)
   --routes-file=FILE  File containing routes (default: WebSite/app/config/Routes.php)
-  --db-path=PATH      Path of SQLite database (tests / site — see note in code)
   --export-json       Export results as JSON
   --export-csv        Export results as CSV
   --help              Display this help
