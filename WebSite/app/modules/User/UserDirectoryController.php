@@ -4,44 +4,28 @@ declare(strict_types=1);
 
 namespace app\modules\User;
 
-use stdClass;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\MemberDataHelper;
-use app\models\PersonDataHelper;
+use app\models\MemberDirectoryDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\services\MemberMapService;
 use app\modules\User\viewModels\UserDirectoryViewModel;
 use app\modules\User\viewModels\UsersMapViewModel;
 use app\modules\Common\valueObjects\Person;
 
-/**
- * @phpstan-import-type PersonRow from Person
- * @phpstan-type DirectoryMapRow object{
- *     Id: int|string,
- *     FirstName: string|null,
- *     LastName: string|null,
- *     NickName: string|null,
- *     Avatar: string|null,
- *     UseGravatar: bool|int|string|null,
- *     Email: string,
- *     Location: string|null,
- *     MyPublicDataInPresentationDirectory: string|null,
- *     InPresentationDirectory: int|string,
- *     ShowPhoneInPresentationDirectory: int|string,
- *     ShowEmailInPresentationDirectory: int|string
- * }
- */
 final class UserDirectoryController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private readonly PersonDataHelper $personDataHelper,
         private readonly GroupDataHelper $groupDataHelper,
         private readonly PersonGroupDataHelper $personGroupDataHelper,
         private readonly MemberDataHelper $memberDataHelper,
+        private readonly MemberMapService $memberMapService,
+        private readonly MemberDirectoryDataHelper $memberDirectoryDataHelper
     ) {
         parent::__construct($application);
     }
@@ -65,15 +49,13 @@ final class UserDirectoryController extends AbstractController
         }
 
         if ($selectedGroup) {
-            $persons = $this->personDataHelper->getPersonsInGroupForDirectory($selectedGroup);
+            $persons = $this->memberDirectoryDataHelper->getPersonsInGroupForDirectory($selectedGroup);
         } else {
             $persons = $this->memberDataHelper->getActiveMembersDirectoryInfo();
 
             $gravatarHandler = new GravatarHandler();
-            foreach ($persons as $person_) {
-                /** @var PersonRow $personRow */
-                $personRow = $person_;
-                $person_->UserImg = WebApp::getUserImg(Person::fromRow($personRow), $gravatarHandler);
+            foreach ($persons as $directoryPerson) {
+                $directoryPerson->UserImg = WebApp::getUserImg(Person::fromRow($directoryPerson), $gravatarHandler);
             }
         }
 
@@ -88,7 +70,7 @@ final class UserDirectoryController extends AbstractController
             : false;
 
         $viewModel = new UserDirectoryViewModel(
-            persons: array_values($persons),
+            persons: $persons,
             navItems: $this->getNavItems($person),
             loggedPersonInPresentationDirectory: $loggedPersonInPresentationDirectory,
             groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
@@ -129,15 +111,9 @@ final class UserDirectoryController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        /** @var array<int|string, DirectoryMapRow> $rows */
-        $rows = $this->dataHelper->gets('Person', [
-            'InPresentationDirectory' => 1,
-            'Location IS NOT NULL' => null,
-            'Inactivated' => 0
-        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, '
-            . 'MyPublicDataInPresentationDirectory, InPresentationDirectory, '
-            . 'ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
-        $locationData = $this->getLocationData(array_values($rows));
+
+        $rows = $this->memberDirectoryDataHelper->getLocatedMembers();
+        $locationData = $this->memberMapService->getLocationData($rows);
 
         $viewModel = new UsersMapViewModel(
             locationData: $locationData,
@@ -160,15 +136,9 @@ final class UserDirectoryController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        /** @var array<int|string, DirectoryMapRow> $rows */
-        $rows = $this->dataHelper->gets('Person', [
-            'InPresentationDirectory' => 1,
-            'Location IS NOT NULL' => null,
-            'Inactivated' => 0,
-            'MyPublicDataInPresentationDirectory IS NOT NULL AND MyPublicDataInPresentationDirectory != ""' => null
-        ], 'Id, FirstName, LastName, NickName, Avatar, UseGravatar, Email, Location, MyPublicDataInPresentationDirectory, '
-            . 'InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory');
-        $locationData = $this->getLocationData(array_values($rows));
+
+        $rows = $this->memberDirectoryDataHelper->getLocatedMembers(null, true);
+        $locationData = $this->memberMapService->getLocationData($rows);
 
         $viewModel = new UsersMapViewModel(
             locationData: $locationData,
@@ -181,50 +151,5 @@ final class UserDirectoryController extends AbstractController
         );
 
         $this->render('User/views/users_map.latte', $viewModel->toArray());
-    }
-
-    #region Private functions
-    /**
-     * @param  list<DirectoryMapRow> $members
-     * @return array<int, array{
-     *     id: int,
-     *     name: string,
-     *     nickname: ?string,
-     *     avatar: ?string,
-     *     useGravatar: bool,
-     *     email: string,
-     *     lat: string,
-     *     lng: string,
-     *     userImg: string,
-     *     myPublicData: ?string
-     * }>
-     */
-    private function getLocationData(array $members): array
-    {
-        $gravatarHandler = new GravatarHandler();
-        $locationData = [];
-        foreach ($members as $member) {
-            if (
-                !empty($member->Location) && preg_match(
-                    '/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/',
-                    $member->Location
-                )
-            ) {
-                list($lat, $lng) = explode(',', $member->Location);
-                $locationData[] = [
-                    'id' => (int) $member->Id,
-                    'name' => $member->FirstName . ' ' . $member->LastName,
-                    'nickname' => $member->NickName,
-                    'avatar' => $member->Avatar,
-                    'useGravatar' => (bool) $member->UseGravatar,
-                    'email' => $member->Email,
-                    'lat' => trim($lat),
-                    'lng' => trim($lng),
-                    'userImg' => WebApp::getUserImg(Person::fromRow($member), $gravatarHandler),
-                    'myPublicData' => $member->MyPublicDataInPresentationDirectory
-                ];
-            }
-        }
-        return $locationData;
     }
 }

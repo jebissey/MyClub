@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Common;
 
 use Envms\FluentPDO\Queries\Select;
-use PDO;
 use app\helpers\Application;
 
 abstract class TableController extends AbstractController
@@ -28,10 +27,6 @@ abstract class TableController extends AbstractController
      */
     protected function prepareTableData(Select $query, array $filters = [], bool $usePdoForLog = false): array
     {
-        $pdo = $usePdoForLog
-            ? $this->application->getPdoForLog()
-            : $this->application->getPdo();
-
         $tablePage = $this->flight->request()->query['tablePage'] ?? null;
         $page = is_numeric($tablePage) ? (int) $tablePage : 1;
 
@@ -46,19 +41,16 @@ abstract class TableController extends AbstractController
             $values[] = "%$value%";
         }
 
-        $totalItems = $this->count($query->getQuery(), $pdo, $values);
-        $totalPages = (int)ceil($totalItems / $this->itemsPerPage);
+        $totalItems = $this->dataHelper->count($query->getQuery(), $values, $usePdoForLog);
+        $totalPages = (int) ceil($totalItems / $this->itemsPerPage);
         $currentPage = max(1, min($page, $totalPages));
 
         $query = $query
             ->limit($this->itemsPerPage)
             ->offset(($currentPage - 1) * $this->itemsPerPage);
 
-        $stmt = $pdo->prepare($query->getQuery());
-        $stmt->execute($values);
-
         /** @var array<int, object> $items */
-        $items = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $items = $this->dataHelper->query($query->getQuery(), $values, $usePdoForLog) ?: [];
 
         return [
             'items' => $items,
@@ -83,17 +75,5 @@ abstract class TableController extends AbstractController
         }
 
         return $params;
-    }
-
-    /**
-     * @param array<int,string> $values
-     */
-    private function count(string $sql, PDO $pdo, array $values = []): int
-    {
-        $countSql = "SELECT COUNT(*) FROM ({$sql}) AS sub";
-        $stmt = $pdo->prepare($countSql);
-        $stmt->execute($values);
-
-        return (int)$stmt->fetchColumn();
     }
 }

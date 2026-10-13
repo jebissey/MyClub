@@ -1,0 +1,17 @@
+{* Avatar of a person: picture (e.g. Gravatar), emoji or placeholder.
+   Parameters: $useGravatar, $email, $avatar (database values), $userImg (value returned by
+   WebApp::getUserImg()), $size (diameter in pixels) *}
+{default $size = 64}
+{var $avatarInfo = \app\modules\Common\valueObjects\AvatarInfo::fromMember($useGravatar, $email, $avatar, $userImg)}
+{if $avatarInfo->Kind === \app\enums\AvatarKind::Image}
+<img src="{$avatarInfo->Value}" alt="" data-avatar-fallback data-avatar-size="{$size}"
+     class="rounded-circle" style="width: {$size}px; height: {$size}px; object-fit: cover;">
+{elseif $avatarInfo->Kind === \app\enums\AvatarKind::Emoji}
+<span class="d-inline-flex align-items-center justify-content-center rounded-circle"
+      style="font-size: {round($size * 0.75)}px; width: {$size}px; height: {$size}px; line-height: {$size}px; background-color: #f0f0f0;">{$avatarInfo->Value}</span>
+{else}
+<span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light"
+      style="width: {$size}px; height: {$size}px;">
+    <i class="bi bi-person-circle" style="font-size: {round($size * 0.75)}px; line-height: 1;"></i>
+</span>
+{/if}

@@ -87,15 +87,20 @@ use app\config\routes\VisitorInsightsApi;
 use app\config\routes\WebappSettings;
 use app\config\routes\Webmaster;
 use app\config\routes\WebmasterApi;
+use app\config\valueObjects\DataHelpers;
+use app\config\valueObjects\Services;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\ErrorManager;
+use app\helpers\GravatarHandler;
 use app\helpers\MediaManager;
+use app\helpers\MemberCustomFields;
 use app\helpers\News;
 use app\helpers\NotificationSender;
 use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
+use app\models\AlertRecipientDataHelper;
 use app\models\DbBrowserDataHelper;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
@@ -104,6 +109,7 @@ use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\AvailabilityDataHelper;
 use app\models\CarouselDataHelper;
+use app\models\ContactDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\DataHelper;
 use app\models\DesignDataHelper;
@@ -119,6 +125,8 @@ use app\models\LoanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\MemberDataHelper;
+use app\models\MemberDirectoryDataHelper;
+use app\models\MemberImportDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
@@ -130,17 +138,22 @@ use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\models\PersonStatisticsDataHelper;
+use app\models\PresentationNewsDataHelper;
 use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\AuthenticationService;
-use app\modules\Common\services\DatabaseSmtpConfigProvider;
 use app\modules\Common\services\CredentialService;
+use app\modules\Common\services\DatabaseSmtpConfigProvider;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\JsonEmailQuotaTracker;
+use app\modules\Common\services\MemberMapService;
 use app\modules\Common\services\MessageRecipientService;
+use app\modules\Common\services\RegistrationLinkService;
+use app\modules\PersonManager\services\MemberCsvImporter;
+use app\modules\PersonManager\services\MemberOdsImporter;
 use app\modules\Common\valueObjects\Route;
 
 final class Routes
@@ -514,224 +527,150 @@ final class Routes
         Flight::stop();
     }
 
-    /**
-     * @return array{
-     *     authorizationDataHelper: AuthorizationDataHelper,
-     *     articleDataHelper: ArticleDataHelper,
-     *     crosstabDataHelper: CrosstabDataHelper,
-     *     designDataHelper: DesignDataHelper,
-     *     eventDataHelper: EventDataHelper,
-     *     groupDataHelper: GroupDataHelper,
-     *     logDataHelper: LogDataHelper,
-     *     messageDataHelper: MessageDataHelper,
-     *     needDataHelper: NeedDataHelper,
-     *     orderDataHelper: OrderDataHelper,
-     *     participantDataHelper: ParticipantDataHelper,
-     *     surveyDataHelper: SurveyDataHelper,
-     *     sharedFileDataHelper: SharedFileDataHelper,
-     *     loanDataHelper: LoanDataHelper,
-     *     languagesDataHelper: LanguagesDataHelper,
-     *     membershipDataHelper: MembershipDataHelper,
-     * }
-     */
-    private function buildDataHelpers(): array
+    private function buildDataHelpers(): DataHelpers
     {
         $authorizationDataHelper = new AuthorizationDataHelper($this->application);
         $articleDataHelper = new ArticleDataHelper($this->application, $authorizationDataHelper);
+        $languagesDataHelper = new LanguagesDataHelper($this->application, $this->application->getErrorManager());
 
-        return [
-            'authorizationDataHelper' => $authorizationDataHelper,
-            'articleDataHelper' => $articleDataHelper,
-            'crosstabDataHelper' => new CrosstabDataHelper($this->application, $authorizationDataHelper),
-            'designDataHelper' => new DesignDataHelper($this->application),
-            'eventDataHelper' => new EventDataHelper($this->application, $this->dataHelper),
-            'groupDataHelper' => new GroupDataHelper($this->application),
-            'logDataHelper' => new LogDataHelper($this->application, $this->dataHelper),
-            'messageDataHelper' => new MessageDataHelper(
-                $this->application,
-                new LanguagesDataHelper($this->application, $this->application->getErrorManager())
-            ),
-            'needDataHelper' => new NeedDataHelper($this->application),
-            'orderDataHelper' => new OrderDataHelper($this->application, $articleDataHelper, $authorizationDataHelper),
-            'participantDataHelper' => new ParticipantDataHelper($this->application),
-            'surveyDataHelper' => new SurveyDataHelper($this->application, $authorizationDataHelper),
-            'sharedFileDataHelper' => new SharedFileDataHelper($this->application),
-            'loanDataHelper' => new LoanDataHelper($this->application),
-            'languagesDataHelper' => new LanguagesDataHelper($this->application, $this->application->getErrorManager()),
-            'membershipDataHelper' => new MembershipDataHelper($this->application),
-        ];
+        return new DataHelpers(
+            articleDataHelper: $articleDataHelper,
+            authorizationDataHelper: $authorizationDataHelper,
+            crosstabDataHelper: new CrosstabDataHelper($this->application, $authorizationDataHelper),
+            dataHelper: $this->dataHelper,
+            designDataHelper: new DesignDataHelper($this->application),
+            eventDataHelper: new EventDataHelper($this->application, $this->dataHelper),
+            groupDataHelper: new GroupDataHelper($this->application),
+            languagesDataHelper: $languagesDataHelper,
+            loanDataHelper: new LoanDataHelper($this->application),
+            logDataHelper: new LogDataHelper($this->application, $this->dataHelper),
+            memberImportDataHelper: new MemberImportDataHelper($this->application),
+            membershipDataHelper: new MembershipDataHelper($this->application),
+            messageDataHelper: new MessageDataHelper($this->application, $languagesDataHelper),
+            needDataHelper: new NeedDataHelper($this->application),
+            orderDataHelper: new OrderDataHelper($this->application, $articleDataHelper, $authorizationDataHelper),
+            participantDataHelper: new ParticipantDataHelper($this->application),
+            sharedFileDataHelper: new SharedFileDataHelper($this->application),
+            surveyDataHelper: new SurveyDataHelper($this->application, $authorizationDataHelper),
+        );
     }
 
-    /**
-     * @param array{
-     *     authorizationDataHelper: AuthorizationDataHelper,
-     *     articleDataHelper: ArticleDataHelper,
-     *     crosstabDataHelper: CrosstabDataHelper,
-     *     designDataHelper: DesignDataHelper,
-     *     eventDataHelper: EventDataHelper,
-     *     groupDataHelper: GroupDataHelper,
-     *     logDataHelper: LogDataHelper,
-     *     messageDataHelper: MessageDataHelper,
-     *     needDataHelper: NeedDataHelper,
-     *     orderDataHelper: OrderDataHelper,
-     *     participantDataHelper: ParticipantDataHelper,
-     *     surveyDataHelper: SurveyDataHelper,
-     *     sharedFileDataHelper: SharedFileDataHelper,
-     *     loanDataHelper: LoanDataHelper,
-     *     languagesDataHelper: LanguagesDataHelper,
-     *     membershipDataHelper: MembershipDataHelper,
-     * } $dataHelpers
-     * @return array{
-     *     emailService: EmailService,
-     *     personPreferences: PersonPreferences,
-     *     personDataHelper: PersonDataHelper,
-     *     authenticationService: AuthenticationService,
-     *     notificationSender: NotificationSender,
-     *     mediaManager: MediaManager,
-     *     news: News,
-     * }
-     */
-    private function buildServices(array $dataHelpers): array
+    private function buildServices(DataHelpers $dataHelpers): Services
     {
-        $emailService = new EmailService(
-            new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
-            $this->quotaTracker
-        );
-        $personPreferences = new PersonPreferences($this->dataHelper);
-        $personDataHelper = new PersonDataHelper($this->application, $personPreferences, $emailService);
-
-        $newsProviders = [
-            $dataHelpers['articleDataHelper'],
-            $dataHelpers['eventDataHelper'],
-            $dataHelpers['messageDataHelper'],
-            $personDataHelper,
-            $dataHelpers['surveyDataHelper'],
-        ];
-
         $authenticationService = new AuthenticationService(
             new MemberDataHelper($this->application),
             Application::$root
         );
         $this->application->setAuthenticationService($authenticationService);
 
-        $notificationSender = new NotificationSender($this->dataHelper, CredentialService::getInstance());
-        $mediaManager = new MediaManager(
-            $this->dataHelper,
-            $dataHelpers['sharedFileDataHelper'],
-            $dataHelpers['languagesDataHelper']
-        );
-
-        return [
-            'emailService' => $emailService,
-            'personPreferences' => $personPreferences,
-            'personDataHelper' => $personDataHelper,
-            'authenticationService' => $authenticationService,
-            'notificationSender' => $notificationSender,
-            'mediaManager' => $mediaManager,
-            'news' => new News($newsProviders),
+        $newsProviders = [
+            $dataHelpers->articleDataHelper,
+            $dataHelpers->eventDataHelper,
+            $dataHelpers->messageDataHelper,
+            new PresentationNewsDataHelper($this->application),
+            $dataHelpers->surveyDataHelper,
         ];
+
+        return new Services(
+            authenticationService: $authenticationService,
+            emailService: new EmailService(
+                new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
+                $this->quotaTracker
+            ),
+            mediaManager: new MediaManager(
+                $this->dataHelper,
+                $dataHelpers->sharedFileDataHelper,
+                $dataHelpers->languagesDataHelper
+            ),
+            memberCsvImporter: new MemberCsvImporter($dataHelpers->memberImportDataHelper),
+            news: new News($newsProviders),
+            notificationSender: new NotificationSender($this->dataHelper, CredentialService::getInstance()),
+            personDataHelper: new PersonDataHelper($this->application),
+            personPreferences: new PersonPreferences($this->dataHelper),
+        );
     }
 
-    /**
-     * @param array{
-     *     authorizationDataHelper: AuthorizationDataHelper,
-     *     articleDataHelper: ArticleDataHelper,
-     *     crosstabDataHelper: CrosstabDataHelper,
-     *     designDataHelper: DesignDataHelper,
-     *     eventDataHelper: EventDataHelper,
-     *     groupDataHelper: GroupDataHelper,
-     *     logDataHelper: LogDataHelper,
-     *     messageDataHelper: MessageDataHelper,
-     *     needDataHelper: NeedDataHelper,
-     *     orderDataHelper: OrderDataHelper,
-     *     participantDataHelper: ParticipantDataHelper,
-     *     surveyDataHelper: SurveyDataHelper,
-     *     sharedFileDataHelper: SharedFileDataHelper,
-     *     loanDataHelper: LoanDataHelper,
-     *     languagesDataHelper: LanguagesDataHelper,
-     *     membershipDataHelper: MembershipDataHelper,
-     * } $dataHelpers
-     * @param array{
-     *     emailService: EmailService,
-     *     personPreferences: PersonPreferences,
-     *     personDataHelper: PersonDataHelper,
-     *     authenticationService: AuthenticationService,
-     *     notificationSender: NotificationSender,
-     *     mediaManager: MediaManager,
-     *     news: News,
-     * } $services
-     */
-    private function buildFactories(array $dataHelpers, array $services): void
+    private function buildFactories(DataHelpers $dataHelpers, Services $services): void
     {
         $this->controllerFactory = new ControllerFactory(
+            new AlertRecipientDataHelper($this->application, $services->personDataHelper, $services->personPreferences),
             $this->application,
-            new ArticleCrosstabDataHelper($this->application, $dataHelpers['crosstabDataHelper']),
-            $dataHelpers['articleDataHelper'],
-            new ArticleService(new CarouselDataHelper($this->application), $services['mediaManager'], $this->dataHelper),
+            new ArticleCrosstabDataHelper($this->application, $dataHelpers->crosstabDataHelper),
+            $dataHelpers->articleDataHelper,
+            new ArticleService(new CarouselDataHelper($this->application), $services->mediaManager, $this->dataHelper),
             new ArticleTableDataHelper($this->application),
-            $services['authenticationService'],
+            $services->authenticationService,
             new Backup(),
             new CarouselDataHelper($this->application),
-            new CrosstabDataHelper($this->application, $dataHelpers['authorizationDataHelper']),
+            new CrosstabDataHelper($this->application, $dataHelpers->authorizationDataHelper),
             new DbBrowserDataHelper($this->application),
-            $dataHelpers['designDataHelper'],
-            $services['emailService'],
+            $dataHelpers->designDataHelper,
+            $services->emailService,
             new ErrorManager($this->application),
-            $dataHelpers['eventDataHelper'],
+            $dataHelpers->eventDataHelper,
             new EventTypeDataHelper($this->application),
             new ExerciseTableDataHelper($this->application),
-            $dataHelpers['groupDataHelper'],
+            $dataHelpers->groupDataHelper,
             new KanbanDataHelper($this->application),
-            $dataHelpers['loanDataHelper'],
-            $dataHelpers['logDataHelper'],
+            $dataHelpers->loanDataHelper,
+            $dataHelpers->logDataHelper,
+            new MemberCsvImporter($dataHelpers->memberImportDataHelper),
+            new MemberCustomFields($dataHelpers->dataHelper),
             new MemberDataHelper($this->application),
-            $dataHelpers['membershipDataHelper'],
-            $dataHelpers['messageDataHelper'],
+            new MemberDirectoryDataHelper($this->application),
+            new MemberMapService(new GravatarHandler()),
+            $dataHelpers->membershipDataHelper,
+            $dataHelpers->messageDataHelper,
             new MetadataDataHelper($this->application),
-            $dataHelpers['needDataHelper'],
-            $services['news'],
-            $services['notificationSender'],
-            $dataHelpers['orderDataHelper'],
-            $dataHelpers['participantDataHelper'],
-            $services['personDataHelper'],
+            $dataHelpers->needDataHelper,
+            $services->news,
+            $services->notificationSender,
+            $dataHelpers->orderDataHelper,
+            $dataHelpers->participantDataHelper,
+            $services->personDataHelper,
             new PersonGroupDataHelper($this->application),
             new PersonStatisticsDataHelper($this->application),
-            $dataHelpers['sharedFileDataHelper'],
-            $dataHelpers['surveyDataHelper'],
+            new RegistrationLinkService(new ContactDataHelper($this->application), $services->emailService),
+            $dataHelpers->sharedFileDataHelper,
+            $dataHelpers->surveyDataHelper,
             new TableControllerDataHelper($this->application),
             new WebApp(),
         );
 
         $this->apiFactory = new ApiFactory(
+            new AlertRecipientDataHelper($this->application, $services->personDataHelper, $services->personPreferences),
             $this->application,
             new AttributeDataHelper($this->application),
-            $dataHelpers['authorizationDataHelper'],
+            $dataHelpers->authorizationDataHelper,
             new AvailabilityDataHelper($this->application),
             new CarouselDataHelper($this->application),
             $this->application->getConnectedUser(),
-            $dataHelpers['designDataHelper'],
-            $services['emailService'],
-            $dataHelpers['eventDataHelper'],
+            $dataHelpers->designDataHelper,
+            $services->emailService,
+            $dataHelpers->eventDataHelper,
             new EventNeedDataHelper($this->application),
-            new EventService($dataHelpers['eventDataHelper']),
+            new EventService($dataHelpers->eventDataHelper),
+            new GravatarHandler(),
             $this->quotaTracker,
             new KanbanDataHelper($this->application),
             new KaraokeDataHelper($this->application),
-            $dataHelpers['languagesDataHelper'],
-            $dataHelpers['loanDataHelper'],
-            $dataHelpers['logDataHelper'],
+            $dataHelpers->languagesDataHelper,
+            $dataHelpers->loanDataHelper,
+            $dataHelpers->logDataHelper,
             new LogWriterDataHelper($this->application, $this->application->getErrorManager()),
-            $services['mediaManager'],
-            $dataHelpers['membershipDataHelper'],
-            new MenuItemDataHelper($this->application, $dataHelpers['authorizationDataHelper']),
-            $dataHelpers['messageDataHelper'],
-            new MessageRecipientService($this->dataHelper),
-            $dataHelpers['needDataHelper'],
-            new NeedTypeDataHelper($this->application),
-            $services['notificationSender'],
-            $dataHelpers['participantDataHelper'],
-            $services['personDataHelper'],
+            $services->mediaManager,
+            new MemberCustomFields($dataHelpers->dataHelper),
             new MemberDataHelper($this->application),
+            new MemberOdsImporter($dataHelpers->memberImportDataHelper, $dataHelpers->languagesDataHelper),
+            $dataHelpers->membershipDataHelper,
+            new MenuItemDataHelper($this->application, $dataHelpers->authorizationDataHelper),
+            $dataHelpers->messageDataHelper,
+            new MessageRecipientService($this->dataHelper),
+            $dataHelpers->needDataHelper,
+            new NeedTypeDataHelper($this->application),
+            $services->notificationSender,
+            $dataHelpers->participantDataHelper,
+            $services->personDataHelper,
         );
     }
 }

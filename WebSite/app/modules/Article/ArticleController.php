@@ -14,6 +14,7 @@ use app\helpers\Backup;
 use app\helpers\GravatarHandler;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
+use app\models\AlertRecipientDataHelper;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
@@ -35,7 +36,6 @@ use app\modules\Common\services\MessageService;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\viewModels\ChatViewModel;
 use app\modules\Common\viewModels\CrosstabViewModel;
-use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Common\viewModels\TableIndexViewModel;
 use app\modules\Common\viewModels\TopItemsByPeriodViewModel;
 
@@ -54,7 +54,8 @@ final class ArticleController extends TableController
         private readonly MessageDataHelper $messageDataHelper,
         private readonly EmailService $emailService,
         private readonly LogDataHelper $logDataHelper,
-        private readonly ArticleService $articleService
+        private readonly ArticleService $articleService,
+        private readonly AlertRecipientDataHelper $alertRecipientDataHelper,
     ) {
         parent::__construct($application);
         $this->authorizationService = new ArticleAuthorizationService(
@@ -286,7 +287,7 @@ final class ArticleController extends TableController
             $this->raiseBadRequest($msg, __FILE__, __LINE__);
             return;
         }
-        $filteredEmails = $this->personDataHelper->getPersonWantedToBeAlerted($idArticle);
+        $filteredEmails = $this->alertRecipientDataHelper->getPersonWantedToBeAlerted($idArticle);
         $root = Application::$root;
         $articleLink = $root . '/article/' . $idArticle;
         $unsubscribeLink = $root . '/user/preferences';

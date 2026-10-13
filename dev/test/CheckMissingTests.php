@@ -19,19 +19,32 @@ function main(): int
         return 1;
     }
 
-    $missing = (new TestCoverageChecker($appDir, $testsDir, Data::class))->findMissing();
+    $checker = new TestCoverageChecker($appDir, $testsDir, Data::class);
+    $missing = $checker->findMissing();
+    $uncovered = $checker->findUncovered();
 
     if ($missing !== []) {
-        fwrite(STDERR, "❌ Classes sans test unitaire (héritage ou injection de DataHelper) :\n\n");
+        fwrite(STDERR, "❌ Classes without a unit test (inheritance or DataHelper usage):\n\n");
         foreach ($missing as $m) {
             $relative = ltrim(substr($m->expectedTestPath, strlen($projectRoot)), '/');
-            fwrite(STDERR, "  - {$m->className}\n");
-            fwrite(STDERR, "    -> {$relative}\n\n");
+            fwrite(STDERR, "  - {$m->className}\n    -> {$relative}\n\n");
         }
+    }
+
+    if ($uncovered !== []) {
+        fwrite(STDERR, "❌ Tests not covering all queried tables/columns:\n\n");
+        foreach ($uncovered as $u) {
+            $relative = ltrim(substr($u->testPath, strlen($projectRoot)), '/');
+            $cols = $u->columns === [] ? '(table not asserted)' : implode(', ', $u->columns);
+            fwrite(STDERR, "  - {$u->className}  [{$u->table}] missing: {$cols}\n    -> {$relative}\n\n");
+        }
+    }
+
+    if ($missing !== [] || $uncovered !== []) {
         return 1;
     }
 
-    fwrite(STDERR, "✅ Toutes les classes concernées ont leur test.\n");
+    fwrite(STDERR, "✅ All relevant classes have complete tests.\n");
     return 0;
 }
 

@@ -24,8 +24,7 @@ final class CommunicationController extends AbstractController
             $connectedUser = $this->application->getConnectedUser();
             $userEmail = $connectedUser->person->Email ?? '';
 
-            $contactEmailRow = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value');
-            $contactEmail = ($contactEmailRow !== false && isset($contactEmailRow->Value)) ? $contactEmailRow->Value : '';
+            $contactEmail = $this->dataHelper->getSetting('contactEmail', '');
 
             $viewModel = new CommunicationEditViewModel(
                 groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),

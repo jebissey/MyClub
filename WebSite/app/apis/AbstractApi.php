@@ -12,6 +12,7 @@ use flight\net\Response;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
@@ -40,6 +41,28 @@ abstract class AbstractApi
         $this->logWriterDataHelper = new LogWriterDataHelper($application, $application->getErrorManager());
         $this->t = fn(string $key): string => $this->languagesDataHelper->translate($key);
     }
+
+    /**
+     * Form fields of a request sent as application/x-www-form-urlencoded or multipart/form-data
+     * (e.g. FormData with a file upload). Counterpart of getJsonInput() for non-JSON bodies.
+     *
+     * @return array<mixed>
+     */
+    protected function getFormInput(): array
+    {
+        return $_POST;
+    }
+
+    protected function getFormString(string $key, string $default = ''): string
+    {
+        return To::str($this->getFormInput()[$key] ?? $default);
+    }
+
+    protected function getFormInt(string $key, int $default = 0): int
+    {
+        return To::int($this->getFormInput()[$key] ?? $default);
+    }
+
 
     /**
      * @return array<string, mixed>
@@ -113,15 +136,15 @@ abstract class AbstractApi
         );
     }
 
-    protected function renderJsonError(string $message, int $statusCode, string $file, int $line): void
+    protected function renderJsonError(string $message, string $file, int $line): void
     {
-        Flight::set('code', $statusCode);
+        Flight::set('code', ApplicationError::Error->value);
         Flight::set('message', $message);
 
         $this->renderJson(
             [],
             false,
-            $statusCode,
+            ApplicationError::Error->value,
             "{$message} in file {$file} at line {$line}"
         );
     }

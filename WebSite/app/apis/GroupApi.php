@@ -53,7 +53,7 @@ final class GroupApi extends AbstractApi
             $success = $this->dataHelper->set('MemberGroup', ['IdMember' => $personId, 'IdGroup' => $groupId]) !== false;
             $this->renderJson([], $success, $success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -70,7 +70,7 @@ final class GroupApi extends AbstractApi
         try {
             $this->renderJsonOk(['items' => $this->personDataHelper->getPersonsInGroup($id)]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -95,7 +95,7 @@ final class GroupApi extends AbstractApi
             $success = $this->dataHelper->delete('MemberGroup', ['IdMember' => $personId, 'IdGroup' => $groupId]) === 1;
             $this->renderJson([], $success, $success ? ApplicationError::Ok->value : ApplicationError::BadRequest->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 }

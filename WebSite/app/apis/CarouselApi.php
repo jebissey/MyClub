@@ -54,7 +54,7 @@ final class CarouselApi extends AbstractApi
             $this->dataHelper->delete('Carousel', ['Id' => $id]);
             $this->renderJsonOk(['message' => 'Élément supprimé avec succès']);
         } catch (Throwable $e) {
-            $this->renderJsonError('error' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError('error' . $e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -74,7 +74,7 @@ final class CarouselApi extends AbstractApi
         } catch (QueryException $e) {
             $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         } catch (Throwable $e) {
-            $this->renderJsonError('error' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError('error' . $e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -113,7 +113,7 @@ final class CarouselApi extends AbstractApi
             $message = $this->carouselDataHelper->addOrUpdate($payload, $item);
             $this->renderJsonOk(['message' => $message]);
         } catch (Throwable $e) {
-            $this->renderJsonError('error' . $e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError('error' . $e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 }

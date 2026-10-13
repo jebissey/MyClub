@@ -109,13 +109,33 @@
                             </ul>
                         </div>
                     </div>
+                {if $isRegistered && count($carpoolData) > 0}
+                    <div class="accordion mb-3" id="carpoolAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#carpoolCollapse"
+                                        aria-expanded="false" aria-controls="carpoolCollapse">
+                                    <i class="bi bi-car-front me-2"></i>{='event.carpooling'|translate}
+                                    <span class="badge bg-secondary ms-2">{count($carpoolData)}</span>
+                                </button>
+                            </h2>
+                            <div id="carpoolCollapse" class="accordion-collapse collapse"
+                                 data-bs-parent="#carpoolAccordion">
+                                <div class="accordion-body">
+                                    <div id="carpoolMap" style="height: 400px; width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
                 </div>
                 
                 <div class="col-md-6">
                 {if $userEmail !== '' || $token !== ''}
                     <div class="card mb-3">
                         <div class="card-header">
-                            <strong>Participants:</strong> 
+                            <strong>{='event.participants'|translate}</strong>
                             {count($participants)}{if $event->MaxParticipants > 0} / {$event->MaxParticipants}{/if}
                         </div>
                         <div class="card-body">
@@ -190,7 +210,7 @@
 
                             <button class="btn btn-dark js-ical-calendar"
                                     {if $isCanceled}disabled{/if}>
-                                <i class="bi bi-apple me-1"></i> <i class="bi bi-android2 me-2"></i> Calendrier
+                                <i class="bi bi-apple me-1"></i> <i class="bi bi-android2 me-2"></i> {='event.calendar_app'|translate}
                             </button>
                         </div>
                         {if $isCanceled}
@@ -321,5 +341,14 @@
 {/block}
 
 {block scripts}
+    {if $isRegistered && count($carpoolData) > 0}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        const carpoolData = {$carpoolData};
+        const carpoolMaxZoom = {$carpoolMaxZoom};
+    </script>
+    <script type="module" src="{='/app/modules/Event/js/detail/carpoolMap.js'|version}"></script>
+    {/if}
     <script type="module" src="{='/app/modules/Event/js/detail/main.js'|version}"></script>
 {/block}

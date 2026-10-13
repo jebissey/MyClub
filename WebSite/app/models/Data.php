@@ -277,10 +277,12 @@ abstract class Data
     }
 
     /** @param array<int|string, mixed> $parameters */
-    public function query(string $sql, array $parameters = []): mixed
+    public function query(string $sql, array $parameters = [], bool $usePdoForLog = false): mixed
     {
+        $pdo = $usePdoForLog ? $this->pdoForLog : $this->pdo;
+
         try {
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = $pdo->prepare($sql);
             $result = $stmt->execute($parameters);
             if (!$result) {
                 return false;
@@ -290,7 +292,7 @@ abstract class Data
                 case 'SELECT':
                     return $stmt->fetchAll(PDO::FETCH_OBJ);
                 case 'INSERT':
-                    return $this->pdo->lastInsertId();
+                    return $pdo->lastInsertId();
                 case 'UPDATE':
                 case 'DELETE':
                     return $stmt->rowCount();
@@ -414,5 +416,18 @@ abstract class Data
             throw new RuntimeException('La requête SQL a échoué.');
         }
         return $stmt->fetchColumn($column);
+    }
+
+    /**
+     * @param array<int, string> $values
+     */
+    public function count(string $table, array $values = [], bool $usePdoForLog = false): int
+    {
+        $pdo = $usePdoForLog ? $this->pdoForLog : $this->pdo;
+        $count = "SELECT COUNT(*) FROM ({$table}) AS sub";
+        $stmt = $pdo->prepare($count);
+        $stmt->execute($values);
+
+        return (int) $stmt->fetchColumn();
     }
 }

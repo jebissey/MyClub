@@ -13,6 +13,7 @@ use app\enums\Period;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 use app\helpers\To;
+use app\modules\Common\valueObjects\MemberBasicRow;
 
 final class LogDataHelper extends Data
 {
@@ -90,7 +91,7 @@ final class LogDataHelper extends Data
     #region Last visits
 
     /**
-     * @param array<int, stdClass> $activePersons
+    * @param list<MemberBasicRow> $activePersons
      * @return array<int, stdClass>
      */
     public function getLastVisitPerActivePersonWithTimeAgo(array $activePersons): array
@@ -135,7 +136,7 @@ final class LogDataHelper extends Data
     }
 
     /**
-     * @param array<int, stdClass> $activePersons
+     * @param list<MemberBasicRow> $activePersons
      * @return array<int, stdClass>
      */
     private function getLastVisitPerActivePerson(array $activePersons): array

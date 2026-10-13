@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\modules\User;
 
-use stdClass;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
@@ -123,15 +122,15 @@ final class UserStatisticsController extends AbstractController
     }
 
     /**
-     * @param  array<int|string, object{Email: string}>  $members
+     * @param  list<string>              $memberEmails Email addresses of active members
      * @param  array<string, int|string> $rawCounts
      * @return array<string, int>
      */
-    private function normalizeMemberCounts(array $members, array $rawCounts): array
+    private function normalizeMemberCounts(array $memberEmails, array $rawCounts): array
     {
         $result = [];
-        foreach ($members as $member) {
-            $result[$member->Email] = (int) ($rawCounts[$member->Email] ?? 0);
+        foreach ($memberEmails as $email) {
+            $result[$email] = (int) ($rawCounts[$email] ?? 0);
         }
         return $result;
     }

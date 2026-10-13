@@ -33,13 +33,16 @@ class LogDataHelperTest extends DataHelperTestCase
         $mainPdo = $this->openDatabaseCopyOrSkip();
 
         $this->assertColumnsExist($mainPdo, 'Individual', [
+            'Id',
             'Email',
+            'Avatar',
             'FirstName',
             'LastName',
         ]);
 
         $this->assertColumnsExist($mainPdo, 'Member', [
             'Id',
+            'UseGravatar',
         ]);
     }
 

@@ -18,16 +18,19 @@ class MessageApiTest extends DataHelperTestCase
         ]);
 
         $this->assertColumnsExist($pdo, 'Article', [
+            'Id',
             'CreatedBy',
             'Title',
         ]);
 
         $this->assertColumnsExist($pdo, 'Event', [
+            'Id',
             'CreatedBy',
             'Summary',
         ]);
 
         $this->assertColumnsExist($pdo, 'Group', [
+            'Id',
             'Name',
         ]);
     }

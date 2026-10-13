@@ -5,21 +5,28 @@ declare(strict_types=1);
 namespace app\apis;
 
 use RuntimeException;
+use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\MemberCustomFields;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
+use app\modules\PersonManager\services\MemberOdsImporter;
 
 final class ImportApi extends AbstractApi
 {
+    private const MAX_ODS_BYTES = 10 * 1024 * 1024;
+
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
         PersonDataHelper $personDataHelper,
-        LanguagesDataHelper $languagesDataHelper
+        LanguagesDataHelper $languagesDataHelper,
+        private readonly MemberOdsImporter $memberOdsImporter,
+        private readonly MemberCustomFields $memberCustomFields
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
@@ -43,78 +50,38 @@ final class ImportApi extends AbstractApi
         );
     }
 
+    /**
+     * POST /api/import/ods (fields: odsFile, dryRun)
+     * Responds with {success, message?, data?} as expected by exportForm.js.
+     */
     public function importOds(): void
     {
-        if (
-            !$this->userIsAllowedAndMethodIsGood(
-                'POST',
-                fn($u) => $u->isPersonManager(),
-                __FILE__,
-                __LINE__
-            )
-        ) {
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             return;
         }
 
-        $file = $_FILES['odsFile'] ?? null;
-
-        $tmpName = is_array($file) && is_string($file['tmp_name'] ?? null)
-            ? $file['tmp_name']
-            : '';
-
-        $fileName = is_array($file) && is_string($file['name'] ?? null)
-            ? $file['name']
-            : '';
-
-        $uploadError = is_array($file) && is_int($file['error'] ?? null)
-            ? $file['error']
-            : UPLOAD_ERR_NO_FILE;
-
-        if (
-            $uploadError !== UPLOAD_ERR_OK
-            || $tmpName === ''
-            || !is_uploaded_file($tmpName)
-        ) {
-            $this->renderJsonBadRequest(
-                ($this->t)('export.import.error.no_file'),
-                __FILE__,
-                __LINE__
-            );
+        $path = $this->uploadedOdsPath();
+        if ($path === null) {
+            $this->renderJsonBadRequest(($this->t)('import.error.invalid_file'), __FILE__, __LINE__);
             return;
         }
 
-        if (strtolower(pathinfo($fileName, PATHINFO_EXTENSION)) !== 'ods') {
-            $this->renderJsonBadRequest(
-                ($this->t)('export.import.error.wrong_type'),
-                __FILE__,
-                __LINE__
-            );
-            return;
-        }
-
-        $dryRun = (
-            $this->application->getFlight()->request()->data->getData()['dryRun'] ?? ''
-        ) === '1';
+        $dryRun = $this->getFormString('dryRun', '0') === '1';
 
         try {
-            $results = $this->personDataHelper->importFromOdsFile(
-                $tmpName,
+            $data = $this->memberOdsImporter->import(
+                $path,
+                $this->memberCustomFields->loadCustomDefinitions(),
                 $this->t,
-                $dryRun
+                dryRun: $dryRun
             );
+            $this->renderJsonOk($data);
         } catch (RuntimeException $e) {
-            error_log('ODS import: ' . $e->getMessage());
-
-            $this->renderJsonError(
-                ($this->t)('export.import.error.invalid_file'),
-                ApplicationError::UnprocessableEntity->value,
-                $e->getFile(),
-                $e->getLine()
-            );
-            return;
+            // Unreadable or invalid file (not an ODS, too many rows, ...)
+            $this->renderJson([], false, ApplicationError::UnprocessableEntity->value, ($this->t)('export.import.error.wrong_type'));
+        } catch (Throwable $e) {
+            $this->renderJsonError(($this->t)('export.import.error.generic'), __FILE__, __LINE__);
         }
-
-        $this->renderJsonOk($results);
     }
 
     #region Private functions
@@ -158,5 +125,29 @@ final class ImportApi extends AbstractApi
         return ['headers' => $headers];
     }
 
+    /** Returns the temporary path of a valid uploaded .ods file, or null. */
+    private function uploadedOdsPath(): ?string
+    {
+        $file = $_FILES['odsFile'] ?? null;
+        if (!is_array($file)) {
+            return null;
+        }
+
+        $name = $file['name'] ?? null;
+        $tmpName = $file['tmp_name'] ?? null;
+        $error = $file['error'] ?? null;
+        $size = $file['size'] ?? null;
+
+        if (
+            !is_string($name) || !is_string($tmpName) || $tmpName === ''
+            || $error !== UPLOAD_ERR_OK
+            || !is_int($size) || $size > self::MAX_ODS_BYTES
+            || strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'ods'
+        ) {
+            return null;
+        }
+
+        return $tmpName;
+    }
     #endregion
 }

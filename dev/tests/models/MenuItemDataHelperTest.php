@@ -17,8 +17,14 @@ class MenuItemDataHelperTest extends DataHelperTestCase
             'ParentId',
             'IdGroup',
             'ForMembers',
+            'ForContacts',
             'ForAnonymous',
             'Url',
+            'Position',
+            'What',
+            'Type',
+            'Label',
+            'Icon',
         ]);
 
         $this->assertColumnsExist($pdo, 'Group', [

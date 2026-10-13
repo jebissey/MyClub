@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use app\enums\CustomFieldType;
+use app\models\DataHelper;
 use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
 use DateTimeImmutable;
 
-final class MemberCustomFields
+final readonly class MemberCustomFields
 {
     public const SETTING_KEY = 'Member_Custom_Fields';
     private const LABEL_MAX_LENGTH = 100;
     private const TEXT_MAX_LENGTH = 1000;
+
+    public function __construct(private DataHelper $dataHelper)
+    {
+    }
 
     /** @return list<CustomFieldDefinition> */
     public static function parseDefinitions(string $json): array
@@ -216,6 +221,14 @@ final class MemberCustomFields
             return self::isValidDate($text) ? $text : null;
         }
         return mb_substr($text, 0, self::TEXT_MAX_LENGTH);
+    }
+
+    /** @return list<CustomFieldDefinition> */
+    public function loadCustomDefinitions(): array
+    {
+        return self::parseDefinitions(
+            $this->dataHelper->getSetting(MemberCustomFields::SETTING_KEY, '[]')
+        );
     }
 
     private static function isValidDate(string $value): bool

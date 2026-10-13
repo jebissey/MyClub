@@ -33,7 +33,9 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
 use app\helpers\MediaManager;
+use app\helpers\MemberCustomFields;
 use app\helpers\NotificationSender;
+use app\models\AlertRecipientDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\AvailabilityDataHelper;
@@ -60,11 +62,12 @@ use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
-use app\modules\Event\services\AuthorizationService;
+use app\modules\PersonManager\services\MemberOdsImporter;
 
 final readonly class ApiFactory
 {
     public function __construct(
+        private AlertRecipientDataHelper $alertRecipientDataHelper,
         private Application $application,
         private AttributeDataHelper $attributeDataHelper,
         private AuthorizationDataHelper $authorizationDataHelper,
@@ -76,6 +79,7 @@ final readonly class ApiFactory
         private EventDataHelper $eventDataHelper,
         private EventNeedDataHelper $eventNeedDataHelper,
         private EventService $eventService,
+        private GravatarHandler $gravatarHandler,
         private JsonEmailQuotaTracker $quotaTracker,
         private KanbanDataHelper $kanbanDataHelper,
         private KaraokeDataHelper $karaokeDataHelper,
@@ -84,6 +88,9 @@ final readonly class ApiFactory
         private LogDataHelper $logDataHelper,
         private LogWriterDataHelper $logWriterDataHelper,
         private MediaManager $mediaManager,
+        private MemberCustomFields $memberCustomFields,
+        private MemberDataHelper $memberDataHelper,
+        private MemberOdsImporter $memberOdsImporter,
         private MembershipDataHelper $membershipDataHelper,
         private MenuItemDataHelper $menuItemDataHelper,
         private MessageDataHelper $messageDataHelper,
@@ -93,7 +100,6 @@ final readonly class ApiFactory
         private NotificationSender $notificationSender,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
-        private MemberDataHelper $memberDataHelper,
     ) {
     }
 
@@ -128,7 +134,7 @@ final readonly class ApiFactory
             $this->languagesDataHelper,
             $this->personDataHelper,
             $this->logDataHelper,
-            new GravatarHandler(),
+            $this->gravatarHandler,
             $this->messageDataHelper,
             $this->memberDataHelper,
         );
@@ -150,12 +156,12 @@ final readonly class ApiFactory
     {
         return new EventApi(
             $this->application,
-            new AuthorizationService($this->connectedUser),
             $this->eventDataHelper,
             $this->eventService,
             $this->participantDataHelper,
             $this->messageDataHelper,
             $this->emailService,
+            $this->alertRecipientDataHelper,
             $this->connectedUser,
             $this->personDataHelper,
             $this->languagesDataHelper,
@@ -256,7 +262,9 @@ final readonly class ApiFactory
             $this->application,
             $this->connectedUser,
             $this->personDataHelper,
-            $this->languagesDataHelper
+            $this->languagesDataHelper,
+            $this->memberOdsImporter,
+            $this->memberCustomFields
         );
     }
 

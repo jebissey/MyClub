@@ -17,11 +17,6 @@ final readonly class ConnectedUser
     ) {
     }
 
-    public function isConnected(): bool
-    {
-        return true;
-    }
-
     public function hasAuthorization(Authorization $authorization): bool
     {
         return in_array($authorization->value, $this->authorizations, true);
@@ -50,6 +45,11 @@ final readonly class ConnectedUser
     public function isCommunicationManager(): bool
     {
         return $this->hasAuthorization(Authorization::CommunicationManager);
+    }
+
+    public function isConnected(): bool
+    {
+        return true;
     }
 
     public function isDesigner(): bool
@@ -141,6 +141,7 @@ final readonly class ConnectedUser
     {
         return $this->hasAuthorization(Authorization::Webmaster);
     }
+
 
     public function hasAuthorizationAny(): bool
     {

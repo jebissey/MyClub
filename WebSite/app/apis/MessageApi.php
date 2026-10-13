@@ -116,7 +116,7 @@ final class MessageApi extends AbstractApi
 
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -135,7 +135,7 @@ final class MessageApi extends AbstractApi
             $apiResponse = $this->doDeleteMessage(To::int($data['messageId']), $this->application->getConnectedUser()->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -156,9 +156,8 @@ final class MessageApi extends AbstractApi
 
             $messageId = To::int($data['messageId'] ?? 0);
             if ($messageId <= 0) {
-                $this->renderJsonError(
+                $this->renderJsonBadRequest(
                     "messageId invalide",
-                    ApplicationError::BadRequest->value,
                     __FILE__,
                     __LINE__
                 );
@@ -178,7 +177,6 @@ final class MessageApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -214,7 +212,7 @@ final class MessageApi extends AbstractApi
             );
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 

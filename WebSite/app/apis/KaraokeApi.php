@@ -42,11 +42,11 @@ final class KaraokeApi extends AbstractApi
         $clientId = To::str($requestParam['clientId'] ?? '');
 
         if (empty($songId)) {
-            $this->renderJsonError('Song ID required', ApplicationError::BadRequest->value, __FILE__, __LINE__);
+            $this->renderJsonBadRequest('Song ID required', __FILE__, __LINE__);
             return;
         }
         if (empty($clientId)) {
-            $this->renderJsonError('Client ID required', ApplicationError::BadRequest->value, __FILE__, __LINE__);
+            $this->renderJsonBadRequest('Client ID required', __FILE__, __LINE__);
             return;
         }
 
@@ -79,7 +79,7 @@ final class KaraokeApi extends AbstractApi
                 break;
 
             default:
-                $this->renderJsonError('Invalid action', ApplicationError::BadRequest->value, __FILE__, __LINE__);
+                $this->renderJsonBadRequest('Invalid action', __FILE__, __LINE__);
                 break;
         }
     }
@@ -140,13 +140,13 @@ final class KaraokeApi extends AbstractApi
     {
         $session = $this->karaokeDataHelper->getSessionBySessionId($this->sessionId);
         if (!$session) {
-            $this->renderJsonError('Session not found', ApplicationError::PageNotFound->value, __FILE__, __LINE__);
+            $this->renderJsonBadRequest('Session not found', __FILE__, __LINE__);
             return;
         }
 
         $sessionDbId = (int)$session->Id;
         if (!$this->karaokeDataHelper->isClientHost($clientId, $sessionDbId)) {
-            $this->renderJsonError('Not host', ApplicationError::Forbidden->value, __FILE__, __LINE__);
+            $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
 

@@ -14,6 +14,7 @@ use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
+use app\modules\Common\services\RegistrationLinkService;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\User\valueObjects\EventRegistrationRow;
 
@@ -28,6 +29,7 @@ final class ContactController extends AbstractController
         Application $application,
         private readonly EmailService $emailService,
         private readonly PersonDataHelper $personDataHelper,
+        private readonly RegistrationLinkService $registrationLinkService,
         private readonly WebApp $webApp,
         private readonly CredentialService $credentials
     ) {
@@ -191,7 +193,7 @@ final class ContactController extends AbstractController
 
     private function sendContactMessage(string $name, string $email, string $message, ?int $eventId): void
     {
-        $contactEmail = $this->dataHelper->get('Settings', ['Name' => 'contactEmail'], 'Value')->Value ?? '';
+        $contactEmail = $this->dataHelper->getSetting('contactEmail', '');
         if ($contactEmail === '') {
             $contactEmail = $this->personDataHelper->getWebmasterEmail();
         }
@@ -207,7 +209,7 @@ final class ContactController extends AbstractController
                 $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
                 return;
             }
-            $emailSent = $this->personDataHelper->sendRegistrationLink(
+            $emailSent = $this->registrationLinkService->send(
                 $contactEmail,
                 $name,
                 $email,

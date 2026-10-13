@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace tests\modules\Common\services;
 
+use DateTime;
 use PHPUnit\Framework\TestCase;
 use app\exceptions\EmailException;
 use app\helpers\Password;
 use app\models\interfaces\MemberDataHelperInterface;
 use app\modules\Common\services\AuthenticationService;
+use app\modules\Common\valueObjects\IdentityRow;
+use app\modules\Common\valueObjects\ResetTokenRow;
+use app\modules\Common\valueObjects\SignInRow;
 
 final class AuthenticationServiceTest extends TestCase
 {
@@ -80,18 +84,18 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testHandleSignInSuccess(): void
     {
-        $row = (object) [
-            'Id' => 42,
-            'Email' => 'user@example.com',
-            'FirstName' => 'Jean',
-            'LastName' => 'Dupont',
-            'NickName' => null,
-            'Avatar' => null,
-            'Password' => Password::signPassword('validpassword'),
-            'Inactivated' => 0,
-            'UseGravatar' => 'no',
-            'Alert' => null,
-        ];
+        $row = new SignInRow(
+            Id: 42,
+            Email: 'user@example.com',
+            FirstName: 'Jean',
+            LastName: 'Dupont',
+            NickName: null,
+            Avatar: null,
+            Password: Password::signPassword('validpassword'),
+            Inactivated: false,
+            UseGravatar: false,
+            Alert: null,
+        );
 
         $memberDataHelper = $this->createMock(MemberDataHelperInterface::class);
         $memberDataHelper->expects($this->once())
@@ -116,18 +120,18 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testHandleSignInFailsWhenUserInactivated(): void
     {
-        $row = (object) [
-            'Id' => 42,
-            'Email' => 'user@example.com',
-            'FirstName' => 'Jean',
-            'LastName' => 'Dupont',
-            'NickName' => null,
-            'Avatar' => null,
-            'Password' => Password::signPassword('validpassword'),
-            'Inactivated' => 1,
-            'UseGravatar' => 'no',
-            'Alert' => null,
-        ];
+        $row = new SignInRow(
+            Id: 42,
+            Email: 'user@example.com',
+            FirstName: 'Jean',
+            LastName: 'Dupont',
+            NickName: null,
+            Avatar: null,
+            Password: Password::signPassword('validpassword'),
+            Inactivated: true,
+            UseGravatar: false,
+            Alert: null,
+        );
 
         $memberDataHelper = $this->createStub(MemberDataHelperInterface::class);
         $memberDataHelper->method('findForSignIn')->willReturn($row);
@@ -146,18 +150,18 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testHandleSignInFailsWithWrongPassword(): void
     {
-        $row = (object) [
-            'Id' => 42,
-            'Email' => 'user@example.com',
-            'FirstName' => 'Jean',
-            'LastName' => 'Dupont',
-            'NickName' => null,
-            'Avatar' => null,
-            'Password' => Password::signPassword('correctpassword'),
-            'Inactivated' => 0,
-            'UseGravatar' => 'no',
-            'Alert' => null,
-        ];
+        $row = new SignInRow(
+            Id: 42,
+            Email: 'user@example.com',
+            FirstName: 'Jean',
+            LastName: 'Dupont',
+            NickName: null,
+            Avatar: null,
+            Password: Password::signPassword('correctpassword'),
+            Inactivated: false,
+            UseGravatar: false,
+            Alert: null,
+        );
 
         $memberDataHelper = $this->createStub(MemberDataHelperInterface::class);
         $memberDataHelper->method('findForSignIn')->willReturn($row);
@@ -187,15 +191,18 @@ final class AuthenticationServiceTest extends TestCase
     {
         $_COOKIE['rememberMe'] = 'valid-token';
 
-        $row = (object) [
-            'Id' => 42,
-            'Email' => 'user@example.com',
-            'FirstName' => 'Jean',
-            'LastName' => 'Dupont',
-            'NickName' => null,
-            'Avatar' => null,
-            'Inactivated' => 0,
-        ];
+        $row = new SignInRow(
+            Id: 42,
+            Email: 'user@example.com',
+            FirstName: 'Jean',
+            LastName: 'Dupont',
+            NickName: null,
+            Avatar: null,
+            Inactivated: false,
+            Password: Password::signPassword('correctpassword'),
+            UseGravatar: false,
+            Alert: null,
+        );
 
         $memberDataHelper = $this->createMock(MemberDataHelperInterface::class);
         $memberDataHelper->expects($this->once())
@@ -263,10 +270,10 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testResetPasswordFailsWhenTokenExpired(): void
     {
-        $member = (object) [
-            'Id' => 42,
-            'TokenCreatedAt' => (new \DateTime('-2 hours'))->format('Y-m-d H:i:s'),
-        ];
+        $member = new ResetTokenRow(
+            Id: 42,
+            TokenCreatedAt: (new DateTime('-2 hours'))->format('Y-m-d H:i:s'),
+        );
 
         $memberDataHelper = $this->createStub(MemberDataHelperInterface::class);
         $memberDataHelper->method('findByResetToken')->willReturn($member);
@@ -279,10 +286,10 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testResetPasswordSuccess(): void
     {
-        $member = (object) [
-            'Id' => 42,
-            'TokenCreatedAt' => (new \DateTime())->format('Y-m-d H:i:s'),
-        ];
+        $member = new ResetTokenRow(
+            Id: 42,
+            TokenCreatedAt: (new DateTime())->format('Y-m-d H:i:s'),
+        );
 
         $memberDataHelper = $this->createMock(MemberDataHelperInterface::class);
         $memberDataHelper->method('findByResetToken')->willReturn($member);
@@ -293,7 +300,7 @@ final class AuthenticationServiceTest extends TestCase
                 42,
                 $this->callback(
                     fn($password) =>
-                        is_string($password) && $password !== 'newpassword123'
+                    is_string($password) && $password !== 'newpassword123'
                 )
             );
 
@@ -320,16 +327,14 @@ final class AuthenticationServiceTest extends TestCase
 
     public function testPrepareForgotPasswordEmailStoresTokenAndBuildsMessage(): void
     {
-        $row = (object) [
-            'Id' => 42,
-            'Email' => 'user@example.com',
-            'FirstName' => 'Jean',
-            'LastName' => 'Dupont',
-            'NickName' => null,
-            'Avatar' => null,
-            'UseGravatar' => 'no',
-            'Alert' => null,
-        ];
+        $row = new IdentityRow(
+            Id: 42,
+            Email: 'user@example.com',
+            FirstName: 'Jean',
+            LastName: 'Dupont',
+            NickName: null,
+            Avatar: null,
+        );
 
         $memberDataHelper = $this->createMock(MemberDataHelperInterface::class);
         $memberDataHelper->method('findBasicByEmail')->willReturn($row);

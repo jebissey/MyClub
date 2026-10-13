@@ -49,7 +49,7 @@ final class EventAttributeApi extends AbstractApi
             [$response, $statusCode] = $this->attributeDataHelper->insert($data);
             $this->renderJson($response, true, $statusCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -67,7 +67,7 @@ final class EventAttributeApi extends AbstractApi
             [$response, $statusCode] = $this->attributeDataHelper->deleteAttribute($id);
             $this->renderJson($response, true, $statusCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -101,7 +101,7 @@ final class EventAttributeApi extends AbstractApi
         try {
             $this->renderJsonOk(['attributes' => $this->attributeDataHelper->getAttributesOf($eventTypeId)]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -129,7 +129,7 @@ final class EventAttributeApi extends AbstractApi
             $this->attributeDataHelper->update($data);
             $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 }

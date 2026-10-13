@@ -8,6 +8,7 @@ use test\CodingStandards\Analysis\PropertyAnalyzer;
 use test\CodingStandards\Analysis\TerminalCallAnalyzer;
 use test\CodingStandards\Rules\ApisRule;
 use test\CodingStandards\Rules\ControllersRule;
+use test\CodingStandards\Rules\DatabaseAccessRule;
 use test\CodingStandards\Rules\FinalClassesRule;
 use test\CodingStandards\Rules\FinalReadonlyRule;
 use test\CodingStandards\Rules\ReadonlyPropertiesRule;
@@ -36,6 +37,7 @@ final readonly class CodingStandardsChecker
                 new FinalClassesRule($paths, $dedicated),
                 new ControllersRule($paths, new TerminalCallAnalyzer()),
                 new ApisRule($paths),
+                new DatabaseAccessRule($paths),
                 new ReadonlyPropertiesRule($paths, new PropertyAnalyzer(), $dedicated),
             ],
             (new ClassScanner())->scan($appDir),

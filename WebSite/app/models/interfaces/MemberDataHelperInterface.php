@@ -4,68 +4,28 @@ declare(strict_types=1);
 
 namespace app\models\interfaces;
 
+use app\modules\Common\valueObjects\IdentityRow;
+use app\modules\Common\valueObjects\MemberBasicRow;
+use app\modules\Common\valueObjects\ResetTokenRow;
+use app\modules\Common\valueObjects\SignInRow;
+
 interface MemberDataHelperInterface
 {
-    /**
-     * @return (object{
-     *     Id: int,
-     *     Email: string,
-     *     FirstName: string,
-     *     LastName: string|null,
-     *     NickName: string|null,
-     *     Avatar: string|null,
-     *     Password: string|null,
-     *     Inactivated: mixed,
-     *     UseGravatar: mixed,
-     *     Alert: mixed
-     * }&\stdClass)|false
-     */
-    public function findForSignIn(string $email): object|false;
+    public function findForSignIn(string $email): SignInRow|false;
+
+    public function findByRememberToken(string $token): IdentityRow|false;
+
+    public function findBasicByEmail(string $email): IdentityRow|false;
+
+    public function findByResetToken(string $token): ResetTokenRow|false;
 
     /**
-     * @return (object{
-     *     Id: int,
-     *     Email: string,
-     *     FirstName: string,
-     *     LastName: string|null,
-     *     NickName: string|null,
-     *     Avatar: string|null
-     * }&\stdClass)|false
-     */
-    public function findByRememberToken(string $token): object|false;
-
-    /**
-     * @return (object{
-     *     Id: int,
-     *     Email: string,
-     *     FirstName: string,
-     *     LastName: string|null,
-     *     NickName: string|null,
-     *     Avatar: string|null
-     * }&\stdClass)|false
-     */
-    public function findBasicByEmail(string $email): object|false;
-
-    /**
-     * @return object{Id: int, TokenCreatedAt: string|null}|false
-     */
-    public function findByResetToken(string $token): object|false;
-
-    /**
-     * @return list<object{Email: string}>
+     * @return list<string>
      */
     public function getActiveMemberEmails(): array;
 
     /**
-     * @return list<object{
-     *     Id: int,
-     *     NickName: string|null,
-     *     FirstName: string,
-     *     LastName: string|null,
-     *     Email: string,
-     *     Avatar: string|null,
-     *     UseGravatar: mixed
-     * }&\stdClass>
+     * @return list<MemberBasicRow>
      */
     public function getActiveMembersBasicInfo(): array;
 

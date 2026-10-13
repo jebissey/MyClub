@@ -34,9 +34,8 @@ final class MediaApi extends AbstractApi
             if ($result->success) {
                 $this->renderJsonOk(['message' => $result->message]);
             } else {
-                $this->renderJsonError(
+                $this->renderJsonBadRequest(
                     $result->message ?? '',
-                    ApplicationError::BadRequest->value,
                     $result->file ?? '',
                     $result->line ?? 0
                 );
@@ -53,9 +52,8 @@ final class MediaApi extends AbstractApi
             $maxSize   = min(To::int($data['maxSize'] ?? 1200), 1200);
 
             if (!preg_match('#^[\w/-]+\.(jpg|jpeg|png|gif)$#i', $path)) {
-                $this->renderJsonError(
+                $this->renderJsonBadRequest(
                     'Invalid path',
-                    ApplicationError::BadRequest->value,
                     __FILE__,
                     __LINE__
                 );
@@ -64,9 +62,8 @@ final class MediaApi extends AbstractApi
 
             $fullPath = MediaManager::GetMediaPath() . '/' . $path;
             if (!file_exists($fullPath)) {
-                $this->renderJsonError(
+                $this->renderJsonBadRequest(
                     'File not found',
-                    ApplicationError::BadRequest->value,
                     __FILE__,
                     __LINE__
                 );
@@ -74,9 +71,8 @@ final class MediaApi extends AbstractApi
             }
 
             if (!preg_match('#^data:image/(\w+);base64,#', $imageData, $m)) {
-                $this->renderJsonError(
+                $this->renderJsonBadRequest(
                     'Invalid image data',
-                    ApplicationError::BadRequest->value,
                     __FILE__,
                     __LINE__
                 );
@@ -85,9 +81,8 @@ final class MediaApi extends AbstractApi
             $binary = base64_decode(preg_replace('#^data:image/\w+;base64,#', '', $imageData) ?? '');
             $img    = imagecreatefromstring($binary);
             if (!$img) {
-                $this->renderJsonError(
+                $this->renderJsonBadRequest(
                     'Cannot decode image',
-                    ApplicationError::BadRequest->value,
                     __FILE__,
                     __LINE__
                 );

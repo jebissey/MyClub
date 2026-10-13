@@ -71,7 +71,7 @@ final class NotificationApi extends AbstractApi
             }
             $this->renderJsonCreated();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -103,7 +103,7 @@ final class NotificationApi extends AbstractApi
             }
             $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 }

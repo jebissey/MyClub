@@ -18,8 +18,6 @@ use app\modules\Common\valueObjects\Person;
 final class ConnectedUser
 {
     public ?ConnectedUserVO $user = null;
-
-    /** Conservé pour la compatibilité et la lisibilité (API plate) */
     public ?Person $person = null;
 
     public function __construct(
@@ -144,6 +142,57 @@ final class ConnectedUser
         );
     }
 
+    private function getHref(string $userEmail): string
+    {
+        return $userEmail === '' ? '/user/sign/in' : '/user';
+    }
+
+    public function getLastSignIn(): ?string
+    {
+        if ($this->person === null) {
+            return null;
+        }
+
+        $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignIn');
+        return $row !== false ? ($row->LastSignIn ?? null) : null;
+    }
+
+    public function getLastSignOut(): ?string
+    {
+        if ($this->person === null) {
+            return null;
+        }
+
+        $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignOut');
+        return $row !== false ? ($row->LastSignOut ?? null) : null;
+    }
+
+    public function getPage(int $segment = 0): ?string
+    {
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        $requestUri = is_string($requestUri) ? $requestUri : '';
+        $path = trim((string) (parse_url($requestUri, PHP_URL_PATH) ?: ''), '/');
+        $segments = explode('/', $path);
+
+        return $segments[$segment] ?? null;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->person->Id ?? 0;
+    }
+
+    public function hasAutorization(): bool
+    {
+        return $this->user?->hasAuthorizationAny() ?? false;
+    }
+
+    public function hasOnlyOneAutorization(): bool
+    {
+        return $this->user?->hasOnlyOneAuthorization() ?? false;
+    }
+
+
     public function isAnybody(): bool
     {
         return true;
@@ -158,8 +207,6 @@ final class ConnectedUser
     {
         return $this->user !== null;
     }
-
-    // === Délégation vers le Value Object ===
 
     public function isAdministrator(): bool
     {
@@ -254,52 +301,5 @@ final class ConnectedUser
     public function isWebmaster(): bool
     {
         return $this->user?->isWebmaster() ?? false;
-    }
-
-    public function hasAutorization(): bool
-    {
-        return $this->user?->hasAuthorizationAny() ?? false;
-    }
-
-    public function hasOnlyOneAutorization(): bool
-    {
-        return $this->user?->hasOnlyOneAuthorization() ?? false;
-    }
-
-    // === Méthodes qui restent dans le helper ===
-
-    public function getLastSignIn(): ?string
-    {
-        if ($this->person === null) {
-            return null;
-        }
-
-        $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignIn');
-        return $row !== false ? ($row->LastSignIn ?? null) : null;
-    }
-
-    public function getLastSignOut(): ?string
-    {
-        if ($this->person === null) {
-            return null;
-        }
-
-        $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignOut');
-        return $row !== false ? ($row->LastSignOut ?? null) : null;
-    }
-
-    public function getPage(int $segment = 0): ?string
-    {
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
-        $requestUri = is_string($requestUri) ? $requestUri : '';
-        $path = trim((string) (parse_url($requestUri, PHP_URL_PATH) ?: ''), '/');
-        $segments = explode('/', $path);
-
-        return $segments[$segment] ?? null;
-    }
-
-    private function getHref(string $userEmail): string
-    {
-        return $userEmail === '' ? '/user/sign/in' : '/user';
     }
 }

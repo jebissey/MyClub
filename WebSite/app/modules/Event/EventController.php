@@ -17,9 +17,12 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
 use app\models\EventDataHelper;
-use app\models\ParticipantDataHelper;
+use app\models\MemberDirectoryDataHelper;
 use app\models\MessageDataHelper;
+use app\models\ParticipantDataHelper;
+use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\services\MemberMapService;
 use app\modules\Event\viewModels\EventChatViewModel;
 use app\modules\Event\viewModels\EventCrosstabViewModel;
 use app\modules\Event\viewModels\EventDetailViewModel;
@@ -39,6 +42,8 @@ final class EventController extends AbstractController
         private readonly CrosstabDataHelper $crosstabDataHelper,
         private readonly ParticipantDataHelper $participantDataHelper,
         private readonly MessageDataHelper $messageDataHelper,
+        private readonly MemberDirectoryDataHelper $memberDirectoryDataHelper,
+        private readonly MemberMapService $memberMapService,
     ) {
         parent::__construct($application);
     }
@@ -183,6 +188,21 @@ final class EventController extends AbstractController
         }
 
         $userEmail = $person->Email ?? '';
+        $participants = $this->participantDataHelper->getEventParticipants($eventId);
+        $isRegistered = $this->eventDataHelper->isUserRegistered($eventId, $userEmail);
+
+        // Carpooling map: only for registered users, restricted to the event participants
+        $carpoolData = [];
+        if ($isRegistered) {
+            // Contacts (ContactId) have no location: only members (PersonId) are considered
+            $memberIds = array_values(array_map(
+                static fn(object $participant): int => (int) $participant->PersonId,
+                array_filter($participants, static fn(object $participant): bool => (bool) $participant->PersonId)
+            ));
+            $carpoolData = $this->memberMapService->getLocationData(
+                $this->memberDirectoryDataHelper->getLocatedMembers($memberIds)
+            );
+        }
 
         $viewModel = new EventDetailViewModel(
             eventId: $eventId,
@@ -196,8 +216,8 @@ final class EventController extends AbstractController
                 ),
                 array_values($this->eventDataHelper->getEventAttributes($eventId))
             ),
-            participants: $this->participantDataHelper->getEventParticipants($eventId),
-            isRegistered: $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
+            participants: $participants,
+            isRegistered: $isRegistered,
             countOfMessages: count($this->dataHelper->gets('Message', [
                 '"From"' => 'User',
                 'EventId' => $eventId
@@ -206,6 +226,8 @@ final class EventController extends AbstractController
             participantSupplies: array_values($this->eventDataHelper->getParticipantSupplies($eventId)),
             userSupplies: array_values($this->eventDataHelper->getUserSupplies($eventId, $userEmail)),
             token: $token,
+            carpoolData: $carpoolData,
+            carpoolMaxZoom: 12,
             message: $message,
             messageType: $messageType,
             layoutParams: $this->getAllParams([]),

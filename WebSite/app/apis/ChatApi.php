@@ -58,7 +58,7 @@ final class ChatApi extends AbstractApi
             $visitPerson = new Person(
                 Id: (int) $visit->PersonId,
                 Email: $visit->Email ?? '',
-                UseGravatar: ($visit->UseGravatar ?? null) === 'yes',
+                UseGravatar: To::bool($visit->UseGravatar ?? null),
                 Avatar: $visit->Avatar ?? null,
             );
 

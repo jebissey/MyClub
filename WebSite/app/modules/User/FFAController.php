@@ -7,20 +7,22 @@ namespace app\modules\User;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\FFAScraper;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
 final class FFAController extends AbstractController
 {
-    public function __construct(
-        Application $application,
-    ) {
+    public function __construct(Application $application)
+    {
         parent::__construct($application);
     }
 
     public function searchMember(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
+        $connectedUser = $this->application->getConnectedUser();
+        $person = $connectedUser->person;
+        if ($person === null) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
@@ -28,14 +30,14 @@ final class FFAController extends AbstractController
             $this->raiseMethodNotAllowed(__FILE__, __LINE__);
             return;
         }
-        $person = $this->application->getConnectedUser()->person;
+
         $schema = [
             'firstName' => FilterInputRule::PersonName->value,
-            'lastName' => FilterInputRule::PersonName->value,
-            'question' => FilterInputRule::HtmlSafeName->value,
-            'year' => FilterInputRule::Int->value,
-            'club' => FilterInputRule::HtmlSafeName->value,
-            'page' => $this->application->getConnectedUser()->getPage() ?? '',
+            'lastName'  => FilterInputRule::PersonName->value,
+            'question'  => FilterInputRule::HtmlSafeName->value,
+            'year'      => FilterInputRule::Int->value,
+            'club'      => FilterInputRule::HtmlSafeName->value,
+            'page'      => $connectedUser->getPage() ?? '',
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
 
@@ -46,24 +48,22 @@ final class FFAController extends AbstractController
         $question = $input['question'] ?? 'rank';
         /** @var string $year */
         $year = $input['year'] ?? date('Y');
-        $club = $input['club'] ?? $this->dataHelper->get('Settings', ['Name' => 'FFA_club'], 'Value')->Value ?? '???';
-        $results = [];
+        $club = $input['club'] ?? $this->dataHelper->getSetting('FFA_club', '???');
+
         $ffaScraper = new FFAScraper();
-        if ($question == 'rank') {
-            $results = $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club);
-        } else {
-            $results = $ffaScraper->searchAthleteResults($firstName, $lastName, $year, $club);
-        }
+        $results = $question === 'rank'
+            ? $ffaScraper->searchAthleteRank($firstName, $lastName, $year, To::str($club))
+            : $ffaScraper->searchAthleteResults($firstName, $lastName, $year, To::str($club));
 
         $this->render('User/views/ffaSearch.latte', $this->getAllParams([
             'firstName' => $firstName,
-            'lastName' => $lastName,
-            'question' => $question,
-            'results' => $results,
-            'navItems' => $this->getNavItems($person),
-            'year' => $year,
-            'club' => $club,
-            'page' => $this->application->getConnectedUser()->getPage()
+            'lastName'  => $lastName,
+            'question'  => $question,
+            'results'   => $results,
+            'navItems'  => $this->getNavItems($person),
+            'year'      => $year,
+            'club'      => $club,
+            'page'      => $connectedUser->getPage(),
         ]));
     }
 }

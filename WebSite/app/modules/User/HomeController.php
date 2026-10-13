@@ -95,8 +95,8 @@ final class HomeController extends AbstractController
                 $connectedUser->person?->Alert
             );
         }
-        $latestArticlesCount = (int) ($this->dataHelper->get('Settings', ['Name' => 'Home_LatestArticlesCount'], 'Value')->Value ?? 10);
-        $featuredArticleId   = (int) ($this->dataHelper->get('Settings', ['Name' => 'Home_FeaturedArticleId'], 'Value')->Value ?? 0);
+        $latestArticlesCount = (int) $this->dataHelper->getSetting('Home_LatestArticlesCount', '10');
+        $featuredArticleId   = (int) $this->dataHelper->getSetting('Home_FeaturedArticleId', '0');
         $homeHeader          = $this->dataHelper->get('Languages', ['Name' => 'Home_Header'], $lang)->$lang ?? '';
         $homeFooter          = $this->dataHelper->get('Languages', ['Name' => 'Home_Footer'], $lang)->$lang ?? '';
         $articles            = $this->articleDataHelper->getLatestArticles($userEmail, $latestArticlesCount);
@@ -133,13 +133,7 @@ final class HomeController extends AbstractController
             ) ?: null;
         }
 
-        $footerArticleId = (int) (
-            $this->dataHelper->get(
-                'Settings',
-                ['Name' => 'Home_FooterArticleId'],
-                'Value'
-            )->Value ?? 0
-        );
+        $footerArticleId = (int) $this->dataHelper->getSetting('Home_FooterArticleId', '0');
 
         $footerArticle = $footerArticleId > 0
             ? $this->dataHelper->get('Article', ['Id' => $footerArticleId], 'Title, Content') ?: null
@@ -183,16 +177,10 @@ final class HomeController extends AbstractController
             pendingDesigns: $userPendingDesigns,
             news: $news,
             carouselItems: $carouselItems,
-            homeParagraphsCount: (int) (
-                $this->dataHelper->get(
-                    'Settings',
-                    ['Name' => 'Home_FeaturedArticleParagraphs'],
-                    'Value'
-                )->Value ?? 1
-            ),
+            homeParagraphsCount: (int) $this->dataHelper->getSetting('Home_FeaturedArticleParagraphs', '1'),
             footerArticle: $footerArticle,
             layoutParams: $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
+                'page' => $connectedUser->getPage(),
             ]),
         );
 
@@ -214,10 +202,10 @@ final class HomeController extends AbstractController
         $user = $this->application->getConnectedUser();
 
         $this->render('Common/views/signpost.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($user->person),
-            'title'   => 'Que souhaitez-vous faire ?',
-            'page'    => $user->getPage(),
-            'user'    => $user,
+            'navItems'        => $this->getNavItems($user->person),
+            'title'           => ($this->t)('home.signpost.title'),
+            'page'            => $user->getPage(),
+            'user'            => $user,
             'btn_HistoryBack' => true,
         ]));
     }

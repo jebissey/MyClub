@@ -66,7 +66,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to create card: ' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -104,7 +103,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to delete card' .  $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -204,7 +202,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to update card :' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -246,7 +243,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to update card status :' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -289,7 +285,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to create project: ' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -327,7 +322,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to delete project: ' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -355,7 +349,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to get project : ' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -399,7 +392,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to update project' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -447,7 +439,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to create project' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -487,7 +478,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to delete cardType' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -513,7 +503,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 "Failed to get project's cards : " . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -536,7 +525,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 "Failed to get project's card types : " . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );
@@ -583,7 +571,6 @@ final class KanbanApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'Failed to update cardType' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );

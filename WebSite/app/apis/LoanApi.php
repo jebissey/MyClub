@@ -204,9 +204,8 @@ final class LoanApi extends AbstractApi
                 empty($data['id']) ? null : To::int($data['id'])
             );
             if ($available < To::int($data['quantity'])) {
-                $this->renderJsonError(
+                $this->renderJsonBadRequest(
                     'Requested quantity exceeds available stock.',
-                    409,
                     __FILE__,
                     __LINE__
                 );

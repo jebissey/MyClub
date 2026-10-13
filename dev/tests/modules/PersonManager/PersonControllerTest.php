@@ -12,7 +12,7 @@ class PersonControllerTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        // Individual : get()/set() dans edit(), editSave()
+        // Individual: get()/set() in edit(), editSave()
         $this->assertColumnsExist($pdo, 'Individual', [
             'Id',
             'Email',
@@ -20,17 +20,18 @@ class PersonControllerTest extends DataHelperTestCase
             'LastName',
         ]);
 
-        // Member : set() dans activate()/delete(), get()/set() dans edit(), editSave()
+        // Member: set() in activate()/delete(), get()/set() in edit(), editSave()
         $this->assertColumnsExist($pdo, 'Member', [
             'Id',
             'Inactivated',
             'Imported',
             'Alert',
             'MemberInfo',
+            'CustomFields',
         ]);
 
-        // Languages : help() sélectionne dynamiquement la colonne de langue
-        // courante (fr_FR, en_US, pl_PL) via $this->dataHelper->get('Languages', ..., $lang)
+        // Languages: help() dynamically selects the column of the current language
+        // (fr_FR, en_US, pl_PL) via $this->dataHelper->get('Languages', ..., $lang)
         $this->assertColumnsExist($pdo, 'Languages', [
             'Name',
             'fr_FR',
@@ -38,15 +39,16 @@ class PersonControllerTest extends DataHelperTestCase
             'pl_PL',
         ]);
 
-        // Settings : membershipSettingsEdit()/Save() via getSetting()/setSetting()
-        // (méthodes de Data qui font elles-mêmes get('Settings', ...) / set('Settings', ...))
+        // Settings: membershipSettingsEdit()/Save() and the custom fields definitions
+        // via getSetting()/setSetting() (methods of Data that themselves call
+        // get('Settings', ...) / set('Settings', ...))
         $this->assertColumnsExist($pdo, 'Settings', [
             'Name',
             'Value',
         ]);
 
-        // NOTE : personDataHelper->create() et tableControllerDataHelper->
-        // getActivePersonsQuery()/getDesactivatedPersonsQuery() délèguent à des
-        // data helpers dédiés, à couvrir séparément dans leurs propres tests.
+        // NOTE: personDataHelper->create() and tableControllerDataHelper->
+        // getActivePersonsQuery()/getDesactivatedPersonsQuery() delegate to
+        // dedicated data helpers, to be covered separately in their own tests.
     }
 }

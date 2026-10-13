@@ -74,19 +74,14 @@
                     <div class="card h-100">
                         <div class="card-body text-center">
                             <a href="/user/presentation/{$person->Id}" class="text-decoration-none">
-                                {if $person->UseGravatar == 'yes' && $person->Email}
-                                <img src="{$person->UserImg}" class="img-fluid rounded-circle mt-2" style="max-width: 64px; max-height: 64px;"
-                                    alt="User gravatar">
-                                {elseif $person->Avatar}
-                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle mt-2"
-                                    style="font-size: 48px; width: 64px; height: 64px; line-height: 64px; text-align: center; background-color: #f0f0f0;">
-                                    {$person->UserImg}
-                                </span>
-                                {else}
-                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 48px; height: 48px;">
-                                    <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
+                                <div class="mt-2 mb-2">
+                                    {include '../../Common/views/partials/avatar.latte',
+                                        useGravatar: $person->UseGravatar,
+                                        email: $person->Email,
+                                        avatar: $person->Avatar,
+                                        userImg: $person->UserImg,
+                                        size: 64}
                                 </div>
-                                {/if}
 
                                 <h5 class="card-title">{$person->FirstName} {$person->LastName}</h5>
                                 {if $person->NickName}
@@ -121,4 +116,8 @@
         </div>
     {/if}
 </div>
+{/block}
+
+{block scripts}
+    <script type="module" src="{='/app/modules/User/js/directory.js'|version}"></script>
 {/block}

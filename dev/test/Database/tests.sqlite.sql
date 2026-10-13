@@ -975,7 +975,7 @@ WHERE i.Id = 2','[{"FirstName":"first name updated","LastName":"last name update
  (1112,NULL,'POST','/api/event/duplicate/1',NULL,'{}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','200',NULL,NULL),
  (1113,NULL,'GET','/api/event/needs/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL),
  (1114,NULL,'POST','/api/event/save',NULL,'{"id": "1", "formMode": "update"}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','200',NULL,NULL),
- (1115,NULL,'POST','/api/event/sendEmails',NULL,'{}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL),
+ (1115,NULL,'POST','/api/event/sendEmails',NULL,'{"EventId":1}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL),
  (1116,NULL,'POST','/api/event/updateSupply',NULL,'{"eventId":1, "needId":1, "supply":1}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL),
  (1117,NULL,'GET','/api/exercise/1',NULL,NULL,'{"email":"eventManager@myclub.foo","password":"eventManager1234" }','400',NULL,NULL),
  (1118,NULL,'POST','/api/exercise/delete/1',NULL,'{}','{"email":"eventManager@myclub.foo","password":"eventManager1234" }','403',NULL,NULL),

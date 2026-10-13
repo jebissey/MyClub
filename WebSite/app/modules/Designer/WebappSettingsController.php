@@ -17,14 +17,18 @@ final class WebappSettingsController extends AbstractController
     private readonly MetadataDataHelper $metadataDataHelper;
 
     /**
+     * Setting name => translation key of its label.
+     *
      * @var array<string, string>
      */
     private array $htmlSettingsKeys = [
-        'Home_Header' => 'En-tête de la page d\'accueil',
-        'Home_Footer' => 'Pied de page de la page d\'accueil',
+        'Home_Header' => 'designer.home_settings.header',
+        'Home_Footer' => 'designer.home_settings.footer',
     ];
 
     /**
+     * The optional "label" is a translation key.
+     *
      * @var array<string, array{
      *     label?: string,
      *     default: int,
@@ -34,19 +38,19 @@ final class WebappSettingsController extends AbstractController
      */
     private array $numericSettingsKeys = [
         'Home_LatestArticlesCount' => [
-            'label'   => 'Nombre de derniers articles à afficher',
+            'label'   => 'designer.home_settings.latest_articles_count',
             'default' => 10,
             'min'     => 0,
             'max'     => 50,
         ],
         'Home_FeaturedArticleId' => [
-            'label'   => "ID de l'article mis en avant (0 = dernier article)",
+            'label'   => 'designer.home_settings.featured_article_id',
             'default' => 0,
             'min'     => 0,
             'max'     => null,
         ],
         'Home_FeaturedArticleParagraphs' => [
-            'label'   => 'Nombre de paragraphes à afficher (0 = article entier)',
+            'label'   => 'designer.home_settings.featured_article_paragraphs',
             'default' => 0,
             'min'     => 0,
             'max'     => null,
@@ -91,43 +95,36 @@ final class WebappSettingsController extends AbstractController
 
         $lang     = TranslationManager::getCurrentLanguage();
         $settings = [];
-        foreach ($this->htmlSettingsKeys as $key => $label) {
+        foreach (array_keys($this->htmlSettingsKeys) as $key) {
             $result = $this->dataHelper->get('Languages', ['Name' => $key], $lang);
-            if ($result === false) {
-                $settings[$key] = '';
-            } else {
-                $settings[$key] = $result->$lang ?? '';
-            }
+            $settings[$key] = $result === false ? '' : ($result->$lang ?? '');
         }
         foreach ($this->numericSettingsKeys as $key => $config) {
-            $result = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
-            if ($result === false) {
-                $this->dataHelper->set('Settings', [
-                    'Name'  => $key,
-                    'Value' => (string) $config['default'],
-                ]);
-                $settings[$key] = $config['default'];
-            } else {
-                $settings[$key] = (int) ($result->Value ?? $config['default']);
-            }
+            $settings[$key] = (int) $this->dataHelper->getSetting($key, (string) $config['default']);
         }
         foreach ($this->colorSettingsKeys as $key => $config) {
-            $result = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
-            if ($result === false) {
-                $this->dataHelper->set('Settings', [
-                    'Name'  => $key,
-                    'Value' => $config['default'],
-                ]);
-                $settings[$key] = $config['default'];
-            } else {
-                $settings[$key] = $result->Value ?? $config['default'];
-            }
+            $settings[$key] = $this->dataHelper->getSetting($key, $config['default']);
         }
+
+        $htmlSettingsLabels = array_map(
+            fn(string $labelKey): string => ($this->t)($labelKey),
+            $this->htmlSettingsKeys
+        );
+        $numericSettings = array_map(
+            function (array $config): array {
+                if (isset($config['label'])) {
+                    $config['label'] = ($this->t)($config['label']);
+                }
+
+                return $config;
+            },
+            $this->numericSettingsKeys
+        );
 
         $this->render('Designer/views/webappSettings.latte', $this->getAllParams([
             'navItems'            => $this->getNavItems($this->application->getConnectedUser()->person),
-            'htmlSettingsKeys'    => $this->htmlSettingsKeys,
-            'numericSettingsKeys' => $this->numericSettingsKeys,
+            'htmlSettingsKeys'    => $htmlSettingsLabels,
+            'numericSettingsKeys' => $numericSettings,
             'settings'            => $settings,
             'page'                => $this->application->getConnectedUser()->getPage(),
             'supportedLanguages'  => TranslationManager::getSupportedLanguages(),
@@ -139,7 +136,6 @@ final class WebappSettingsController extends AbstractController
                 'imageProcessing' => ($this->t)('designer.home_settings.image_processing'),
                 'imageToSave'     => ($this->t)('designer.home_settings.image_to_save'),
                 'imageReadError'  => ($this->t)('designer.home_settings.image_read_error'),
-
             ],
         ]));
     }
@@ -165,7 +161,7 @@ final class WebappSettingsController extends AbstractController
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $lang = TranslationManager::getCurrentLanguage();
-        foreach ($this->htmlSettingsKeys as $key => $label) {
+        foreach (array_keys($this->htmlSettingsKeys) as $key) {
             $value    = $input[$key] ?? '';
             $existing = $this->dataHelper->get('Languages', ['Name' => $key], $lang);
             if ($existing === false) {
@@ -175,24 +171,12 @@ final class WebappSettingsController extends AbstractController
             }
         }
         foreach ($this->numericSettingsKeys as $key => $config) {
-            $value    = $input[$key] ?? $config['default'];
-            $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
-            $valueStr = To::str($value);
-            if ($existing === false) {
-                $this->dataHelper->set('Settings', ['Name' => $key, 'Value' => $valueStr]);
-            } else {
-                $this->dataHelper->set('Settings', ['Value' => $valueStr], ['Name' => $key]);
-            }
+            $this->dataHelper->setSetting($key, To::str($input[$key] ?? $config['default']));
         }
         foreach ($this->colorSettingsKeys as $key => $config) {
             $raw   = $input[$key] ?? $config['default'];
-            $value = (is_string($raw) && preg_match('/^#[0-9a-fA-F]{6}$/', $raw)) ? $raw : $config['default'];
-            $existing = $this->dataHelper->get('Settings', ['Name' => $key], 'Value');
-            if ($existing === false) {
-                $this->dataHelper->set('Settings', ['Name' => $key, 'Value' => $value]);
-            } else {
-                $this->dataHelper->set('Settings', ['Value' => $value], ['Name' => $key]);
-            }
+            $value = (is_string($raw) && preg_match('/^#[0-9a-fA-F]{6}$/', $raw) === 1) ? $raw : $config['default'];
+            $this->dataHelper->setSetting($key, $value);
         }
         foreach ($this->imageTargets as $field => $target) {
             $dataUrl = trim(To::str($input[$field] ?? ''));
@@ -216,7 +200,7 @@ final class WebappSettingsController extends AbstractController
         if ($commaPos === false) {
             return;
         }
-        $header  = substr($dataUrl, 5, $commaPos - 5);   // ex. "image/png;base64"
+        $header  = substr($dataUrl, 5, $commaPos - 5);   // e.g. "image/png;base64"
         $encoded = substr($dataUrl, $commaPos + 1);
 
         $parts = explode(';', $header);

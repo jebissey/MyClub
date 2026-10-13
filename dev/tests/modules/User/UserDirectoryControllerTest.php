@@ -15,6 +15,8 @@ class UserDirectoryControllerTest extends DataHelperTestCase
         $this->assertColumnsExist($pdo, 'Member', [
             'Id',
             'InPresentationDirectory',
+            'Inactivated',
+            'MyPublicDataInPresentationDirectory',
         ]);
 
         $this->assertColumnsExist($pdo, 'Group', [

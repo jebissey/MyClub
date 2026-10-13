@@ -16,9 +16,6 @@ use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\valueObjects\Person;
 use app\modules\User\valueObjects\AuthResult;
 
-/**
- * @phpstan-import-type PersonRow from Person
- */
 final readonly class AuthenticationService
 {
     public function __construct(
@@ -28,7 +25,7 @@ final readonly class AuthenticationService
     }
 
     /**
-     * @throws EmailException si l'adresse est inconnue
+     * @throws EmailException if the email address is unknown
      */
     public function prepareForgotPasswordEmail(string $email): EmailMessage
     {
@@ -38,7 +35,7 @@ final readonly class AuthenticationService
         }
 
         $token = bin2hex(random_bytes(32));
-        $this->memberDataHelper->setResetToken((int) $row->Id, $token);
+        $this->memberDataHelper->setResetToken($row->Id, $token);
 
         $resetLink = $this->baseUrl . '/user/setPassword/' . $token;
 
@@ -63,8 +60,7 @@ final readonly class AuthenticationService
             return null;
         }
 
-        /** @var PersonRow $row */
-        $person = Person::fromRow($row);
+        $person = $row->toPerson();
 
         $this->memberDataHelper->recordSignIn($person->Id);
 
@@ -110,7 +106,7 @@ final readonly class AuthenticationService
             return false;
         }
 
-        $this->memberDataHelper->finalizeReset((int) $member->Id, Password::signPassword($newPassword));
+        $this->memberDataHelper->finalizeReset($member->Id, Password::signPassword($newPassword));
 
         return true;
     }
@@ -138,7 +134,7 @@ final readonly class AuthenticationService
                 return AuthResult::error("Sign in failed: unknown email {$email}");
             }
 
-            if ((bool) ($row->Inactivated ?? false)) {
+            if ($row->Inactivated) {
                 return AuthResult::error("Sign in failed: inactivated user {$email}");
             }
 
@@ -146,10 +142,7 @@ final readonly class AuthenticationService
                 return AuthResult::error("Sign in failed: wrong password for {$email}");
             }
 
-            /** @var PersonRow $row */
-            $person = Person::fromRow($row);
-
-            return $this->loginUser($person, $rememberMe);
+            return $this->loginUser($row->toPerson(), $rememberMe);
         } catch (Throwable $e) {
             return AuthResult::error(
                 "Authentication error: {$e->getMessage()} in {$e->getFile()} at line {$e->getLine()}"

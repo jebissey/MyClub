@@ -16,11 +16,11 @@ final class ExportController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private readonly PersonDataHelper $personDataHelper
+        private readonly PersonDataHelper $personDataHelper,
+        private readonly MemberCustomFields $memberCustomFields
     ) {
         parent::__construct($application);
     }
-
 
     public function download(): void
     {
@@ -28,9 +28,7 @@ final class ExportController extends AbstractController
             return;
         }
 
-        $definitions = MemberCustomFields::parseDefinitions(
-            $this->dataHelper->getSetting(MemberCustomFields::SETTING_KEY, '[]')
-        );
+        $definitions = $this->memberCustomFields->loadCustomDefinitions();
 
         $header = [
             'Id',
@@ -74,9 +72,10 @@ final class ExportController extends AbstractController
         }
     }
 
-    #private functions
+    #region Private functions
     private function defaultFileName(): string
     {
         return ($this->t)('export.default_file_name') . '-' . date('Y-m-d');
     }
+    #endregion
 }

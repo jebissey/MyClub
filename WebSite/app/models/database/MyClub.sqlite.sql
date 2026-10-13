@@ -8504,10 +8504,22 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
 
     <a href="/" class="btn btn-primary mt-3">🏠 Powrót do strony głównej</a>
   </div>
-</div>');
+</div>'),
+ (1262,'event.carpooling','Carpooling','Covoiturage','Wspólne dojazdy'),
+ (1263,'event.participants','Participants:','Participants :','Uczestnicy:'),
+ (1264,'event.calendar_app','Calendar','Calendrier','Kalendarz'),
+ (1265,'user.map.title','Members map','Carte des membres','Mapa członków'),
+ (1266,'user.map.public_title','Public members map','Carte des membres publics','Mapa członków publicznych'),
+ (1267,'user.map.members_located','members located','membres localisés','członków zlokalizowanych'),
+ (1268,'designer.home_settings.header','Home page header','En-tête de la page d''accueil','Nagłówek strony głównej'),
+ (1269,'designer.home_settings.footer','Home page footer','Pied de page de la page d''accueil','Stopka strony głównej'),
+ (1270,'designer.home_settings.latest_articles_count','Number of latest articles to display','Nombre de derniers articles à afficher','Liczba ostatnich artykułów do wyświetlenia'),
+ (1271,'designer.home_settings.featured_article_id','Featured article ID (0 = latest article)','ID de l''article mis en avant (0 = dernier article)','ID wyróżnionego artykułu (0 = najnowszy artykuł)'),
+ (1272,'designer.home_settings.featured_article_paragraphs','Number of paragraphs to display (0 = whole article)','Nombre de paragraphes à afficher (0 = article entier)','Liczba akapitów do wyświetlenia (0 = cały artykuł)'),
+ (1273,'home.signpost.title','What would you like to do?','Que souhaitez-vous faire ?','Co chcesz zrobić?');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',91,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',92,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

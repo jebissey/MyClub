@@ -75,7 +75,6 @@ final class TranslatorApi extends AbstractApi
             if (!$success) {
                 $this->renderJsonError(
                     "Échec mise à jour",
-                    ApplicationError::Error->value,
                     __FILE__,
                     __LINE__
                 );
@@ -96,7 +95,6 @@ final class TranslatorApi extends AbstractApi
         } catch (Throwable $e) {
             $this->renderJsonError(
                 'error ' . $e->getMessage(),
-                ApplicationError::Error->value,
                 $e->getFile(),
                 $e->getLine()
             );

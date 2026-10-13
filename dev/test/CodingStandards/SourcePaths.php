@@ -12,6 +12,7 @@ final readonly class SourcePaths
     public const VIEW_MODELS = 'viewModels';
     public const APIS = 'apis';
     public const MODULES = 'modules';
+    public const MIGRATORS = 'migrators';
 
     public function __construct(private string $appDir)
     {

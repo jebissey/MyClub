@@ -342,17 +342,17 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
     /**
      * @return array<string, mixed>|null
      */
-    public function getSpotlightArticle(): mixed
+    public function getSpotlightArticle(): ?array
     {
-        $settingsRow = $this->get('Settings', ['Name' => 'SpotlightArticle'], 'Value');
-        if ($settingsRow === false) {
+        $json = $this->getSetting('SpotlightArticle', '');
+        if ($json === '') {
             return null;
         }
-        $spotlightArticleJson = To::str($settingsRow->Value ?? '');
-        /** @var array<string, mixed>|null $decoded */
-        $decoded = json_decode($spotlightArticleJson, true);
 
-        return $decoded;
+        /** @var array<string, mixed>|null $decoded */
+        $decoded = json_decode($json, true);
+
+        return is_array($decoded) ? $decoded : null;
     }
 
     /**
@@ -405,10 +405,8 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         if ($spotlight === null) {
             return false;
         }
-        $now = date('Y-m-d H:i:s');
-        $spotlightUntil = To::str($spotlight['spotlightUntil'] ?? '');
-
-        return strtotime($now) < strtotime($spotlightUntil);
+        $spotlightUntil = strtotime(To::str($spotlight['spotlightUntil'] ?? ''));
+        return $spotlightUntil !== false && time() < $spotlightUntil;
     }
 
     public function isUserAllowedToReadArticle(string $userEmail, int $id): bool
@@ -418,11 +416,10 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
 
     public function setSpotlightArticle(int $articleId, string $spotlightUntil): void
     {
-        $data = [
+        $this->setSetting('SpotlightArticle', json_encode([
             'articleId' => $articleId,
-            'spotlightUntil' => $spotlightUntil
-        ];
-        $this->set('Settings', ['Value' => json_encode($data)], ['Name' => 'SpotlightArticle']);
+            'spotlightUntil' => $spotlightUntil,
+        ], JSON_THROW_ON_ERROR));
     }
 
     #region Private functions

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Event\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\MemberMapMarker;
 use app\modules\Event\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\EventDetailRow;
 
@@ -27,6 +28,8 @@ final readonly class EventDetailViewModel extends LayoutViewModel
      * @param list<mixed> $eventNeeds No matching VO exists yet for this Need/EventNeed aggregate shape.
      * @param list<mixed> $participantSupplies No matching VO exists yet for this shape.
      * @param list<mixed> $userSupplies No matching VO exists yet for this shape.
+     * @param list<MemberMapMarker> $carpoolData Map markers of the registered members who can be located
+     *  (empty if the user is not registered).
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
@@ -40,6 +43,8 @@ final readonly class EventDetailViewModel extends LayoutViewModel
         public array $participantSupplies,
         public array $userSupplies,
         public string|false $token,
+        public array $carpoolData,
+        public int $carpoolMaxZoom,
         public string $message,
         public string $messageType,
         array $layoutParams = []

@@ -15,8 +15,9 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\modules\Event\interfaces\AuthorizationServiceInterface;
+use app\modules\Event\services\AuthorizationService;
 use app\modules\Common\interfaces\EventServiceInterface;
+use app\models\AlertRecipientDataHelper;
 use app\models\EventDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\MessageDataHelper;
@@ -36,12 +37,12 @@ final class EventApi extends AbstractApi
 {
     public function __construct(
         Application $application,
-        private readonly AuthorizationServiceInterface $authService,
         private readonly EventDataHelper $eventDataHelper,
         private readonly EventServiceInterface $eventService,
         private readonly ParticipantDataHelper $participantDataHelper,
         private readonly MessageDataHelper $messageDataHelper,
         private readonly EmailService $emailService,
+        private readonly AlertRecipientDataHelper $alertRecipientDataHelper,
         ConnectedUser $connectedUser,
         PersonDataHelper $personDataHelper,
         LanguagesDataHelper $languagesDataHelper
@@ -57,11 +58,11 @@ final class EventApi extends AbstractApi
         }
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             try {
-                $this->eventDataHelper->removeParticipant($id, $this->authService->getUserId());
+                $this->eventDataHelper->removeParticipant($id, $this->connectedUser->getUserId());
                 $apiResponse = new ApiResponse(true, ApplicationError::Ok->value);
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }
@@ -85,7 +86,7 @@ final class EventApi extends AbstractApi
                 );
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }
@@ -104,7 +105,7 @@ final class EventApi extends AbstractApi
                 ]);
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message ?? '');
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }
@@ -114,12 +115,12 @@ final class EventApi extends AbstractApi
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             try {
                 $data = $this->getJsonInput();
-                $this->eventDataHelper->update($data, $this->authService->getUserId());
+                $this->eventDataHelper->update($data, $this->connectedUser->getUserId());
                 $this->renderJsonOk();
             } catch (QueryException $e) {
                 $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }
@@ -130,7 +131,7 @@ final class EventApi extends AbstractApi
             $data = $this->getJsonInput();
             $eventId = To::int($data['EventId'] ?? null);
             if ($eventId === 0) {
-                $this->renderJsonError("Missing EvendId data", ApplicationError::BadRequest->value, __FILE__, __LINE__);
+                $this->renderJsonError("Missing EvendId data", __FILE__, __LINE__);
                 return;
             }
             try {
@@ -143,9 +144,9 @@ final class EventApi extends AbstractApi
                 );
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message ?? '');
             } catch (QueryException $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::BadRequest->value, $e->getFile(), $e->getLine());
+                $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }
@@ -161,7 +162,7 @@ final class EventApi extends AbstractApi
             $participants = []; //TODO
         } elseif ($recipients === 'all') {
             /** @var list<object{PersonId: int|string, Email: string|null}> $rows */
-            $rows = $this->personDataHelper->getInterestedPeople(
+            $rows = $this->alertRecipientDataHelper->getInterestedPeople(
                 $this->eventDataHelper->getEventGroup($event->Id),
                 $event->IdEventType,
                 (new DateTime($event->StartTime))->format('N') - 1,

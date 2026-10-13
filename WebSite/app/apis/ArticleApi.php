@@ -104,7 +104,7 @@ final class ArticleApi extends AbstractApi
                 ? json_encode($data['order_answers'], JSON_THROW_ON_ERROR)
                 : '[]';
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), __FILE__, __LINE__);
             return;
         }
         $this->orderReplyDataHelper->insertOrUpdate(
@@ -146,7 +146,7 @@ final class ArticleApi extends AbstractApi
                 ? json_encode($data['survey_answers'], JSON_THROW_ON_ERROR)
                 : '[]';
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, __FILE__, __LINE__);
+            $this->renderJsonError($e->getMessage(), __FILE__, __LINE__);
             return;
         }
         $this->replyDataHelper->insertOrUpdate(
@@ -195,12 +195,7 @@ final class ArticleApi extends AbstractApi
                 ]
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError(
-                $e->getMessage(),
-                ApplicationError::Error->value,
-                $e->getFile(),
-                $e->getLine()
-            );
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -242,12 +237,7 @@ final class ArticleApi extends AbstractApi
                 ]
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError(
-                $e->getMessage(),
-                ApplicationError::Error->value,
-                $e->getFile(),
-                $e->getLine()
-            );
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 }

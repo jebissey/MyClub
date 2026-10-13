@@ -10,6 +10,7 @@ use app\helpers\MemberCustomFields;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\PersonManager\services\MemberCsvImporter;
 use app\modules\PersonManager\viewModels\UsersImportViewModel;
 use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
 
@@ -19,6 +20,8 @@ use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
  */
 final class ImportController extends AbstractController
 {
+    private const SETTING_KEY = 'ImportPersonParameters';
+
     /** @var ImportSettings */
     private array $importSettings;
 
@@ -27,7 +30,9 @@ final class ImportController extends AbstractController
 
     public function __construct(
         Application $application,
-        private readonly PersonDataHelper $personDataHelper
+        private readonly PersonDataHelper $personDataHelper,
+        private readonly MemberCsvImporter $csvImporter,
+        private readonly MemberCustomFields $memberCustomFields
     ) {
         parent::__construct($application);
     }
@@ -72,8 +77,9 @@ final class ImportController extends AbstractController
 
         $postData = $this->flight->request()->data->getData();
         $rawColumns = is_array($postData['customColumn'] ?? null) ? $postData['customColumn'] : [];
+        $definitions = $this->memberCustomFields->loadCustomDefinitions();
         $customMapping = [];
-        foreach ($this->loadCustomDefinitions() as $definition) {
+        foreach ($definitions as $definition) {
             $column = $rawColumns[$definition->key] ?? '';
             if (is_string($column) && ctype_digit($column)) {
                 $customMapping[$definition->key] = (int)$column;
@@ -92,7 +98,7 @@ final class ImportController extends AbstractController
         $this->importSettings['headerRow'] = $headerRow;
         $this->importSettings['mapping'] = $mapping;
 
-        $this->dataHelper->set('Settings', ['Value' => json_encode($this->importSettings)], ['Name' => 'ImportPersonParameters']);
+        $this->dataHelper->setSetting(self::SETTING_KEY, json_encode($this->importSettings, JSON_THROW_ON_ERROR));
 
         $path = $file['tmp_name'] ?? null;
         if (!is_string($path) || $path === '') {
@@ -102,11 +108,12 @@ final class ImportController extends AbstractController
         }
 
         $this->renderImportForm(
-            $this->personDataHelper->importFromCsvFile(
+            $this->csvImporter->import(
                 $path,
                 $headerRow,
                 $mapping,
                 $this->personDataHelper->getAllPersons(),
+                $definitions,
                 $this->t
             )
         );
@@ -131,10 +138,8 @@ final class ImportController extends AbstractController
 
     private function loadSettings(): void
     {
-        $row = $this->dataHelper->get('Settings', ['Name' => 'ImportPersonParameters'], 'Value');
-        /** @var object{Value: string|null}|false $row */
-        $json = ($row !== false && $row->Value !== null) ? $row->Value : null;
-        $decoded = $json !== null ? json_decode($json, true) : null;
+        $json = $this->dataHelper->getSetting(self::SETTING_KEY, '');
+        $decoded = $json !== '' ? json_decode($json, true) : null;
 
         $this->importSettings = $this->buildImportSettings(is_array($decoded) ? $decoded : []);
     }
@@ -168,20 +173,12 @@ final class ImportController extends AbstractController
         ];
     }
 
-    /** @return list<CustomFieldDefinition> */
-    private function loadCustomDefinitions(): array
-    {
-        return MemberCustomFields::parseDefinitions(
-            $this->dataHelper->getSetting(MemberCustomFields::SETTING_KEY, '[]')
-        );
-    }
-
     /** @return list<array{key: string, label: string}> */
     private function customFieldsForView(): array
     {
         return array_map(
             static fn(CustomFieldDefinition $d) => ['key' => $d->key, 'label' => $d->label],
-            $this->loadCustomDefinitions()
+            $this->memberCustomFields->loadCustomDefinitions()
         );
     }
 

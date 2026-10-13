@@ -6,13 +6,13 @@ namespace app\modules\User\viewModels;
 
 use stdClass;
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\DirectoryPersonRow;
 use app\modules\Common\valueObjects\MenuItemRow;
-use app\modules\Common\valueObjects\Person;
 
 final readonly class UserDirectoryViewModel extends LayoutViewModel
 {
     /**
-     * @param list<stdClass> $persons
+     * @param list<DirectoryPersonRow|stdClass> $persons
      * @param list<MenuItemRow> $navItems
      * @param list<stdClass> $groups
      * @param array<int|string, mixed> $groupCounts

@@ -61,6 +61,13 @@ class AuthorizationDataHelperTest extends DataHelperTestCase
             'ImagePath',
         ]);
 
+        $this->assertColumnsExist($pdo, 'Order', [
+            'Id',
+            'IdArticle',
+            'ClosingDate',
+            'Visibility',
+        ]);
+
         $this->assertColumnsExist($pdo, 'OrderReply', [
             'IdOrder',
             'IdPerson',
@@ -81,6 +88,37 @@ class AuthorizationDataHelperTest extends DataHelperTestCase
             'Id',
             'Inactivated',
             'IdGroup',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Group', [
+            'Id',
+            'Name',          // getGroups(): 'Name LIKE "%..."'
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Article', [
+            'Id',
+            'CreatedBy',
+            'PublishedBy',
+            'OnlyForMembers',
+            'IdGroup',
+            'Content',
+            'Title',         // getArticle()
+            'LastUpdate',    // getArticle()
+            'Timestamp',     // getArticle()
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Order', [
+            'Id',
+            'IdArticle',
+            'ClosingDate',
+            'Visibility',
+        ]);
+
+        $this->assertColumnsExist($pdo, 'Survey', [
+            'Id',
+            'IdArticle',
+            'ClosingDate',
+            'Visibility',
         ]);
     }
 

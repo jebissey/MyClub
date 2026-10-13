@@ -26,7 +26,7 @@ use app\modules\Common\valueObjects\Person;
 
 final class Application
 {
-    public const VERSION = '0.96';
+    public const VERSION = '0.97';
 
     // @formatter:off
     public const  EMOJI_LIST = [
@@ -151,6 +151,11 @@ final class Application
     public function getPdoForLog(): PDO
     {
         return $this->pdoForLog;
+    }
+
+    public function getPdoForCredential(): PDO
+    {
+        return Database::getInstance()->getPdoForCredential();
     }
 
     public function getErrorManager(): ErrorManager

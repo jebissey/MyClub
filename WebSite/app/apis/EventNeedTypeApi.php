@@ -43,7 +43,7 @@ final class EventNeedTypeApi extends AbstractApi
             $apiResponse = $this->doDeleteNeedType($id);
             $this->renderJson([], $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -60,7 +60,7 @@ final class EventNeedTypeApi extends AbstractApi
         $data = $this->getJsonInput();
         $name = To::str($data['name'] ?? null);
         if ($name === '') {
-            $this->renderJsonError('Missing parameter name', ApplicationError::BadRequest->value, __FILE__, __LINE__);
+            $this->renderJsonBadRequest('Missing parameter name', __FILE__, __LINE__);
             return;
         }
         try {
@@ -69,7 +69,7 @@ final class EventNeedTypeApi extends AbstractApi
                 $name
             )], true, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -79,7 +79,7 @@ final class EventNeedTypeApi extends AbstractApi
             $needs = $this->needDataHelper->needsforNeedType($id);
             $this->renderJsonOk(['needs' => $needs]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 

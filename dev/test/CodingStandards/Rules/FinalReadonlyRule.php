@@ -23,6 +23,14 @@ final readonly class FinalReadonlyRule implements RuleInterface
 
     public function check(array $classes): array
     {
+        // Collect every class that is extended by another one: it cannot be final.
+        $extended = [];
+        foreach ($classes as $class) {
+            if ($class->extends !== null) {
+                $extended[$class->extends] = true;
+            }
+        }
+
         $issues = [];
 
         foreach ($classes as $class) {
@@ -32,8 +40,9 @@ final readonly class FinalReadonlyRule implements RuleInterface
 
             $where = "{$class->className} ({$this->paths->rel($class)})";
 
-            // final + abstract is contradictory in PHP: a base class can only be readonly.
-            if ($class->isAbstract) {
+            // A base class (abstract, or concrete but extended) cannot be final:
+            // it can only be required to be readonly.
+            if ($class->isAbstract || isset($extended[$class->className])) {
                 if (!$class->isReadonly) {
                     $issues[] = "{$where} should be 'readonly' (base class)";
                 }

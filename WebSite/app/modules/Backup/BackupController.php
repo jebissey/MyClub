@@ -65,8 +65,18 @@ final class BackupController extends AbstractController
     #private functions
     private function getLastBackupDate(): ?string
     {
-        $stmt = $this->application->getPdo()->query('SELECT Backup_lastDate FROM Metadata LIMIT 1');
-        $value = $stmt !== false ? $stmt->fetchColumn() : false;
+        /** @var object{Backup_lastDate: string|null}|false $meta */
+        $meta = $this->dataHelper->get(
+            'Metadata',
+            ['Id' => 1],
+            'Backup_lastDate'
+        );
+
+        if ($meta === false) {
+            return null;
+        }
+
+        $value = $meta->Backup_lastDate ?? null;
 
         return is_string($value) && $value !== '' ? $value : null;
     }

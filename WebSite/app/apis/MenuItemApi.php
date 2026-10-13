@@ -41,7 +41,7 @@ final class MenuItemApi extends AbstractApi
             $result = $this->menuItemDataHelper->del($id);
             $this->renderJson([], $result >= 1, ApplicationError::Ok->value);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -66,7 +66,7 @@ final class MenuItemApi extends AbstractApi
                 'Id, What, Type, Label, Icon, Url, ParentId, Position, IdGroup, ForMembers, ForContacts, ForAnonymous'
             )]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -125,7 +125,7 @@ final class MenuItemApi extends AbstractApi
             $this->menuItemDataHelper->insertOrUpdate($menuItemData);
             $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -155,7 +155,7 @@ final class MenuItemApi extends AbstractApi
             $this->menuItemDataHelper->updates($positions);
             $this->renderJsonOk();
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 }

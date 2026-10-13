@@ -8,15 +8,16 @@ use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
-use app\models\PersonDataHelper;
+use app\models\AlertRecipientDataHelper;
+use app\models\MemberDirectoryDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\Common\viewModels\InfoViewModel;
 
 final class EventEmailController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private readonly PersonDataHelper $personDataHelper,
+        private readonly AlertRecipientDataHelper $alertRecipientDataHelper,
+        private readonly MemberDirectoryDataHelper $memberDirectoryDataHelper
     ) {
         parent::__construct($application);
     }
@@ -52,7 +53,7 @@ final class EventEmailController extends AbstractController
         $idEventType = $input['idEventType'] ?? null;
         $dayOfWeek = $input['dayOfWeek'] ?? null;
         $timeOfDay = $input['timeOfDay'] ?? '';
-        $filteredEmails = $this->personDataHelper->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
+        $filteredEmails = $this->alertRecipientDataHelper->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
         $groupName = $idGroup != null ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';
         $eventTypeName = $idEventType !== null ? $this->dataHelper->get('EventType', ['Id' => $idEventType], 'Name')->Name ?? '' : '';
         $dayOfWeekName = $dayOfWeek !== null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
@@ -62,7 +63,7 @@ final class EventEmailController extends AbstractController
             'emailsJson' => json_encode($filteredEmails),
             'emails' => $filteredEmails,
             'filters' => "{$groupName} / {$eventTypeName} / {$dayOfWeekName} / {$translatedTimeOfDay}",
-            'people' => $this->personDataHelper->getActiveMembersContactInfoByEmail(),
+            'people' => $this->memberDirectoryDataHelper->getActiveMembersContactInfoByEmail(),
             'page' => $this->application->getConnectedUser()->getPage(),
             'i18n' => [
                 'copySuccess' => ($this->t)('event.copy_emails.clipboard.success'),

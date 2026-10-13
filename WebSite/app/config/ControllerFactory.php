@@ -8,9 +8,11 @@ use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\DistributionCalculator;
 use app\helpers\ErrorManager;
+use app\helpers\MemberCustomFields;
 use app\helpers\News;
 use app\helpers\NotificationSender;
 use app\helpers\WebApp;
+use app\models\AlertRecipientDataHelper;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
@@ -29,6 +31,7 @@ use app\models\LogAnalyticsDataHelper;
 use app\models\LoanDataHelper;
 use app\models\LogStatisticsDataHelper;
 use app\models\MemberDataHelper;
+use app\models\MemberDirectoryDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MessageDataHelper;
 use app\models\MetadataDataHelper;
@@ -51,6 +54,8 @@ use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
+use app\modules\Common\services\MemberMapService;
+use app\modules\Common\services\RegistrationLinkService;
 use app\modules\Communication\CommunicationController;
 use app\modules\Designer\DesignController;
 use app\modules\Designer\DesignerController;
@@ -75,6 +80,7 @@ use app\modules\PersonManager\ImportController;
 use app\modules\PersonManager\MemberFieldController;
 use app\modules\PersonManager\PersonController;
 use app\modules\PersonManager\RegistrationController;
+use app\modules\PersonManager\services\MemberCsvImporter;
 use app\modules\Pwa\PwaController;
 use app\modules\Translator\TranslatorController;
 use app\modules\User\ContactController;
@@ -104,6 +110,7 @@ use app\modules\Webmaster\WebmasterController;
 final readonly class ControllerFactory
 {
     public function __construct(
+        private AlertRecipientDataHelper $alertRecipientDataHelper,
         private Application $application,
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
         private ArticleDataHelper $articleDataHelper,
@@ -124,7 +131,11 @@ final readonly class ControllerFactory
         private KanbanDataHelper $kanbanDataHelper,
         private LoanDataHelper $loanDataHelper,
         private LogDataHelper $logDataHelper,
+        private MemberCsvImporter $memberCsvImporter,
+        private MemberCustomFields $memberCustomFields,
         private MemberDataHelper $memberDataHelper,
+        private MemberDirectoryDataHelper $memberDirectoryDataHelper,
+        private MemberMapService $memberMapService,
         private MembershipDataHelper $membershipDataHelper,
         private MessageDataHelper $messageDataHelper,
         private MetadataDataHelper $metadataDataHelper,
@@ -136,6 +147,7 @@ final readonly class ControllerFactory
         private PersonDataHelper $personDataHelper,
         private PersonGroupDataHelper $personGroupDataHelper,
         private PersonStatisticsDataHelper $personStatisticsDataHelper,
+        private RegistrationLinkService $registrationLinkService,
         private SharedFileDataHelper $sharedFileDataHelper,
         private SurveyDataHelper $surveyDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
@@ -156,6 +168,7 @@ final readonly class ControllerFactory
             $this->emailService,
             $this->logDataHelper,
             $this->articleService,
+            $this->alertRecipientDataHelper
         );
     }
 
@@ -196,6 +209,7 @@ final readonly class ControllerFactory
             $this->application,
             $this->emailService,
             $this->personDataHelper,
+            $this->registrationLinkService,
             $this->webapp,
             CredentialService::getInstance()
         );
@@ -218,7 +232,9 @@ final readonly class ControllerFactory
             $this->eventDataHelper,
             $this->crosstabDataHelper,
             $this->participantDataHelper,
-            $this->messageDataHelper
+            $this->messageDataHelper,
+            $this->memberDirectoryDataHelper,
+            $this->memberMapService
         );
     }
 
@@ -242,7 +258,8 @@ final readonly class ControllerFactory
     {
         return new EventEmailController(
             $this->application,
-            $this->personDataHelper
+            $this->alertRecipientDataHelper,
+            $this->memberDirectoryDataHelper
         );
     }
 
@@ -276,7 +293,8 @@ final readonly class ControllerFactory
     {
         return new ExportController(
             $this->application,
-            $this->personDataHelper
+            $this->personDataHelper,
+            $this->memberCustomFields
         );
     }
 
@@ -312,7 +330,9 @@ final readonly class ControllerFactory
     {
         return new ImportController(
             $this->application,
-            $this->personDataHelper
+            $this->personDataHelper,
+            $this->memberCsvImporter,
+            $this->memberCustomFields
         );
     }
 
@@ -485,10 +505,11 @@ final readonly class ControllerFactory
     {
         return new UserDirectoryController(
             $this->application,
-            $this->personDataHelper,
             $this->groupDataHelper,
             $this->personGroupDataHelper,
-            $this->memberDataHelper
+            $this->memberDataHelper,
+            $this->memberMapService,
+            $this->memberDirectoryDataHelper
         );
     }
 

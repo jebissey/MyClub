@@ -38,7 +38,7 @@ final class EventNeedApi extends AbstractApi
                     $this->renderJsonBadRequest('', __FILE__, __LINE__);
                 }
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }
@@ -59,7 +59,7 @@ final class EventNeedApi extends AbstractApi
                 );
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }
@@ -72,7 +72,7 @@ final class EventNeedApi extends AbstractApi
                 $this->doSaveNeed($data);
                 $this->renderJsonOk();
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }

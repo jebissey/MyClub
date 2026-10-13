@@ -7,12 +7,20 @@ namespace app\models;
 use DateTime;
 use PDO;
 use app\helpers\Application;
+use app\helpers\To;
 use app\models\interfaces\MemberDataHelperInterface;
+use app\modules\Common\valueObjects\IdentityRow;
+use app\modules\Common\valueObjects\MemberBasicRow;
+use app\modules\Common\valueObjects\ResetTokenRow;
+use app\modules\Common\valueObjects\SignInRow;
 
 /**
  * Data access for sign-in, remember-me and password reset flows.
  * Hides the Individual/Member split and column names from callers
  * (especially AuthenticationService).
+ *
+ * @phpstan-import-type IndividualShape from IdentityRow
+ * @phpstan-import-type JoinedShape from MemberBasicRow
  */
 final class MemberDataHelper extends Data implements MemberDataHelperInterface
 {
@@ -27,23 +35,10 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
 
     /**
      * Merged Individual + Member row, including Password/Inactivated for authentication.
-     *
-     * @return (object{
-     *     Id: int,
-     *     Email: string,
-     *     FirstName: string,
-     *     LastName: string|null,
-     *     NickName: string|null,
-     *     Avatar: string|null,
-     *     Password: string|null,
-     *     Inactivated: mixed,
-     *     UseGravatar: mixed,
-     *     Alert: mixed
-     * }&\stdClass)|false
      */
-    public function findForSignIn(string $email): object|false
+    public function findForSignIn(string $email): SignInRow|false
     {
-        /** @var object{Id: int, Email: string, FirstName: string, LastName: string|null, NickName: string|null, Avatar: string|null}|false $individual */
+        /** @var IndividualShape|false $individual */
         $individual = $this->get(
             'Individual',
             ['Email' => $email],
@@ -63,63 +58,37 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
             return false;
         }
 
-        /** @var object{Id: int, Email: string, FirstName: string, LastName: string|null, NickName: string|null, Avatar: string|null, Password: string|null, Inactivated: mixed, UseGravatar: mixed, Alert: mixed}&\stdClass $row */
-        $row = (object) array_merge((array) $individual, (array) $member);
-
-        return $row;
+        return SignInRow::fromRows($individual, $member);
     }
 
     /**
-     * Merged Individual + Member row from a remember-me token.
-     *
-     * @return (object{
-     *     Id: int,
-     *     Email: string,
-     *     FirstName: string,
-     *     LastName: string|null,
-     *     NickName: string|null,
-     *     Avatar: string|null
-     * }&\stdClass)|false
+     * Identity row of an active member, looked up from a remember-me token.
      */
-    public function findByRememberToken(string $token): object|false
+    public function findByRememberToken(string $token): IdentityRow|false
     {
         /** @var object{Id: int, Inactivated: mixed}|false $member */
         $member = $this->get('Member', ['Token' => $token], 'Id, Inactivated');
-        if ($member === false || (bool) ($member->Inactivated ?? false)) {
+        if ($member === false || (bool) $member->Inactivated) {
             return false;
         }
 
-        /** @var object{Id: int, Email: string, FirstName: string, LastName: string|null, NickName: string|null, Avatar: string|null}|false $individual */
+        /** @var IndividualShape|false $individual */
         $individual = $this->get(
             'Individual',
             ['Id' => $member->Id],
             'Id, Email, FirstName, LastName, NickName, Avatar'
         );
-        if ($individual === false) {
-            return false;
-        }
 
-        /** @var object{Id: int, Email: string, FirstName: string, LastName: string|null, NickName: string|null, Avatar: string|null}&\stdClass $row */
-        $row = (object) array_merge((array) $individual, (array) $member);
-
-        return $row;
+        return $individual === false ? false : IdentityRow::fromIndividual($individual);
     }
 
     /**
-     * Merged Individual + Member row (without Password), for the reset-password email.
-     *
-     * @return (object{
-     *     Id: int,
-     *     Email: string,
-     *     FirstName: string,
-     *     LastName: string|null,
-     *     NickName: string|null,
-     *     Avatar: string|null
-     * }&\stdClass)|false
+     * Identity row (without Password), for the reset-password email.
+     * Returns false if the Individual has no matching Member row.
      */
-    public function findBasicByEmail(string $email): object|false
+    public function findBasicByEmail(string $email): IdentityRow|false
     {
-        /** @var object{Id: int, Email: string, FirstName: string, LastName: string|null, NickName: string|null, Avatar: string|null}|false $individual */
+        /** @var IndividualShape|false $individual */
         $individual = $this->get(
             'Individual',
             ['Email' => $email],
@@ -129,35 +98,28 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
             return false;
         }
 
-        /** @var object{UseGravatar: mixed, Alert: mixed}|false $member */
-        $member = $this->get('Member', ['Id' => $individual->Id], 'UseGravatar, Alert');
-        if ($member === false) {
+        if ($this->get('Member', ['Id' => $individual->Id], 'Id') === false) {
             return false;
         }
 
-        /** @var object{Id: int, Email: string, FirstName: string, LastName: string|null, NickName: string|null, Avatar: string|null}&\stdClass $row */
-        $row = (object) array_merge((array) $individual, (array) $member);
-
-        return $row;
+        return IdentityRow::fromIndividual($individual);
     }
 
     /**
-     * Member row identified by a password-reset token.
-     *
-     * @return object{Id: int, TokenCreatedAt: string|null}|false
+     * Member identified by a password-reset token.
      */
-    public function findByResetToken(string $token): object|false
+    public function findByResetToken(string $token): ResetTokenRow|false
     {
         /** @var object{Id: int, TokenCreatedAt: string|null}|false $row */
         $row = $this->get('Member', ['Token' => $token], 'Id, TokenCreatedAt');
 
-        return $row;
+        return $row === false ? false : ResetTokenRow::fromRow($row);
     }
 
     /**
      * Email of every active (non-inactivated) member, for statistics aggregation.
      *
-     * @return list<object{Email: string}>
+     * @return list<string>
      */
     public function getActiveMemberEmails(): array
     {
@@ -171,22 +133,20 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
         if ($stmt === false) {
             return [];
         }
-        return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+
+        return array_values(
+            array_map(
+                static fn(mixed $email): string => To::str($email),
+                $stmt->fetchAll(PDO::FETCH_COLUMN)
+            )
+        );
     }
 
     /**
      * Basic identity + presence fields for every active (non-inactivated) member,
      * used by the "who's online" chat feature (ChatApi::getActiveUsers).
      *
-     * @return list<object{
-     *     Id: int,
-     *     NickName: string|null,
-     *     FirstName: string,
-     *     LastName: string|null,
-     *     Email: string,
-     *     Avatar: string|null,
-     *     UseGravatar: mixed
-     * }&\stdClass>
+     * @return list<MemberBasicRow>
      */
     public function getActiveMembersBasicInfo(): array
     {
@@ -207,7 +167,11 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
         if ($stmt === false) {
             return [];
         }
-        return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+
+        /** @var list<JoinedShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(MemberBasicRow::fromJoinedRow(...), $rows);
     }
 
     public function recordSignIn(int $id): void
@@ -232,8 +196,8 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
     }
 
     /**
-     * Informations pour l'annuaire (répertoire) de tous les membres actifs
-     * qui acceptent d'apparaître dans le répertoire.
+     * Directory information for every active member who agreed
+     * to appear in the presentation directory.
      *
      * @return list<object{
      *     Id: int,
@@ -242,10 +206,10 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
      *     NickName: string|null,
      *     Avatar: string|null,
      *     Email: string,
-     *     UseGravatar: mixed,
-     *     InPresentationDirectory: mixed,
-     *     ShowPhoneInPresentationDirectory: mixed,
-     *     ShowEmailInPresentationDirectory: mixed,
+     *     UseGravatar: bool|int|string|null,
+     *     InPresentationDirectory: bool|int|string|null,
+     *     ShowPhoneInPresentationDirectory: bool|int|string|null,
+     *     ShowEmailInPresentationDirectory: bool|int|string|null,
      *     Location: string|null
      * }&\stdClass>
      */

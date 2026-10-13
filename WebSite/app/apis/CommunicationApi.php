@@ -37,7 +37,7 @@ final class CommunicationApi extends AbstractApi
             try {
                 $this->renderJsonOk($this->buildQuotaStats());
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }
@@ -75,7 +75,7 @@ final class CommunicationApi extends AbstractApi
                 ], $members)),
             ]);
         } catch (Throwable $e) {
-            $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -128,7 +128,6 @@ final class CommunicationApi extends AbstractApi
                 if ($config === null) {
                     $this->renderJsonError(
                         $this->languagesDataHelper->translate('communication.api.smtp_not_configured'),
-                        ApplicationError::Error->value,
                         __FILE__,
                         __LINE__
                     );
@@ -180,7 +179,6 @@ final class CommunicationApi extends AbstractApi
                 } else {
                     $this->renderJsonError(
                         $this->languagesDataHelper->translate('communication.api.send_failed'),
-                        ApplicationError::Error->value,
                         __FILE__,
                         __LINE__
                     );
@@ -188,12 +186,11 @@ final class CommunicationApi extends AbstractApi
             } catch (EmailException $e) {
                 $this->renderJsonError(
                     $this->languagesDataHelper->translate('communication.api.send_impossible') . $e->getMessage(),
-                    ApplicationError::Error->value,
                     $e->getFile(),
                     $e->getLine()
                 );
             } catch (Throwable $e) {
-                $this->renderJsonError($e->getMessage(), ApplicationError::Error->value, $e->getFile(), $e->getLine());
+                $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }

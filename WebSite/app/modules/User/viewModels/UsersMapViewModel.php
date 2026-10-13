@@ -5,25 +5,15 @@ declare(strict_types=1);
 namespace app\modules\User\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\MemberMapMarker;
 use app\modules\Common\valueObjects\MenuItemRow;
 
 final readonly class UsersMapViewModel extends LayoutViewModel
 {
     /**
-     * @param array<int, array{
-     *     id: int,
-     *     name: string,
-     *     nickname: ?string,
-     *     avatar: ?string,
-     *     useGravatar: bool,
-     *     email: string,
-     *     lat: string,
-     *     lng: string,
-     *     userImg: string,
-     *     myPublicData: ?string
-     * }> $locationData
+     * @param list<MemberMapMarker> $locationData
      * @param list<MenuItemRow> $navItems
-     * @param array<string, mixed> $layoutParams Full output of Params::getAll().
+     * @param array<string, mixed> $layoutParams
      */
     public function __construct(
         public array $locationData,

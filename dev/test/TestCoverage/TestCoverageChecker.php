@@ -10,6 +10,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
 use test\TestCoverage\ValueObjects\MissingTest;
+use test\TestCoverage\ValueObjects\UncoveredColumns;
 
 final class TestCoverageChecker
 {
@@ -25,8 +26,7 @@ final class TestCoverageChecker
         private readonly string $appDir,
         private readonly string $testsDir,
         private readonly string $baseClass,
-    ) {
-    }
+    ) {}
 
     /** @return array<int, MissingTest> */
     public function findMissing(): array
@@ -51,6 +51,75 @@ final class TestCoverageChecker
             }
         }
         return $missing;
+    }
+
+    /**
+     * For every class that requires a test and has one, checks that the test
+     * asserts every table and column queried in the source.
+     *
+     * @return array<int, UncoveredColumns>
+     */
+    public function findUncovered(): array
+    {
+        $classes = $this->scanClasses($this->appDir);
+        foreach ($classes as $path) {
+            require_once $path;
+        }
+
+        $extractor = new SourceQueryExtractor();
+        $uncovered = [];
+
+        foreach ($classes as $fqcn => $path) {
+            if (!class_exists($fqcn) || !$this->requiresTest(new ReflectionClass($fqcn))) {
+                continue;
+            }
+            $testPath = $this->expectedTestPath($path);
+            if (!is_file($testPath)) {
+                continue; // already reported by findMissing()
+            }
+
+            $source = file_get_contents($path);
+            $testSource = file_get_contents($testPath);
+            if ($source === false || $testSource === false) {
+                continue;
+            }
+
+            $covered = $this->coveredColumns($testSource);
+
+            foreach ($extractor->extract($source) as $table => $columns) {
+                $known = $covered[strtolower($table)] ?? [];
+                $absent = array_values(array_filter(
+                    $columns,
+                    static fn(string $c): bool => !in_array(strtolower($c), $known, true)
+                ));
+                // A table without any literal column still has to be asserted.
+                if ($absent !== [] || ($columns === [] && !isset($covered[strtolower($table)]))) {
+                    $uncovered[] = new UncoveredColumns($fqcn, $testPath, $table, $absent);
+                }
+            }
+        }
+
+        return $uncovered;
+    }
+
+    /** @return array<string, list<string>> lowercase table => lowercase columns asserted by the test */
+    private function coveredColumns(string $testSource): array
+    {
+        $covered = [];
+        $pattern = '/assertColumnsExist\(\s*\$\w+\s*,\s*([\'"])(\w+)\1\s*,\s*\[(.*?)\]\s*\)/s';
+        if (preg_match_all($pattern, $testSource, $calls, PREG_SET_ORDER) === 0) {
+            return $covered;
+        }
+        foreach ($calls as $call) {
+            $table = strtolower($call[2]);
+            $covered[$table] ??= [];
+            if (preg_match_all('/([\'"])(\w+)\1/', $call[3], $cols) > 0) {
+                foreach ($cols[2] as $col) {
+                    $covered[$table][] = strtolower($col);
+                }
+            }
+        }
+        return $covered;
     }
 
     /** @return array<string, string> FQCN => chemin du fichier source */
