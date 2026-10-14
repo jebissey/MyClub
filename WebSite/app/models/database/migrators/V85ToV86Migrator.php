@@ -569,36 +569,38 @@ final class V85ToV86Migrator implements DatabaseMigratorInterface
         )
     SQL);
 
-        $pdo->exec(<<<'SQL'
-        INSERT INTO "Metadata_new" (
-            "Id",
-            "ApplicationName",
-            "DatabaseVersion",
-            "SiteUnderMaintenance",
-            "Compact_lastDate",
-            "Compact_everyXdays",
-            "Compact_removeOlderThanXmonths",
-            "Compact_compactOlderThanXmonths",
-            "Compact_maxRecords",
-            "ThisIsProdSiteUrl",
-            "ThisIsTestSite",
-            "ThisIsForcedLanguage"
-        )
-        SELECT
-            "Id",
-            "ApplicationName",
-            "DatabaseVersion",
-            COALESCE("SiteUnderMaintenance", 0),
-            "Compact_lastDate",
-            COALESCE("Compact_everyXdays", 10),
-            COALESCE("Compact_removeOlderThanXmonths", 36),
-            COALESCE("Compact_compactOlderThanXmonths", 6),
-            COALESCE("Compact_maxRecords", 1000000),
-            "ThisIsProdSiteUrl",
-            COALESCE("ThisIsTestSite", 0),
-            "ThisIsForcedLanguage"
-        FROM "Metadata"
-    SQL);
+        $stmt = $pdo->query('PRAGMA table_info("Metadata")');
+        /** @var list<string> $existing */
+        $existing = $stmt === false ? [] : $stmt->fetchAll(PDO::FETCH_COLUMN, 1);
+
+        $boolean = static fn(string $c): string => "CASE WHEN lower(trim(CAST(COALESCE(\"$c\", 0) AS TEXT))) IN ('1', 'true', 'yes', 'on') THEN 1 ELSE 0 END";
+        $withDefault = static fn(string $c, string $default): string => "COALESCE(\"$c\", $default)";
+        $plain = static fn(string $c): string => "\"$c\"";
+
+        // column => [expression used when the column exists in the old table, value used when it does not]
+        $definitions = [
+            'SiteUnderMaintenance'            => [$boolean('SiteUnderMaintenance'), '0'],
+            'Compact_lastDate'                => [$plain('Compact_lastDate'), 'NULL'],
+            'Compact_everyXdays'              => [$withDefault('Compact_everyXdays', '10'), '10'],
+            'Compact_removeOlderThanXmonths'  => [$withDefault('Compact_removeOlderThanXmonths', '36'), '36'],
+            'Compact_compactOlderThanXmonths' => [$withDefault('Compact_compactOlderThanXmonths', '6'), '6'],
+            'Compact_maxRecords'              => [$withDefault('Compact_maxRecords', '1000000'), '1000000'],
+            'ThisIsProdSiteUrl'               => [$plain('ThisIsProdSiteUrl'), 'NULL'],
+            'ThisIsTestSite'                  => [$boolean('ThisIsTestSite'), '0'],
+            'ThisIsForcedLanguage'            => [$plain('ThisIsForcedLanguage'), 'NULL'],
+        ];
+
+        $targets = ['"Id"', '"ApplicationName"', '"DatabaseVersion"'];
+        $sources = ['"Id"', '"ApplicationName"', '"DatabaseVersion"'];
+        foreach ($definitions as $column => [$expression, $fallback]) {
+            $targets[] = "\"$column\"";
+            $sources[] = in_array($column, $existing, true) ? $expression : $fallback;
+        }
+
+        $pdo->exec(
+            'INSERT INTO "Metadata_new" (' . implode(', ', $targets) . ') '
+                . 'SELECT ' . implode(', ', $sources) . ' FROM "Metadata"'
+        );
 
         $pdo->exec('DROP TABLE "Metadata"');
         $pdo->exec('ALTER TABLE "Metadata_new" RENAME TO "Metadata"');

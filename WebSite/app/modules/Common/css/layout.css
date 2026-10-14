@@ -72,7 +72,9 @@
 
 /* ─── Sidebar ────────────────────────────────────────────────── */
 #sidebar {
-    height: 100%;
+    /* Start the sidebar right below the fixed navbar */
+    margin-top: var(--navbar-height);
+    height: calc(100% - var(--navbar-height));
     width: fit-content;
     min-width: 0;
     flex-shrink: 0;

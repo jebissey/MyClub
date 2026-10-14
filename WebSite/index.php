@@ -38,6 +38,7 @@ else               Debugger::enable(Debugger::Production, $logDir);
 
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $application = Application::init();
+$application->compactLogIfNeeded();
 $flight = $application->getFlight();
 // Add a custom URL parser to fix issue with URL with encoded email address
 $flight->map('pass', function ($str) {

@@ -13,6 +13,34 @@ final class V9ToV10Migrator implements DatabaseMigratorInterface
     {
 
         $pdo->exec(<<<'SQL'
+
+CREATE TABLE "Guest" (
+	"Id"	INTEGER,
+	"IdContact"	INTEGER NOT NULL,
+	"IdEvent"	INTEGER NOT NULL,
+	"InvitedBy"	INTEGER NOT NULL,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdContact") REFERENCES "Contact"("Id"),
+	FOREIGN KEY("IdEvent") REFERENCES "Event"("Id"),
+	FOREIGN KEY("InvitedBy") REFERENCES "Person"("Id")
+);
+
+CREATE TABLE "SharedFile" (
+	"Id"	INTEGER,
+	"Item"	TEXT NOT NULL,
+	"IdGroup"	INTEGER,
+	"OnlyForMembers"	INTEGER NOT NULL DEFAULT 1,
+	"Token"	TEXT,
+	PRIMARY KEY("Id"),
+	FOREIGN KEY("IdGroup") REFERENCES "Group"("Id")
+);
+
+INSERT INTO Authorization (Id, Name) VALUES 
+(6, 'HomeDesigner'),
+(7, 'EventDesigner'),
+(8, 'VisitorInsights'),
+(9, 'MenuDesigner');
+
 INSERT INTO Languages (Name, en_US, fr_FR)
 VALUES (
     'Admin',

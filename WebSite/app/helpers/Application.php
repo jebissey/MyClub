@@ -26,7 +26,7 @@ use app\modules\Common\valueObjects\Person;
 
 final class Application
 {
-    public const VERSION = '0.97';
+    public const VERSION = '0.98';
 
     // @formatter:off
     public const  EMOJI_LIST = [
@@ -94,20 +94,26 @@ final class Application
         if (!isset(self::$instance)) {
             self::$instance = new self();
         }
-        $row = new DataHelper(
-            self::$instance->getPdo(),
-            self::$instance->getErrorManager(),
-            self::$instance->getPdoForLog()
-        )->get('Metadata', ['Id' => 1], 'Compact_everyXdays, Compact_removeOlderThanXmonths, Compact_compactOlderThanXmonths');
+        return self::$instance;
+    }
+
+    /**
+     * Compacts the log according to the settings stored in Metadata.
+     * Must only be called once init() has returned, i.e. once the database is up to date.
+     */
+    public function compactLogIfNeeded(): void
+    {
+        $row = new DataHelper($this->getPdo(), $this->getErrorManager(), $this->getPdoForLog())
+            ->get('Metadata', ['Id' => 1], 'Compact_everyXdays, Compact_removeOlderThanXmonths, Compact_compactOlderThanXmonths');
         if ($row === false) {
-            Application::unreachable("Missing metadata", __FILE__, __LINE__);
+            self::unreachable('Missing metadata', __FILE__, __LINE__);
         }
         /** @var stdClass $row */
         $metadata = CompactSettingsRow::fromStdClass($row);
-        new LogCompactDataHelper(
-            self::$instance
-        )->compactLog($metadata->Compact_removeOlderThanXmonths, $metadata->Compact_compactOlderThanXmonths);
-        return self::$instance;
+        new LogCompactDataHelper($this)->compactLog(
+            $metadata->Compact_removeOlderThanXmonths,
+            $metadata->Compact_compactOlderThanXmonths
+        );
     }
 
     /**
@@ -196,7 +202,14 @@ final class Application
             }
         }
         if ($log) {
-            new LogWriterDataHelper(self::init(), self::init()->getErrorManager())->add('UNREACHABLE', $msg);
+            try {
+                $pdoForLog = Database::getPdoForLogIfAvailable();
+                if ($pdoForLog !== null) {
+                    LogWriterDataHelper::insert($pdoForLog, 'UNREACHABLE', $msg);
+                }
+            } catch (Throwable) {
+                // A logging failure must never hide the original error.
+            }
         }
         throw new LogicException($msg);
     }

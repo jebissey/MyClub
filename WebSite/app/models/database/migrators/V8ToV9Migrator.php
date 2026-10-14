@@ -13,6 +13,7 @@ final class V8ToV9Migrator implements DatabaseMigratorInterface
     {
         $pdo->exec("UPDATE Languages SET Name = 'Help_Designer'        WHERE Name = 'Help_designer';");
         $pdo->exec("UPDATE Languages SET Name = 'Help_EventManager'    WHERE Name = 'Help_eventManager';");
+        $pdo->exec("ALTER TABLE Person ADD COLUMN Notepad TEXT;");
 
         $pdo->exec(<<<SQL
 UPDATE Languages

@@ -26,7 +26,7 @@ final class Database
     private const SQLITE_CREDENTIAL_FILE = 'Credential.db';
     private const MIGRATORS_DIR = __DIR__ . '/database/migrators';
     private const APPLICATION = 'MyClub';
-    private const DB_VERSION = 92;              //Don't forget to update here and in Metadata when database structure is modified
+    private const DB_VERSION = 93;              //Don't forget to update here and in Metadata when database structure is modified
 
     private static ?Database $instance = null;
     private static ?PDO $pdo = null;
@@ -46,6 +46,15 @@ final class Database
             self::$instance = new self();
         }
         return self::$instance;
+    }
+
+    /**
+     * Returns the log PDO if it is already open, without creating any instance.
+     * Safe to call while the database is still being checked or migrated.
+     */
+    public static function getPdoForLogIfAvailable(): ?PDO
+    {
+        return self::$pdoForLog;
     }
 
     public function getPdo(): PDO

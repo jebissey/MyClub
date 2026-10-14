@@ -515,48 +515,8 @@ INSERT INTO "Group" VALUES (1,'Webmaster',0,0);
 INSERT INTO "GroupAuthorization" VALUES (1,1,1);
 INSERT INTO "Individual" VALUES (1,'Member','webmaster@myclub.foo','my first name','my last name','my nick name or nothing',NULL,NULL,'2026-09-14 13:04:32');
 INSERT INTO "Languages" VALUES (1,'select_language','Select language','Sélectionner la langue','Wybierz język'),
- (2,'language','Language','Langue','Język'),
- (3,'my_data','My ddata','Mes données','Moje dane'),
- (4,'admin_zone','Admin zone','Zone d''administration','Strefa administratora'),
- (5,'logout','Logout','Déconnexion','Wyloguj'),
- (6,'contextual_help','Contextual help','Aide contextuelle','Pomoc kontekstualna'),
- (7,'vote','Vote','Voter','Głosuj'),
- (8,'connection_required','(You must be connected)','(Vous devez être connecté)','(Musisz być zalogowany)'),
- (9,'home','Home','Accueil','Strona główna'),
- (10,'created_by','Created by','Créé par','Utworzony przez'),
- (11,'modified_on','modified on','modifié le','zmodyfikowano dnia'),
- (12,'on','on','le','dnia'),
- (13,'eventsAvailableForYou','Your events','Vos événements','Twoje wydarzenia'),
- (14,'eventsAvailableForAll','The events','Les événements','Wszystkie wydarzenia'),
- (15,'type','Type','Type','Typ'),
- (16,'summary','Summary','Sommaire','Podsumowanie'),
- (17,'location','Location','Lieu','Miejsce'),
- (18,'date_time','Date and time','Date et heure','Data i godzina'),
- (19,'duration','Duration','Durée','Czas trwania'),
- (20,'attributes','Attributes','Attribut','Atrybuty'),
- (21,'description','Description','Description','Opis'),
- (22,'participants','Participants','Participants','Uczestnicy'),
- (23,'audience','Audience','Audience','Odbiorcy'),
  (24,'ClubMembersOnly','Members','Membres','Członkowie'),
  (25,'All','Public','Public','Publiczne'),
- (26,'register','Register','S''inscrire','Zapisz się'),
- (27,'unregister','Unregister','Se désinscrire','Wypisz się'),
- (28,'fullyBooked','Fully booked','Complet','Komplet'),
- (29,'noAttributes','No attributes','Aucun attribut','Brak atrybutów'),
- (30,'noParticipant','No participant at this time','Aucun participant pour le moment','Brak uczestników'),
- (31,'login','Login','Connexion','Logowanie'),
- (32,'edit','Edit','Modifier','Edytuj'),
- (33,'messages','Messages','Messages','Wiadomości'),
- (34,'delete','Delete','Supprimer','Usuń'),
- (35,'duplicate','Duplicate','Dupliquer','Duplikuj'),
- (36,'sendEmail','Send email','Envoyer courriel','Wyślij e-mail'),
- (37,'news','News','News','Aktualności'),
- (38,'directory','Directory','Trombinoscope','Katalog'),
- (39,'statistics','Statistics','Statistiques','Statystyki'),
- (40,'preferences','Preferences','Préférences','Preferencje'),
- (41,'groups','Groups','Groupes','Grupy'),
- (42,'availabilities','Availabilities','Disponibilités','Dostępności'),
- (43,'account','Account','Compte','Konto'),
  (44,'Guest','Guest','Invité','Gość'),
  (45,'morning','Morning','Matin','Rano'),
  (46,'afternoon','Afternoon','Après-midi','Południe'),
@@ -1126,8 +1086,6 @@ INSERT INTO "Languages" VALUES (1,'select_language','Select language','Sélectio
         </div>
     </section>
 </div>'),
- (54,'Help_Designer','Designer help','Aide designer','Pomoc projektanta'),
- (55,'Help_EventManager','Event manager help','Aide gestionnaire d''événements','Pomoc animatora'),
  (56,'Help_Home','
 <div class="container my-5">
     <header class="mb-5 border-bottom pb-3">
@@ -1537,7 +1495,6 @@ W stopce,
   <strong>słownik</strong> i inne zasoby pomocnicze.
 </div>'),
  (57,'Help_PersonManager','People manager help','Aide gestionnaire de personnes','Pomoc zarządcy osób'),
- (58,'Help_Redactor','Redactor help','Aide rédateur','Pomoc redaktora'),
  (59,'Help_User','User help','Aide utilisateur','Pomoc użytkownika'),
  (60,'Help_VisitorInsights','Visitor insights help','Aide statistiques visiteurs','Pomoc statystyk odwiedzających'),
  (61,'Help_Webmaster','Webmater help','Aide webmaster','Pomoc webmastera'),
@@ -1683,217 +1640,6 @@ W stopce,
     <a href="/" class="btn btn-primary mt-3">🏠 Powrót do strony głównej</a>
   </div>
 </div>'),
- (66,'Error500','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-danger">💥 Error 500 – Internal Server Error</h1>
-    
-    <p class="mt-3">
-      Oops… something went wrong on our side.  
-      This error is caused by an internal problem in the application.
-    </p>
-
-    <hr class="my-4">
-
-    <h5>ℹ️ What to do?</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ <strong>Please notify the webmaster</strong> so the issue can be fixed.</li>
-      <li>➡️ You can also try again later — sometimes the server just needs a little coffee ☕.</li>
-    </ul>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-danger">💥 Erreur 500 – Erreur interne du serveur</h1>
-    
-    <p class="mt-3">
-      Oups… quelque chose s’est mal passé de notre côté.  
-      Cette erreur est due à un problème interne de l’application.
-    </p>
-
-    <hr class="my-4">
-
-    <h5>ℹ️ Que faire ?</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ <strong>Prévenez le webmaster</strong> afin qu’il puisse corriger le problème.</li>
-      <li>➡️ Vous pouvez aussi réessayer un peu plus tard, parfois le serveur a juste besoin d’un petit café ☕.</li>
-    </ul>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-danger">💥 Błąd 500 – Wewnętrzny błąd serwera</h1>
-    <p class="mt-3">
-      Ups… coś poszło nie tak po naszej stronie.<br>
-      Ten błąd wynika z wewnętrznego problemu aplikacji.
-    </p>
-    <hr class="my-4">
-    <h5>ℹ️ Co zrobić?</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ <strong>Prosimy poinformować webmastera</strong>, aby mógł naprawić problem.</li>
-      <li>➡️ Możesz też spróbować ponownie za chwilę — czasem serwer po prostu potrzebuje kawy ☕.</li>
-    </ul>
-    <a href="/" class="btn btn-primary mt-3">🏠 Powrót do strony głównej</a>
-  </div>
-</div>'),
- (69,'message_password_reset_sent','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-success">📧 Email sent!</h1>
-    
-    <p class="mt-3">
-      An email with a link to <strong>create a new password</strong> has been sent to the address you entered.
-    </p>
-
-    <hr class="my-4">
-
-    <h5>ℹ️ Please note:</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Check your <strong>spam</strong> or <strong>junk mail</strong> folder if you don’t see the message in your inbox.</li>
-      <li>➡️ Simply click the link in the email to set your new password.</li>
-    </ul>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Back to Home</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-success">📧 Courriel envoyé !</h1>
-    
-    <p class="mt-3">
-      Un message contenant un lien pour <strong>créer un nouveau mot de passe</strong> vient d’être envoyé à l’adresse courriel que vous avez indiquée.
-    </p>
-
-    <hr class="my-4">
-
-    <h5>ℹ️ À savoir :</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Pensez à vérifier votre dossier <strong>spam</strong> ou <strong>courrier indésirable</strong> si vous ne trouvez pas le message.</li>
-      <li>➡️ Cliquez simplement sur le lien présent dans le courriel pour définir votre nouveau mot de passe.</li>
-    </ul>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-success">📧 E-mail wysłany!</h1>
-    <p class="mt-3">
-      E-mail z linkiem do <strong>utworzenia nowego hasła</strong> został wysłany na podany adres.
-    </p>
-    <hr class="my-4">
-    <h5>ℹ️ Uwaga:</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Sprawdź folder <strong>spam</strong> lub <strong>niechciana poczta</strong>, jeśli nie widzisz wiadomości w skrzynce głównej.</li>
-      <li>➡️ Kliknij po prostu link w e-mailu, aby ustawić nowe hasło.</li>
-    </ul>
-    <a href="/" class="btn btn-primary mt-3">🏠 Powrót na stronę główną</a>
-  </div>
-</div>'),
- (70,'message_password_reset_failed','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-danger">⚠️ Email could not be sent</h1>
-
-    <p class="mt-3">
-      The password reset email <strong>could not be sent</strong> to the address you entered.
-    </p>
-
-    <hr class="my-4">
-
-    <h5>ℹ️ Please check the following:</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Make sure the email address you entered is correct and registered in our system.</li>
-      <li>➡️ If the issue continues, please contact the <strong>webmaster</strong> or site administrator.</li>
-    </ul>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Back to Home</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-danger">⚠️ Échec de l’envoi du courriel</h1>
-
-    <p class="mt-3">
-      Le message de réinitialisation du mot de passe <strong>n’a pas pu être envoyé</strong> à l’adresse courriel indiquée.
-    </p>
-
-    <hr class="my-4">
-
-    <h5>ℹ️ Vérifiez les points suivants :</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Assurez-vous que l’adresse courriel saisie est correcte et enregistrée dans notre système.</li>
-      <li>➡️ Si le problème persiste, contactez le <strong>webmaster</strong> ou l’administrateur du site.</li>
-    </ul>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-danger">⚠️ Nie udało się wysłać e-maila</h1>
-    <p class="mt-3">
-      E-mail z resetowaniem hasła <strong>nie mógł zostać wysłany</strong> na podany adres.
-    </p>
-    <hr class="my-4">
-    <h5>ℹ️ Sprawdź następujące kwestie:</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Upewnij się, że podany adres e-mail jest poprawny i zarejestrowany w naszym systemie.</li>
-      <li>➡️ Jeśli problem się powtarza, skontaktuj się z <strong>webmasterem</strong> lub administratorem strony.</li>
-    </ul>
-    <a href="/" class="btn btn-primary mt-3">🏠 Powrót na stronę główną</a>
-  </div>
-</div>'),
- (71,'message_email_unknown','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-warning">📧 Unknown Email Address</h1>
-
-    <p class="mt-3">
-      The email address you entered <strong>does not exist</strong> in our system.
-    </p>
-
-    <hr class="my-4">
-
-    <h5>🔍 Please check the following:</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Make sure you typed your email address correctly, without any spelling mistakes.</li>
-      <li>➡️ If you have never created an account, please contact the site administrator to request one.</li>
-      <li>➡️ If you are unsure, contact the <strong>webmaster</strong> or the club administrator.</li>
-    </ul>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Back to Home</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-warning">📧 Adresse courriel inconnue</h1>
-
-    <p class="mt-3">
-      L’adresse courriel que vous avez saisie <strong>n’existe pas</strong> dans notre système.
-    </p>
-
-    <hr class="my-4">
-
-    <h5>🔍 Vérifiez les points suivants :</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Assurez-vous que vous avez bien saisi votre adresse courriel sans erreur de frappe.</li>
-      <li>➡️ Si vous n’avez jamais créé de compte, vous pouvez en demander un auprès de l’administrateur du site.</li>
-      <li>➡️ En cas de doute, contactez le <strong>webmaster</strong> ou le responsable du club.</li>
-    </ul>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-warning">📧 Nieznany adres e-mail</h1>
-    <p class="mt-3">
-      Podany adres e-mail <strong>nie istnieje</strong> w naszym systemie.
-    </p>
-    <hr class="my-4">
-    <h5>🔍 Sprawdź następujące kwestie:</h5>
-    <ul class="text-start mx-auto d-inline-block">
-      <li>➡️ Upewnij się, że adres e-mail został wpisany poprawnie, bez literówek.</li>
-      <li>➡️ Jeśli nigdy nie tworzyłeś/aś konta, skontaktuj się z administratorem strony w celu jego założenia.</li>
-      <li>➡️ W razie wątpliwości, skontaktuj się z <strong>webmasterem</strong> lub administratorem klubu.</li>
-    </ul>
-    <a href="/" class="btn btn-primary mt-3">🏠 Powrót na stronę główną</a>
-  </div>
-</div>'),
- (72,'connections','Connections','Connexions','Połączenia'),
  (73,'ErrorLyricsFileNotFound','<div class=''container text-center mt-5''>
                     <div class=''card shadow-lg rounded-3 p-4''>
                         <h1 class=''text-danger''>📁 Lyrics File Not Found</h1>
@@ -2014,629 +1760,6 @@ W stopce,
                         <a href=''/'' class=''btn btn-primary mt-4''>🏠 Powrót na stronę główną</a>
                     </div>
                 </div>'),
- (76,'save','Save','Enregistrer','Zapisz'),
- (77,'cancel','Cancel','Annuler','Anuluj'),
- (78,'User','<div class="alert alert-info mt-2">
-    <h5 class="alert-heading">Welcome to your personal space</h5>
-    <p>
-        Here, you can view and update your information.
-    </p>
-    <p class="mb-0">
-        👉 If the ☰ button is visible in the top right corner, click on it to access the menu.
-    </p>
-    <p class="mb-0">
-        💡 You can also click directly on the links below to access the different options.
-    </p>
-</div>
-<div class="user-links mt-3 mb-3">
-    <div class="d-flex flex-wrap gap-3">
-        <a href="/user/account" class="{if $page == ''account''}active{/if} text-decoration-none">👤 Account</a>
-        <a href="/user/availabilities" class="{if $page == ''account''}active{/if} text-decoration-none">🕒 Availability</a>
-        <a href="/user/groups" class="{if $page == ''account''}active{/if} text-decoration-none">🔐 Groups</a>
-        <a href="/user/preferences" class="{if $page == ''account''}active{/if} text-decoration-none">⭐ Preferences</a>
-        <a href="/user/notifications" class="{if $page == ''account''}active{/if} text-decoration-none">🔔 Notifications</a>
-        <a href="/user/statistics" class="{if $page == ''account''}active{/if} text-decoration-none">📊 Statistics</a>
-        <a href="/user/directory" class="{if $page == ''account''}active{/if} text-decoration-none">🎭 Member Directory</a>
-        <a href="/user/news" class="{if $page == ''account''}active{/if} text-decoration-none">📰 News</a>
-        <a href="/user/messages" class="{if $page == ''account''}active{/if} text-decoration-none">💬 Messages</a>
-        <a href="/user/notepad" class="{if $page == ''account''}active{/if} text-decoration-none">🗒️ Notepad</a>
-        <a href="/user/connections" class="{if $page == ''account''}active{/if} text-decoration-none">🕸️ Connections</a>
-    </div>
-</div>','<div class="alert alert-info mt-2">
-    <h5 class="alert-heading">Bienvenue dans votre espace personnel</h5>
-    <p>
-        Ici, vous pouvez consulter et mettre à jour vos informations.
-    </p>
-    <p class="mb-0">
-        👉 Si le bouton ☰ est présent en haut à droite, il faut cliquer dessus pour accéder au menu.
-    </p>
-        <p class="mb-0">
-        💡 Vous pouvez aussi cliquer directement sur les liens ci-dessous pour accéder aux différentes options.
-    </p>
-</div>
-<div class="user-links mt-3 mb-3">
-    <div class="d-flex flex-wrap gap-3">
-        <a href="/user/account" class="{if $page == ''account''}active{/if} text-decoration-none">👤 Compte</a>
-        <a href="/user/availabilities" class="{if $page == ''account''}active{/if} text-decoration-none">🕒 Disponibilités</a>
-        <a href="/user/groups" class="{if $page == ''account''}active{/if} text-decoration-none">🔐 Groupes</a>
-        <a href="/user/preferences" class="{if $page == ''account''}active{/if} text-decoration-none">⭐ Préférences</a>
-        <a href="/user/notifications" class="{if $page == ''account''}active{/if} text-decoration-none">🔔 Notifications</a>
-        <a href="/user/statistics" class="{if $page == ''account''}active{/if} text-decoration-none">📊 Statistiques</a>
-        <a href="/user/directory" class="{if $page == ''account''}active{/if} text-decoration-none">🎭 Trombinoscope</a>
-        <a href="/user/news" class="{if $page == ''account''}active{/if} text-decoration-none">📰 News</a>
-        <a href="/user/messages" class="{if $page == ''account''}active{/if} text-decoration-none">💬 Messages</a>
-        <a href="/user/notepad" class="{if $page == ''account''}active{/if} text-decoration-none">🗒️ Bloc-notes</a>
-        <a href="/user/connections" class="{if $page == ''account''}active{/if} text-decoration-none">🕸️ Connexions</a>
-    </div>
-</div>','<div class="alert alert-info mt-2">
-    <h5 class="alert-heading">Witaj w swoim obszarze osobistym</h5>
-    <p>
-        Tutaj możesz przeglądać i aktualizować swoje informacje.
-    </p>
-    <p class="mb-0">
-        👉 Jeśli przycisk ☰ jest widoczny w prawym górnym rogu, kliknij go, aby uzyskać dostęp do menu.
-    </p>
-    <p class="mb-0">
-        💡 Możesz też kliknąć bezpośrednio na poniższe linki, aby przejść do różnych opcji.
-    </p>
-</div>
-<div class="user-links mt-3 mb-3">
-    <div class="d-flex flex-wrap gap-3">
-        <a href="/user/account" class="{if $page == ''account''}active{/if} text-decoration-none">👤 Konto</a>
-        <a href="/user/availabilities" class="{if $page == ''account''}active{/if} text-decoration-none">🕒 Dostępności</a>
-        <a href="/user/groups" class="{if $page == ''account''}active{/if} text-decoration-none">🔐 Grupy</a>
-        <a href="/user/preferences" class="{if $page == ''account''}active{/if} text-decoration-none">⭐ Preferencje</a>
-        <a href="/user/notifications" class="{if $page == ''account''}active{/if} text-decoration-none">🔔 Powiadomienia</a>
-        <a href="/user/statistics" class="{if $page == ''account''}active{/if} text-decoration-none">📊 Statystyki</a>
-        <a href="/user/directory" class="{if $page == ''account''}active{/if} text-decoration-none">🎭 Katalog członków</a>
-        <a href="/user/news" class="{if $page == ''account''}active{/if} text-decoration-none">📰 Aktualności</a>
-        <a href="/user/messages" class="{if $page == ''account''}active{/if} text-decoration-none">💬 Wiadomości</a>
-        <a href="/user/notepad" class="{if $page == ''account''}active{/if} text-decoration-none">🗒️ Notatnik</a>
-        <a href="/user/connections" class="{if $page == ''account''}active{/if} text-decoration-none">🕸️ Połączenia</a>
-    </div>
-</div>'),
- (79,'notepad','Notepad','Bloc-notes','Notatnik'),
- (80,'Admin','<div class="alert alert-warning mt-2">
-        <h5 class="alert-heading">Administration access</h5>
-        <p>
-            From here, you can access the administration areas according to your permissions.
-        </p>
-        <p class="mb-0">
-            🔐 Only the sections you are authorized to access are displayed.
-        </p>
-    </div>
-    <div class="admin-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-
-            {if $isEventManager}
-            <li class="nav-item"><a class="nav-link" href="/eventManager">🗓️ Event management</a></li>
-            {/if}
-
-            {if $isDesigner}
-            <li class="nav-item"><a class="nav-link" href="/designer">🎨 Design</a></li>
-            {/if}
-
-            {if $isRedactor}
-            <li class="nav-item"><a class="nav-link" href="/redactor">✍️ Content writing</a></li>
-            {/if}
-
-            {if $isPersonManager}
-            <li class="nav-item"><a class="nav-link" href="/personManager">📇 Member management</a></li>
-            {/if}
-
-            {if $isVisitorInsights}
-            <li class="nav-item"><a class="nav-link" href="/visitorInsights">🔍 Visitor insights</a></li>
-            {/if}
-
-            {if $isWebmaster}
-            <li class="nav-item"><a class="nav-link" href="/webmaster">🛠️ Website administration</a></li>
-            {/if}
-            
-        </ul>
-    </div>','<div class="alert alert-warning mt-2">
-        <h5 class="alert-heading">Accès à l’administration</h5>
-        <p>
-            Depuis cette page, vous pouvez accéder aux différentes zones d’administration selon vos droits.
-        </p>
-        <p class="mb-0">
-            🔐 Seules les sections auxquelles vous êtes autorisé sont affichées.
-        </p>
-    </div>
-
-    <div class="admin-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-
-            {if $isEventManager}
-            <li class="nav-item"><a class="nav-link" href="/eventManager">🗓️ Gestion des événements</a></li>
-            {/if}
-
-            {if $isDesigner}
-            <li class="nav-item"><a class="nav-link" href="/designer">🎨 Design</a></li>
-            {/if}
-
-            {if $isRedactor}
-            <li class="nav-item"><a class="nav-link" href="/redactor">✍️ Rédaction de contenu</a></li>
-            {/if}
-
-            {if $isPersonManager}
-            <li class="nav-item"><a class="nav-link" href="/personManager">📇 Gestion des membres</a></li>
-            {/if}
-
-            {if $isVisitorInsights}
-            <li class="nav-item"><a class="nav-link" href="/visitorInsights">🔍 Analyse des visiteurs</a></li>
-            {/if}
-
-            {if $isWebmaster}
-            <li class="nav-item"><a class="nav-link" href="/webmaster">🛠️ Administration du site</a></li>
-            {/if}
-
-        </ul>
-    </div>','<div class="alert alert-warning mt-2">
-        <h5 class="alert-heading">Dostęp do administracji</h5>
-        <p>
-            Stąd możesz uzyskać dostęp do obszarów administracyjnych zgodnie z Twoimi uprawnieniami.
-        </p>
-        <p class="mb-0">
-            🔐 Wyświetlane są tylko sekcje, do których masz dostęp.
-        </p>
-    </div>
-    <div class="admin-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-
-            {if $isEventManager}
-            <li class="nav-item">
-                <a class="nav-link" href="/eventManager">🗓️ Zarządzanie wydarzeniami</a>
-            </li>
-            {/if}
-
-            {if $isDesigner}
-            <li class="nav-item">
-                <a class="nav-link" href="/designer">🎨 Design</a>
-            </li>
-            {/if}
-
-            {if $isRedactor}
-            <li class="nav-item">
-                <a class="nav-link" href="/redactor">✍️ Redakcja treści</a>
-            </li>
-            {/if}
-
-            {if $isPersonManager}
-            <li class="nav-item">
-                <a class="nav-link" href="/personManager">📇 Zarządzanie członkami</a>
-            </li>
-            {/if}
-
-            {if $isVisitorInsights}
-            <li class="nav-item">
-                <a class="nav-link" href="/visitorInsights">🔍 Analiza odwiedzających</a>
-            </li>
-            {/if}
-
-            {if $isWebmaster}
-            <li class="nav-item">
-                <a class="nav-link" href="/webmaster">🛠️ Administracja stroną</a>
-            </li>
-            {/if}
-        </ul>
-    </div>'),
- (81,'Designer','<div class="alert alert-info mt-2">
-            <h5 class="alert-heading">Design administration</h5>
-            <p>This area allows you to configure the visual and structural elements of the application.</p>
-            <p class="mb-0">🎨 Only the design tools you are authorized to use are displayed below.</p>
-        </div>
-        <div class="designer-links mt-3 mb-3">
-            <ul class="nav nav-pills gap-3">
-                {if $isEventDesigner}
-                <li class="nav-item"><a class="nav-link" href="/eventTypes">🗓️ Event types and attributes</a></li>
-                <li class="nav-item"><a class="nav-link" href="/needs">📋 Event-related needs</a></li>
-                {/if}
-                {if $isHomeDesigner}
-                <li class="nav-item"><a class="nav-link" href="/settings">🔧 Customization</a></li>
-                <li class="nav-item"><a class="nav-link" href="/designs">🧠 Designs</a></li>
-                {/if}
-                {if $isKanbanDesigner}
-                <li class="nav-item"><a class="nav-link" href="/kanban">🟨 Kanban</a></li>
-                {/if}
-                {if $isMenuDesigner}
-                <li class="nav-item"><a class="nav-link" href="/menu">📑 Navigation bars</a></li>
-                {/if}
-            </ul>
-        </div>','<div class="alert alert-info mt-2">
-            <h5 class="alert-heading">Administration du design</h5>
-            <p>Cette zone permet de configurer les éléments visuels et structurels de l’application.</p>
-            <p class="mb-0">🎨 Seuls les outils de conception auxquels vous avez accès sont affichés ci-dessous.</p>
-        </div>
-        <div class="designer-links mt-3 mb-3">
-            <ul class="nav nav-pills gap-3">
-                {if $isEventDesigner}
-                <li class="nav-item"><a class="nav-link" href="/eventTypes">🗓️ Les types d''événements et leurs attributs</a></li>
-                <li class="nav-item"><a class="nav-link" href="/needs">📋 Les besoins associés aux événements</a></li>
-                {/if}
-                {if $isHomeDesigner}
-                <li class="nav-item"><a class="nav-link" href="/settings">🔧 Personnalisation</a></li>
-                <li class="nav-item"><a class="nav-link" href="/designs">🧠 Les designs</a></li>
-                {/if}
-                {if $isKanbanDesigner}
-                <li class="nav-item"><a class="nav-link" href="/kanban">🟨 Kanban</a></li>
-                {/if}
-                {if $isMenuDesigner}
-                <li class="nav-item"><a class="nav-link" href="/menu">📑 Les barres de navigations</a></li>
-                {/if}
-            </ul>
-        </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Administracja projektem</h5>
-        <p>
-            Ten obszar umożliwia konfigurację elementów wizualnych i strukturalnych aplikacji.
-        </p>
-        <p class="mb-0">
-            🎨 Poniżej wyświetlane są tylko narzędzia projektowe, do których masz dostęp.
-        </p>
-    </div>
-
-    <div class="designer-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-
-            {if $isEventDesigner}
-            <li class="nav-item">
-                <a class="nav-link" href="/eventTypes">🗓️ Typy wydarzeń i atrybuty</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/needs">📋 Potrzeby związane z wydarzeniami</a>
-            </li>
-            {/if}
-
-            {if $isHomeDesigner}
-            <li class="nav-item">
-                <a class="nav-link" href="/settings">🔧 Personalizacja</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/designs">🧠 Projekty</a>
-            </li>
-            {/if}
-
-            {if $isKanbanDesigner}
-            <li class="nav-item">
-                <a class="nav-link" href="/kanban">🟨 Kanban</a>
-            </li>
-            {/if}
-
-            {if $isNavbarDesigner}
-            <li class="nav-item">
-                <a class="nav-link" href="/navbar">📑 Pasy nawigacyjne</a>
-            </li>
-            {/if}
-
-        </ul>
-    </div>'),
- (82,'EventManager','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Event management</h5>
-        <p>
-            This area allows you to manage events, schedules and participant communication.
-        </p>
-        <p class="mb-0">
-            🗓️ Use the tools below to plan, monitor and analyze your events.
-        </p>
-    </div>
-
-    <div class="event-manager-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/weekEvents">🗓️ Weekly calendar</a></li>
-            <li class="nav-item"><a class="nav-link" href="/nextEvents">📅 Upcoming events</a></li>
-            <li class="nav-item"><a class="nav-link" href="/events/guest">📩 Send an invitation</a></li>
-            <li class="nav-item"><a class="nav-link" href="/emails">📧 Get emails</a></li>
-            <li class="nav-item"><a class="nav-link" href="/events/crossTab">🧮 Pivot table</a></li>
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Gestion des événements</h5>
-        <p>
-            Cette zone vous permet de gérer les événements, les plannings et la communication avec les participants.
-        </p>
-        <p class="mb-0">
-            🗓️ Utilisez les outils ci-dessous pour planifier, suivre et analyser vos événements.
-        </p>
-    </div>
-
-    <div class="event-manager-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/weekEvents">🗓️ Calendrier hebdomadaire</a></li>
-            <li class="nav-item"><a class="nav-link" href="/nextEvents">📅 Prochains événements</a></li>
-            <li class="nav-item"><a class="nav-link" href="/events/guest">📩 Envoyer une invitation</a></li>
-            <li class="nav-item"><a class="nav-link" href="/emails">📧 Get emails</a></li>
-            <li class="nav-item"><a class="nav-link" href="/events/crossTab">🧮 Tableau croisé dynamique</a></li>
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Zarządzanie wydarzeniami</h5>
-        <p>
-            Ten obszar umożliwia zarządzanie wydarzeniami, harmonogramami i komunikacją z uczestnikami.
-        </p>
-        <p class="mb-0">
-            🗓️ Skorzystaj z poniższych narzędzi, aby planować, monitorować i analizować swoje wydarzenia.
-        </p>
-    </div>
-
-    <div class="event-manager-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-
-            <li class="nav-item">
-                <a class="nav-link" href="/weekEvents">🗓️ Tygodniowy kalendarz</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/nextEvents">📅 Nadchodzące wydarzenia</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/events/guest">📩 Wyślij zaproszenie</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/emails">📧 Pobierz e-maile</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/events/crossTab">🧮 Tabela przestawna</a>
-            </li>
-
-        </ul>
-    </div>'),
- (83,'Redactor','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Editorial space</h5>
-        <p>
-            This area is dedicated to writing, managing and analyzing published content.
-        </p>
-        <p class="mb-0">
-            ✍️ Use the tools below to create articles, manage media and track performance.
-        </p>
-    </div>
-
-    <div class="redactor-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/articles">📰 Articles</a></li>
-            <li class="nav-item"><a class="nav-link" href="/media/list">📂 Media</a></li>
-            <li class="nav-item"><a class="nav-link" href="/topArticles">📈 Top 50</a></li>
-            <li class="nav-item"><a class="nav-link" href="/articles/crossTab">🧮 Pivot table</a></li>
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Espace rédaction</h5>
-        <p>
-            Cette zone est dédiée à la rédaction, la gestion et l’analyse des contenus publiés.
-        </p>
-        <p class="mb-0">
-            ✍️ Utilisez les outils ci-dessous pour créer des articles, gérer les médias et suivre les performances.
-        </p>
-    </div>
-
-    <div class="redactor-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/articles">📰 Articles</a></li>
-            <li class="nav-item"><a class="nav-link" href="/media/list">📂 Média</a></li>
-            <li class="nav-item"><a class="nav-link" href="/topArticles">📈 Top 50</a></li>
-            <li class="nav-item"><a class="nav-link" href="/articles/crossTab">🧮 Tableau croisé dynamique</a></li>
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Przestrzeń redakcyjna</h5>
-        <p>
-            Ten obszar jest przeznaczony do pisania, zarządzania i analizowania opublikowanych treści.
-        </p>
-        <p class="mb-0">
-            ✍️ Skorzystaj z poniższych narzędzi, aby tworzyć artykuły, zarządzać mediami i śledzić wyniki.
-        </p>
-    </div>
-
-    <div class="redactor-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item">
-                <a class="nav-link" href="/articles">📰 Artykuły</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/media/list">📂 Media</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/topArticles">📈 Top 50</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/articles/crossTab">🧮 Tabela przestawna</a>
-            </li>
-        </ul>
-    </div>'),
- (84,'PersonManager','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Member management</h5>
-        <p>
-            This area allows you to manage club members, groups and registrations.
-        </p>
-        <p class="mb-0">
-            👥 Use the tools below to organize, import and manage member data.
-        </p>
-    </div>
-
-    <div class="person-manager-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/persons">🎭 Members</a></li>
-            <li class="nav-item"><a class="nav-link" href="/groups">👫 Groups</a></li>
-            <li class="nav-item"><a class="nav-link" href="/registration">🎟️ Registrations</a></li>
-            <li class="nav-item"><a class="nav-link" href="/import">📥 Import</a></li>
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Gestion des membres</h5>
-        <p>
-            Cette zone permet de gérer les membres du club, les groupes et les inscriptions.
-        </p>
-        <p class="mb-0">
-            👥 Utilisez les outils ci-dessous pour organiser, importer et administrer les données des membres.
-        </p>
-    </div>
-
-    <div class="person-manager-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/persons">🎭 Membres</a></li>
-            <li class="nav-item"><a class="nav-link" href="/groups">👫 Groupes</a></li>
-            <li class="nav-item"><a class="nav-link" href="/registration">🎟️ Inscriptions</a></li>
-            <li class="nav-item"><a class="nav-link" href="/import">📥 Importer</a></li>
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Zarządzanie członkami</h5>
-        <p>
-            Ten obszar umożliwia zarządzanie członkami klubu, grupami i rejestracjami.
-        </p>
-        <p class="mb-0">
-            👥 Skorzystaj z poniższych narzędzi, aby organizować, importować i zarządzać danymi członków.
-        </p>
-    </div>
-    <div class="person-manager-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item">
-                <a class="nav-link" href="/persons">🎭 Członkowie</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/groups">👫 Grupy</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/registration">🎟️ Rejestracje</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/import">📥 Import</a>
-            </li>
-        </ul>
-    </div>'),
- (85,'VisitorInsights','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Visitor insights</h5>
-        <p>
-            This area allows you to monitor visitor activity, analyze traffic sources and trends.
-        </p>
-        <p class="mb-0">
-            👀 Use the tools below to access logs, top pages and alerts requested by members.
-        </p>
-    </div>
-
-    <div class="visitor-insights-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/referents">☁️ Referring sites</a></li>
-            <li class="nav-item"><a class="nav-link" href="/topPages">📈 Top pages by period</a></li>
-            <li class="nav-item"><a class="nav-link" href="/crossTab">🧮 Pivot table</a></li>
-            <li class="nav-item"><a class="nav-link" href="/logs">📊 Visitors</a></li>
-            <li class="nav-item"><a class="nav-link" href="/lastVisits">👁️ Last visits</a></li>
-            <li class="nav-item"><a class="nav-link" href="/membersAlerts">📩 Member requested alerts</a></li>
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Observateurs</h5>
-        <p>
-            Cette zone permet de suivre l’activité des visiteurs, analyser les sources de trafic et les tendances.
-        </p>
-        <p class="mb-0">
-            👀 Utilisez les outils ci-dessous pour accéder aux logs, aux pages les plus consultées et aux alertes demandées par les membres.
-        </p>
-    </div>
-
-    <div class="visitor-insights-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/referents">☁️ Sites référents</a></li>
-            <li class="nav-item"><a class="nav-link" href="/topPages">📈 Top pages</a></li>
-            <li class="nav-item"><a class="nav-link" href="/crossTab">🧮 Tableau croisé dynamique</a></li>
-            <li class="nav-item"><a class="nav-link" href="/logs">📊 Visiteurs</a></li>
-            <li class="nav-item"><a class="nav-link" href="/lastVisits">👁️ Dernières visites</a></li>
-            <li class="nav-item"><a class="nav-link" href="/membersAlerts">📩 Alertes demandées par les membres</a></li>
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Analiza odwiedzających</h5>
-        <p>
-            Ten obszar umożliwia monitorowanie aktywności odwiedzających, analizowanie źródeł ruchu i trendów.
-        </p>
-        <p class="mb-0">
-            👀 Skorzystaj z poniższych narzędzi, aby uzyskać dostęp do logów, najpopularniejszych stron i alertów żądanych przez członków.
-        </p>
-    </div>
-    <div class="visitor-insights-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item">
-                <a class="nav-link" href="/referents">☁️ Strony odsyłające</a>
-            </li>
-            <li class="nav-item" title="Najpopularniejsze strony według okresu">
-                <a class="nav-link" href="/topPages">📈 Popularne strony</a>
-            </li>
-            <li class="nav-item" title="Tabela przestawna">
-                <a class="nav-link" href="/crossTab">🧮 Tabela przestawna</a>
-            </li>
-            <li class="nav-item" title="Odwiedzający">
-                <a class="nav-link" href="/logs">📊 Odwiedzający</a>
-            </li>
-            <li class="nav-item" title="Ostatnie wizyty">
-                <a class="nav-link" href="/lastVisits">👁️ Ostatnie wizyty</a>
-            </li>
-            <li class="nav-item" title="Alerty żądane przez członków">
-                <a class="nav-link" href="/membersAlerts">📩 Alerty członków</a>
-            </li>
-        </ul>
-    </div>'),
- (86,'Webmaster','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Webmaster Area</h5>
-        <p>
-            This area allows you to manage the website, databases, notifications, and maintenance.
-        </p>
-        <p class="mb-0">
-            🛠️ Use the tools below to access databases, manage members, manage group registrations with permissions, handle notifications, configure the email server, and put the website into maintenance mode.
-        </p>
-    </div>
-
-    <div class="webmaster-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/dbbrowser">🗂️ DB Browser</a></li>
-
-            <li class="nav-item"><a class="nav-link" href="/groups">🧑‍🤝‍🧑 Groups</a></li>
-            <li class="nav-item"><a class="nav-link" href="/registration">🎟️ Registrations</a></li>
-            <li class="nav-item"><a class="nav-link" href="/notifications">🔔 Notifications</a></li>
-            <li class="nav-item"><a class="nav-link" href="/sendEmails">📥 Emails</a></li>
-            <li class="nav-item"><a class="nav-link" href="/maintenance">🚧 Maintenance</a></li>
-
-            {if $isMyclubWebSite}
-            <li class="nav-item"><a class="nav-link" href="/installations">🌐 Installations</a></li>
-            {/if}
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Zone Webmaster</h5>
-        <p>
-            Cette zone permet de gérer le site, les bases de données, les notifications et la maintenance.
-        </p>
-        <p class="mb-0">
-            🛠️ Utilisez les outils ci-dessous pour accéder aux bases de données, gérer les inscriptions, envoyer des emails et effectuer la maintenance.
-        </p>
-    </div>
-
-    <div class="webmaster-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/dbbrowser">🗂️ DB Browser</a></li>
-            <li class="nav-item"><a class="nav-link" href="/groups">🧑‍🤝‍🧑 Groupes</a></li> 
-            <li class="nav-item"><a class="nav-link" href="/registration">🎟️ Inscriptions</a></li>
-            <li class="nav-item"><a class="nav-link" href="/notifications">🔔 Notifications</a></li>
-            <li class="nav-item"><a class="nav-link" href="/sendEmails">📥 Courriels</a></li>
-            <li class="nav-item"><a class="nav-link" href="/maintenance">🚧 Maintenance</a></li>
-
-            {if $isMyclubWebSite} 
-            <li class="nav-item"><a class="nav-link" href="/installations">🌐 Installations</a></li>
-            {/if} 
-        </ul>
-    </div>','<div class="alert alert-info mt-2">
-        <h5 class="alert-heading">Obszar webmastera</h5>
-        <p>
-            Ten obszar umożliwia zarządzanie stroną internetową, bazami danych, powiadomieniami i konserwacją.
-        </p>
-        <p class="mb-0">
-            🛠️ Skorzystaj z poniższych narzędzi, aby uzyskać dostęp do baz danych, zarządzać rejestracjami, wysyłać e-maile i przeprowadzać konserwację.
-        </p>
-    </div>
-    <div class="webmaster-links mt-3 mb-3">
-        <ul class="nav nav-pills gap-3">
-            <li class="nav-item"><a class="nav-link" href="/dbbrowser">🗂️ Przeglądarka bazy danych</a></li>
-            <li class="nav-item"><a class="nav-link" href="/groups">🧑‍🤝‍🧑 Grupy</a></li>
-            <li class="nav-item"><a class="nav-link" href="/registration">🎟️ Rejestracje</a></li>
-            <li class="nav-item"><a class="nav-link" href="/notifications">🔔 Powiadomienia</a></li>
-            <li class="nav-item"><a class="nav-link" href="/sendEmails">📥 E-maile</a></li>
-            <li class="nav-item"><a class="nav-link" href="/maintenance">🚧 Konserwacja</a></li>
-            {if $isMyclubWebSite}
-            <li class="nav-item"><a class="nav-link" href="/installations">🌐 Instalacje</a></li>
-            {/if}
-        </ul>
-    </div>'),
  (87,'article.error.not_found','Article {id} does not exist','L''article {id} n''existe pas','Artykuł {id} nie istnieje'),
  (88,'article.error.unknown_author','Unknown author for article {id}','Auteur inconnu pour l''article {id}','Nieznany autor artykułu {id}'),
  (89,'article.error.login_required','You must be logged in to view this article','Il faut être connecté pour pouvoir consulter cet article','Musisz być zalogowany, aby wyświetlić ten artykuł'),
@@ -2823,7 +1946,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
 <strong>ponownie aktywować</strong> zamiast tworzyć nowe.
 </p>
 </div>'),
- (214,'quick_actions','Quick actions','Vous voulez gagner du temps ? Accédez aux actions rapides.','Chcesz zaoszczędzić czas? Przejdź do szybkich działań.'),
  (215,'presentation.edit.title','Edit my presentation','Édition de ma présentation','Edytuj moją prezentację'),
  (216,'presentation.edit.inDirectory','I wish to appear in the directory','Je souhaite figurer dans le trombinoscope','Chcę figurować w katalogu'),
  (217,'presentation.edit.inDirectory.hint','Your presentation will be visible to other members','Votre présentation sera visible par les autres membres','Twoja prezentacja będzie widoczna dla innych członków'),
@@ -4673,7 +3795,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </section>
 </div>'),
- (419,'attribute_details','🔍 Attribute details','🔍 Détail des attributs','🔍 Szczegóły atrybutów'),
  (420,'designer.home_settings.paragraphs_label','Number of paragraphs to display','Nombre de paragraphes à afficher','Liczba akapitów do wyświetlenia'),
  (421,'designer.home_settings.paragraphs_description','Limits the number of paragraphs shown from the featured article on the home page.','Limite le nombre de paragraphes affichés de l''article mis en avant sur la page d''accueil.','Ogranicza liczbę akapitów wyświetlanych z wyróżnionego artykułu na stronie głównej.'),
  (422,'designer.home_settings.paragraphs_zero_hint','0 = display the entire article','0 = afficher l''article entier','0 = wyświetl cały artykuł'),
@@ -4794,8 +3915,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (555,'chat.placeholder','Write your message...','Écrivez votre message...','Napisz wiadomość...'),
  (556,'chat.send','Send','Envoyer','Wyślij'),
  (565,'chat.error.delete_failed','An error occurred while deleting the message','Une erreur est survenue lors de la suppression du message','Wystąpił błąd podczas usuwania wiadomości'),
- (567,'chat.no_messages','No messages yet.\nBe the first to write!','Aucun message pour le moment.\nSoyez le premier à écrire !','Brak wiadomości.\nBądź pierwszy!'),
- (568,'chat.online','Online:','En ligne :','Online:'),
  (571,'chat.edit_title','Edit message','Modifier le message','Edytuj wiadomość'),
  (572,'chat.edit_icon_title','Edit','Modifier','Edytuj'),
  (573,'chat.message_label','Message:','Message :','Wiadomość:'),
@@ -4981,515 +4100,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (785,'loan.msg.cancelled','Cancelled.','Annulé.','Anulowano.'),
  (786,'loan.msg.error','An error occurred.','Une erreur est survenue.','Wystąpił błąd.'),
  (787,'loan.msg.qty_exceeded','Requested quantity exceeds available stock.','La quantité demandée dépasse le stock disponible.','Żądana ilość przekracza dostępne zapasy.'),
- (788,'Help_LoanDesigner','<div class="container my-5">
-  <header class="mb-5 border-bottom pb-3">
-    <h1 class="display-5 fw-bold text-primary">Contextual Help: Material Loan &amp; Reservation</h1>
-    <p class="lead">Manage your club''s equipment: lend items to take away or reserve them for on-site use.</p>
-  </header>
-
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">The 3 roles</h2>
-        <div class="row g-3">
-          <div class="col-md-4">
-            <div class="d-flex align-items-start">
-              <span class="fs-4 me-3">🎨</span>
-              <div><strong>Designer</strong>
-              <p class="text-muted small">Creates and manages the material catalogue: name, description, type (loan / reservation / both) and total available quantity.</p></div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="d-flex align-items-start">
-              <span class="fs-4 me-3">📋</span>
-              <div><strong>Manager</strong>
-              <p class="text-muted small">Handles loans of items to take away: records who lends what to whom, for how long, and registers returns.</p></div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="d-flex align-items-start">
-              <span class="fs-4 me-3">👤</span>
-              <div><strong>User</strong>
-              <p class="text-muted small">Books items for on-site use: chooses a date, a time slot and a quantity. No return step required.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Material catalogue <span class="badge bg-primary ms-2 fs-6">Designer</span></h2>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-box-seam-fill"></i></div>
-              <div><strong>Item type</strong>
-              <p class="text-muted small">Each item is tagged <em>Loan (take away)</em>, <em>Reservation (on-site)</em> or <em>Both</em>. This controls where it appears in the Manager and User views.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-123"></i></div>
-              <div><strong>Total quantity</strong>
-              <p class="text-muted small">Defines the maximum number of units available simultaneously. The system prevents overbooking automatically.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-toggle-on"></i></div>
-              <div><strong>Active / Inactive</strong>
-              <p class="text-muted small">An inactive item no longer appears in loan or reservation forms, but its history is preserved.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
-              <div><strong>Deletion</strong>
-              <p class="text-muted small">An item cannot be deleted if it has active loans or reservations. Deactivate it instead.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Loans <span class="badge bg-primary ms-2 fs-6">Manager</span></h2>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-arrow-right-circle-fill"></i></div>
-              <div><strong>Creating a loan</strong>
-              <p class="text-muted small">Record who lends (lender), who borrows (borrower), the loan date, the expected return date and the quantity. Real-time availability is shown before saving.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-check2-circle"></i></div>
-              <div><strong>Registering a return</strong>
-              <p class="text-muted small">Click <strong>Register return</strong> <i class="bi bi-check2-circle"></i> on an active loan. Enter the actual return date and the person who received the item.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-danger text-white rounded p-2 me-3"><i class="bi bi-exclamation-circle-fill"></i></div>
-              <div><strong>Overdue loans</strong>
-              <p class="text-muted small">Loans past their due date are automatically flagged <em>Overdue</em> <i class="bi bi-exclamation-triangle-fill text-danger"></i>. They remain visible and can still be returned.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-secondary text-white rounded p-2 me-3"><i class="bi bi-funnel-fill"></i></div>
-              <div><strong>Status filter</strong>
-              <p class="text-muted small">Filter the list by status: <em>Active</em>, <em>Overdue</em>, <em>Returned</em> or <em>Cancelled</em>.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Reservations <span class="badge bg-warning text-dark ms-2 fs-6">User</span></h2>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-calendar-plus-fill"></i></div>
-              <div><strong>Creating a reservation</strong>
-              <p class="text-muted small">Choose an item, a date, a start time, an end time and a quantity. The system checks availability in real time for the selected slot.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-clock-fill"></i></div>
-              <div><strong>No return required</strong>
-              <p class="text-muted small">On-site reservations have no return step. Simply cancel a reservation if it is no longer needed.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-person-badge-fill"></i></div>
-              <div><strong>Manager view</strong>
-              <p class="text-muted small">Managers see all users'' reservations and can cancel any of them. Standard users only see their own.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <hr class="my-5">
-  <section>
-    <h2 class="h4 mb-4">Calendar</h2>
-    <div class="list-group">
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-primary fs-6 me-3">&nbsp;&nbsp;</span>
-        <span><strong>Blue – Active loan:</strong> item currently out on loan.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-success fs-6 me-3">&nbsp;&nbsp;</span>
-        <span><strong>Green – Returned loan:</strong> item successfully returned.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-danger fs-6 me-3">&nbsp;&nbsp;</span>
-        <span><strong>Red – Overdue loan:</strong> item not returned by the due date.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge fs-6 me-3" style="background:#fd7e14">&nbsp;&nbsp;</span>
-        <span><strong>Orange – Reservation:</strong> on-site time slot booked.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center bg-light">
-        <i class="bi bi-shield-lock-fill fs-3 text-primary me-3"></i>
-        <span><strong>Permissions:</strong> <strong>LoanDesigner</strong> manages the catalogue. <strong>LoanManager</strong> manages loans and can view all reservations. Any connected member can book an on-site reservation and view the calendar.</span>
-      </div>
-    </div>
-  </section>
-</div>','<div class="container my-5">
-  <header class="mb-5 border-bottom pb-3">
-    <h1 class="display-5 fw-bold text-primary">Aide Contextuelle : Prêt et Réservation de Matériel</h1>
-    <p class="lead">Gérez le matériel du club : prêtez des articles à emporter ou réservez-les pour une utilisation sur place.</p>
-  </header>
-
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Les 3 rôles</h2>
-        <div class="row g-3">
-          <div class="col-md-4">
-            <div class="d-flex align-items-start">
-              <span class="fs-4 me-3">🎨</span>
-              <div><strong>Designer</strong>
-              <p class="text-muted small">Crée et gère le catalogue du matériel : nom, description, type (prêt / réservation / les deux) et quantité totale disponible.</p></div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="d-flex align-items-start">
-              <span class="fs-4 me-3">📋</span>
-              <div><strong>Manager</strong>
-              <p class="text-muted small">Gère les prêts à emporter : enregistre qui prête quoi à qui, pour combien de temps, et gère les retours.</p></div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="d-flex align-items-start">
-              <span class="fs-4 me-3">👤</span>
-              <div><strong>Utilisateur</strong>
-              <p class="text-muted small">Réserve du matériel pour une utilisation sur place : choisit une date, un créneau horaire et une quantité. Aucune remise à gérer.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Catalogue du matériel <span class="badge bg-primary ms-2 fs-6">Designer</span></h2>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-box-seam-fill"></i></div>
-              <div><strong>Type de matériel</strong>
-              <p class="text-muted small">Chaque article est classé <em>Prêt (à emporter)</em>, <em>Réservation (sur place)</em> ou <em>Les deux</em>. Ce paramètre détermine où il apparaît dans les vues Manager et Utilisateur.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-123"></i></div>
-              <div><strong>Quantité totale</strong>
-              <p class="text-muted small">Définit le nombre maximum d''unités disponibles simultanément. Le système empêche automatiquement le survol de stock.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-toggle-on"></i></div>
-              <div><strong>Actif / Inactif</strong>
-              <p class="text-muted small">Un article inactif n''apparaît plus dans les formulaires de prêt ou de réservation, mais son historique est conservé.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
-              <div><strong>Suppression</strong>
-              <p class="text-muted small">Un article ne peut pas être supprimé s''il possède des prêts ou réservations actifs. Désactivez-le à la place.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Prêts <span class="badge bg-primary ms-2 fs-6">Manager</span></h2>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-arrow-right-circle-fill"></i></div>
-              <div><strong>Créer un prêt</strong>
-              <p class="text-muted small">Enregistrez qui prête (prêteur), qui emprunte (emprunteur), la date de prêt, la date de retour prévue et la quantité. La disponibilité est vérifiée en temps réel avant l''enregistrement.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-check2-circle"></i></div>
-              <div><strong>Enregistrer un retour</strong>
-              <p class="text-muted small">Cliquez sur <strong>Enregistrer le retour</strong> <i class="bi bi-check2-circle"></i> sur un prêt actif. Saisissez la date de retour effective et la personne qui récupère le matériel.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-danger text-white rounded p-2 me-3"><i class="bi bi-exclamation-circle-fill"></i></div>
-              <div><strong>Prêts en retard</strong>
-              <p class="text-muted small">Les prêts dont la date de retour prévue est dépassée passent automatiquement en statut <em>En retard</em> <i class="bi bi-exclamation-triangle-fill text-danger"></i>. Ils restent visibles et peuvent toujours être clôturés.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-secondary text-white rounded p-2 me-3"><i class="bi bi-funnel-fill"></i></div>
-              <div><strong>Filtre par statut</strong>
-              <p class="text-muted small">Filtrez la liste par statut : <em>En cours</em>, <em>En retard</em>, <em>Rendu</em> ou <em>Annulé</em>.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Réservations <span class="badge bg-warning text-dark ms-2 fs-6">Utilisateur</span></h2>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-calendar-plus-fill"></i></div>
-              <div><strong>Créer une réservation</strong>
-              <p class="text-muted small">Choisissez un matériel, une date, une heure de début, une heure de fin et une quantité. La disponibilité est vérifiée en temps réel pour le créneau sélectionné.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-clock-fill"></i></div>
-              <div><strong>Pas de retour à gérer</strong>
-              <p class="text-muted small">Les réservations sur place n''ont pas d''étape de remise. Il suffit d''annuler une réservation si elle n''est plus nécessaire.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-person-badge-fill"></i></div>
-              <div><strong>Vue Manager</strong>
-              <p class="text-muted small">Les managers voient les réservations de tous les utilisateurs et peuvent en annuler n''importe laquelle. Les utilisateurs simples ne voient que les leurs.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="my-5">
-
-  <section>
-    <h2 class="h4 mb-4">Calendrier</h2>
-    <div class="list-group">
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-primary fs-6 me-3">&nbsp;&nbsp;</span>
-        <span><strong>Bleu – Prêt actif :</strong> matériel actuellement sorti en prêt.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-success fs-6 me-3">&nbsp;&nbsp;</span>
-        <span><strong>Vert – Prêt rendu :</strong> matériel retourné avec succès.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-danger fs-6 me-3">&nbsp;&nbsp;</span>
-        <span><strong>Rouge – Prêt en retard :</strong> matériel non rendu à la date prévue.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge fs-6 me-3" style="background:#fd7e14">&nbsp;&nbsp;</span>
-        <span><strong>Orange – Réservation :</strong> créneau sur place réservé.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center bg-light">
-        <i class="bi bi-shield-lock-fill fs-3 text-primary me-3"></i>
-        <span><strong>Permissions :</strong> <strong>LoanDesigner</strong> gère le catalogue. <strong>LoanManager</strong> gère les prêts et peut consulter toutes les réservations. Tout membre connecté peut créer une réservation sur place et consulter le calendrier.</span>
-      </div>
-    </div>
-  </section>
-</div>','<div class="container my-5">
-  <header class="mb-5 border-bottom pb-3">
-    <h1 class="display-5 fw-bold text-primary">Pomoc kontekstowa: Pożyczki i Rezerwacje Sprzętu</h1>
-    <p class="lead">Zarządzaj sprzętem klubu: pożyczaj przedmioty do zabrania lub rezerwuj je do użytku na miejscu.</p>
-  </header>
-
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">3 role</h2>
-        <div class="row g-3">
-          <div class="col-md-4">
-            <div class="d-flex align-items-start">
-              <span class="fs-4 me-3">🎨</span>
-              <div><strong>Designer</strong>
-              <p class="text-muted small">Tworzy katalog sprzętu i nim zarządza: nazwa, opis, typ (pożyczka / rezerwacja / oba) oraz łączna dostępna ilość.</p></div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="d-flex align-items-start">
-              <span class="fs-4 me-3">📋</span>
-              <div><strong>Manager</strong>
-              <p class="text-muted small">Zarządza pożyczkami sprzętu do zabrania: rejestruje kto pożycza co komu, na jak długo oraz obsługuje zwroty.</p></div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="d-flex align-items-start">
-              <span class="fs-4 me-3">👤</span>
-              <div><strong>Użytkownik</strong>
-              <p class="text-muted small">Rezerwuje sprzęt do użytku na miejscu: wybiera datę, przedział czasowy i ilość. Nie ma etapu zwrotu.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Katalog sprzętu <span class="badge bg-primary ms-2 fs-6">Designer</span></h2>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-box-seam-fill"></i></div>
-              <div><strong>Typ przedmiotu</strong>
-              <p class="text-muted small">Każdy przedmiot jest oznaczony jako <em>Pożyczka (do zabrania)</em>, <em>Rezerwacja (na miejscu)</em> lub <em>Oba</em>. Decyduje to o tym, gdzie pojawia się w widokach Managera i Użytkownika.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-123"></i></div>
-              <div><strong>Łączna ilość</strong>
-              <p class="text-muted small">Określa maksymalną liczbę jednostek dostępnych jednocześnie. System automatycznie zapobiega nadrezerwacji.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-primary text-white rounded p-2 me-3"><i class="bi bi-toggle-on"></i></div>
-              <div><strong>Aktywny / Nieaktywny</strong>
-              <p class="text-muted small">Nieaktywny przedmiot nie pojawia się w formularzach pożyczek ani rezerwacji, ale jego historia jest zachowana.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
-              <div><strong>Usuwanie</strong>
-              <p class="text-muted small">Przedmiotu nie można usunąć, jeśli ma aktywne pożyczki lub rezerwacje. Zamiast tego należy go dezaktywować.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Pożyczki <span class="badge bg-primary ms-2 fs-6">Manager</span></h2>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-arrow-right-circle-fill"></i></div>
-              <div><strong>Tworzenie pożyczki</strong>
-              <p class="text-muted small">Zarejestruj kto pożycza (pożyczkodawca), kto bierze (pożyczkobiorca), datę pożyczki, planowany termin zwrotu i ilość. Dostępność jest sprawdzana w czasie rzeczywistym przed zapisem.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-success text-white rounded p-2 me-3"><i class="bi bi-check2-circle"></i></div>
-              <div><strong>Rejestrowanie zwrotu</strong>
-              <p class="text-muted small">Kliknij <strong>Zarejestruj zwrot</strong> <i class="bi bi-check2-circle"></i> przy aktywnej pożyczce. Podaj faktyczną datę zwrotu i osobę, która odebrała sprzęt.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-danger text-white rounded p-2 me-3"><i class="bi bi-exclamation-circle-fill"></i></div>
-              <div><strong>Pożyczki przeterminowane</strong>
-              <p class="text-muted small">Pożyczki po terminie zwrotu automatycznie zmieniają status na <em>Przeterminowane</em> <i class="bi bi-exclamation-triangle-fill text-danger"></i>. Pozostają widoczne i nadal można je zamknąć.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-secondary text-white rounded p-2 me-3"><i class="bi bi-funnel-fill"></i></div>
-              <div><strong>Filtr statusu</strong>
-              <p class="text-muted small">Filtruj listę według statusu: <em>Aktywna</em>, <em>Przeterminowana</em>, <em>Zwrócona</em> lub <em>Anulowana</em>.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mb-5">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title h4 mb-4">Rezerwacje <span class="badge bg-warning text-dark ms-2 fs-6">Użytkownik</span></h2>
-        <div class="row g-4">
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-calendar-plus-fill"></i></div>
-              <div><strong>Tworzenie rezerwacji</strong>
-              <p class="text-muted small">Wybierz przedmiot, datę, godzinę rozpoczęcia, godzinę zakończenia i ilość. System sprawdza dostępność w czasie rzeczywistym dla wybranego przedziału.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start mb-3">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-clock-fill"></i></div>
-              <div><strong>Brak etapu zwrotu</strong>
-              <p class="text-muted small">Rezerwacje na miejscu nie wymagają zwrotu. Wystarczy anulować rezerwację, gdy nie jest już potrzebna.</p></div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex align-items-start">
-              <div class="bg-warning text-dark rounded p-2 me-3"><i class="bi bi-person-badge-fill"></i></div>
-              <div><strong>Widok Managera</strong>
-              <p class="text-muted small">Managerowie widzą rezerwacje wszystkich użytkowników i mogą anulować dowolną z nich. Zwykli użytkownicy widzą tylko swoje.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="my-5">
-
-  <section>
-    <h2 class="h4 mb-4">Kalendarz</h2>
-    <div class="list-group">
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-primary fs-6 me-3">&nbsp;&nbsp;</span>
-        <span><strong>Niebieski – Aktywna pożyczka:</strong> sprzęt aktualnie wypożyczony.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-success fs-6 me-3">&nbsp;&nbsp;</span>
-        <span><strong>Zielony – Zwrócona pożyczka:</strong> sprzęt pomyślnie zwrócony.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge bg-danger fs-6 me-3">&nbsp;&nbsp;</span>
-        <span><strong>Czerwony – Pożyczka przeterminowana:</strong> sprzęt nie zwrócony w terminie.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center">
-        <span class="badge fs-6 me-3" style="background:#fd7e14">&nbsp;&nbsp;</span>
-        <span><strong>Pomarańczowy – Rezerwacja:</strong> zarezerwowany przedział na miejscu.</span>
-      </div>
-      <div class="list-group-item d-flex align-items-center bg-light">
-        <i class="bi bi-shield-lock-fill fs-3 text-primary me-3"></i>
-        <span><strong>Uprawnienia:</strong> <strong>LoanDesigner</strong> zarządza katalogiem. <strong>LoanManager</strong> zarządza pożyczkami i może przeglądać wszystkie rezerwacje. Każdy zalogowany członek może tworzyć rezerwacje na miejscu i przeglądać kalendarz.</span>
-      </div>
-    </div>
-  </section>
-</div>'),
  (789,'user.filter.since_signout','Since your last sign-out','Depuis votre dernière déconnexion','Od ostatniego wylogowania'),
  (790,'user.filter.since_signin','Since your sign-in','Depuis votre connexion','Od ostatniego logowania'),
  (791,'user.filter.since_week','Since one week','Depuis une semaine','Od tygodnia'),
@@ -5497,11 +4107,7 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (793,'user.filter.since_quarter','Since one quarter','Depuis un trimestre','Od kwartału'),
  (794,'user.filter.since_year','Since one year','Depuis un an','Od roku'),
  (795,'user.filter.info.showing_since','Showing content since','Affichage depuis le','Wyświetlanie od'),
- (802,'user.messages.group.events','Events','Événements','Wydarzenia'),
- (803,'user.messages.group.articles','Articles','Articles','Artykuły'),
- (804,'user.messages.group.groups','Groups','Groupes','Grupy'),
  (805,'user.messages.action.view','View','Voir','Zobacz'),
- (806,'user.messages.empty.title','No messages','Aucun message','Brak wiadomości'),
  (813,'user.news.group.articles','Articles','Articles','Artykuły'),
  (814,'user.news.group.events','Events','Événements','Wydarzenia'),
  (815,'user.news.group.messages','Messages','Messages','Wiadomości'),
@@ -5539,7 +4145,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (858,'visitor_insights.cross_tab.filter.group','Filter by Group','Filtrer par Groupe','Filtruj według Grupy'),
  (859,'visitor_insights.cross_tab.filter.all_groups','All groups','Tous les groupes','Wszystkie grupy'),
  (860,'visitor_insights.cross_tab.filter.submit','Filter','Filtrer','Filtruj'),
- (861,'reset','Reset','Réinitialiser','Resetuj'),
  (862,'visitor_insights.cross_tab.table.title','Visit cross-tab (URI × User)','Tableau croisé des visites (URI × Utilisateur)','Tabela krzyżowa wizyt (URI × Użytkownik)'),
  (863,'visitor_insights.cross_tab.table.hide','Hide','Masquer','Ukryj'),
  (864,'visitor_insights.cross_tab.table.show','Show','Afficher','Pokaż'),
@@ -5548,13 +4153,11 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (867,'visitor_insights.cross_tab.no_data','No data matches the selected filter criteria.','Aucune donnée ne correspond aux critères de filtrage sélectionnés.','Brak danych spełniających wybrane kryteria filtrowania.'),
  (868,'visitor_insights.top_articles.card_title','Top visited articles','Top des articles visités','Najpopularniejsze artykuły'),
  (870,'common.creation_time_modal.title','⏱️ Creation time distribution','⏱️ Répartition des temps de création','⏱️ Rozkład czasu tworzenia'),
- (871,'loading','Loading…','Chargement…','Ładowanie…'),
  (872,'common.creation_time_modal.info','Each point represents a generation time slot. The median point is highlighted to give an idea of the typical creation time.','Chaque point représente une tranche de temps de génération. Le point médian est mis en évidence pour donner une idée du temps de création typique.','Każdy punkt reprezentuje przedział czasu generowania. Punkt mediany jest wyróżniony, aby dać wyobrażenie o typowym czasie tworzenia.'),
  (873,'article.edit.error.content_required','Content is required.','Le contenu est obligatoire.','Treść jest wymagana.'),
  (874,'article.edit.error.editor_not_ready','The editor is not ready yet.','L''éditeur n''est pas encore prêt.','Edytor nie jest jeszcze gotowy.'),
  (875,'article.edit.error.title_required','Title is required.','Le titre est obligatoire.','Tytuł jest wymagany.'),
  (876,'article.error.owner_required','An owner is required.','Un propriétaire est obligatoire.','Właściciel jest wymagany.'),
- (877,'close','Close','Fermer','Zamknij'),
  (878,'common.creation_time_modal.tab_distribution','Distribution','Distribution','Rozkład'),
  (879,'common.creation_time_modal.tab_trend','Trend','Tendance','Tendencja'),
  (880,'common.table.column.avg_duration.tooltip','Average page creation time','Temps de création moyen de la page','Średni czas tworzenia strony'),
@@ -5575,11 +4178,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (895,'media_manager.file_upload_error','Error while saving file','Erreur lors de l’enregistrement du fichier','Błąd podczas zapisywania pliku'),
  (896,'chat.current_image','Current image','Image actuelle','Aktualne zdjęcie'),
  (898,'chat.attach_image','Attach an image','Joindre une image','Dołącz zdjęcie'),
- (899,'media_manager.file_not_found','File not found','Fichier non trouvé','Plik nie został znaleziony'),
- (900,'media_manager.file_deleted_success','File deleted successfully','Fichier supprimé avec succès','Plik został pomyślnie usunięty'),
- (901,'media_manager.file_delete_error','Error while deleting file','Erreur lors de la suppression du fichier','Błąd podczas usuwania pliku'),
- (902,'media_manager.file_not_exists','File doesn''t exist','Le fichier n''existe pas','Plik nie istnieje'),
- (903,'media_manager.file_upload_error','Error while saving file','Erreur lors de l’enregistrement du fichier','Błąd podczas zapisywania pliku'),
  (904,'message.image_not_found','Message not found','Message introuvable','Wiadomość nie została znaleziona'),
  (905,'message.image_not_attached','No image attached to this message','Aucune image associée à ce message','Brak obrazu powiązanego z tą wiadomością'),
  (906,'message.image_invalid_path','Invalid image path','Chemin d''image invalide','Nieprawidłowa ścieżka obrazu'),
@@ -5649,8 +4247,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (972,'designer.home_settings.navbar_bg_label','Background color','Couleur de fond','Kolor tła'),
  (973,'designer.home_settings.navbar_ink_label','Ink color','Couleur de l''encre','Kolor tekstu'),
  (974,'designer.home_settings.navbar_icon_label','Icon','Icône','Ikona'),
- (975,'filter','Filter','Filtrer','Filtruj'),
- (976,'filters','Filters','Filtres','Filtry'),
  (977,'media.uses.in_events','Used in events','Utilisé dans des événements','Używane w wydarzeniach'),
  (978,'media.uses.no_events','Not used in any event','Non utilisé dans aucun événement','Nieużywane w żadnym wydarzeniu'),
  (979,'navbar.designer.exercise','Exercise','Exercice','Ćwiczenie'),
@@ -5670,8 +4266,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (993,'designer.home_settings.section_footer_accordion','Footer accordion','Accordéon pied de page','Akordeon stopki'),
  (994,'designer.home_settings.title_edit_footer_accordion','Edit footer accordion article','Modifier l''article de l''accordéon du pied de page','Edytuj artykuł akordeonu stopki'),
  (995,'designer.home_settings.footer_accordion_hint','0 = no article; otherwise enter the article ID to display in the footer accordion.','0 = aucun article ; sinon, saisir l''ID de l''article à afficher dans l''accordéon du pied de page.','0 = brak artykułu; w przeciwnym razie podaj ID artykułu do wyświetlenia w akordeonie stopki.'),
- (996,'previous','Previous','Précédent','Poprzedni'),
- (997,'next','Next','Suivant','Następny'),
  (998,'Help_Communication','<div class="container my-5">
   <header class="mb-5 border-bottom pb-3">
     <h1 class="display-5 fw-bold text-primary">
@@ -6209,7 +4803,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1067,'personManager.membershipSettings.seasonEnd','End date','Date de fin','Data zakończenia'),
  (1068,'personManager.membershipSettings.seasonHint','Leave empty to use the current season automatically.','Laisser vide pour utiliser la saison en cours automatiquement.','Pozostaw puste, aby automatycznie użyć bieżącego sezonu.'),
  (1069,'media.upload.error','Upload error','Erreur de téléversement','Błąd przesyłania pliku'),
- (1070,'membership','Membership','Adhésion','Członkostwo'),
  (1071,'navbar.person_manager.membershipSettings','Membership settings','Paramètres des adhésions','Ustawienia członkostwa'),
  (1072,'navbar.webmaster.helloasso','HelloAsso','HelloAsso','HelloAsso'),
  (1073,'Help_Redactor','<div class="container my-5">
@@ -7480,217 +6073,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1077,'user.statistics.message_distribution','Message distribution','Distribution des messages','Dystrybucja wiadomości'),
  (1078,'user.statistics.chart.messages.y_axis','Messages','Messages','Wiadomości'),
  (1079,'user.statistics.chart.messages.x_axis','Members','Membres','Członkowie'),
- (1080,'Help_Messages','<div class="container my-5">
-    <h1 class="display-5 fw-bold text-primary">💬 Messages</h1>
-    <p class="lead">View all conversations you are part of, grouped by type: articles, events and groups.</p>
-
-    <section class="mb-5">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h2 class="card-title h4 mb-4">How to post a message</h2>
-                <p class="text-muted">Messages are linked to an article, an event or a group. Browse to the relevant section to start or join a conversation.</p>
-                <div class="row g-4">
-
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📰</div>
-                            <div>
-                                <strong>Article</strong>
-                                <ol class="text-muted small ps-3 mt-1">
-                                    <li>Go to the <a href="/articles">articles list</a></li>
-                                    <li>Click the green 👁 button to open the article</li>
-                                    <li>Click <strong>[Messages]</strong> in the top-right navigation bar</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📅</div>
-                            <div>
-                                <strong>Event</strong>
-                                <ol class="text-muted small ps-3 mt-1">
-                                    <li>Go to the <a href="/nextEvents">events list</a></li>
-                                    <li>Use the top-right buttons to browse past events if needed</li>
-                                    <li>Click the event row, then click <strong>[Messages]</strong></li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">👥</div>
-                            <div>
-                                <strong>Group</strong>
-                                <ol class="text-muted small ps-3 mt-1">
-                                    <li>Go to the <a href="/user/directory">directory</a></li>
-                                    <li>Click on a group</li>
-                                    <li>If you are a member, a <strong>[Messages]</strong> button will appear</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="mb-5">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h2 class="card-title h4 mb-3">Reading your messages</h2>
-                <p class="text-muted small">
-                    The list shows all conversations with at least one message. Each row displays the title, the number of messages 💬, the date of the last activity and the avatar of the last contributor.
-                    Use the search filters at the top to narrow down the results by period.
-                    Click the green 👁 button on any row to open the conversation.
-                </p>
-            </div>
-        </div>
-    </section>
-</div>','<div class="container my-5">
-    <h1 class="display-5 fw-bold text-primary">💬 Messages</h1>
-    <p class="lead">Consultez toutes les conversations auxquelles vous participez, regroupées par type : articles, événements et groupes.</p>
-
-    <section class="mb-5">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h2 class="card-title h4 mb-4">Comment créer un message</h2>
-                <p class="text-muted">Les messages sont liés à un article, un événement ou un groupe. Rendez-vous dans la section concernée pour démarrer ou rejoindre une conversation.</p>
-                <div class="row g-4">
-
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📰</div>
-                            <div>
-                                <strong>Article</strong>
-                                <ol class="text-muted small ps-3 mt-1">
-                                    <li>Rendez-vous dans la <a href="/articles">liste des articles</a></li>
-                                    <li>Cliquez sur le bouton vert 👁 pour ouvrir l''article</li>
-                                    <li>Cliquez sur <strong>[Messages]</strong> dans la barre de navigation en haut à droite</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📅</div>
-                            <div>
-                                <strong>Événement</strong>
-                                <ol class="text-muted small ps-3 mt-1">
-                                    <li>Rendez-vous dans la <a href="/nextEvents">liste des événements</a></li>
-                                    <li>Utilisez les boutons en haut à droite pour accéder aux événements passés si besoin</li>
-                                    <li>Cliquez sur la ligne de l''événement, puis sur <strong>[Messages]</strong></li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">👥</div>
-                            <div>
-                                <strong>Groupe</strong>
-                                <ol class="text-muted small ps-3 mt-1">
-                                    <li>Rendez-vous dans le <a href="/user/directory">trombinoscope</a></li>
-                                    <li>Cliquez sur un groupe</li>
-                                    <li>Si vous faites partie du groupe, un bouton <strong>[Messages]</strong> apparaît</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="mb-5">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h2 class="card-title h4 mb-3">Lire vos messages</h2>
-                <p class="text-muted small">
-                    La liste affiche toutes les conversations ayant au moins un message. Chaque ligne indique le titre, le nombre de messages 💬, la date de la dernière activité et l''avatar du dernier contributeur.
-                    Utilisez les filtres de recherche en haut pour affiner les résultats par période.
-                    Cliquez sur le bouton vert 👁 d''une ligne pour ouvrir la conversation.
-                </p>
-            </div>
-        </div>
-    </section>
-</div>','<div class="container my-5">
-    <h1 class="display-5 fw-bold text-primary">💬 Wiadomości</h1>
-    <p class="lead">Przeglądaj wszystkie rozmowy, w których uczestniczysz, pogrupowane według typu: artykuły, wydarzenia i grupy.</p>
-
-    <section class="mb-5">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h2 class="card-title h4 mb-4">Jak dodać wiadomość</h2>
-                <p class="text-muted">Wiadomości są powiązane z artykułem, wydarzeniem lub grupą. Przejdź do odpowiedniej sekcji, aby rozpocząć lub dołączyć do rozmowy.</p>
-                <div class="row g-4">
-
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📰</div>
-                            <div>
-                                <strong>Artykuł</strong>
-                                <ol class="text-muted small ps-3 mt-1">
-                                    <li>Przejdź do <a href="/articles">listy artykułów</a></li>
-                                    <li>Kliknij zielony przycisk 👁, aby otworzyć artykuł</li>
-                                    <li>Kliknij <strong>[Wiadomości]</strong> na pasku nawigacji w prawym górnym rogu</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">📅</div>
-                            <div>
-                                <strong>Wydarzenie</strong>
-                                <ol class="text-muted small ps-3 mt-1">
-                                    <li>Przejdź do <a href="/nextEvents">listy wydarzeń</a></li>
-                                    <li>Użyj przycisków w prawym górnym rogu, aby przeglądać minione wydarzenia</li>
-                                    <li>Kliknij wiersz wydarzenia, a następnie <strong>[Wiadomości]</strong></li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start">
-                            <div class="me-3" style="font-size:1.75rem; line-height:1;">👥</div>
-                            <div>
-                                <strong>Grupa</strong>
-                                <ol class="text-muted small ps-3 mt-1">
-                                    <li>Przejdź do <a href="/user/directory">katalogu</a></li>
-                                    <li>Kliknij na grupę</li>
-                                    <li>Jeśli jesteś członkiem grupy, pojawi się przycisk <strong>[Wiadomości]</strong></li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="mb-5">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h2 class="card-title h4 mb-3">Odczytywanie wiadomości</h2>
-                <p class="text-muted small">
-                    Lista wyświetla wszystkie rozmowy zawierające co najmniej jedną wiadomość. Każdy wiersz pokazuje tytuł, liczbę wiadomości 💬, datę ostatniej aktywności oraz awatar ostatniego uczestnika.
-                    Użyj filtrów wyszukiwania u góry, aby zawęzić wyniki według okresu.
-                    Kliknij zielony przycisk 👁 w dowolnym wierszu, aby otworzyć rozmowę.
-                </p>
-            </div>
-        </div>
-    </section>
-</div>'),
  (1081,'Help_Messages','<div class="container my-5">
     <section class="mb-5">
         <div class="card shadow-sm">
@@ -7857,20 +6239,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1082,'user.groups.select_prompt','Select the groups you wish to join to access the associated resources:','Sélectionnez les groupes auxquels vous souhaitez appartenir pour accéder aux ressources associées :','Wybierz grupy, do których chcesz należeć, aby uzyskać dostęp do powiązanych zasobów:'),
  (1083,'user.groups.managed_info','An administrator has added you to these groups. If you no longer wish to be a member, you must submit a request to them.','Un administrateur vous a inscrit dans ces groupes. Si vous ne souhaitez plus y figurer, vous devez lui en faire la demande.','Administrator zapisał Cię do tych grup. Jeśli nie chcesz już w nich figurować, musisz złożyć mu odpowiedni wniosek.'),
  (1084,'communication.index.contact_email_tooltip','Email address where contact requests will be sent','Adresse e-mail où les demandes de contact seront envoyées','Adres e-mail, na który będą wysyłane prośby o kontakt'),
- (1085,'Home_Header','<h1 class="text-center">🚧🔧🛠️ Under Construction 🛠️🔧🚧</h1>','<h1 class="text-center">🚧🔧🛠️ En construction 🛠️🔧🚧</h1>','<h1 class="text-center">🚧🔧🛠️ W budowie 🛠️🔧🚧</h1>'),
- (1086,'Home_Footer','<div style="text-align:center; font-size:2.4em; line-height:1.4;">
-🚧👷‍♂️🔧👷‍♀️🚧<br>
-<b>WORK IN PROGRESS</b><br>
-🚧👷‍♀️🔧👷‍♂️🚧
-</div>','<div style="text-align:center; font-size:2.4em; line-height:1.4;">
-🚧👷‍♂️🔧👷‍♀️🚧<br>
-<b>TRAVAUX EN COURS</b><br>
-🚧👷‍♀️🔧👷‍♂️🚧
-</div>','<div style="text-align:center; font-size:2.4em; line-height:1.4;">
-🚧👷‍♂️🔧👷‍♀️🚧<br>
-<b>PRACE W TOKU</b><br>
-🚧👷‍♀️🔧👷‍♂️🚧
-</div>'),
  (1087,'Help_Media_list','<div class="container my-5">
   <header class="mb-5 border-bottom pb-3">
     <h1 class="display-5 fw-bold text-primary">Contextual Help: Media Manager</h1>
@@ -8277,15 +6645,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1094,'availability.evening','Evening','Soir','Wieczór'),
  (1095,'availability.percent_available','% available','% disponible','% dostępnych'),
  (1096,'navbar.event_manager.availabilities','Availabilities','Disponibilités','Dostępności'),
- (1097,'availability.stats.title','Availability statistics','Statistiques de disponibilité','Statystyki dostępności'),
- (1098,'availability.filled.title','Response rate','Taux de réponses','Wskaźnik odpowiedzi'),
- (1099,'availability.filled.members','members have submitted their availability','membres ont renseigné leurs disponibilités','członków podało swoją dostępność'),
- (1100,'availability.by_slot.title','Breakdown by time slot','Répartition par créneau','Podział według przedziałów czasowych'),
- (1101,'availability.morning','Morning','Matin','Rano'),
- (1102,'availability.afternoon','Afternoon','Après-midi','Popołudnie'),
- (1103,'availability.evening','Evening','Soir','Wieczór'),
- (1104,'availability.percent_available','% available','% disponible','% dostępnych'),
- (1105,'navbar.event_manager.availabilities','Availabilities','Disponibilités','Dostępności'),
  (1106,'day.monday','Monday','Lundi','Poniedziałek'),
  (1107,'day.tuesday','Tuesday','Mardi','Wtorek'),
  (1108,'day.wednesday','Wednesday','Mercredi','Środa'),
@@ -8351,7 +6710,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1168,'astronomy.my_position','My position','Ma position','Moja pozycja'),
  (1169,'astronomy.invalid_coordinates','Invalid coordinates','Coordonnées invalides','Nieprawidłowe współrzędne'),
  (1170,'astronomy.cookie_save_failed','Unable to save location cookie','Impossible d’enregistrer le cookie de localisation','Nie można zapisać ciasteczka lokalizacji'),
- (1171,'message_helloasso_not_configured','HelloAsso is not configured','HelloAsso n''est pas configuré','HelloAsso nie jest skonfigurowane'),
  (1172,'custom_fields.title','Custom member fields','Champs personnalisés des membres','Pola niestandardowe członków'),
  (1173,'custom_fields.help','Define the additional fields you want to fill in for each member of the association.','Définissez les champs supplémentaires que vous souhaitez renseigner pour chaque membre de l''association.','Zdefiniuj dodatkowe pola, które chcesz wypełniać dla każdego członka stowarzyszenia.'),
  (1174,'custom_fields.label','Field name','Nom du champ','Nazwa pola'),
@@ -8423,88 +6781,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1240,'export.import.error.wrong_type','Only .ods files are accepted.','Seuls les fichiers .ods sont acceptés.','Akceptowane są tylko pliki .ods.'),
  (1241,'export.import.error.invalid_file','The file is not a valid .ods file.','Le fichier n''est pas un fichier .ods valide.','Plik nie jest prawidłowym plikiem .ods.'),
  (1242,'export.import.error.generic','The import failed.','L''import a échoué.','Import nie powiódł się.'),
- (1243,'import.ods.error.empty','The file contains no member rows.','Le fichier ne contient aucune ligne de membre.','Plik nie zawiera żadnych wierszy z członkami.'),
- (1244,'import.ods.error.missing_column','Required column not found: {column}','Colonne obligatoire introuvable : {column}','Nie znaleziono wymaganej kolumny: {column}'),
- (1245,'import.ods.error.invalid_id','Line {line}: invalid Id "{value}", row ignored.','Ligne {line} : Id « {value} » invalide, ligne ignorée.','Wiersz {line}: nieprawidłowy Id „{value}”, wiersz pominięto.'),
- (1246,'import.ods.error.unknown_id','Line {line}: unknown Id {id}, row ignored.','Ligne {line} : Id {id} inconnu, ligne ignorée.','Wiersz {line}: nieznany Id {id}, wiersz pominięto.'),
- (1247,'import.ods.error.invalid_email','Line {line}: invalid or missing email address "{email}", row ignored.','Ligne {line} : adresse email « {email} » invalide ou absente, ligne ignorée.','Wiersz {line}: nieprawidłowy lub brakujący adres e-mail „{email}”, wiersz pominięto.'),
- (1248,'import.ods.error.email_exists','Line {line}: the address {email} is already used by member {id}, row ignored.','Ligne {line} : l''adresse {email} est déjà utilisée par le membre {id}, ligne ignorée.','Wiersz {line}: adres {email} jest już używany przez członka {id}, wiersz pominięto.'),
- (1249,'import.ods.warning.duplicate_id','Line {line}: Id {id} appears several times, this row was added as a new member.','Ligne {line} : l''Id {id} apparaît plusieurs fois, cette ligne a été ajoutée comme nouveau membre.','Wiersz {line}: Id {id} występuje wielokrotnie, ten wiersz dodano jako nowego członka.'),
- (1250,'export.import.title','Import a modified export','Importer un export modifié','Importuj zmodyfikowany eksport'),
- (1251,'export.import.help','Drop an .ods file produced by the export. Rows without an Id are added; members whose Id is missing from the file, or whose Active box is not ticked, are deactivated; the others are updated.','Déposez un fichier .ods issu de l''export. Les lignes sans Id sont ajoutées ; les membres dont l''Id a disparu du fichier, ou dont la case Actif n''est pas cochée, sont désactivés ; les autres sont mis à jour.','Upuść plik .ods pochodzący z eksportu. Wiersze bez Id są dodawane; członkowie, których Id brakuje w pliku lub u których pole Aktywny nie jest zaznaczone, są dezaktywowani; pozostali są aktualizowani.'),
- (1252,'export.import.drop','Drop an .ods file here, or click to choose one','Déposez un fichier .ods ici, ou cliquez pour en choisir un','Upuść tutaj plik .ods lub kliknij, aby go wybrać'),
- (1253,'export.import.confirm','{created} created, {updated} updated, {deactivated} deactivated, {reactivated} reactivated, {errors} error(s). Apply these changes?','{created} créé(s), {updated} modifié(s), {deactivated} désactivé(s), {reactivated} réactivé(s), {errors} erreur(s). Appliquer ces modifications ?','{created} utworzonych, {updated} zmienionych, {deactivated} dezaktywowanych, {reactivated} reaktywowanych, błędy: {errors}. Zastosować te zmiany?'),
- (1254,'export.import.no_change','No change to apply.','Aucune modification à appliquer.','Brak zmian do zastosowania.'),
- (1255,'export.import.result.applied','Changes applied.','Modifications appliquées.','Zmiany zastosowane.'),
- (1256,'export.import.result.reactivated','Reactivated records:','Enregistrements réactivés :','Reaktywowane rekordy:'),
- (1257,'export.import.error.no_file','No file received.','Aucun fichier reçu.','Nie otrzymano pliku.'),
- (1258,'export.import.error.wrong_type','Only .ods files are accepted.','Seuls les fichiers .ods sont acceptés.','Akceptowane są tylko pliki .ods.'),
- (1259,'export.import.error.invalid_file','The file is not a valid .ods file.','Le fichier n''est pas un fichier .ods valide.','Plik nie jest prawidłowym plikiem .ods.'),
- (1260,'export.import.error.generic','The import failed.','L''import a échoué.','Import nie powiódł się.'),
- (1261,'help_missing','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-secondary">🤝 No help here (yet)</h1>
-
-    <p class="mt-3">
-      The help for this section doesn’t exist yet...<br>
-      but it’s up to <strong>you</strong> to change that!
-    </p>
-
-    <p class="fw-bold">
-      💡 MyClub is a community project. If you know how this page works, share your knowledge with the webmaster: the next person will thank you.
-    </p>
-
-    <hr class="my-4">
-
-    <p>
-      ➡️ Not sure where to start? <strong>Tell the webmaster what you would have liked to find here.</strong>
-    </p>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-secondary">🤝 Pas encore d’aide ici</h1>
-
-    <p class="mt-3">
-      L’aide pour cette rubrique n’existe pas encore...<br>
-      mais il ne tient qu’à <strong>vous</strong> d’y remédier !
-    </p>
-
-    <p class="fw-bold">
-      💡 MyClub est un projet communautaire. Si vous savez comment fonctionne cette page, partagez vos connaissances avec le webmaster : la prochaine personne vous remerciera.
-    </p>
-
-    <hr class="my-4">
-
-    <p>
-      ➡️ Pas sûr(e) par où commencer ? <strong>Dites au webmaster ce que vous auriez aimé trouver ici.</strong>
-    </p>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
-  </div>
-</div>','<div class="container text-center mt-5">
-  <div class="card shadow-lg rounded-3 p-4">
-    <h1 class="text-secondary">🤝 Brak pomocy (jeszcze)</h1>
-
-    <p class="mt-3">
-      Pomoc dla tej sekcji jeszcze nie istnieje...<br>
-      ale to od <strong>Ciebie</strong> zależy, czy się to zmieni!
-    </p>
-
-    <p class="fw-bold">
-      💡 MyClub to projekt społecznościowy. Jeśli wiesz, jak działa ta strona, podziel się swoją wiedzą z webmasterem: kolejna osoba Ci za to podziękuje.
-    </p>
-
-    <hr class="my-4">
-
-    <p>
-      ➡️ Nie wiesz, od czego zacząć? <strong>Napisz do webmastera, czego chciał(a)byś tu znaleźć.</strong>
-    </p>
-
-    <a href="/" class="btn btn-primary mt-3">🏠 Powrót do strony głównej</a>
-  </div>
-</div>'),
  (1262,'event.carpooling','Carpooling','Covoiturage','Wspólne dojazdy'),
  (1263,'event.participants','Participants:','Participants :','Uczestnicy:'),
  (1264,'event.calendar_app','Calendar','Calendrier','Kalendarz'),
@@ -8516,10 +6792,102 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1270,'designer.home_settings.latest_articles_count','Number of latest articles to display','Nombre de derniers articles à afficher','Liczba ostatnich artykułów do wyświetlenia'),
  (1271,'designer.home_settings.featured_article_id','Featured article ID (0 = latest article)','ID de l''article mis en avant (0 = dernier article)','ID wyróżnionego artykułu (0 = najnowszy artykuł)'),
  (1272,'designer.home_settings.featured_article_paragraphs','Number of paragraphs to display (0 = whole article)','Nombre de paragraphes à afficher (0 = article entier)','Liczba akapitów do wyświetlenia (0 = cały artykuł)'),
- (1273,'home.signpost.title','What would you like to do?','Que souhaitez-vous faire ?','Co chcesz zrobić?');
+ (1273,'home.signpost.title','What would you like to do?','Que souhaitez-vous faire ?','Co chcesz zrobić?'),
+ (1274,'Admin','Admin','Administration','Administrator'),
+ (1275,'Designer','Designer','Concepteur','Projektant'),
+ (1276,'Error500','Internal server error','Erreur interne du serveur','Wewnętrzny błąd serwera'),
+ (1277,'EventManager','Event manager','Gestionnaire des événements','Menedżer wydarzeń'),
+ (1278,'Help_LoanDesigner','Loan designer help','Aide : gestionnaire des prêts','Pomoc: zarządzanie wypożyczeniami'),
+ (1279,'Home_Footer','Home page footer','Pied de page de l’accueil','Stopka strony głównej'),
+ (1280,'Home_Header','Home page header','En-tête de l’accueil','Nagłówek strony głównej'),
+ (1281,'PersonManager','Member manager','Gestionnaire des membres','Menedżer członków'),
+ (1282,'Redactor','Editor','Rédacteur','Redaktor'),
+ (1283,'User','User','Utilisateur','Użytkownik'),
+ (1284,'VisitorInsights','Visitor insights','Analyse des visiteurs','Analiza odwiedzających'),
+ (1285,'Webmaster','Webmaster','Webmaster','Webmaster'),
+ (1286,'account','Account','Compte','Konto'),
+ (1287,'admin_zone','Administration area','Zone d’administration','Strefa administracyjna'),
+ (1288,'attribute_details','Attribute details','Détails de l’attribut','Szczegóły atrybutu'),
+ (1289,'attributes','Attributes','Attributs','Atrybuty'),
+ (1290,'audience','Audience','Public','Odbiorcy'),
+ (1291,'availabilities','Availabilities','Disponibilités','Dostępności'),
+ (1292,'backup.default_file_name','backup','sauvegarde','kopia-zapasowa'),
+ (1293,'backup.form.fallback_note','Your browser does not support the save file picker; the file will be downloaded automatically.','Votre navigateur ne prend pas en charge le sélecteur d’enregistrement ; le fichier sera téléchargé automatiquement.','Twoja przeglądarka nie obsługuje okna zapisu pliku; plik zostanie pobrany automatycznie.'),
+ (1294,'backup.form.file_name','File name','Nom du fichier','Nazwa pliku'),
+ (1295,'backup.form.submit','Download backup','Télécharger la sauvegarde','Pobierz kopię zapasową'),
+ (1296,'backup.form.submitting','Creating backup…','Création de la sauvegarde…','Tworzenie kopii zapasowej…'),
+ (1297,'backup.help','Download a ZIP archive of the WebSite/data folder.','Téléchargez une archive ZIP du dossier WebSite/data.','Pobierz archiwum ZIP folderu WebSite/data.'),
+ (1298,'backup.history.date','Date','Date','Data'),
+ (1299,'backup.history.email','Email','Courriel','E-mail'),
+ (1300,'backup.history.empty','No backup found in the logs.','Aucune sauvegarde trouvée dans les journaux.','Nie znaleziono kopii zapasowych w logach.'),
+ (1301,'backup.history.title','Last 10 backups','10 dernières sauvegardes','Ostatnie 10 kopii zapasowych'),
+ (1302,'backup.js.done','Backup downloaded successfully.','Sauvegarde téléchargée avec succès.','Kopia zapasowa została pobrana pomyślnie.'),
+ (1303,'backup.js.error','Backup failed','Échec de la sauvegarde','Nie udało się utworzyć kopii zapasowej'),
+ (1304,'backup.js.file_type','ZIP archive','Archive ZIP','Archiwum ZIP'),
+ (1305,'backup.last_backup','Last backup','Dernière sauvegarde','Ostatnia kopia zapasowa'),
+ (1306,'backup.last_backup.never','No backup yet','Aucune sauvegarde effectuée','Brak kopii zapasowych'),
+ (1307,'backup.title','Backup','Sauvegarde','Kopia zapasowa'),
+ (1308,'cancel','Cancel','Annuler','Anuluj'),
+ (1309,'close','Close','Fermer','Zamknij'),
+ (1310,'communication.api.smtp_not_configured','Email sending is not configured.','L’envoi de courriels n’est pas configuré.','Wysyłanie wiadomości e-mail nie jest skonfigurowane.'),
+ (1311,'connection_required','You must be logged in to perform this action.','Vous devez être connecté pour effectuer cette action.','Aby wykonać tę czynność, musisz się zalogować.'),
+ (1312,'connections','Connections','Connexions','Połączenia'),
+ (1313,'contextual_help','Contextual help','Aide contextuelle','Pomoc kontekstowa'),
+ (1314,'created_by','Created by','Créé par','Utworzone przez'),
+ (1315,'custom_fields.delete_confirm','Are you sure you want to delete this field?','Voulez-vous vraiment supprimer ce champ ?','Czy na pewno chcesz usunąć to pole?'),
+ (1316,'date_time','Date and time','Date et heure','Data i godzina'),
+ (1317,'delete','Delete','Supprimer','Usuń'),
+ (1318,'description','Description','Description','Opis'),
+ (1319,'directory','Directory','Annuaire','Katalog członków'),
+ (1320,'duplicate','Duplicate','Dupliquer','Duplikuj'),
+ (1321,'duration','Duration','Durée','Czas trwania'),
+ (1322,'edit','Edit','Modifier','Edytuj'),
+ (1323,'eventsAvailableForAll','Events available to everyone','Événements accessibles à tous','Wydarzenia dostępne dla wszystkich'),
+ (1324,'eventsAvailableForYou','Events available to you','Événements accessibles pour vous','Wydarzenia dostępne dla Ciebie'),
+ (1325,'filter','Filter','Filtrer','Filtruj'),
+ (1326,'filters','Filters','Filtres','Filtry'),
+ (1327,'fullyBooked','Fully booked','Complet','Brak wolnych miejsc'),
+ (1328,'groups','Groups','Groupes','Grupy'),
+ (1329,'helloasso.field.org_slug','HelloAsso organization slug','Identifiant de l’organisation HelloAsso','Identyfikator organizacji HelloAsso'),
+ (1330,'helloasso.field.org_slug.hint','Enter the identifier used in your HelloAsso organization URL.','Saisissez l’identifiant présent dans l’URL de votre organisation HelloAsso.','Wprowadź identyfikator z adresu URL organizacji HelloAsso.'),
+ (1331,'help_missing','Help article not found','Article d’aide introuvable','Nie znaleziono artykułu pomocy'),
+ (1332,'home','Home','Accueil','Strona główna'),
+ (1333,'language','Language','Langue','Język'),
+ (1334,'loading','Loading…','Chargement…','Ładowanie…'),
+ (1335,'location','Location','Lieu','Miejsce'),
+ (1336,'login','Log in','Connexion','Zaloguj się'),
+ (1337,'logout','Log out','Déconnexion','Wyloguj się'),
+ (1338,'membership','Membership','Adhésion','Członkostwo'),
+ (1339,'message_email_unknown','This email address is not known.','Cette adresse courriel est inconnue.','Ten adres e-mail nie jest znany.'),
+ (1340,'message_helloasso_not_configured','HelloAsso is not configured.','HelloAsso n’est pas configuré.','HelloAsso nie jest skonfigurowane.'),
+ (1341,'message_password_reset_failed','The password reset request could not be processed.','La demande de réinitialisation du mot de passe n’a pas pu aboutir.','Nie udało się przetworzyć żądania resetowania hasła.'),
+ (1342,'message_password_reset_sent','Instructions to reset your password have been sent by email.','Les instructions de réinitialisation du mot de passe ont été envoyées par courriel.','Instrukcje resetowania hasła zostały wysłane e-mailem.'),
+ (1343,'messages','Messages','Messages','Wiadomości'),
+ (1344,'modified_on','Modified on','Modifié le','Data modyfikacji'),
+ (1345,'my_data','My data','Mes données','Moje dane'),
+ (1346,'navbar.admin.backup_manager','Backup manager','Gestionnaire de sauvegardes','Menedżer kopii zapasowych'),
+ (1347,'news','News','Actualités','Aktualności'),
+ (1348,'next','Next','Suivant','Dalej'),
+ (1349,'noAttributes','No attributes','Aucun attribut','Brak atrybutów'),
+ (1350,'noParticipant','No participants','Aucun participant','Brak uczestników'),
+ (1351,'notepad','Notepad','Bloc-notes','Notatnik'),
+ (1352,'on','On','Le','Dnia'),
+ (1353,'participants','Participants','Participants','Uczestnicy'),
+ (1354,'preferences','Preferences','Préférences','Preferencje'),
+ (1355,'previous','Previous','Précédent','Wstecz'),
+ (1356,'quick_actions','Quick actions','Actions rapides','Szybkie działania'),
+ (1357,'register','Register','S’inscrire','Zapisz się'),
+ (1358,'reset','Reset','Réinitialiser','Resetuj'),
+ (1359,'save','Save','Enregistrer','Zapisz'),
+ (1360,'sendEmail','Send email','Envoyer un courriel','Wyślij e-mail'),
+ (1361,'statistics','Statistics','Statistiques','Statystyki'),
+ (1362,'summary','Summary','Résumé','Podsumowanie'),
+ (1363,'type','Type','Type','Typ'),
+ (1364,'unregister','Unregister','Se désinscrire','Wypisz się'),
+ (1365,'vote','Vote','Voter','Głosuj');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',92,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',93,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),
@@ -8658,4 +7026,7 @@ CREATE VIEW public_article_list_view AS
             )
         )
     ORDER BY LastUpdate DESC;
+CREATE UNIQUE INDEX IF NOT EXISTS "UX_Languages_Name" ON "Languages" (
+	"Name"
+);
 COMMIT;
