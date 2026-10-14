@@ -13,7 +13,7 @@ use app\helpers\interfaces\ErrorManagerInterface;
 
 final class LogWriterDataHelper extends Data
 {
-    public function __construct(private Application $application, ErrorManagerInterface $errorManager)
+    public function __construct(private readonly Application $application, ErrorManagerInterface $errorManager)
     {
         parent::__construct($application->getPdo(), $errorManager, $application->getPdoForLog());
     }

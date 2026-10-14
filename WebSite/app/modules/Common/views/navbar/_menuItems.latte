@@ -1,0 +1,17 @@
+{foreach $items as $item}
+    {if $item['visible'] ?? true}
+        <li class="nav-item">
+            <a class="nav-link {if isset($item['page']) && $page == $item['page']}active{/if}"
+               href="{$item['href']}"
+               data-bs-toggle="tooltip"
+               data-bs-placement="bottom"
+               title="{$item['label']|translate}">
+                {if isset($item['iconHtml'])}
+                    <h3>{$item['iconHtml']|noescape}{$item['text'] ?? ''}</h3>
+                {else}
+                    <h2>{$item['icon']}</h2>
+                {/if}
+            </a>
+        </li>
+    {/if}
+{/foreach}

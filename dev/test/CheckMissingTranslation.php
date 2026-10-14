@@ -24,7 +24,10 @@ final class CheckMissingTranslation
     private string $sqlFile;
     private bool $verbose;
 
-    public function __construct()
+    /**
+     * @param array<int, string> $argv Command-line arguments (as in the global $argv)
+     */
+    public function __construct(array $argv)
     {
         $scanDir = realpath(MYCLUB_WEBSITE_DIR . '/app');
         $sqlFile = realpath(MYCLUB_WEBSITE_DIR . '/app/models/database/MyClub.sqlite.sql');
@@ -41,13 +44,11 @@ final class CheckMissingTranslation
 
         $this->scanDir  = $scanDir;
         $this->sqlFile  = $sqlFile;
-        $this->verbose  = false;
+        $this->verbose = in_array('--verbose', $argv, true);
     }
 
     public function run(): int
     {
-        $this->parseOptions();
-
         if (!is_dir($this->scanDir)) {
             $this->error("Directory not found: {$this->scanDir}");
             return 1;
@@ -73,15 +74,6 @@ final class CheckMissingTranslation
         return $this->printReport($missingKeys, $orphanKeys);
     }
 
-    // -------------------------------------------------------------------------
-    // Options
-    // -------------------------------------------------------------------------
-
-    private function parseOptions(): void
-    {
-        global $argv;
-        $this->verbose = in_array('--verbose', $argv ?? [], true);
-    }
 
     // -------------------------------------------------------------------------
     // SQL extraction (handles single-line and multi-line INSERT)
@@ -553,5 +545,5 @@ function dim(string $s): string
 
 $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
 if (is_string($scriptName) && basename(__FILE__) === basename($scriptName)) {
-    exit((new CheckMissingTranslation())->run());
+    exit((new CheckMissingTranslation($argv))->run());
 }

@@ -1,9 +1,27 @@
 {layout '../../Common/views/layout.latte'}
 
+{* Single source of truth for the designer menu entries *}
+{var $designerMenuItems = [
+    ['visible' => $isEventDesigner,    'page' => 'eventTypes', 'href' => '/eventTypes', 'icon' => '🗓️', 'label' => 'navbar.designer.event_types'],
+    ['visible' => $isEventDesigner,    'page' => 'needs',      'href' => '/needs',      'icon' => '📋', 'label' => 'navbar.designer.needs'],
+    ['visible' => $isExerciseDesigner, 'page' => 'exercises',  'href' => '/exercises',  'icon' => '🏋️', 'label' => 'navbar.designer.exercise'],
+    ['visible' => $isHomeDesigner,     'page' => 'settings',   'href' => '/settings',   'icon' => '🔧', 'label' => 'navbar.designer.settings'],
+    ['visible' => $isHomeDesigner,     'page' => 'designs',    'href' => '/designs',    'icon' => '🧠', 'label' => 'navbar.designer.designs'],
+    ['visible' => $isKanbanDesigner,   'page' => 'kanban',     'href' => '/kanban',     'icon' => '🟨', 'label' => 'navbar.designer.kanban'],
+    ['visible' => $isMenuDesigner,     'page' => 'menu',       'href' => '/menu',       'icon' => '📑', 'label' => 'navbar.designer.menu'],
+    ['visible' => $isLoanDesigner,     'page' => 'loan',       'href' => '/loan',       'icon' => '🔁', 'label' => 'navbar.designer.loan'],
+    ['visible' => $isTranslator,       'page' => 'translator', 'href' => '/translator', 'icon' => '🌍', 'label' => 'navbar.designer.translator'],
+]}
+
 {block navbar}
-    {include 'navbar/designer.latte'}
+    {include 'navbar/designer.latte', items: $designerMenuItems}
 {/block}
 
 {block content}
-{$content|noescape}
+    {if $content}
+        {$content|noescape}
+    {else}
+        {* Narrow screens only: the navbar is collapsed, so list the options here *}
+        {include '../../Common/views/navbar/_menuList.latte', items: $designerMenuItems}
+    {/if}
 {/block}

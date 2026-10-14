@@ -345,7 +345,7 @@ VALUES
 SQL;
         $pdo->exec($sql);
 
-$sql = <<<SQL
+        $sql = <<<SQL
 INSERT INTO "Languages" (Name, en_US, fr_FR, pl_PL) VALUES
 ('navbar.designer.translator','Translations','Les traductions','Tłumaczenia');
 

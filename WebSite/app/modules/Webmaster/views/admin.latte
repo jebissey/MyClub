@@ -1,9 +1,26 @@
 {layout '../../Common/views/layout.latte'}
 
+{* Single source of truth for the admin menu entries *}
+{var $adminMenuItems = [
+    ['visible' => $isCommunicationManager, 'href' => '/communication',   'icon' => '📢', 'label' => 'navbar.admin.communication_manager'],
+    ['visible' => $isEventManager,         'href' => '/eventManager',    'icon' => '🗓️', 'label' => 'navbar.admin.event_manager'],
+    ['visible' => $isDesigner,             'href' => '/designer',        'icon' => '🎨', 'label' => 'navbar.admin.designer'],
+    ['visible' => $isRedactor,             'href' => '/redactor',        'icon' => '✍️', 'label' => 'navbar.admin.redactor'],
+    ['visible' => $isPersonManager,        'href' => '/personManager',   'icon' => '📇', 'label' => 'navbar.admin.person_manager'],
+    ['visible' => $isVisitorInsights,      'href' => '/visitorInsights', 'icon' => '🔍', 'label' => 'navbar.admin.visitor_insights'],
+    ['visible' => $isWebmaster,            'href' => '/webmaster',       'icon' => '🛠️', 'label' => 'navbar.admin.webmaster'],
+    ['visible' => $isBackupManager,        'page' => 'backupAll', 'href' => '/backupAll', 'icon' => '💾', 'label' => 'navbar.admin.backup_manager'],
+]}
+
 {block navbar}
-    {include 'navbar/admin.latte'}
+    {include 'navbar/admin.latte', items: $adminMenuItems}
 {/block}
 
 {block content}
-{$content|noescape}
+    {if $content}
+        {$content|noescape}
+    {else}
+        {* Narrow screens only: the navbar is collapsed, so list the options here *}
+        {include '../../Common/views/navbar/_menuList.latte', items: $adminMenuItems}
+    {/if}
 {/block}

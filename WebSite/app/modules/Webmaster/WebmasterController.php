@@ -119,18 +119,9 @@ final class WebmasterController extends AbstractController
                 $this->raiseMethodNotAllowed(__FILE__, __LINE__);
                 return;
             }
-            $content = ($this->t)('Admin');
-            $params  = [
-                'isEventManager'    => $connectedUser->isEventManager(),
-                'isDesigner'        => $connectedUser->isDesigner(),
-                'isRedactor'        => $connectedUser->isRedactor(),
-                'isPersonManager'   => $connectedUser->isPersonManager(),
-                'isVisitorInsights' => $connectedUser->isVisitorInsights(),
-                'isWebmaster'       => $connectedUser->isWebmaster(),
-            ];
 
             $viewModel = new AdminHomeViewModel(
-                content: WebApp::getcompiledContent($content, $params),
+                content: '',
                 layoutParams: $this->getAllParams([]),
             );
             $this->render('Webmaster/views/admin.latte', $viewModel->toArray());
@@ -141,12 +132,10 @@ final class WebmasterController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'webmaster';
-            $content = ($this->t)('Webmaster');
-            $params  = ['isMyclubWebSite' => WebApp::isMyClubWebSite()];
 
             $viewModel = new WebmasterHomeViewModel(
                 newVersion: $this->getLastVersion(),
-                content: WebApp::getcompiledContent($content, $params),
+                content: '',
                 previousPage: true,
                 layoutParams: $this->getAllParams([]),
             );
@@ -192,7 +181,9 @@ final class WebmasterController extends AbstractController
                     'mbstring' => extension_loaded('mbstring'),
                 ],
                 navItems: $this->getNavItems($this->application->getConnectedUser()->person),
-                layoutParams: $this->getAllParams([]),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
             );
 
             $this->render('Webmaster/views/notifications.latte', $viewModel->toArray());
@@ -216,7 +207,9 @@ final class WebmasterController extends AbstractController
                 brevoSender: $this->credentials->get('brevo', 'sender'),
                 dailyLimit: $this->credentials->get('email', 'daily_limit'),
                 monthlyLimit: $this->credentials->get('email', 'monthly_limit'),
-                layoutParams: $this->getAllParams([]),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
             );
 
             $this->render('Webmaster/views/emailCredentials.latte', $viewModel->toArray());
@@ -292,7 +285,9 @@ final class WebmasterController extends AbstractController
                 installations: array_values($installations),
                 totalInstallations: count($installations),
                 navItems: $this->getNavItems($this->application->getConnectedUser()->person),
-                layoutParams: $this->getAllParams([]),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
             );
 
             $this->render('Webmaster/views/installations.latte', $viewModel->toArray());
@@ -346,7 +341,9 @@ final class WebmasterController extends AbstractController
                 navItems: $this->getNavItems($this->application->getConnectedUser()->person),
                 turnstileSiteKey: $this->credentials->get('turnstile', 'site_key'),
                 turnstileConfigured: !empty($this->credentials->get('turnstile', 'secret_key')),
-                layoutParams: $this->getAllParams([]),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
             );
 
             $this->render('Webmaster/views/turnstileCredentials.latte', $viewModel->toArray());
@@ -379,7 +376,9 @@ final class WebmasterController extends AbstractController
                 helloassoClientId: $this->credentials->get('helloasso', 'client_id'),
                 helloassoConfigured: !empty($this->credentials->get('helloasso', 'client_secret')),
                 helloassoOrgSlug: $this->credentials->get('helloasso', 'org_slug'),
-                layoutParams: $this->getAllParams([]),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
             );
 
             $this->render('Webmaster/views/helloassoCredentials.latte', $viewModel->toArray());

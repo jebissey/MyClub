@@ -1,9 +1,25 @@
 {layout '../../Common/views/layout.latte'}
 
+{* Single source of truth for the person manager menu entries *}
+{var $personManagerMenuItems = [
+    ['page' => 'persons',               'href' => '/persons',               'icon' => '👥', 'label' => 'navbar.person_manager.persons'],
+    ['page' => 'groups',                'href' => '/groups',                'icon' => '👫', 'label' => 'navbar.person_manager.groups'],
+    ['page' => 'registration',          'href' => '/registration',          'icon' => '🎟️', 'label' => 'navbar.person_manager.registration'],
+    ['page' => 'import',                'href' => '/import',                'icon' => '📥', 'label' => 'navbar.person_manager.import'],
+    ['page' => 'export',                'href' => '/export',                'icon' => '📤', 'label' => 'navbar.person_manager.export'],
+    ['page' => 'membershipSettings',    'href' => '/membership-settings',   'icon' => '🤝', 'label' => 'navbar.person_manager.membershipSettings'],
+    ['page' => 'memberFields-settings', 'href' => '/memberFields-settings', 'icon' => '🔧', 'label' => 'navbar.person_manager.settings'],
+]}
+
 {block navbar}
-    {include 'navbar/personManager.latte'}
+    {include 'navbar/personManager.latte', items: $personManagerMenuItems}
 {/block}
 
 {block content}
-{$content|noescape}
+    {if $content}
+        {$content|noescape}
+    {else}
+        {* Narrow screens only: the navbar is collapsed, so list the options here *}
+        {include '../../Common/views/navbar/_menuList.latte', items: $personManagerMenuItems}
+    {/if}
 {/block}

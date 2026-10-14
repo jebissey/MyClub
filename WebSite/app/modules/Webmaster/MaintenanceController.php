@@ -23,7 +23,9 @@ final class MaintenanceController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $viewModel = new MaintenanceViewModel(
-                layoutParams: $this->getAllParams([]),
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
             );
 
             $this->render('Webmaster/views/maintenance.latte', $viewModel->toArray());

@@ -573,7 +573,8 @@ final class V85ToV86Migrator implements DatabaseMigratorInterface
         /** @var list<string> $existing */
         $existing = $stmt === false ? [] : $stmt->fetchAll(PDO::FETCH_COLUMN, 1);
 
-        $boolean = static fn(string $c): string => "CASE WHEN lower(trim(CAST(COALESCE(\"$c\", 0) AS TEXT))) IN ('1', 'true', 'yes', 'on') THEN 1 ELSE 0 END";
+        $boolean = static fn(string $c): string =>
+            "CASE WHEN lower(trim(CAST(COALESCE(\"$c\", 0) AS TEXT))) IN ('1', 'true', 'yes', 'on') THEN 1 ELSE 0 END";
         $withDefault = static fn(string $c, string $default): string => "COALESCE(\"$c\", $default)";
         $plain = static fn(string $c): string => "\"$c\"";
 

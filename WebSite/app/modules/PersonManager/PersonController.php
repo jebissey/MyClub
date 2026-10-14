@@ -251,7 +251,7 @@ final class PersonController extends TableController
             $_SESSION['navbar'] = 'personManager';
 
             $viewModel = new PersonManagerHomeViewModel(
-                content: ($this->t)('PersonManager'),
+                content: '',
                 layoutParams: $this->getAllParams([]),
             );
 

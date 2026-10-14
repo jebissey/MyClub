@@ -332,7 +332,7 @@ final class ArticleController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'redactor';
             $viewModel = new RedactorHomeViewModel(
-                content: ($this->t)('Redactor'),
+                content: '',
                 layoutParams: $this->getAllParams([
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),

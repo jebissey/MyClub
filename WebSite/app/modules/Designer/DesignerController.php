@@ -26,20 +26,10 @@ final class DesignerController extends AbstractController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'designer';
             $connectedUser = $this->application->getConnectedUser();
-            $content = ($this->t)('Designer');
-            $params = [
-                'isEventDesigner' => $connectedUser->isEventDesigner(),
-                'isExerciseDesigner' => $connectedUser->isExerciseDesigner(),
-                'isHomeDesigner' => $connectedUser->isHomeDesigner(),
-                'isKanbanDesigner' => $connectedUser->isKanbanDesigner(),
-                'isLoanDesigner' => $connectedUser->isLoanDesigner(),
-                'isMenuDesigner' => $connectedUser->isMenuDesigner(),
-            ];
-            $compiledContent = WebApp::getcompiledContent($content, $params);
 
             $this->render('Designer/views/designer.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
-                'content' => $compiledContent,
+                'content' => '',
                 'btn_HistoryBack' => true,
                 'btn_Parent'      => "/admin",
             ]));
