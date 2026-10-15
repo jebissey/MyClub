@@ -31,8 +31,11 @@ final readonly class UserStatisticsViewModel extends LayoutViewModel
         public array $i18n,
         array $layoutParams = []
     ) {
+        $baseArgs = self::baseArgsFrom($layoutParams);
+        $baseArgs['page'] = 'statistics';
+
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
+            ...$baseArgs,
             btn_HistoryBack: true,
             btn_Parent: '/user',
         );

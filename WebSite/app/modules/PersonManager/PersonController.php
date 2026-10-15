@@ -83,6 +83,7 @@ final class PersonController extends TableController
             );
 
             $viewModel = new UserAccountViewModel(
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
                 readOnly: (bool)($member->Imported ?? false),
                 email: $individual->Email,
                 firstName: $individual->FirstName ?? '',

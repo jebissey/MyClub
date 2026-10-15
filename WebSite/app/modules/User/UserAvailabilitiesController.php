@@ -36,6 +36,7 @@ final class UserAvailabilitiesController extends AbstractController
         $currentAvailabilities = json_decode($availabilitiesJson, true);
 
         $viewModel = new UserAvailabilitiesViewModel(
+            navItems: $this->getNavItems($person),
             currentAvailabilities: is_array($currentAvailabilities) ? $currentAvailabilities : null,
             layoutParams: $this->getAllParams([]),
         );

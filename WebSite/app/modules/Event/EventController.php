@@ -20,9 +20,9 @@ use app\models\EventDataHelper;
 use app\models\MemberDirectoryDataHelper;
 use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
-use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\MemberMapService;
+use app\modules\Common\viewModels\CrosstabViewModel;
 use app\modules\Event\viewModels\EventChatViewModel;
 use app\modules\Event\viewModels\EventCrosstabViewModel;
 use app\modules\Event\viewModels\EventDetailViewModel;
@@ -146,20 +146,24 @@ final class EventController extends AbstractController
         $period = Period::from($this->flight->request()->query->period ?? 'month');
         [$dateRange, $crosstabData] = $this->crosstabDataHelper->getevents($period);
 
-        $viewModel = new EventCrosstabViewModel(
+        $viewModel = new CrosstabViewModel(
             crosstabData: $crosstabData,
             period: $period->value,
             dateRange: $dateRange,
             availablePeriods: Period::gets($this->languagesDataHelper),
-            navbarTemplate: '../../Event/views/navbar/eventManager.latte',
-            title: "Animateurs vs type d'événement",
-            totalLabels: ['événements', 'participants'],
+            title: ($this->t)('event.crosstab.title'),
+            totalLabels: [
+                ($this->t)('event.crosstab.total.events'),
+                ($this->t)('event.crosstab.total.participants'),
+            ],
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(1),
+
             ]),
+            historyBack: true,
         );
 
-        $this->render('Common/views/crosstab.latte', $viewModel->toArray());
+        $this->render('Event/views/crosstab.latte', $viewModel->toArray());
     }
 
     public function show(int $eventId, string $message = '', string $messageType = ''): void

@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace app\modules\User\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\MenuItemRow;
 
 final readonly class UserAccountViewModel extends LayoutViewModel
 {
     /**
+     * @param list<MenuItemRow> $navItems
      * @param list<string> $emojis
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      * @param list<array{key: string, label: string, inputType: string, value: string}> $customFields
      */
     public function __construct(
+        public array $navItems,
         public bool $readOnly,
         public string $email,
         public string $firstName,
@@ -31,8 +34,11 @@ final readonly class UserAccountViewModel extends LayoutViewModel
         public array $customFields = [],
         array $layoutParams = [],
     ) {
+        $baseArgs = self::baseArgsFrom($layoutParams);
+        $baseArgs['page'] = 'account';
+
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
+            ...$baseArgs,
             btn_HistoryBack: true,
             btn_Parent: '/user',
         );

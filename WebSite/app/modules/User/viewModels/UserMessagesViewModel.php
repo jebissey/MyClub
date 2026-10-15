@@ -24,8 +24,11 @@ final readonly class UserMessagesViewModel extends LayoutViewModel
         string $btnParent = '/user',
         array $layoutParams = []
     ) {
+        $baseArgs = self::baseArgsFrom($layoutParams);
+        $baseArgs['page'] = 'messages';
+
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
+            ...$baseArgs,
             btn_HistoryBack: true,
             btn_Parent: $btnParent,
         );

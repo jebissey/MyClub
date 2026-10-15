@@ -40,7 +40,6 @@ CREATE UNIQUE INDEX "UX_Languages_Name" ON "Languages" ("Name");
 INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 ('Admin', 'Admin', 'Administration', 'Administrator'),
 ('Designer', 'Designer', 'Concepteur', 'Projektant'),
-('Error500', 'Internal server error', 'Erreur interne du serveur', 'Wewnętrzny błąd serwera'),
 ('EventManager', 'Event manager', 'Gestionnaire des événements', 'Menedżer wydarzeń'),
 ('Help_LoanDesigner', 'Loan designer help', 'Aide : gestionnaire des prêts', 'Pomoc: zarządzanie wypożyczeniami'),
 ('Home_Footer', 'Home page footer', 'Pied de page de l’accueil', 'Stopka strony głównej'),

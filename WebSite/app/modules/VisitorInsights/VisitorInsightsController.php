@@ -123,7 +123,9 @@ final class VisitorInsightsController extends TableController
             filters: $filterConfig,
             columns: $columns,
             resetUrl: '/logs',
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('VisitorInsights/views/visitor.latte', $viewModel->toArray());
@@ -137,7 +139,9 @@ final class VisitorInsightsController extends TableController
 
         $viewModel = new MembersAlertsViewModel(
             membersAlerts: array_values($this->personDataHelper->getMembersAlerts()),
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('VisitorInsights/views/membersAlerts.latte', $viewModel->toArray());
@@ -174,7 +178,9 @@ final class VisitorInsightsController extends TableController
             externalRefs: $this->logDataAnalyticsHelper->getExternalReferentStats($period, $currentDate),
             control: new WebApp(),
             rows: $this->logDataAnalyticsHelper->getReferentStats($period, $currentDate),
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('VisitorInsights/views/referent.latte', $viewModel->toArray());
@@ -210,7 +216,9 @@ final class VisitorInsightsController extends TableController
                 'tooltipAvg'     => ($this->t)('visitor_insights.statistics.tooltip.avg_per_day'),
                 'tooltipMin'     => ($this->t)('visitor_insights.statistics.tooltip.min_per_day'),
             ],
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('VisitorInsights/views/statistics.latte', $viewModel->toArray());
@@ -236,7 +244,9 @@ final class VisitorInsightsController extends TableController
             i18n: [
                 'visits' => ($this->t)('visitor_insights.analytics.visits'),
             ],
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('VisitorInsights/views/analytics.latte', $viewModel->toArray());
@@ -257,7 +267,9 @@ final class VisitorInsightsController extends TableController
             periodTo: $period->getEnd()->format('Y-m-d H:i:s'),
             topPages: array_values($this->logDataHelper->getTopPages($period, self::TOP)),
             translations: TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('VisitorInsights/views/topPages.latte', $viewModel->toArray());
@@ -304,7 +316,9 @@ final class VisitorInsightsController extends TableController
                 'tableHide' => ($this->t)('visitor_insights.cross_tab.table.hide'),
                 'tableShow' => ($this->t)('visitor_insights.cross_tab.table.show'),
             ],
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('VisitorInsights/views/crossTab.latte', $viewModel->toArray());
@@ -322,7 +336,9 @@ final class VisitorInsightsController extends TableController
             lastVisits: $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
             totalActiveUsers: count($activePersons),
             navItems: $this->getNavItems($this->application->getConnectedUser()->person),
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('VisitorInsights/views/lastVisits.latte', $viewModel->toArray());

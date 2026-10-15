@@ -33,8 +33,11 @@ final readonly class UserDirectoryViewModel extends LayoutViewModel
         public int $totalPersons,
         array $layoutParams = []
     ) {
+        $baseArgs = self::baseArgsFrom($layoutParams);
+        $baseArgs['page'] = 'directory';
+
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
+            ...$baseArgs,
             btn_HistoryBack: true,
             btn_Parent: '/user',
         );

@@ -21,8 +21,11 @@ final readonly class UserGroupsViewModel extends LayoutViewModel
         public array $navItems,
         array $layoutParams = []
     ) {
+        $baseArgs = self::baseArgsFrom($layoutParams);
+        $baseArgs['page'] = 'groups';
+
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
+            ...$baseArgs,
             btn_HistoryBack: true,
             btn_Parent: '/user',
         );

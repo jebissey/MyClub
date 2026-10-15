@@ -24,8 +24,11 @@ final readonly class UserNewsViewModel extends LayoutViewModel
         string $btnParent = '/user',
         array $layoutParams = []
     ) {
+        $baseArgs = self::baseArgsFrom($layoutParams);
+        $baseArgs['page'] = 'news';
+
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
+            ...$baseArgs,
             btn_HistoryBack: true,
             btn_Parent: $btnParent,
         );

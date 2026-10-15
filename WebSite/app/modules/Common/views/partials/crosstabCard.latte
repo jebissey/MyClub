@@ -1,0 +1,34 @@
+{* Expected params: $title, $crosstabData, $totalLabels, $period, $availablePeriods, $dateRange *}
+<div class="container-fluid mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h4 class="mb-0">{$title}</h4>
+                </div>
+                <div class="col-auto">
+                    <form method="get" class="d-flex align-items-center">
+                        {include 'periodSelect.latte'}
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle-fill"></i>
+                {='common.crosstab.selected_period'|translate}:
+                <strong>{$dateRange['start']|date:'d/m/Y'}</strong> →
+                <strong>{$dateRange['end']|date:'d/m/Y'}</strong>
+            </div>
+
+            {if count($crosstabData['columns']) > 0}
+                {include 'crosstabTable.latte'}
+            {else}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    {='common.crosstab.no_data'|translate}
+                </div>
+            {/if}
+        </div>
+    </div>
+</div>

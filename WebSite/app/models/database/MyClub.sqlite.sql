@@ -1681,85 +1681,85 @@ W stopce,
                     </div>
                 </div>'),
  (74,'ErrorLyricsFileNotReadable','<div class=''container text-center mt-5''>
-                    <div class=''card shadow-lg rounded-3 p-4''>
-                        <h1 class=''text-danger''>🔒 Lyrics File Not Readable</h1>
-                        <p class=''mt-3''>
-                        The lyrics file exists but cannot be read.<br>
-                        Please check file permissions or contact the administrator.
-                        </p>
-                        <ul class=''text-start mx-auto d-inline-block mt-3''>
-                        <li>➡️ The file might not have proper read permissions.</li>
-                        <li>➡️ The file might be locked or corrupted.</li>
-                        </ul>
-                        <a href=''/'' class=''btn btn-primary mt-4''>🏠 Back to homepage</a>
-                    </div>
-                </div>','''<div class=''container text-center mt-5''>
-                    <div class=''card shadow-lg rounded-3 p-4''>
-                        <h1 class=''text-danger''>🔒 Fichier de paroles non lisible</h1>
-                        <p class=''mt-3''>
-                        Le fichier de paroles existe mais n’a pas pu être lu.<br>
-                        Vérifie les permissions du fichier ou contacte l’administrateur.
-                        </p>
-                        <ul class=''text-start mx-auto d-inline-block mt-3''>
-                        <li>➡️ Le fichier n’a peut-être pas les droits de lecture suffisants.</li>
-                        <li>➡️ Le fichier est peut-être verrouillé ou corrompu.</li>
-                        </ul>
-                        <a href=''/'' class=''btn btn-primary mt-4''>🏠 Retour à l’accueil</a>
-                    </div>
-                </div>','<div class=''container text-center mt-5''>
-                    <div class=''card shadow-lg rounded-3 p-4''>
-                        <h1 class=''text-danger''>🔒 Plik tekstu niedostępny</h1>
-                        <p class=''mt-3''>
-                        Plik z tekstem piosenki istnieje, ale nie można go odczytać.<br>
-                        Sprawdź uprawnienia pliku lub skontaktuj się z administratorem.
-                        </p>
-                        <ul class=''text-start mx-auto d-inline-block mt-3''>
-                        <li>➡️ Plik może nie mieć odpowiednich uprawnień do odczytu.</li>
-                        <li>➡️ Plik może być zablokowany lub uszkodzony.</li>
-                        </ul>
-                        <a href=''/'' class=''btn btn-primary mt-4''>🏠 Powrót na stronę główną</a>
-                    </div>
-                </div>'),
- (75,'ErrorLyricsFileReadError','''<div class=''container text-center mt-5''>
-                    <div class=''card shadow-lg rounded-3 p-4''>
-                        <h1 class=''text-danger''>⚠️ Lyrics File Reading Error</h1>
-                        <p class=''mt-3''>
-                        We encountered an unexpected error while reading the lyrics file.<br>
-                        Please verify the file content or try again later.
-                        </p>
-                        <ul class=''text-start mx-auto d-inline-block mt-3''>
-                        <li>➡️ The file might be corrupted.</li>
-                        <li>➡️ The server encountered a temporary I/O error.</li>
-                        </ul>
-                        <a href=''/'' class=''btn btn-primary mt-4''>🏠 Back to homepage</a>
-                    </div>
-                </div>','<div class=''container text-center mt-5''>
-                    <div class=''card shadow-lg rounded-3 p-4''>
-                        <h1 class=''text-danger''>⚠️ Erreur de lecture du fichier de paroles</h1>
-                        <p class=''mt-3''>
-                        Une erreur est survenue lors de la lecture du fichier de paroles.<br>
-                        Vérifie le contenu du fichier ou réessaie plus tard.
-                        </p>
-                        <ul class=''text-start mx-auto d-inline-block mt-3''>
-                        <li>➡️ Le fichier est peut-être corrompu.</li>
-                        <li>➡️ Le serveur a rencontré une erreur d’accès disque temporaire.</li>
-                        </ul>
-                        <a href=''/'' class=''btn btn-primary mt-4''>🏠 Retour à l’accueil</a>
-                    </div>
-                </div>','<div class=''container text-center mt-5''>
-                    <div class=''card shadow-lg rounded-3 p-4''>
-                        <h1 class=''text-danger''>⚠️ Błąd odczytu pliku tekstu</h1>
-                        <p class=''mt-3''>
-                        Wystąpił nieoczekiwany błąd podczas odczytu pliku z tekstem piosenki.<br>
-                        Sprawdź zawartość pliku lub spróbuj ponownie później.
-                        </p>
-                        <ul class=''text-start mx-auto d-inline-block mt-3''>
-                        <li>➡️ Plik może być uszkodzony.</li>
-                        <li>➡️ Serwer napotkał tymczasowy błąd operacji wejścia/wyjścia.</li>
-                        </ul>
-                        <a href=''/'' class=''btn btn-primary mt-4''>🏠 Powrót na stronę główną</a>
-                    </div>
-                </div>'),
+	<div class=''card shadow-lg rounded-3 p-4''>
+		<h1 class=''text-danger''>🔒 Lyrics File Not Readable</h1>
+			<p class=''mt-3''>
+				The lyrics file exists but cannot be read.<br>
+				Please check file permissions or contact the administrator.
+			</p>
+			<ul class=''text-start mx-auto d-inline-block mt-3''>
+				<li>➡️ The file might not have proper read permissions.</li>
+				<li>➡️ The file might be locked or corrupted.</li>
+			</ul>
+		<a href=''/'' class=''btn btn-primary mt-4''>🏠 Back to homepage</a>
+	</div>
+</div>','<div class=''container text-center mt-5''>
+	<div class=''card shadow-lg rounded-3 p-4''>
+		<h1 class=''text-danger''>🔒 Fichier de paroles non lisible</h1>
+		<p class=''mt-3''>
+		Le fichier de paroles existe mais n’a pas pu être lu.<br>
+		Vérifie les permissions du fichier ou contacte l’administrateur.
+		</p>
+		<ul class=''text-start mx-auto d-inline-block mt-3''>
+		<li>➡️ Le fichier n’a peut-être pas les droits de lecture suffisants.</li>
+		<li>➡️ Le fichier est peut-être verrouillé ou corrompu.</li>
+		</ul>
+		<a href=''/'' class=''btn btn-primary mt-4''>🏠 Retour à l’accueil</a>
+	</div>
+</div>','<div class=''container text-center mt-5''>
+	<div class=''card shadow-lg rounded-3 p-4''>
+		<h1 class=''text-danger''>🔒 Plik tekstu niedostępny</h1>
+		<p class=''mt-3''>
+		Plik z tekstem piosenki istnieje, ale nie można go odczytać.<br>
+		Sprawdź uprawnienia pliku lub skontaktuj się z administratorem.
+		</p>
+		<ul class=''text-start mx-auto d-inline-block mt-3''>
+		<li>➡️ Plik może nie mieć odpowiednich uprawnień do odczytu.</li>
+		<li>➡️ Plik może być zablokowany lub uszkodzony.</li>
+		</ul>
+		<a href=''/'' class=''btn btn-primary mt-4''>🏠 Powrót na stronę główną</a>
+	</div>
+</div>'),
+ (75,'ErrorLyricsFileReadError','<div class=''container text-center mt-5''>
+	<div class=''card shadow-lg rounded-3 p-4''>
+		<h1 class=''text-danger''>⚠️ Lyrics File Reading Error</h1>
+		<p class=''mt-3''>
+		We encountered an unexpected error while reading the lyrics file.<br>
+		Please verify the file content or try again later.
+		</p>
+		<ul class=''text-start mx-auto d-inline-block mt-3''>
+		<li>➡️ The file might be corrupted.</li>
+		<li>➡️ The server encountered a temporary I/O error.</li>
+		</ul>
+		<a href=''/'' class=''btn btn-primary mt-4''>🏠 Back to homepage</a>
+	</div>
+</div>','<div class=''container text-center mt-5''>
+	<div class=''card shadow-lg rounded-3 p-4''>
+		<h1 class=''text-danger''>⚠️ Erreur de lecture du fichier de paroles</h1>
+		<p class=''mt-3''>
+		Une erreur est survenue lors de la lecture du fichier de paroles.<br>
+		Vérifie le contenu du fichier ou réessaie plus tard.
+		</p>
+		<ul class=''text-start mx-auto d-inline-block mt-3''>
+		<li>➡️ Le fichier est peut-être corrompu.</li>
+		<li>➡️ Le serveur a rencontré une erreur d’accès disque temporaire.</li>
+		</ul>
+		<a href=''/'' class=''btn btn-primary mt-4''>🏠 Retour à l’accueil</a>
+	</div>
+</div>','<div class=''container text-center mt-5''>
+	<div class=''card shadow-lg rounded-3 p-4''>
+		<h1 class=''text-danger''>⚠️ Błąd odczytu pliku tekstu</h1>
+		<p class=''mt-3''>
+		Wystąpił nieoczekiwany błąd podczas odczytu pliku z tekstem piosenki.<br>
+		Sprawdź zawartość pliku lub spróbuj ponownie później.
+		</p>
+		<ul class=''text-start mx-auto d-inline-block mt-3''>
+		<li>➡️ Plik może być uszkodzony.</li>
+		<li>➡️ Serwer napotkał tymczasowy błąd operacji wejścia/wyjścia.</li>
+		</ul>
+		<a href=''/'' class=''btn btn-primary mt-4''>🏠 Powrót na stronę główną</a>
+	</div>
+</div>'),
  (87,'article.error.not_found','Article {id} does not exist','L''article {id} n''existe pas','Artykuł {id} nie istnieje'),
  (88,'article.error.unknown_author','Unknown author for article {id}','Auteur inconnu pour l''article {id}','Nieznany autor artykułu {id}'),
  (89,'article.error.login_required','You must be logged in to view this article','Il faut être connecté pour pouvoir consulter cet article','Musisz być zalogowany, aby wyświetlić ten artykuł'),
@@ -4132,14 +4132,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (845,'period.year','Year','An','Rok'),
  (846,'visitor_insights.cross_tab.title','Cross-tab of visits','Tableau croisé dynamique des visites','Dynamiczna tabela krzyżowa wizyt'),
  (847,'visitor_insights.cross_tab.filters','Filters','Filtres','Filtry'),
- (848,'visitor_insights.cross_tab.period','Period','Période','Okres'),
- (849,'visitor_insights.cross_tab.period.today','Today','Aujourd''hui','Dzisiaj'),
- (850,'visitor_insights.cross_tab.period.yesterday','Yesterday','Hier','Wczoraj'),
- (851,'visitor_insights.cross_tab.period.before_yesterday','Day before yesterday','Avant hier','Przedwczoraj'),
- (852,'visitor_insights.cross_tab.period.week','Last 7 days','7 derniers jours','Ostatnie 7 dni'),
- (853,'visitor_insights.cross_tab.period.month','Last 30 days','30 derniers jours','Ostatnie 30 dni'),
- (854,'visitor_insights.cross_tab.period.quarter','Last quarter','Dernier trimestre','Ostatni kwartał'),
- (855,'visitor_insights.cross_tab.period.year','Last year','Dernière année','Ostatni rok'),
  (856,'visitor_insights.cross_tab.filter.uri','Filter by URI','Filtrer par URI','Filtruj według URI'),
  (857,'visitor_insights.cross_tab.filter.email','Filter by Email','Filtrer par Email','Filtruj według Email'),
  (858,'visitor_insights.cross_tab.filter.group','Filter by Group','Filtrer par Groupe','Filtruj według Grupy'),
@@ -6795,7 +6787,60 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1273,'home.signpost.title','What would you like to do?','Que souhaitez-vous faire ?','Co chcesz zrobić?'),
  (1274,'Admin','Admin','Administration','Administrator'),
  (1275,'Designer','Designer','Concepteur','Projektant'),
- (1276,'Error500','Internal server error','Erreur interne du serveur','Wewnętrzny błąd serwera'),
+ (1276,'Error500','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-danger">💥 Error 500 – Internal Server Error</h1>
+    
+    <p class="mt-3">
+      Oops… something went wrong on our side.  
+      This error is caused by an internal problem in the application.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ What to do?</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ <strong>Please notify the webmaster</strong> so the issue can be fixed.</li>
+      <li>➡️ You can also try again later — sometimes the server just needs a little coffee ☕.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Back to homepage</a>
+  </div>
+</div>','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-danger">💥 Erreur 500 – Erreur interne du serveur</h1>
+    
+    <p class="mt-3">
+      Oups… quelque chose s’est mal passé de notre côté.  
+      Cette erreur est due à un problème interne de l’application.
+    </p>
+
+    <hr class="my-4">
+
+    <h5>ℹ️ Que faire ?</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ <strong>Prévenez le webmaster</strong> afin qu’il puisse corriger le problème.</li>
+      <li>➡️ Vous pouvez aussi réessayer un peu plus tard, parfois le serveur a juste besoin d’un petit café ☕.</li>
+    </ul>
+
+    <a href="/" class="btn btn-primary mt-3">🏠 Retour à l’accueil</a>
+  </div>
+</div>','<div class="container text-center mt-5">
+  <div class="card shadow-lg rounded-3 p-4">
+    <h1 class="text-danger">💥 Błąd 500 – Wewnętrzny błąd serwera</h1>
+    <p class="mt-3">
+      Ups… coś poszło nie tak po naszej stronie.<br>
+      Ten błąd wynika z wewnętrznego problemu aplikacji.
+    </p>
+    <hr class="my-4">
+    <h5>ℹ️ Co zrobić?</h5>
+    <ul class="text-start mx-auto d-inline-block">
+      <li>➡️ <strong>Prosimy poinformować webmastera</strong>, aby mógł naprawić problem.</li>
+      <li>➡️ Możesz też spróbować ponownie za chwilę — czasem serwer po prostu potrzebuje kawy ☕.</li>
+    </ul>
+    <a href="/" class="btn btn-primary mt-3">🏠 Powrót do strony głównej</a>
+  </div>
+</div>'),
  (1277,'EventManager','Event manager','Gestionnaire des événements','Menedżer wydarzeń'),
  (1278,'Help_LoanDesigner','Loan designer help','Aide : gestionnaire des prêts','Pomoc: zarządzanie wypożyczeniami'),
  (1279,'Home_Footer','Home page footer','Pied de page de l’accueil','Stopka strony głównej'),
@@ -6884,10 +6929,25 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1362,'summary','Summary','Résumé','Podsumowanie'),
  (1363,'type','Type','Type','Typ'),
  (1364,'unregister','Unregister','Se désinscrire','Wypisz się'),
- (1365,'vote','Vote','Voter','Głosuj');
+ (1365,'vote','Vote','Voter','Głosuj'),
+ (1366,'common.period','Period','Période','Okres'),
+ (1367,'common.crosstab.selected_period','Selected period','Période sélectionnée','Wybrany okres'),
+ (1368,'common.crosstab.no_data','No results found for the selected period.','Aucun résultat trouvé pour la période sélectionnée.','Nie znaleziono wyników dla wybranego okresu.'),
+ (1369,'common.crosstab.total','Total','Total','Razem'),
+ (1370,'article.crosstab.title','Editors vs audience','Rédacteurs vs audience','Redaktorzy a odbiorcy'),
+ (1371,'article.crosstab.total.articles','articles','articles','artykuły'),
+ (1372,'event.crosstab.title','Organizers vs event type','Animateurs vs type d''événement','Organizatorzy a typ wydarzenia'),
+ (1373,'event.crosstab.total.events','events','événements','wydarzenia'),
+ (1374,'event.crosstab.total.participants','participants','participants','uczestnicy'),
+ (1375,'user.messages.empty.since_signout','No messages since your last sign-out.','Aucun message depuis votre dernière déconnexion.','Brak wiadomości od ostatniego wylogowania.'),
+ (1376,'user.messages.empty.since_signin','No messages since your last sign-in.','Aucun message depuis votre dernière connexion.','Brak wiadomości od ostatniego logowania.'),
+ (1377,'user.messages.empty.since_week','No messages in the past week.','Aucun message depuis une semaine.','Brak wiadomości od tygodnia.'),
+ (1378,'user.messages.empty.since_month','No messages in the past month.','Aucun message depuis un mois.','Brak wiadomości od miesiąca.'),
+ (1379,'user.messages.empty.since_quarter','No messages in the past quarter.','Aucun message depuis un trimestre.','Brak wiadomości od kwartału.'),
+ (1380,'user.messages.empty.since_year','No messages in the past year.','Aucun message depuis un an.','Brak wiadomości od roku.');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',93,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',94,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

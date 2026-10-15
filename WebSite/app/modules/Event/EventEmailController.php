@@ -88,6 +88,7 @@ final class EventEmailController extends AbstractController
             'weekdayNames' => TranslationManager::getWeekdayNames(),
             'timeOptions' => $this->getAllLabels(),
             'page' => $this->application->getConnectedUser()->getPage(),
+            'btn_HistoryBack' => true,
         ]));
     }
 

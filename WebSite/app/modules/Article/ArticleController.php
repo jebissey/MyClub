@@ -688,14 +688,13 @@ final class ArticleController extends TableController
             period: $period->value,
             dateRange: $dateRange,
             availablePeriods: Period::gets($this->languagesDataHelper),
-            navbarTemplate: '../../Article/views/navbar/redactor.latte',
             title: 'Rédacteurs vs audience',
             totalLabels: ['articles', ''],
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(1),
             ]),
         );
-        $this->render('Common/views/crosstab.latte', $viewModel->toArray());
+        $this->render('Article/views/crosstab.latte', $viewModel->toArray());
     }
 
     public function topArticlesByPeriod(): void

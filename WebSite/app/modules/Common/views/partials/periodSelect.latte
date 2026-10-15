@@ -1,0 +1,7 @@
+{* Expected params: $period, $availablePeriods (key => label) *}
+<label for="period" class="form-label me-2 mb-0">{='common.period'|translate}:</label>
+<select class="form-select form-select-sm" id="period" name="period" onchange="this.form.submit()">
+    {foreach $availablePeriods as $key => $label}
+        <option value="{$key}" {if $period == $key}selected{/if}>{$label}</option>
+    {/foreach}
+</select>

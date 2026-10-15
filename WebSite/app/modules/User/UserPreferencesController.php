@@ -44,6 +44,7 @@ final class UserPreferencesController extends AbstractController
         $preferencesJson = $row !== false ? ($row->Preferences ?? '') : '';
 
         $viewModel = new UserPreferencesViewModel(
+            navItems: $this->getNavItems($person),
             currentPreferences: json_decode($preferencesJson, true),
             eventTypes: $eventTypesWithAttributes,
             layoutParams: $this->getAllParams([]),

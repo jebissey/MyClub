@@ -61,7 +61,9 @@ final class KanbanController extends AbstractController
             cardTypes: array_values($this->kanbanDataHelper->getProjectCardTypes($selectedProjectId)),
             filters: $filters,
             isOwner: $isOwner,
-            layoutParams: $this->getAllParams([]),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
         );
 
         $this->render('Kanban/views/kanban.latte', $viewModel->toArray());

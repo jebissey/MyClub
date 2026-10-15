@@ -59,6 +59,7 @@ final class UserNotificationsController extends AbstractController
         $groupsWithType = $this->groupDataHelper->getGroupsWithType($person->Id);
 
         $viewModel = new UserNotificationsViewModel(
+            navItems: $this->getNavItems($person),
             currentNotifications: is_array($decodedNotifications) ? $decodedNotifications : [],
             groups: array_values($groupsWithType),
             vapidPubliKey: $this->credentials->get('vapid', 'publicKey') ?? '',

@@ -35,6 +35,7 @@ final class UserAccountController extends AbstractController
         $readOnly = $imported !== false && (bool)($imported->Imported ?? false);
 
         $viewModel = new UserAccountViewModel(
+            navItems: $this->getNavItems($person),
             readOnly: $readOnly,
             email: filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
             firstName: WebApp::sanitizeInput($person->FirstName ?? ''),

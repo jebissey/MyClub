@@ -22,8 +22,11 @@ final readonly class UserConnectionsViewModel extends LayoutViewModel
         public string $user,
         array $layoutParams = []
     ) {
+        $baseArgs = self::baseArgsFrom($layoutParams);
+        $baseArgs['page'] = 'connections';
+
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
+            ...$baseArgs,
             btn_HistoryBack: true,
             btn_Parent: '/user',
         );
