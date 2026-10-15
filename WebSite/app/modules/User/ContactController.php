@@ -16,6 +16,7 @@ use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\RegistrationLinkService;
 use app\modules\Common\valueObjects\EmailMessage;
+use app\modules\Common\viewModels\ContactViewModel;
 use app\modules\User\valueObjects\EventRegistrationRow;
 
 final class ContactController extends AbstractController
@@ -38,33 +39,68 @@ final class ContactController extends AbstractController
 
     public function contact(?int $eventId = null): void
     {
-        if (WebApp::getRequestMethod() === 'GET') {
-            $_SESSION['contact_form_loaded'] = time();
+        $method = WebApp::getRequestMethod();
 
-            $event = null;
-            if ($eventId !== null) {
-                $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary, StartTime, Audience');
-                /** @var object{Id: int, Summary: string, StartTime: string, Audience: string}|false $event */
-                if (!$event || $event->Audience !== EventAudience::ForAll->value) {
-                    $eventId = $event = null;
-                }
-            }
-            $this->render('Common/views/contact.latte', $this->getAllParams([
-                'navItems'          => $this->getNavItems($this->application->getConnectedUser()->person),
-                'event'             => $event,
-                'page'              => $this->application->getConnectedUser()->getPage(),
-                'turnstileSiteKey'  => $this->credentials->get('turnstile', 'site_key') ?? '',
-                'btn_HistoryBack' => true,
-
-            ]));
-        } elseif (WebApp::getRequestMethod() === 'POST') {
+        if ($method === 'POST') {
             $this->handleContactForm();
-        } else {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
         }
+        if ($method !== 'GET') {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+
+        $_SESSION['contact_form_loaded'] = time();
+
+        $event = null;
+        if ($eventId !== null) {
+            $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary, StartTime, Audience');
+            /** @var object{Id: int, Summary: string, StartTime: string, Audience: string}|false $event */
+            if (!$event || $event->Audience !== EventAudience::ForAll->value) {
+                $event = null;
+            }
+        }
+
+        $connectedUser = $this->application->getConnectedUser();
+        $identity = $this->getConnectedIdentity();
+
+        // A connected user cannot change identity: prefill and lock the fields.
+        $viewModel = new ContactViewModel(
+            navItems: $this->getNavItems($connectedUser->person),
+            event: $event,
+            turnstileSiteKey: (string)($this->credentials->get('turnstile', 'site_key') ?? ''),
+            name: $identity['name'] ?? '',
+            email: $identity['email'] ?? '',
+            identityReadOnly: $identity !== null,
+            layout: $this->getLayout(),
+            page: $connectedUser->getPage(),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->render('Common/views/contact.latte', $viewModel->toArray());
     }
 
     #region Private functions
+    /**
+     * Identity of the connected user, or null for a visitor.
+     *
+     * @return array{name: string, email: string}|null
+     */
+    private function getConnectedIdentity(): ?array
+    {
+        $person = $this->application->getConnectedUser()->person;
+        if ($person === null) {
+            return null;
+        }
+        return [
+            'name'  => trim(
+                WebApp::sanitizeInput($person->LastName ?? '') . ' ' .
+                    WebApp::sanitizeInput($person->FirstName ?? '')
+            ),
+            'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
+        ];
+    }
+
     private function handleContactForm(): void
     {
         $honeypot = To::str($_POST['website'] ?? '');
@@ -107,15 +143,22 @@ final class ContactController extends AbstractController
         $eventIdRaw = $input['eventId'] ?? null;
         $eventId = $eventIdRaw !== null ? To::int($eventIdRaw) : null;
 
+        // A connected user cannot choose an identity: ignore what the client sent.
+        $identity = $this->getConnectedIdentity();
+        if ($identity !== null) {
+            $name  = $identity['name'];
+            $email = $identity['email'];
+        }
+
         $errors = [];
-        if (empty($name)) {
-            $errors[] = 'Nom et prénom sont requis.';
+        if ($name === '') {
+            $errors[] = ($this->t)('contact.error.name_required');
         }
-        if (empty($email)) {
-            $errors[] = 'Un email valide est requis.';
+        if ($email === '') {
+            $errors[] = ($this->t)('contact.error.email_required');
         }
-        if ($eventId === null && empty($message)) {
-            $errors[] = 'Le message est requis.';
+        if ($eventId === null && $message === '') {
+            $errors[] = ($this->t)('contact.error.message_required');
         }
 
         if (empty($errors)) {
@@ -219,7 +262,7 @@ final class ContactController extends AbstractController
             $emailMessage = new EmailMessage(
                 from: $email,
                 to: $contactEmail,
-                subject: "Message de contact de {$name} ({$email})",
+                subject: sprintf(($this->t)('contact.email.subject'), $name, $email),
                 body: $message,
                 isHtml: false
             );
@@ -228,13 +271,13 @@ final class ContactController extends AbstractController
 
         if ($emailSent) {
             $url = '/contact' . $this->webApp->buildUrl([
-                'success' => 'Message envoyé avec succès.',
+                'success' => ($this->t)('contact.success.sent'),
                 'who'     => $email,
             ]);
             $this->redirect($url);
         } else {
             $params = [
-                'error'       => "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.",
+                'error'       => ($this->t)('contact.error.send_failed'),
                 'old_name'    => $name,
                 'old_email'   => $email,
                 'old_message' => $message,
@@ -256,4 +299,5 @@ final class ContactController extends AbstractController
         ];
         $this->redirect('/contact?' . http_build_query($params));
     }
+    #endregion
 }

@@ -6944,10 +6944,25 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1377,'user.messages.empty.since_week','No messages in the past week.','Aucun message depuis une semaine.','Brak wiadomości od tygodnia.'),
  (1378,'user.messages.empty.since_month','No messages in the past month.','Aucun message depuis un mois.','Brak wiadomości od miesiąca.'),
  (1379,'user.messages.empty.since_quarter','No messages in the past quarter.','Aucun message depuis un trimestre.','Brak wiadomości od kwartału.'),
- (1380,'user.messages.empty.since_year','No messages in the past year.','Aucun message depuis un an.','Brak wiadomości od roku.');
+ (1380,'user.messages.empty.since_year','No messages in the past year.','Aucun message depuis un an.','Brak wiadomości od roku.'),
+ (1390,'contact.page_title','Contact','Contact','Kontakt'),
+ (1391,'contact.heading.contact','Contact us','Nous contacter','Skontaktuj się z nami'),
+ (1392,'contact.heading.event','Register for the event on','Vous inscrire à l''événement du','Zapisz się na wydarzenie z dnia'),
+ (1393,'contact.honeypot.label','Leave this field empty','Laisser ce champ vide','Pozostaw to pole puste'),
+ (1394,'contact.field.name','Last name & First name *','Nom & Prénom *','Nazwisko i imię *'),
+ (1395,'contact.field.email','Email *','Email *','E-mail *'),
+ (1396,'contact.field.message','Your message *','Votre message *','Twoja wiadomość *'),
+ (1397,'contact.field.locked','These details come from your account and cannot be changed here.','Ces informations proviennent de votre compte et ne peuvent pas être modifiées ici.','Te dane pochodzą z Twojego konta i nie można ich tutaj zmienić.'),
+ (1398,'contact.submit','Send','Envoyer','Wyślij'),
+ (1399,'contact.error.name_required','Last name and first name are required.','Nom et prénom sont requis.','Nazwisko i imię są wymagane.'),
+ (1400,'contact.error.email_required','A valid email is required.','Un email valide est requis.','Wymagany jest poprawny adres e-mail.'),
+ (1401,'contact.error.message_required','The message is required.','Le message est requis.','Wiadomość jest wymagana.'),
+ (1402,'contact.error.send_failed','An error occurred while sending the message. Please try again.','Une erreur est survenue lors de l''envoi du message. Veuillez réessayer.','Podczas wysyłania wiadomości wystąpił błąd. Spróbuj ponownie.'),
+ (1403,'contact.success.sent','Message sent successfully.','Message envoyé avec succès.','Wiadomość została wysłana.'),
+ (1404,'contact.email.subject','Contact message from %1$s (%2$s)','Message de contact de %1$s (%2$s)','Wiadomość kontaktowa od %1$s (%2$s)');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',94,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',95,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

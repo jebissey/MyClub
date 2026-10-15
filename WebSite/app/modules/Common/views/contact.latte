@@ -1,20 +1,20 @@
 {layout 'layout.latte'}
 
-{block title}Contact{/block}
+{block title}{='contact.page_title'|translate}{/block}
 
 {block head}
-    {* Honeypot *}
-    <style>
-        .contact-trap {
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            opacity: 0;
-            height: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-    </style>
+{* Honeypot *}
+<style>
+    .contact-trap {
+        position: absolute;
+        left: -9999px;
+        top: -9999px;
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+</style>
 {/block}
 
 {block navbar}
@@ -22,82 +22,111 @@
 {/block}
 
 {block content}
-    <div class="container-fluid">
-        <div class="row mb-4">
-            <h1 class="mb-4">
-                <strong>{if $event}Vous inscrire à l'événement du {$event->StartTime|longDate}{else}Nous contacter{/if}</strong>
-            </h1>
-            {if $event}
-                <h2>{$event->Summary}</h2>
-            {/if}
-
-            {if isset($_GET['success'])}
-                <div class="alert alert-success" role="alert">
-                    {$_GET['success']}
-                </div>
-            {/if}
-
-            {if isset($_GET['error'])}
-                <div class="alert alert-danger" role="alert">
-                    {$_GET['error']}
-                </div>
-            {/if}
-
-            {if isset($_GET['errors'])}
-                <div class="alert alert-danger" role="alert">
-                    <ul class="mb-0">
-                        {foreach explode('|', $_GET['errors']) as $error}
-                            <li>{$error}</li>
-                        {/foreach}
-                    </ul>
-                </div>
-            {/if}
-
-            <form id="emailForm" method="POST" action="/contact">
+<div class="container-fluid">
+    <div class="row mb-4">
+        <h1 class="mb-4">
+            <strong>
                 {if $event}
-                    <input type="hidden" id="eventId" name="eventId" value="{$event->Id}">
+                    {='contact.heading.event'|translate} {$event->StartTime|longDate}
+                {else}
+                    {='contact.heading.contact'|translate}
                 {/if}
+            </strong>
+        </h1>
+        {if $event}
+            <h2>{$event->Summary}</h2>
+        {/if}
 
-                {* ── Honeypot ── *}
-                <div class="contact-trap" aria-hidden="true">
-                    <label for="website">Laisser ce champ vide</label>
-                    <input type="text" id="website" name="website"
-                        tabindex="-1" autocomplete="off" value="">
-                </div>
+        {if isset($_GET['success'])}
+            <div class="alert alert-success" role="alert">{$_GET['success']}</div>
+        {/if}
 
-                <div class="mb-3">
-                    <label for="name" class="form-label"><strong>Nom & Prénom *</strong></label>
+        {if isset($_GET['error'])}
+            <div class="alert alert-danger" role="alert">{$_GET['error']}</div>
+        {/if}
+
+        {if isset($_GET['errors'])}
+            <div class="alert alert-danger" role="alert">
+                <ul class="mb-0">
+                    {foreach explode('|', $_GET['errors']) as $error}
+                        <li>{$error}</li>
+                    {/foreach}
+                </ul>
+            </div>
+        {/if}
+
+        <form id="emailForm" method="POST" action="/contact">
+            {if $event}
+                <input type="hidden" id="eventId" name="eventId" value="{$event->Id}">
+            {/if}
+
+            {* Honeypot *}
+            <div class="contact-trap" aria-hidden="true">
+                <label for="website">{='contact.honeypot.label'|translate}</label>
+                <input type="text" id="website" name="website"
+                       tabindex="-1" autocomplete="off" value="">
+            </div>
+
+            {* Identity fields: disabled for a connected user (the server ignores them anyway) *}
+            <div class="mb-3">
+                <label for="name" class="form-label">
+                    <strong>{='contact.field.name'|translate}</strong>
+                </label>
+                <div class="input-group">
+                    {if $identityReadOnly}
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    {/if}
                     <input type="text" class="form-control" id="name" name="name"
-                        value="{if isset($_GET['old_name'])}{$_GET['old_name']}{/if}" required>
+                           value="{if $identityReadOnly}{$name}{elseif isset($_GET['old_name'])}{$_GET['old_name']}{/if}"
+                           n:attr="disabled => $identityReadOnly, required => !$identityReadOnly">
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label for="email" class="form-label"><strong>Email *</strong></label>
+            <div class="mb-3">
+                <label for="email" class="form-label">
+                    <strong>{='contact.field.email'|translate}</strong>
+                </label>
+                <div class="input-group">
+                    {if $identityReadOnly}
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    {/if}
                     <input type="email" class="form-control" id="email" name="email"
-                        value="{if isset($_GET['old_email'])}{$_GET['old_email']}{/if}" required>
+                           value="{if $identityReadOnly}{$email}{elseif isset($_GET['old_email'])}{$_GET['old_email']}{/if}"
+                           n:attr="disabled => $identityReadOnly, required => !$identityReadOnly">
                 </div>
+            </div>
 
-                {if !$event}
+            {if $identityReadOnly}
+                <p class="form-text mb-3">
+                    <i class="bi bi-info-circle me-1"></i>{='contact.field.locked'|translate}
+                </p>
+            {/if}
+
+            {if !$event}
                 <div class="mb-3">
-                    <label for="message" class="form-label"><strong>Votre message *</strong></label>
+                    <label for="message" class="form-label">
+                        <strong>{='contact.field.message'|translate}</strong>
+                    </label>
                     <textarea class="form-control" id="message" name="message"
-                            rows="5" required>{if isset($_GET['old_message'])}{$_GET['old_message']}{/if}</textarea>
+                              rows="5" required>{if isset($_GET['old_message'])}{$_GET['old_message']}{/if}</textarea>
                 </div>
-                {/if}
+            {/if}
 
-                <div class="mb-3">
-                    <div class="cf-turnstile"
-                            data-sitekey="{$turnstileSiteKey}"
-                            data-theme="light">
-                    </div>
+            <div class="mb-3">
+                <div class="cf-turnstile"
+                     data-sitekey="{$turnstileSiteKey}"
+                     data-theme="light">
                 </div>
+            </div>
 
-                <button type="submit" class="btn btn-primary"><strong>Envoyer</strong></button>
-            </form>
-        </div>
+            <button type="submit" class="btn btn-primary">
+                <strong>{='contact.submit'|translate}</strong>
+            </button>
+        </form>
     </div>
+</div>
 {/block}
 
 {block scripts}
-    <script src="https://challenges.cloudflare.com/turnstile/v1/api.js" async defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v1/api.js" async defer></script>
 {/block}

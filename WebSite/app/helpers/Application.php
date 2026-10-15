@@ -26,7 +26,7 @@ use app\modules\Common\valueObjects\Person;
 
 final class Application
 {
-    public const VERSION = '0.98.1';
+    public const VERSION = '0.98.2';
 
     // @formatter:off
     public const  EMOJI_LIST = [
