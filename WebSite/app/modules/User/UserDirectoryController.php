@@ -15,7 +15,7 @@ use app\modules\Common\AbstractController;
 use app\modules\Common\services\MemberMapService;
 use app\modules\User\viewModels\UserDirectoryViewModel;
 use app\modules\User\viewModels\UsersMapViewModel;
-use app\modules\Common\valueObjects\Person;
+use app\modules\Common\valueObjects\LocatedMemberRow;
 
 final class UserDirectoryController extends AbstractController
 {
@@ -51,12 +51,18 @@ final class UserDirectoryController extends AbstractController
         if ($selectedGroup) {
             $persons = $this->memberDirectoryDataHelper->getPersonsInGroupForDirectory($selectedGroup);
         } else {
-            $persons = $this->memberDataHelper->getActiveMembersDirectoryInfo();
-
             $gravatarHandler = new GravatarHandler();
-            foreach ($persons as $directoryPerson) {
-                $directoryPerson->UserImg = WebApp::getUserImg(Person::fromRow($directoryPerson), $gravatarHandler);
-            }
+            $persons = array_map(
+                static fn(LocatedMemberRow $member): LocatedMemberRow => $member->withUserImg(
+                    WebApp::computeUserImg(
+                        (bool) $member->UseGravatar,
+                        $member->Email,
+                        $member->Avatar,
+                        $gravatarHandler,
+                    ),
+                ),
+                $this->memberDataHelper->getActiveMembersDirectoryInfo(),
+            );
         }
 
         $loggedPersonRow = $this->dataHelper->get(

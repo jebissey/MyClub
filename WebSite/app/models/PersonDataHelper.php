@@ -9,8 +9,11 @@ use PDOStatement;
 use RuntimeException;
 use stdClass;
 use app\helpers\Application;
+use app\modules\Common\valueObjects\MemberExportRow;
 
 /**
+ * @phpstan-import-type MemberExportRowShape from MemberExportRow
+ *
  * @phpstan-type PersonGroupRow object{
  *     PersonId: int,
  *     Id: int,
@@ -146,15 +149,7 @@ final class PersonDataHelper extends Data
     }
 
     /**
-     * @return list<object{
-     *     Id: int|string,
-     *     Inactivated: int|bool|string|null,
-     *     Email: string,
-     *     FirstName: string|null,
-     *     LastName: string|null,
-     *     Phone: string|null,
-     *     CustomFields: string|null
-     * }>
+     * @return list<MemberExportRow>
      */
     public function getMembersForExport(): array
     {
@@ -167,9 +162,13 @@ final class PersonDataHelper extends Data
         if ($stmt === false) {
             throw new RuntimeException("Unable to read the members for export");
         }
-        /** @var list<object{Id: int|string, Inactivated: int|bool|string|null, Email: string, FirstName: string|null, LastName: string|null, Phone: string|null, CustomFields: string|null}> $members */
-        $members = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return $members;
+        /** @var list<MemberExportRowShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(
+            static fn(object $row): MemberExportRow => MemberExportRow::fromStdClass($row),
+            $rows
+        );
     }
 
     /**

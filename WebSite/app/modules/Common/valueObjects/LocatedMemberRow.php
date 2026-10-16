@@ -35,7 +35,30 @@ final readonly class LocatedMemberRow
         public int $InPresentationDirectory,
         public int $ShowPhoneInPresentationDirectory,
         public int $ShowEmailInPresentationDirectory,
+        public string $UserImg = '',
     ) {
+    }
+
+    /**
+     * Returns a copy of this row with the computed user image set.
+     */
+    public function withUserImg(string $userImg): self
+    {
+        return new self(
+            $this->Id,
+            $this->FirstName,
+            $this->LastName,
+            $this->NickName,
+            $this->Avatar,
+            $this->UseGravatar,
+            $this->Email,
+            $this->Location,
+            $this->MyPublicDataInPresentationDirectory,
+            $this->InPresentationDirectory,
+            $this->ShowPhoneInPresentationDirectory,
+            $this->ShowEmailInPresentationDirectory,
+            $userImg,
+        );
     }
 
     /**

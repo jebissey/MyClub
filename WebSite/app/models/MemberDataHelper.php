@@ -10,6 +10,7 @@ use app\helpers\Application;
 use app\helpers\To;
 use app\models\interfaces\MemberDataHelperInterface;
 use app\modules\Common\valueObjects\IdentityRow;
+use app\modules\Common\valueObjects\LocatedMemberRow;
 use app\modules\Common\valueObjects\MemberBasicRow;
 use app\modules\Common\valueObjects\ResetTokenRow;
 use app\modules\Common\valueObjects\SignInRow;
@@ -19,6 +20,7 @@ use app\modules\Common\valueObjects\SignInRow;
  * Hides the Individual/Member split and column names from callers
  * (especially AuthenticationService).
  *
+ * @phpstan-import-type LocatedMemberRowShape from LocatedMemberRow
  * @phpstan-import-type IndividualShape from IdentityRow
  * @phpstan-import-type JoinedShape from MemberBasicRow
  */
@@ -199,19 +201,7 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
      * Directory information for every active member who agreed
      * to appear in the presentation directory.
      *
-     * @return list<object{
-     *     Id: int,
-     *     LastName: string|null,
-     *     FirstName: string,
-     *     NickName: string|null,
-     *     Avatar: string|null,
-     *     Email: string,
-     *     UseGravatar: bool|int|string|null,
-     *     InPresentationDirectory: bool|int|string|null,
-     *     ShowPhoneInPresentationDirectory: bool|int|string|null,
-     *     ShowEmailInPresentationDirectory: bool|int|string|null,
-     *     Location: string|null
-     * }&\stdClass>
+     * @return list<LocatedMemberRow>
      */
     public function getActiveMembersDirectoryInfo(): array
     {
@@ -238,7 +228,14 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
         if ($stmt === false) {
             return [];
         }
-        return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+
+        /** @var list<LocatedMemberRowShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(
+            static fn(object $row): LocatedMemberRow => LocatedMemberRow::fromStdClass($row),
+            $rows
+        );
     }
 
     public function setRememberToken(int $id, string $token): void

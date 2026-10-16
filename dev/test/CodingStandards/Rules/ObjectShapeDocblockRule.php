@@ -10,7 +10,7 @@ use test\CodingStandards\ValueObjects\ClassInfo;
 final readonly class ObjectShapeDocblockRule implements RuleInterface
 {
     /** Shapes with this many properties or fewer are tolerated. */
-    private const MAX_INLINE_PROPERTIES = 10;
+    private const MAX_INLINE_PROPERTIES = 9;
 
     private const OPENERS = ['{' => '}', '<' => '>', '(' => ')', '[' => ']'];
 
@@ -40,6 +40,11 @@ final readonly class ObjectShapeDocblockRule implements RuleInterface
                 $position = (int) $offset;
 
                 if (!$this->isInDocblock($source, $position)) {
+                    continue;
+                }
+
+                // A @phpstan-type definition is the shape itself, not an inline usage
+                if ($this->isShapeDefinition($source, $position)) {
                     continue;
                 }
 
@@ -99,5 +104,17 @@ final readonly class ObjectShapeDocblockRule implements RuleInterface
         }
 
         return $hasContent ? $properties + 1 : $properties;
+    }
+
+    /**
+     * True when the shape is the target of a "@phpstan-type Name object{...}" tag.
+     */
+    private function isShapeDefinition(string $source, int $position): bool
+    {
+        $lineStart = strrpos(substr($source, 0, $position), "\n");
+        $lineStart = $lineStart === false ? 0 : $lineStart + 1;
+        $prefix = substr($source, $lineStart, $position - $lineStart);
+
+        return preg_match('~@phpstan-type\s+\w+\s*$~', $prefix) === 1;
     }
 }

@@ -14,6 +14,8 @@ use app\modules\Common\valueObjects\LocatedMemberRow;
 /**
  * Member queries serving the presentation directory, the members map
  * and the contact lists.
+ *
+ * @phpstan-import-type LocatedMemberRowShape from LocatedMemberRow
  */
 final class MemberDirectoryDataHelper extends Data
 {
@@ -109,20 +111,7 @@ final class MemberDirectoryDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
-        /** @var list<object{
-         *     Id: int|string,
-         *     FirstName: string,
-         *     LastName: string,
-         *     NickName: string|null,
-         *     Avatar: string|null,
-         *     UseGravatar: string,
-         *     Email: string,
-         *     Location: string|null,
-         *     MyPublicDataInPresentationDirectory: string|null,
-         *     InPresentationDirectory: int|string,
-         *     ShowPhoneInPresentationDirectory: int|string,
-         *     ShowEmailInPresentationDirectory: int|string
-         * }> $rows */
+        /** @var list<LocatedMemberRowShape> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return array_map(
