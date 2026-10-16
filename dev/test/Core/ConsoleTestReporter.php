@@ -116,6 +116,26 @@ final class ConsoleTestReporter implements TestReporterInterface
         );
     }
 
+    public function displayLinkedResult(
+        string $testedPath,
+        int $httpCode,
+        float $responseTimeMs,
+        ?int $dbId = null
+    ): void {
+        $dbIdLabel = $dbId !== null ? " [dbId={$dbId}]" : '';
+
+        echo sprintf(
+            "===> %s -> %s%d %s%s (%.2fms)%s\n",
+            $testedPath,
+            $this->getStatusColor($httpCode),
+            $httpCode,
+            $this->getStatusText($httpCode),
+            Color::Reset->value,
+            $responseTimeMs,
+            $dbIdLabel
+        );
+    }
+
     // -------------------------------------------------------------------------
     // Private
     // -------------------------------------------------------------------------

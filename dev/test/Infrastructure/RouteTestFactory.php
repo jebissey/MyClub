@@ -7,6 +7,7 @@ namespace test\Infrastructure;
 use Throwable;
 
 use test\Core\ConsoleTestReporter;
+use test\Core\LinkExtractor;
 use test\Core\TestDataValidator;
 use test\Core\TestExecutor;
 use test\Core\ValueObjects\TestConfiguration;
@@ -63,7 +64,8 @@ final class RouteTestFactory
                 $httpClient,
                 new TestDataValidator(),
                 $reporter,
-                $config
+                $config,
+                new LinkExtractor()
             ),
             $reporter,
             $dbTestsPath

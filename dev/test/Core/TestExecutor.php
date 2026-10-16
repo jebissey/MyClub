@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace test\Core;
 
+use Throwable;
 use test\Core\Enums\TestResultStatus;
+use test\Core\ValueObjects\HttpResponse;
 use test\Core\ValueObjects\Route;
 use test\Core\ValueObjects\Simulation;
 use test\Core\ValueObjects\TestConfiguration;
@@ -43,7 +45,8 @@ final class TestExecutor
         private HttpClientInterface $http,
         private TestDataValidator $validator,
         private TestReporterInterface $reporter,
-        private TestConfiguration $config
+        private TestConfiguration $config,
+        private LinkExtractor $linkExtractor
     ) {}
 
     /**
@@ -120,9 +123,14 @@ final class TestExecutor
 
             $this->displayTestResult($tests[0], $simulation->postParams);
 
-            if ($stop && $this->batchHasFailure($tests)) {
+            $linkedTests = $this->testLinkedPages($tests[0], $simulation);
+            $results = array_merge($results, $linkedTests);
+
+            if ($stop && $this->batchHasFailure(array_merge($tests, $linkedTests))) {
                 break;
             }
+
+            echo "\n";
         }
 
         return $results;
@@ -516,5 +524,64 @@ final class TestExecutor
         }
 
         return null;
+    }
+
+    /**
+     * Tests every internal page link found in the HTML response of a
+     * successful GET simulation (Step IS NOT NULL). Requests reuse the
+     * simulation session (already authenticated): the session is NOT
+     * cleared, unlike runSingleTest().
+     *
+     * A followed link fails on 4xx/5xx (3xx accepted, because
+     * CURLOPT_FOLLOWLOCATION is disabled).
+     *
+     * @return list<TestResult>
+     */
+    private function testLinkedPages(TestResult $mainResult, Simulation $simulation): array
+    {
+        $response = $mainResult->response;
+        if ($response === null || $mainResult->route->method !== 'GET' || $response->httpCode !== 200) {
+            return [];
+        }
+
+        if (stripos($response->headers, 'text/html') === false) {
+            return [];
+        }
+
+        $fromPath = $mainResult->requestPath !== ''
+            ? $mainResult->requestPath
+            : $mainResult->route->path;
+
+        $links = $this->linkExtractor->extract($response->body, $this->config->baseUrl, $fromPath);
+
+        $results = [];
+        foreach ($links as $link) {
+            try {
+                $linkedResponse = $this->http->request('GET', $link);
+            } catch (Throwable $e) {
+                $linkedResponse = new HttpResponse(0, '', '', 0.0, false, $e->getMessage());
+            }
+
+            $result = $linkedResponse->httpCode >= 200 && $linkedResponse->httpCode < 400
+                ? TestResult::success($mainResult->route, $simulation->number, $linkedResponse, $simulation->dbId, $link)
+                : TestResult::responseCodeFailure($mainResult->route, $simulation->number, $linkedResponse, 200, $simulation->dbId, $link);
+
+            $results[] = $result;
+
+            $this->reporter->displayLinkedResult(
+                $link,
+                $linkedResponse->httpCode,
+                $linkedResponse->responseTimeMs,
+                $simulation->dbId
+            );
+
+            if ($result->isFailure()) {
+                $this->recordFailure($result);
+            }
+
+            usleep($this->config->requestDelay);
+        }
+
+        return $results;
     }
 }

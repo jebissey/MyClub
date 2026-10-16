@@ -43,4 +43,16 @@ interface TestReporterInterface
         array $postParams,
         ?int $dbId = null
     ): void;
+
+    /**
+     * Displays the result of a page link followed after a simulation
+     * (Step IS NOT NULL). Prefixed with '===>' to distinguish it from the
+     * main test result.
+     */
+    public function displayLinkedResult(
+        string $testedPath,
+        int $httpCode,
+        float $responseTimeMs,
+        ?int $dbId = null
+    ): void;
 }
