@@ -11,6 +11,7 @@ use test\CodingStandards\Rules\ControllersRule;
 use test\CodingStandards\Rules\DatabaseAccessRule;
 use test\CodingStandards\Rules\FinalClassesRule;
 use test\CodingStandards\Rules\FinalReadonlyRule;
+use test\CodingStandards\Rules\ObjectShapeDocblockRule;
 use test\CodingStandards\Rules\ReadonlyPropertiesRule;
 use test\CodingStandards\Rules\RuleInterface;
 use test\CodingStandards\ValueObjects\ClassInfo;
@@ -21,9 +22,7 @@ final readonly class CodingStandardsChecker
      * @param list<RuleInterface> $rules
      * @param list<ClassInfo> $classes
      */
-    public function __construct(private array $rules, private array $classes)
-    {
-    }
+    public function __construct(private array $rules, private array $classes) {}
 
     public static function create(string $appDir): self
     {
@@ -39,6 +38,8 @@ final readonly class CodingStandardsChecker
                 new ApisRule($paths),
                 new DatabaseAccessRule($paths),
                 new ReadonlyPropertiesRule($paths, new PropertyAnalyzer(), $dedicated),
+                new ReadonlyPropertiesRule($paths, new PropertyAnalyzer(), $dedicated),
+                new ObjectShapeDocblockRule($paths),
             ],
             (new ClassScanner())->scan($appDir),
         );
