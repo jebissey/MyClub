@@ -18,6 +18,9 @@ use app\modules\Article\valueObjects\PersonNameRow;
 use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Article\valueObjects\IdRow;
 
+/**
+ * @phpstan-import-type ArticleRowShape from ArticleRow
+ */
 final class SurveyController extends AbstractController
 {
     public function __construct(Application $application, private readonly SurveyDataHelper $surveyDataHelper)
@@ -124,6 +127,7 @@ final class SurveyController extends AbstractController
             return;
         }
 
+        /** @var ArticleRowShape|false $articleForAuth */
         $articleForAuth = $this->dataHelper->get(
             'Article',
             ['Id' => $survey->IdArticle],
@@ -135,16 +139,6 @@ final class SurveyController extends AbstractController
             return;
         }
 
-        /** @var object{
-        * Id: int|string,
-        * Title: string,
-        * Content: string,
-        * CreatedBy: int|string,
-        * PublishedBy?: int|string|null,
-        * IdGroup?: int|string|null,
-        * OnlyForMembers?: bool|int|null,
-        * LastUpdate: string
-        * } $articleForAuth */
         $article = ArticleAuthorizationRow::fromStdClass(ArticleRow::fromStdClass($articleForAuth));
 
         if ($this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser)) {

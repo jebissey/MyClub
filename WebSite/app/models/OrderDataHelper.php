@@ -11,6 +11,7 @@ use app\helpers\ConnectedUser;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\OrderWithCreatorRow;
+use app\modules\Article\valueObjects\OrderNewsRow;
 
 /**
  * @phpstan-type PendingOrderResponse object{
@@ -31,6 +32,7 @@ use app\modules\Article\valueObjects\OrderWithCreatorRow;
  *     date: string,
  *     url: string
  * }
+ * @phpstan-import-type OrderNewsRowShape from OrderNewsRow
  */
 final class OrderDataHelper extends Data implements NewsProviderInterface
 {
@@ -158,9 +160,13 @@ final class OrderDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
-        /** @var array<int, object{FirstName: string, LastName: string, Question: string, ClosingDate: string, Visibility: mixed, IdArticle: int, LastActivity: string, Orderers: string}> $orders */
-        $orders = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $news = [];
+        /** @var list<OrderNewsRowShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $orders = array_map(
+            static fn(object $row): OrderNewsRow => OrderNewsRow::fromStdClass($row),
+            $rows
+        );
+
         foreach ($orders as $order) {
             $articleRow = $this->articleDataHelper->getWithAuthor($order->IdArticle);
             if ($articleRow === false) {

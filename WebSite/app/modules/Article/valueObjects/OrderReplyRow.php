@@ -7,8 +7,6 @@ namespace app\modules\Article\valueObjects;
 use app\modules\Common\valueObjects\AbstractValueObject;
 
 /**
- * Représentation fortement typée d'une réponse à une commande groupée (table OrderReply).
- *
  * @phpstan-type OrderReplyRowShape object{
  *     Id: int|string,
  *     IdPerson: int|string,

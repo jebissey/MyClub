@@ -19,6 +19,10 @@ use app\modules\Common\AbstractController;
 use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Article\valueObjects\IdRow;
 
+/**
+ * @phpstan-import-type ArticleRowShape from ArticleRow
+ * @phpstan-import-type OrderReplyRowShape from OrderReplyRow
+ */
 final class OrderController extends AbstractController
 {
     public function __construct(Application $application, private readonly OrderDataHelper $orderDataHelper)
@@ -136,6 +140,7 @@ final class OrderController extends AbstractController
             return;
         }
 
+        /** @var ArticleRowShape|false $articleForAuth */
         $articleForAuth = $this->dataHelper->get(
             'Article',
             ['Id' => $order->IdArticle],
@@ -147,17 +152,6 @@ final class OrderController extends AbstractController
             return;
         }
 
-        /** @var object{
-         *     Id: int|string,
-         *     Title: string,
-         *     Content: string,
-         *     CreatedBy: int|string,
-         *     PublishedBy?: int|string|null,
-         *     IdGroup?: int|string|null,
-         *     OnlyForMembers?: bool|int|null,
-         *     LastUpdate: string
-         * } $articleForAuth
-         */
         $articleAuthorization = ArticleAuthorizationRow::fromStdClass(ArticleRow::fromStdClass($articleForAuth));
 
         if (
@@ -166,19 +160,13 @@ final class OrderController extends AbstractController
                 $connectedUser
             )
         ) {
+            /** @var array<int, OrderReplyRowShape> $repliesData */
             $repliesData = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id], '*');
 
-            $replies = array_map(function ($row) {
-                /** @var object{
-                 *     Id: int|string,
-                 *     IdPerson: int|string,
-                 *     IdOrder: int|string,
-                 *     Answers: string,
-                 *     LastUpdate: string
-                 * } $row
-                 */
-                return OrderReplyRow::fromStdClass($row);
-            }, $repliesData);
+            $replies = array_map(
+                static fn(object $row): OrderReplyRow => OrderReplyRow::fromStdClass($row),
+                $repliesData
+            );
 
             $participants = [];
             /** @var array<string, float|int> $results */
