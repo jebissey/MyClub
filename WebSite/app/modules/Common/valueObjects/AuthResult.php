@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\modules\User\valueObjects;
+namespace app\modules\Common\valueObjects;
 
 use app\modules\Common\valueObjects\Person;
 

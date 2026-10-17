@@ -7,7 +7,7 @@ namespace app\modules\Common\services;
 use app\helpers\WebApp;
 use app\models\ContactDataHelper;
 use app\modules\Common\valueObjects\EmailMessage;
-use app\modules\User\valueObjects\EventRegistrationRow;
+use app\modules\Common\valueObjects\EventRegistrationRow;
 
 /**
  * Sends an event registration link to a contact.

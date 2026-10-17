@@ -22,16 +22,15 @@ use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\MemberMapService;
+use app\modules\Common\valueObjects\EventAttributeRow;
+use app\modules\Common\valueObjects\EventTypeRow;
 use app\modules\Common\viewModels\CrosstabViewModel;
 use app\modules\Event\viewModels\EventChatViewModel;
-use app\modules\Event\viewModels\EventCrosstabViewModel;
 use app\modules\Event\viewModels\EventDetailViewModel;
 use app\modules\Event\viewModels\EventManagerHomeViewModel;
 use app\modules\Event\viewModels\EventNextEventsViewModel;
 use app\modules\Event\viewModels\EventWeekEventsViewModel;
-use app\modules\Event\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\EventAudienceRow;
-use app\modules\Event\valueObjects\EventTypeRow;
 use app\modules\Event\valueObjects\NeedTypeRow;
 
 final class EventController extends AbstractController
@@ -71,6 +70,8 @@ final class EventController extends AbstractController
             'offset' => FilterInputRule::Int->value,
             'mode' => $this->application->enumToValues(EventSearchMode::class),
             'filterByPreferences' => FilterInputRule::Int->value,
+            'registeredOnly' => FilterInputRule::Int->value,
+            'eventTypeId' => FilterInputRule::Int->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $offset = isset($input['offset']) && is_int($input['offset'])
@@ -84,10 +85,21 @@ final class EventController extends AbstractController
             $mode = EventSearchMode::Next->value;
         }
         $filterByPreferences = (($input['filterByPreferences'] ?? null) === 1);
+        $registeredOnly = (($input['registeredOnly'] ?? null) === 1);
+        $eventTypeId = isset($input['eventTypeId']) && is_int($input['eventTypeId'])
+            ? $input['eventTypeId']
+            : null;
         $connectedUser = $this->application->getConnectedUser();
 
         $viewModel = new EventNextEventsViewModel(
-            events: array_values($this->eventDataHelper->getEvents($connectedUser->person, $mode, $offset, $filterByPreferences)),
+            events: array_values($this->eventDataHelper->getEvents(
+                $connectedUser->person,
+                $mode,
+                $offset,
+                $filterByPreferences,
+                $registeredOnly,
+                $eventTypeId
+            )),
             person: $connectedUser->person,
             eventTypes: array_map(
                 static fn(\stdClass $row): EventTypeRow => EventTypeRow::fromStdClass($row),
@@ -104,6 +116,8 @@ final class EventController extends AbstractController
             offset: $offset,
             mode: $mode,
             filterByPreferences: $filterByPreferences,
+            registeredOnly: $registeredOnly,
+            selectedEventTypeId: $eventTypeId,
             duplicateModeToday: Period::Today->value,
             duplicateModeTomorrow: Period::Tomorrow->value,
             duplicateModeNextWeek: Period::NextWeek->value,

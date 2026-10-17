@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Common\valueObjects;
+namespace app\modules\Article\valueObjects;
+
+use app\modules\Common\valueObjects\AbstractValueObject;
 
 /**
  * Ligne minimale ne contenant qu'un identifiant, utilisée pour les

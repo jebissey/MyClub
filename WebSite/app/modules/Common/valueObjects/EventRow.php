@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Event\valueObjects;
+namespace app\modules\Common\valueObjects;
 
 use app\modules\Common\valueObjects\AbstractValueObject;
-use app\modules\Event\valueObjects\EventAttributeRow;
+use app\modules\Common\valueObjects\EventAttributeRow;
 
 /**
  * Représentation fortement typée d'un événement.

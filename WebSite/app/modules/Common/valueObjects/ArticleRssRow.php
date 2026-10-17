@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Article\valueObjects;
+namespace app\modules\Common\valueObjects;
 
 /**
  * Lightweight value object for RSS feed items.

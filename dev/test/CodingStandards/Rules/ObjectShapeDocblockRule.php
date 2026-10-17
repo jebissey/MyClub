@@ -10,7 +10,7 @@ use test\CodingStandards\ValueObjects\ClassInfo;
 final readonly class ObjectShapeDocblockRule implements RuleInterface
 {
     /** Shapes with this many properties or fewer are tolerated. */
-    private const MAX_INLINE_PROPERTIES = 9;
+    private const MAX_INLINE_PROPERTIES = 8;
 
     private const OPENERS = ['{' => '}', '<' => '>', '(' => ')', '[' => ']'];
 

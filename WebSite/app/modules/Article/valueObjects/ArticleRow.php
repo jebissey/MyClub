@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace app\modules\Article\valueObjects;
 
-use app\modules\Common\valueObjects\AuthorInfo;
-use app\modules\Common\valueObjects\GroupInfo;
-
 /**
  * @phpstan-type ArticleRowShape object{
  *     Id: int|string,

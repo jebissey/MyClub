@@ -23,20 +23,21 @@ use app\helpers\To;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\models\DataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
-use app\modules\Event\valueObjects\EventAttributeRow;
+use app\modules\Common\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\EventDetailRow;
 use app\modules\Event\valueObjects\EventExternalRow;
 use app\modules\Event\valueObjects\EventFullRow;
 use app\modules\Common\valueObjects\Person;
 
 /**
- * @phpstan-import-type EventArrayShape from \app\modules\Event\valueObjects\EventRow
+ * @phpstan-import-type EventArrayShape from \app\modules\Common\valueObjects\EventRow
  * @phpstan-type WeekData array{
  *     weekStart: string,
  *     weekEnd: string,
  *     weekStartFull: string,
  *     days: array<int, list<EventArrayShape>>
  * }
+ * @phpstan-import-type EventDetailRowShape from EventDetailRow
  */
 final class EventDataHelper extends Data implements NewsProviderInterface
 {
@@ -92,7 +93,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':id' => $id]);
-            /** @var object{Id: int|string, Summary: string, Description?: string|null, Location?: string|null, StartTime: string, Duration: int|string, IdEventType: int|string, CreatedBy: int|string, MaxParticipants?: int|string|null, Audience: string}|false $event */
+            /** @var EventDetailRowShape|false $event */
             $event = $stmt->fetch(PDO::FETCH_OBJ);
             if ($event === false) {
                 $this->pdo->rollBack();
@@ -336,7 +337,6 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
-
     public function getEvent(int $eventId): EventDetailRow
     {
         if ($this->eventExists($eventId)) {
@@ -352,16 +352,17 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':eventId' => $eventId]);
-            /** @var object{Id: int|string, Summary: string, Description: string, Location: string, StartTime: string, Duration: int|string, IdEventType: int|string, CreatedBy: int|string, MaxParticipants: int|string, Audience: string, LastUpdate: string, Canceled: int|string, EventTypeName: string}|false $result */
+            /** @var EventDetailRowShape|false $result */
             $result = $stmt->fetch(PDO::FETCH_OBJ);
             if ($result === false) {
                 throw new QueryException("Event type doesn't exist for event ({$eventId})");
             }
+
             return EventDetailRow::fromStdClass($result);
         }
+
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
-
 
     /** @return array<int, stdClass> */
     public function getEventAttributes(int $eventId): array
@@ -493,12 +494,18 @@ final class EventDataHelper extends Data implements NewsProviderInterface
 
 
     /** @return array<int, array<string, mixed>> */
-    public function getEvents(?Person $person, string $mode, int $offset, bool $filterByPreferences = false): array
-    {
+    public function getEvents(
+        ?Person $person,
+        string $mode,
+        int $offset,
+        bool $filterByPreferences = false,
+        bool $registeredOnly = false,
+        ?int $eventTypeId = null
+    ): array {
         if ($mode === EventSearchMode::Next->value) {
-            return $this->getNextEvents($person, $filterByPreferences);
+            return $this->getNextEvents($person, $filterByPreferences, $registeredOnly, $eventTypeId);
         } elseif ($mode === EventSearchMode::Past->value) {
-            return $this->getPassedEvents($person, $offset);
+            return $this->getPassedEvents($person, $offset, $registeredOnly, $eventTypeId);
         } else {
             Application::unreachable("Invalide mode ({$mode})", __FILE__, __LINE__);
         }
@@ -868,9 +875,14 @@ final class EventDataHelper extends Data implements NewsProviderInterface
 
 
     /** @return array<int, array<string, mixed>> */
-    private function getNextEvents(?Person $person, bool $filterByPreferences = false): array
-    {
+    private function getNextEvents(
+        ?Person $person,
+        bool $filterByPreferences = false,
+        bool $registeredOnly = false,
+        ?int $eventTypeId = null
+    ): array {
         $params = [':personId' => $person->Id ?? 0];
+
         $sql = "
             SELECT 
                 e.*,
@@ -882,13 +894,14 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             LEFT JOIN EventType et ON e.IdEventType = et.Id
             LEFT JOIN Participant p 
                 ON e.Id = p.IdEvent 
-               AND p.IdIndividual = :personId
+                AND p.IdIndividual = :personId
             LEFT JOIN Message m 
                 ON m.EventId = e.Id 
-               AND m.\"From\" = 'User'
+                AND m.\"From\" = 'User'
             WHERE datetime(replace(e.StartTime, 'T', ' ')) > DATETIME('now')
-              AND et.Inactivated = 0
+                AND et.Inactivated = 0
         ";
+
         if ($person === null) {
             $sql .= " AND e.Audience = :audience AND et.IdGroup IS NULL";
             $params[':audience'] = EventAudience::ForAll->value;
@@ -899,21 +912,40 @@ final class EventDataHelper extends Data implements NewsProviderInterface
                 WHERE IdMember = :personId
             ))";
         }
+
+        // Filtre : uniquement les événements où je suis inscrit
+        if ($registeredOnly && $person !== null) {
+            $sql .= " AND p.Id IS NOT NULL";
+        }
+
+        // Filtre : type d'événement sélectionné
+        if ($eventTypeId !== null) {
+            $sql .= " AND e.IdEventType = :eventTypeId";
+            $params[':eventTypeId'] = $eventTypeId;
+        }
+
         $sql .= " GROUP BY e.Id ORDER BY datetime(replace(e.StartTime, 'T', ' '))";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
         $events = $this->events($rows);
+
         if ($filterByPreferences && $person !== null) {
             return $this->personPreferences->filterEventsByPreferences($events, $person);
         }
+
         return $events;
     }
 
 
     /** @return array<int, array<string, mixed>> */
-    private function getPassedEvents(?Person $person, int $offset): array
-    {
+    private function getPassedEvents(
+        ?Person $person,
+        int $offset,
+        bool $registeredOnly = false,
+        ?int $eventTypeId = null
+    ): array {
         $params = [
             ':idperson' => $person->Id ?? 0,
             ':offset'   => $offset,
@@ -939,8 +971,19 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             $params[':audience'] = EventAudience::ForAll->value;
         } else {
             $sql .= " AND (et.IdGroup IS NULL OR et.IdGroup IN (
-            SELECT IdGroup FROM MemberGroup WHERE IdMember = :idperson
-        ))";
+                SELECT IdGroup FROM MemberGroup WHERE IdMember = :idperson
+            ))";
+        }
+
+        // Filtre : uniquement les événements où je suis inscrit
+        if ($registeredOnly && $person !== null) {
+            $sql .= " AND p.Id IS NOT NULL";
+        }
+
+        // Filtre : type d'événement sélectionné
+        if ($eventTypeId !== null) {
+            $sql .= " AND e.IdEventType = :eventTypeId";
+            $params[':eventTypeId'] = $eventTypeId;
         }
 
         $sql .= "
@@ -954,7 +997,6 @@ final class EventDataHelper extends Data implements NewsProviderInterface
 
         return $this->events($stmt->fetchAll(PDO::FETCH_OBJ));
     }
-
 
     /** @return array{0: DateTime, 1: DateTime} */
     private function getDatesOfThreeWeeks(): array

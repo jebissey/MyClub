@@ -11,8 +11,8 @@ use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\Article\valueObjects\ArticleRssRow;
-use app\modules\Event\valueObjects\EventRow;
+use app\modules\Common\valueObjects\ArticleRssRow;
+use app\modules\Common\valueObjects\EventRow;
 
 /**
  * @phpstan-import-type WeekData from EventDataHelper

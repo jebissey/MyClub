@@ -6,7 +6,7 @@ namespace app\modules\Event\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\MemberMapMarker;
-use app\modules\Event\valueObjects\EventAttributeRow;
+use app\modules\Common\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\EventDetailRow;
 
 final readonly class EventDetailViewModel extends LayoutViewModel

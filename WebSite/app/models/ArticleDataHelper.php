@@ -10,9 +10,9 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\modules\Article\valueObjects\ArticleAuthorRow;
 use app\modules\Article\valueObjects\ArticleRow;
-use app\modules\Article\valueObjects\ArticleRssRow;
 use app\modules\Article\valueObjects\ArticleSitemapRow;
 use app\modules\Article\valueObjects\ArticleSummaryRow;
+use app\modules\Common\valueObjects\ArticleRssRow;
 use app\modules\Common\interfaces\NewsProviderInterface;
 
 /**
@@ -231,6 +231,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
             SELECT Article.*, 
                 Individual.FirstName, 
                 Individual.LastName, 
+                Individual.NickName,
                 \"Group\".Name AS GroupName,
                 Article.CreatedBy
             FROM Article

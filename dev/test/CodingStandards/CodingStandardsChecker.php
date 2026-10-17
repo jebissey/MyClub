@@ -6,7 +6,9 @@ namespace test\CodingStandards;
 
 use test\CodingStandards\Analysis\PropertyAnalyzer;
 use test\CodingStandards\Analysis\TerminalCallAnalyzer;
+use test\CodingStandards\Analysis\ValueObjectReferenceAnalyzer;
 use test\CodingStandards\Rules\ApisRule;
+use test\CodingStandards\Rules\CommonValueObjectUsageRule;
 use test\CodingStandards\Rules\ControllersRule;
 use test\CodingStandards\Rules\DatabaseAccessRule;
 use test\CodingStandards\Rules\FinalClassesRule;
@@ -14,6 +16,7 @@ use test\CodingStandards\Rules\FinalReadonlyRule;
 use test\CodingStandards\Rules\ObjectShapeDocblockRule;
 use test\CodingStandards\Rules\ReadonlyPropertiesRule;
 use test\CodingStandards\Rules\RuleInterface;
+use test\CodingStandards\Rules\ValueObjectModuleBoundaryRule;
 use test\CodingStandards\ValueObjects\ClassInfo;
 
 final readonly class CodingStandardsChecker
@@ -28,6 +31,7 @@ final readonly class CodingStandardsChecker
     {
         $paths = new SourcePaths($appDir);
         $dedicated = [SourcePaths::VALUE_OBJECTS, SourcePaths::VIEW_MODELS];
+        $valueObjectReferences = new ValueObjectReferenceAnalyzer();
 
         return new self(
             [
@@ -40,6 +44,8 @@ final readonly class CodingStandardsChecker
                 new ReadonlyPropertiesRule($paths, new PropertyAnalyzer(), $dedicated),
                 new ReadonlyPropertiesRule($paths, new PropertyAnalyzer(), $dedicated),
                 new ObjectShapeDocblockRule($paths),
+                new ValueObjectModuleBoundaryRule($paths, $valueObjectReferences),
+                new CommonValueObjectUsageRule($paths, $valueObjectReferences),
             ],
             (new ClassScanner())->scan($appDir),
         );

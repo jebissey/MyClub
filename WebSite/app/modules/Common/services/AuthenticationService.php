@@ -13,8 +13,8 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\interfaces\MemberDataHelperInterface;
 use app\modules\Common\valueObjects\EmailMessage;
+use app\modules\Common\valueObjects\AuthResult;
 use app\modules\Common\valueObjects\Person;
-use app\modules\User\valueObjects\AuthResult;
 
 final readonly class AuthenticationService
 {
