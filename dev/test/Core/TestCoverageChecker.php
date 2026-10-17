@@ -33,7 +33,7 @@ final class TestCoverageChecker
         /** @var list<array<string, mixed>> $putRows */
         $putRows = self::query(
             $pdo,
-            'SELECT DISTINCT "Uri" FROM "Test" WHERE "Method" = \'PUT\''
+            'SELECT DISTINCT "Uri" FROM "Test" WHERE "Method" = \'PUT\' AND Active = 1'
         )->fetchAll(PDO::FETCH_ASSOC);
 
         /** @var list<string> $putUris */

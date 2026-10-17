@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace test\Infrastructure;
 
+use InvalidArgumentException;
+use RuntimeException;
 use Throwable;
-
 use test\Core\ConsoleTestReporter;
 use test\Core\LinkExtractor;
 use test\Core\TestDataValidator;
@@ -28,7 +29,7 @@ final class RouteTestFactory
             $hint = $dbTestsPath !== null
                 ? "Specified path: {$dbTestsPath} (exists: no)"
                 : 'No tests database path provided';
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Tests database is required but missing or not found. {$hint}"
             );
         }
@@ -37,7 +38,7 @@ final class RouteTestFactory
             $hint = $dbMyClubPath !== null
                 ? "Specified path: {$dbMyClubPath} (exists: no)"
                 : 'No MyClub database path provided';
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "MyClub database is required but missing or not found. {$hint}"
             );
         }
@@ -45,7 +46,7 @@ final class RouteTestFactory
         try {
             $testDataRepository = new SqliteTestDataRepository($dbTestsPath);
         } catch (Throwable $e) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Failed to connect to tests database: ' . $e->getMessage(),
                 0,
                 $e

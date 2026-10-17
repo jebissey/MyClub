@@ -26,8 +26,8 @@ final class Solfege implements RouteInterface
     {
         $solfegeController = fn() => $this->controllerFactory->makeSolfegeController();
 
-        $this->routes[] = new Route('GET  /games/solfege/learn', $solfegeController, 'learn');
-        $this->routes[] = new Route('POST /games/solfege/save-score', $solfegeController, 'saveScore');
+        /*$this->routes[] = new Route('GET  /games/solfege/learn', $solfegeController, 'learn');
+        $this->routes[] = new Route('POST /games/solfege/save-score', $solfegeController, 'saveScore');*/
 
         return $this->routes;
     }

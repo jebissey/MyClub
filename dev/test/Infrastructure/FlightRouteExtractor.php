@@ -36,6 +36,7 @@ final class FlightRouteExtractor
         if ($content === false) {
             throw new InvalidArgumentException("Unable to read file $filePath");
         }
+        $content = $this->stripComments($content);
 
         $this->lookingForRoutes($content, self::REGEX_MAP_ROUTE);
         $this->lookingForRoutes($content, self::REGEX_DIRECT_ROUTE);
@@ -44,7 +45,7 @@ final class FlightRouteExtractor
 
         $files = array_filter(
             scandir($directoryPath),
-            fn (string $file): bool => pathinfo($file, PATHINFO_EXTENSION) === 'php'
+            fn(string $file): bool => pathinfo($file, PATHINFO_EXTENSION) === 'php'
         );
         foreach ($files as $file) {
             $path = $directoryPath . DIRECTORY_SEPARATOR . $file;
@@ -52,15 +53,15 @@ final class FlightRouteExtractor
             if ($fileContent === false) {
                 continue;
             }
-            $this->lookingForRoutes($fileContent, self::REGEX_NEW_ROUTE);
+            $this->lookingForRoutes($this->stripComments($fileContent), self::REGEX_NEW_ROUTE);
         }
 
         $this->routes = array_values(array_filter(
             $this->routes,
-            fn (Route $r): bool => !in_array($r->path, self::EXCLUDED_PATHS, true)
+            fn(Route $r): bool => !in_array($r->path, self::EXCLUDED_PATHS, true)
         ));
 
-        usort($this->routes, fn (Route $a, Route $b): int => strcmp($a->path, $b->path));
+        usort($this->routes, fn(Route $a, Route $b): int => strcmp($a->path, $b->path));
 
         return $this->routes;
     }
@@ -113,6 +114,31 @@ final class FlightRouteExtractor
             path: $path,
             hasParameters: preg_match(self::REGEX_ROUTE_PARAM, $path) > 0,
         );
+    }
+
+    /**
+     * Removes PHP comments (//, #, /* ... *\/ and docblocks) from the source code,
+     * so that commented-out routes are not extracted.
+     */
+    private function stripComments(string $source): string
+    {
+        $result = '';
+        foreach (token_get_all($source) as $token) {
+            if (!is_array($token)) {
+                $result .= $token;
+                continue;
+            }
+
+            if ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT) {
+                // Keep line breaks so the code layout stays consistent
+                $result .= str_repeat("\n", substr_count($token[1], "\n"));
+                continue;
+            }
+
+            $result .= $token[1];
+        }
+
+        return $result;
     }
 
     #endregion

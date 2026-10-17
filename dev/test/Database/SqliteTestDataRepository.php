@@ -50,7 +50,7 @@ final class SqliteTestDataRepository implements TestDataRepositoryInterface
             $stmt = $this->db->prepare(
                 'SELECT ' . self::TEST_COLUMNS . '
                  FROM Test
-                 WHERE Uri = ? AND Method = ? AND Step IS NULL
+                 WHERE Uri = ? AND Method = ? AND Step IS NULL AND Active = 1
                  ORDER BY JsonConnectedUser IS NOT NULL, JsonConnectedUser'
             );
             $stmt->execute([$uri, $method]);
@@ -80,7 +80,7 @@ final class SqliteTestDataRepository implements TestDataRepositoryInterface
             $stmt = $this->db->prepare(
                 'SELECT ' . self::TEST_COLUMNS . '
                  FROM Test
-                 WHERE Step IS NOT NULL
+                 WHERE Step IS NOT NULL AND Active = 1
                  ORDER BY Step'
             );
             $stmt->execute();

@@ -26,9 +26,9 @@ final class ExerciseApi implements RouteInterface
     {
         $api = fn() => $this->apiFactory->makeExerciseApi();
 
-        $this->routes[] = new Route('GET  /api/exercise/@id:[0-9]+', $api, 'get');
+        /*$this->routes[] = new Route('GET  /api/exercise/@id:[0-9]+', $api, 'get');
         $this->routes[] = new Route('POST /api/exercise/save/@id:[0-9]+', $api, 'save');
-        $this->routes[] = new Route('POST /api/exercise/delete/@id:[0-9]+', $api, 'delete');
+        $this->routes[] = new Route('POST /api/exercise/delete/@id:[0-9]+', $api, 'delete');*/
 
         return $this->routes;
     }
