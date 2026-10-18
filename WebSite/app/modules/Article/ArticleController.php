@@ -23,6 +23,8 @@ use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\valueObjects\ArticleAuthorizationRow;
+use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Article\viewModels\ArticleCarouselViewModel;
 use app\modules\Article\viewModels\ArticleEditViewModel;
 use app\modules\Article\viewModels\ArticleShowViewModel;
@@ -758,7 +760,7 @@ final class ArticleController extends TableController
      * When access is refused, the response (error page or redirect) has already
      * been emitted and null is returned: the caller must simply stop.
      *
-     * @return array{row: object, authorization: object, latest: object}|null
+     * @return array{row: object, authorization: ArticleAuthorizationRow, latest: ArticleRow}|null
      *         row: the article row limited to $columns,
      *         authorization: the article authorization data,
      *         latest: the latest version of the article,
