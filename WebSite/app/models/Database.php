@@ -26,7 +26,7 @@ final class Database
     private const SQLITE_CREDENTIAL_FILE = 'Credential.db';
     private const MIGRATORS_DIR = __DIR__ . '/database/migrators';
     private const APPLICATION = 'MyClub';
-    private const DB_VERSION = 95;              //Don't forget to update here and in Metadata when database structure is modified
+    private const DB_VERSION = 97;              //Don't forget to update here and in Metadata when database structure is modified
 
     private static ?Database $instance = null;
     private static ?PDO $pdo = null;

@@ -51,6 +51,8 @@ use app\config\routes\LeapfrogApi;
 use app\config\routes\Loan;
 use app\config\routes\LoanApi;
 use app\config\routes\Maintenance;
+use app\config\routes\MakeTheTarget;
+use app\config\routes\MakeTheTargetApi;
 use app\config\routes\Media;
 use app\config\routes\MediaApi;
 use app\config\routes\MemberFields;
@@ -290,6 +292,8 @@ final class Routes
         $this->routes = array_merge($this->routes, (new LeapfrogApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Loan($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new LoanApi($this->apiFactory))->get());
+        $this->routes = array_merge($this->routes, (new MakeTheTarget($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new MakeTheTargetApi($this->apiFactory))->get());        
         $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());

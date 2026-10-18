@@ -1,0 +1,197 @@
+{layout '../../../Common/views/layout.latte'}
+{block title}Make the Target{/block}
+
+{block head}
+<style>
+    .tile {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        margin: 6px;
+        font-size: 1.6rem;
+        font-weight: bold;
+        border: 3px solid #333;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #f8f1e3, #e8d9b8);
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .tile:hover:not(.used):not(.selected) {
+        transform: scale(1.08);
+        box-shadow: 3px 3px 10px rgba(0,0,0,0.25);
+    }
+
+    .tile.selected {
+        background: linear-gradient(145deg, #4fc3f7, #0288d1);
+        color: white;
+        border-color: #01579b;
+        transform: scale(1.1);
+    }
+
+    .tile.used {
+        background: #ccc;
+        color: #888;
+        text-decoration: line-through;
+        cursor: not-allowed;
+        opacity: 0.55;
+        transform: none;
+    }
+
+    .tile.result-tile {
+        background: linear-gradient(145deg, #a5d6a7, #66bb6a);
+        border-color: #2e7d32;
+    }
+
+    .tile.result-tile.selected {
+        background: linear-gradient(145deg, #4fc3f7, #0288d1);
+        border-color: #01579b;
+    }
+
+    .op-btn {
+        width: 60px;
+        height: 60px;
+        margin: 6px;
+        font-size: 1.8rem;
+        font-weight: bold;
+        border-radius: 50%;
+        border: 3px solid #555;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .op-btn:hover:not(:disabled) {
+        background: #ffeb3b;
+        transform: scale(1.1);
+    }
+
+    .op-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .op-btn.selected {
+        background: #ff9800;
+        color: white;
+        border-color: #e65100;
+    }
+
+    #target-display {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: #c62828;
+        letter-spacing: 2px;
+    }
+
+    .history-line {
+        font-family: monospace;
+        font-size: 1.15rem;
+        padding: 4px 0;
+        border-bottom: 1px dashed #ddd;
+    }
+
+    .history-line.exact {
+        color: #2e7d32;
+        font-weight: bold;
+    }
+
+    #solution-box {
+        background: #fff8e1;
+        border: 2px solid #ffc107;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        display: none;
+        white-space: pre-wrap;
+        font-family: monospace;
+        font-size: 1.05rem;
+    }
+
+    .btn-action {
+        min-width: 140px;
+    }
+</style>
+{/block}
+
+{block navbar}
+    {include '../../../Common/views/navbar/home.latte'}
+{/block}
+
+{block content}
+<div class="container mt-3">
+    <h1 class="text-center mb-3">🔢 MAKE THE TARGET 🔢</h1>
+
+    <div class="bg-light rounded p-3 mb-4">
+        <h4>Rules</h4>
+        <ul class="mb-0">
+            <li>Draw 6 number tiles and a target to reach.</li>
+            <li>Select <strong>2 numbers</strong> then one <strong>operation</strong> (+ − × ÷).</li>
+            <li>The result becomes a new usable tile.</li>
+            <li>Used tiles are crossed out.</li>
+            <li>You win when you reach the target exactly.</li>
+        </ul>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+        <button id="btn-draw" class="btn btn-primary btn-lg btn-action">
+            🎲 Draw tiles
+        </button>
+        <button id="btn-solution" class="btn btn-warning btn-lg btn-action" disabled>
+            💡 Solution
+        </button>
+        <button id="btn-reset" class="btn btn-outline-secondary btn-lg btn-action" disabled>
+            ↺ Restart
+        </button>
+    </div>
+
+    <div class="text-center mb-4">
+        <div class="text-muted">Target</div>
+        <div id="target-display">—</div>
+    </div>
+
+    <div class="text-center mb-3">
+        <h5>Tiles</h5>
+        <div id="tiles-container" class="d-flex flex-wrap justify-content-center">
+        </div>
+    </div>
+
+    <div class="text-center mb-4">
+        <h5>Operation</h5>
+        <div id="ops-container">
+            <button class="op-btn" data-op="+" disabled>+</button>
+            <button class="op-btn" data-op="-" disabled>−</button>
+            <button class="op-btn" data-op="*" disabled>×</button>
+            <button class="op-btn" data-op="/" disabled>÷</button>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>Operation history</strong>
+            <span id="move-counter" class="badge bg-secondary float-end">0 operation</span>
+        </div>
+        <div class="card-body" id="history-box">
+            <em class="text-muted">No operation yet.</em>
+        </div>
+    </div>
+
+    <div id="solution-box"></div>
+
+    <div id="end-message" class="text-center mt-3" style="display:none;"></div>
+</div>
+{/block}
+
+{block scripts}
+<script>
+window.makeTheTargetConfig = {
+    sessionId: {$sessionId},
+    i18n: {=$i18n}
+};
+</script>
+<script type="module" src="{='/app/modules/Games/MakeTheTarget/js/main.js'|version}"></script>
+{/block}

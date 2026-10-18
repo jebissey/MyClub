@@ -22,6 +22,7 @@ use app\apis\KanbanApi;
 use app\apis\KaraokeApi;
 use app\apis\LeapfrogApi;
 use app\apis\LoanApi;
+use app\apis\MakeTheTargetApi;
 use app\apis\MediaApi;
 use app\apis\MenuItemApi;
 use app\apis\MessageApi;
@@ -355,6 +356,17 @@ final readonly class ApiFactory
             $this->connectedUser,
             $this->languagesDataHelper,
             $this->personDataHelper
+        );
+    }
+
+    public function makeMakeTheTargetApi(): MakeTheTargetApi
+    {
+        return new MakeTheTargetApi(
+            $this->application,
+            $this->connectedUser,
+            $this->languagesDataHelper,
+            $this->personDataHelper,
+            $this->logWriterDataHelper
         );
     }
 

@@ -138,4 +138,89 @@ final class TableControllerDataHelper extends Data
         }
         return $this->fluent->from('leapfrog_statistics');
     }
+
+    public function getMakeTheTargetQuery(): Select
+    {
+        $stmt = $this->pdoForLog->prepare("
+        SELECT name 
+        FROM sqlite_master 
+        WHERE type = 'view' 
+        AND name = 'makethetarget_statistics'
+    ");
+        $stmt->execute();
+        $exists = $stmt->fetchColumn();
+
+        if (!$exists) {
+            $sql = "
+                CREATE VIEW makethetarget_statistics AS
+                WITH Parsed AS (
+                    SELECT 
+                        Id,
+                        date(CreatedAt) AS Date,
+                        COALESCE(Uri, '') AS Uri,
+                        COALESCE(Who, '') AS Who,
+                        trim(substr(
+                            Message,
+                            instr(Message, 'Session ') + 8,
+                            instr(Message || ':', ':') - (instr(Message, 'Session ') + 8)
+                        )) AS SessionId,
+                        CASE 
+                            WHEN Message LIKE '%Game won%' THEN 'won'
+                            ELSE ''
+                        END AS GameResult
+                    FROM Log 
+                    WHERE Message LIKE 'Session %:%'
+                    AND (Message LIKE '%makethetarget%' 
+                        OR Uri LIKE '%makethetarget%' 
+                        OR Message LIKE '%New game drawn%' 
+                        OR Message LIKE '%Game won%' 
+                        OR Message LIKE '%Operation:%' 
+                        OR Message LIKE '%Solution requested%')
+                ),
+                WithOps AS (
+                    SELECT 
+                        p.*,
+                        (
+                            SELECT COUNT(*)
+                            FROM Log g
+                            WHERE g.Uri = p.Uri
+                            AND g.Message LIKE '%Operation:%'
+                            AND instr(g.Message, p.SessionId) > 0
+                        ) AS OperationCount
+                    FROM Parsed p
+                ),
+                Ranked AS (
+                    SELECT
+                        *,
+                        CASE
+                            WHEN GameResult = 'won' THEN 1
+                            ELSE 2
+                        END AS priority,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY SessionId
+                            ORDER BY 
+                                CASE
+                                    WHEN GameResult = 'won' THEN 1
+                                    ELSE 2
+                                END
+                        ) AS rn
+                    FROM WithOps
+                )
+                SELECT 
+                    Id,
+                    Date,
+                    Uri,
+                    Who,
+                    SessionId,
+                    GameResult,
+                    OperationCount
+                FROM Ranked
+                WHERE rn = 1
+                ORDER BY Date DESC;
+            ";
+            $this->pdoForLog->exec($sql);
+        }
+
+        return $this->fluent->from('makethetarget_statistics');
+    }
 }

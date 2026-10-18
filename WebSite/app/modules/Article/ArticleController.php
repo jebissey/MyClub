@@ -518,53 +518,15 @@ final class ArticleController extends TableController
 
     public function show(int $id): void
     {
-        if (!in_array(WebApp::getRequestMethod(), ['GET', 'HEAD'])) {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        $access = $this->getReadableArticle($id);
+        if ($access === null) {
             return;
         }
-        $article = $this->dataHelper->get('Article', ['Id' => $id], 'Id, OnlyForMembers');
-        if (!$article) {
-            $msg = str_replace(
-                '{id}',
-                (string)$id,
-                ($this->t)('article.error.not_found')
-            );
-            $this->raiseBadRequest($msg, __FILE__, __LINE__);
-            return;
-        }
+        $articleAuthorization = $access['authorization'];
+        $article = $access['latest'];
         $connectedUser = $this->application->getConnectedUser();
-        if (!$this->authorizationService->canRead($id, $connectedUser)) {
-            if ($connectedUser->person === null) {
-                $requestUri = is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '/';
-                $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
-                if ($result && $result->isSuccess()) {
-                    $this->application->getConnectedUser()->get();
-                    $this->redirect(
-                        $requestUri,
-                        ApplicationError::Ok,
-                        "Auto sign in succeeded for {$result->getUser()?->Email}"
-                    );
-                    return;
-                }
-                $this->redirect('/user/sign/in?redirect=' . urlencode($requestUri));
-            } else {
-                $this->raiseForbidden(__FILE__, __LINE__, 10000, false);
-            }
-            return;
-        }
+
         try {
-            $articleAuthorization = $this->authorizationDataHelper->getArticle($id, $connectedUser);
-            if ($articleAuthorization === false) {
-                $this->raiseForbidden(__FILE__, __LINE__);
-                return;
-            }
-
-            $article = $this->articleDataHelper->getLatestArticle([$id]);
-            if ($article === null) {
-                $this->raiseForbidden(__FILE__, __LINE__);
-                return;
-            }
-
             [$message, $messageType] = MessageService::get();
 
             $layoutParams = $this->getAllParams([]);
@@ -628,25 +590,21 @@ final class ArticleController extends TableController
 
     public function showArticleChat(int $articleId): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        $access = $this->getReadableArticle($articleId, 'Id, OnlyForMembers, Title, CreatedBy, IdGroup');
+        if ($access === null) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $article = $this->dataHelper->get('Article', ['Id' => $articleId], 'Id, OnlyForMembers, Title, CreatedBy, IdGroup');
-        if (!$article) {
-            $this->raiseBadRequest("L'article {$articleId} n'existe pas", __FILE__, __LINE__);
-            return;
-        }
+        $article = $access['row'];
+
         $connectedUser = $this->application->getConnectedUser();
-        if (!$this->authorizationService->canRead($articleId, $connectedUser)) {
-            $this->raiseBadRequest(($this->t)('article.error.login_required'), __FILE__, __LINE__);
+        $person = $connectedUser->person;
+        if ($person === null) {
+            // Public article, but the chat requires a signed-in member:
+            // same flow as an anonymous visitor on a protected article.
+            $this->handleAnonymousAccess();
             return;
         }
-        $person = $connectedUser->person ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+
         $userImg = WebApp::getUserImg($person, new GravatarHandler());
         $lastLogId = isset($_SESSION['last_log_id']) && is_numeric($_SESSION['last_log_id'])
             ? (int)$_SESSION['last_log_id']
@@ -658,11 +616,11 @@ final class ArticleController extends TableController
             group: null,
             messages: array_values($this->messageDataHelper->getArticleMessages($articleId)),
             person: $person,
-            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            navItems: $this->getNavItems($person),
             newMessages: $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
             btnParent: "/article/{$articleId}",
             layoutParams: $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
+                'page' => $connectedUser->getPage(),
                 'userImg' => $userImg,
             ]),
         );
@@ -790,5 +748,84 @@ final class ArticleController extends TableController
             $_SESSION['error'] = ($this->t)('article.error.update_failed');
         }
         $this->redirect('/article/' . $id);
+    }
+
+    /**
+     * Shared access gate for the article pages (article view, article chat).
+     *
+     * Checks the HTTP method, the article existence, the read permission, the
+     * article authorization record and the availability of the latest version.
+     * When access is refused, the response (error page or redirect) has already
+     * been emitted and null is returned: the caller must simply stop.
+     *
+     * @return array{row: object, authorization: object, latest: object}|null
+     *         row: the article row limited to $columns,
+     *         authorization: the article authorization data,
+     *         latest: the latest version of the article,
+     *         or null if the request was already handled
+     */
+    private function getReadableArticle(int $id, string $columns = 'Id, OnlyForMembers'): ?array
+    {
+        if (!in_array(WebApp::getRequestMethod(), ['GET', 'HEAD'], true)) {
+            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            return null;
+        }
+
+        $article = $this->dataHelper->get('Article', ['Id' => $id], $columns);
+        if (!$article) {
+            $msg = str_replace('{id}', (string)$id, ($this->t)('article.error.not_found'));
+            $this->raiseBadRequest($msg, __FILE__, __LINE__);
+            return null;
+        }
+
+        $connectedUser = $this->application->getConnectedUser();
+        if (!$this->authorizationService->canRead($id, $connectedUser)) {
+            if ($connectedUser->person === null) {
+                $this->handleAnonymousAccess();
+            } else {
+                $this->raiseForbidden(__FILE__, __LINE__, 10000, false);
+            }
+            return null;
+        }
+
+        try {
+            $authorization = $this->authorizationDataHelper->getArticle($id, $connectedUser);
+            if ($authorization === false) {
+                $this->raiseForbidden(__FILE__, __LINE__);
+                return null;
+            }
+
+            $latest = $this->articleDataHelper->getLatestArticle([$id]);
+            if ($latest === null) {
+                $this->raiseForbidden(__FILE__, __LINE__);
+                return null;
+            }
+        } catch (QueryException $e) {
+            $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
+            return null;
+        }
+
+        return ['row' => $article, 'authorization' => $authorization, 'latest' => $latest];
+    }
+
+    /**
+     * Anonymous visitor on a protected page: try the "remember me" cookie,
+     * otherwise send the visitor to the sign-in page.
+     */
+    private function handleAnonymousAccess(): void
+    {
+        $requestUri = is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '/';
+        $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
+
+        if ($result && $result->isSuccess()) {
+            $this->application->getConnectedUser()->get();
+            $this->redirect(
+                $requestUri,
+                ApplicationError::Ok,
+                "Auto sign in succeeded for {$result->getUser()?->Email}"
+            );
+            return;
+        }
+        $this->redirect('/user/sign/in?redirect=' . urlencode($requestUri));
     }
 }

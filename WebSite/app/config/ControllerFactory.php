@@ -71,6 +71,7 @@ use app\modules\Exercise\ExerciseController;
 use app\modules\Games\Karaoke\KaraokeController;
 use app\modules\Games\Leapfrog\LeapfrogController;
 use app\modules\Games\Solfege\SolfegeController;
+use app\modules\Games\MakeTheTarget\MakeTheTargetController;
 use app\modules\Kanban\KanbanController;
 use app\modules\Loan\LoanController;
 use app\modules\Membership\MembershipController;
@@ -462,19 +463,27 @@ final readonly class ControllerFactory
         return new SolfegeController($this->application);
     }
 
+    public function makeTranslatorController(): TranslatorController
+    {
+        return new TranslatorController(
+            $this->application,
+        );
+    }
+
+    public function makeMakeTheTargetController(): MakeTheTargetController
+    {
+        return new MakeTheTargetController(
+            $this->application,
+            $this->tableControllerDataHelper
+        );
+    }
+
     public function makeUserController(): UserController
     {
         return new UserController(
             $this->application,
             $this->authenticationService,
             $this->emailService
-        );
-    }
-
-    public function makeTranslatorController(): TranslatorController
-    {
-        return new TranslatorController(
-            $this->application,
         );
     }
 

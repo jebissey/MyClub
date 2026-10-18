@@ -83,7 +83,7 @@ final class VisitorInsightsController extends TableController
             'Type'      => FilterInputRule::Content->value,
             'Browser'   => FilterInputRule::String->value,
             'Os'        => FilterInputRule::String->value,
-            'Uri'       => FilterInputRule::Uri->value,
+            'Uri'       => FilterInputRule::Text->value,
             'Who'       => FilterInputRule::Email->value,
             'Code'      => FilterInputRule::String->value,
             'Message'   => FilterInputRule::Content->value,

@@ -4,35 +4,40 @@
 36 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CheckCodingStandards.php
 36 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CheckJs.php
 51 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CheckMissingTests.php
-557 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CheckMissingTranslation.php
+549 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CheckMissingTranslation.php
 21 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Analysis/PropertyAnalysis.php
 251 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Analysis/PropertyAnalyzer.php
 446 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Analysis/TerminalCallAnalyzer.php
 100 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Analysis/TokenHelper.php
+46 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Analysis/ValueObjectReferenceAnalyzer.php
 195 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/ClassScanner.php
-62 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/CodingStandardsChecker.php
+70 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/CodingStandardsChecker.php
 36 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/CodingStandards.php
 92 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/JsVersionChecker.php
 58 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/ApisRule.php
+104 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/CommonValueObjectUsageRule.php
 52 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/ControllersRule.php
 185 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/DatabaseAccessRule.php
 56 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/FinalClassesRule.php
 59 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/FinalReadonlyRule.php
+120 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/ObjectShapeDocblockRule.php
 172 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/ReadonlyPropertiesRule.php
 17 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/RuleInterface.php
+57 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/ValueObjectModuleBoundaryRule.php
 41 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/SourcePaths.php
 24 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/ValueObjects/ClassInfo.php
 15 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/Color.php
-196 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/ConsoleTestReporter.php
+216 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/ConsoleTestReporter.php
 45 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/CsvTestExporter.php
 53 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/Enums/TestResultStatus.php
 17 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/JsonTestExporter.php
+133 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/LinkExtractor.php
 16 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/ResponseValidator.php
 9 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/StopRequestedException.php
 257 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/TestCoverageChecker.php
 10 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/TestCoverageException.php
 71 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/TestDataValidator.php
-520 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/TestExecutor.php
+587 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/TestExecutor.php
 38 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/UrlBuilder.php
 14 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/ValueObjects/AuthenticationResult.php
 19 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Core/ValueObjects/HttpResponse.php
@@ -48,16 +53,16 @@
 306 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/FlightRouteTester.php
 170 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/CurlHttpClient.php
 228 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/CurrentWebSite.php
-119 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/FlightRouteExtractor.php
+145 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/FlightRouteExtractor.php
 180 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/RouteReferenceExtractor.php
-72 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/RouteTestFactory.php
+75 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/RouteTestFactory.php
 177 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/RouteTestOrchestrator.php
 47 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/SessionAuthenticator.php
 110 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/SimulationExtractor.php
 17 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Interfaces/HttpClientInterface.php
 30 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Interfaces/TestDataRepositoryInterface.php
 15 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Interfaces/TestExporterInterface.php
-46 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Interfaces/TestReporterInterface.php
+58 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Interfaces/TestReporterInterface.php
 51 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/apis/ArticleApiTest.php
 28 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/apis/CarouselApiTest.php
 29 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/apis/ChatApiTest.php
@@ -180,7 +185,7 @@
 
 === Total by file type ===
 PHP files:
-20072
+20660
 Latte files:
 
 JavaScript files:
@@ -189,4 +194,4 @@ TypeScript files:
 
 
 === Grand total ===
- 20072 Total all files
+ 20660 Total all files

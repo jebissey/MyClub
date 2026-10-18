@@ -40,7 +40,7 @@
                 <div>
                     <h2 class="card-title" id="article-title-display">{$article->Title}</h2>
                     <small class="text-muted">
-                        Créé par {$article->FirstName} {$article->LastName}
+                        Créé par {$article->Author?->FirstName} {$article->Author?->LastName}
                         le {date('d/m/Y', strtotime($article->Timestamp))}
                         {$publishedBy}
                         {if date('Y-m-d', strtotime($article->Timestamp)) !== date('Y-m-d', strtotime($article->LastUpdate))}
