@@ -13,7 +13,8 @@ final readonly class GameManagerViewModel extends LayoutViewModel
      */
     public function __construct(
         public string $content,
-        array $layoutParams = []
+        array $layoutParams = [],
+        public string $sidebarState = 'open',
     ) {
         $baseArgs = self::baseArgsFrom($layoutParams);
         $baseArgs['page'] = '';

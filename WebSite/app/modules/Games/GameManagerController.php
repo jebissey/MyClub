@@ -17,15 +17,15 @@ final class GameManagerController extends AbstractController
 
     public function help(): void
     {
-        $this->renderHelp('Help_Game', fn($u) => $u->isConnected(), __FILE__, __LINE__);
+        $this->renderHelp('Help_Game', fn($u) => $u->isAdministrator(), __FILE__, __LINE__);
     }
 
-    public function game(): void
+    public function games(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdmin(), __FILE__, __LINE__)) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator(), __FILE__, __LINE__)) {
             return;
         }
-        $_SESSION['navbar'] = 'game';
+        $_SESSION['navbar'] = 'games';
 
         $viewModel = new GameManagerViewModel(
             content: ($this->t)('Games'),

@@ -6995,10 +6995,19 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1437,'makethetarget.column.who','Who','Qui','Kto'),
  (1438,'makethetarget.column.game','Game','Jeu','Gra'),
  (1439,'makethetarget.column.operations','Operations','Opérations','Działania'),
- (1440,'makethetarget.column.result','Result','Résultat','Wynik');
+ (1440,'makethetarget.column.result','Result','Résultat','Wynik'),
+ (1441,'gameManager.title','Game manager','Gestion des jeux','Zarządzanie grami'),
+ (1442,'gameManager.sidebar.heading','Categories','Catégories','Kategorie'),
+ (1443,'gameManager.sidebar.arcade','Arcade games','Jeux d''arcade','Gry zręcznościowe'),
+ (1444,'gameManager.sidebar.puzzle','Puzzle games','Jeux de réflexion','Gry logiczne'),
+ (1445,'gameManager.sidebar.memory','Memory games','Jeux de mémoire','Gry pamięciowe'),
+ (1446,'gameManager.sidebar.other','Other','Autres','Inne'),
+ (1447,'gameManager.sidebar.arcade.leapfrog','Leapfrog','Leapfrog','Leapfrog'),
+ (1448,'gameManager.sidebar.puzzle.makethetarget','Make the target','Make the target','Make the target'),
+ (1449,'gameManager.sidebar.other.astronomy','Astronomy','Astronomie','Astronomia');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',97,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',98,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

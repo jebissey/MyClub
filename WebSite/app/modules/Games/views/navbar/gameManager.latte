@@ -1,18 +1,13 @@
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <img src="/app/images/home.png" alt="Home" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='home'|translate}">
-        </a>
-        <a class="navbar-brand" href="/admin" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='admin_zone'|translate}">
-            <i class="bi bi-key-fill fs-1 text-warning"></i>
-        </a>
+<div class="d-flex align-items-center ms-3">
+    <button id="sidebarToggle"
+            class="btn btn-sm me-2 border-0"
+            style="color: var(--navbar-ink); background: color-mix(in srgb, var(--navbar-ink) 12%, transparent);"
+            title="{='layout.sidebar.toggle.title'|translate}">
+        <i class="bi bi-layout-sidebar" style="color: var(--navbar-ink);"></i>
+    </button>
+    {include '../../../Common/views/navbar/_userLeft.latte'}
+</div>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <a class="navbar-brand" href="/gameManager/help" data-bs-toggle="tooltip" title="{='contextual_help'|translate}">
-                <i class="bi bi-question-circle-fill fs-2 text-warning"></i>
-            </a>
-        </div>
-    </div>
+<div class="d-flex align-items-center ms-auto me-3">
+    {include 'gameRight.latte'}
+</div>

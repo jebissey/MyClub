@@ -26,7 +26,7 @@ final class Database
     private const SQLITE_CREDENTIAL_FILE = 'Credential.db';
     private const MIGRATORS_DIR = __DIR__ . '/database/migrators';
     private const APPLICATION = 'MyClub';
-    private const DB_VERSION = 97;              //Don't forget to update here and in Metadata when database structure is modified
+    private const DB_VERSION = 98;              //Don't forget to update here and in Metadata when database structure is modified
 
     private static ?Database $instance = null;
     private static ?PDO $pdo = null;
@@ -59,12 +59,12 @@ final class Database
 
     public function getPdo(): PDO
     {
-        return self::$pdo ?? Application::unreachable('Fatal error with null pdo in file ', __FILE__, __LINE__);
+        return self::$pdo ?? Application::unreachable('Fatal error with null pdo in file ');
     }
 
     public function getPdoForLog(): PDO
     {
-        return self::$pdoForLog ?? Application::unreachable('Fatal error with null pdoforLog in file ', __FILE__, __LINE__);
+        return self::$pdoForLog ?? Application::unreachable('Fatal error with null pdoforLog in file ');
     }
 
     public function getPdoForCredential(): PDO
@@ -104,7 +104,7 @@ final class Database
         $query = "SELECT ApplicationName, DatabaseVersion FROM Metadata LIMIT 1";
         $stmt = self::$pdo->query($query);
         if (!$stmt instanceof PDOStatement) {
-            Application::unreachable('Failed to query Metadata table', __FILE__, __LINE__);
+            Application::unreachable('Failed to query Metadata table');
         }
         /** @var object{ApplicationName: string, DatabaseVersion: int}|false $row */
         $row = $stmt->fetch(PDO::FETCH_OBJ);
@@ -112,11 +112,11 @@ final class Database
 
         if ($row) {
             if ($row->ApplicationName != self::APPLICATION) {
-                Application::unreachable('Non-compliant database', __FILE__, __LINE__);
+                Application::unreachable('Non-compliant database');
             }
             if ($row->DatabaseVersion != self::DB_VERSION) {
                 if ($row->DatabaseVersion > self::DB_VERSION) {
-                    Application::unreachable('The database requires a more recent version of the application', __FILE__, __LINE__);
+                    Application::unreachable('The database requires a more recent version of the application');
                 }
                 self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::DB_VERSION);
             }
@@ -125,7 +125,7 @@ final class Database
             // or it was created from the template (new installation) or was already up to date.
             $this->deleteMigratorsDirectory();
         } else {
-            Application::unreachable('Empty Metadata table', __FILE__, __LINE__);
+            Application::unreachable('Empty Metadata table');
         }
     }
 
@@ -184,14 +184,14 @@ final class Database
                 $currentVersion = $newVersion;
             }
             if ($currentVersion !== $to) {
-                Application::unreachable('Fatal program error: wrong final version', __FILE__, __LINE__);
+                Application::unreachable('Fatal program error: wrong final version');
             }
             $stmt = $pdo->prepare("UPDATE Metadata SET DatabaseVersion = ? WHERE Id = 1");
             $stmt->execute([$to]);
             $pdo->commit();
         } catch (Throwable $e) {
             $pdo->rollBack();
-            Application::unreachable('Fatal program error during migration: ' . $e->getMessage(), $e->getFile(), $e->getLine());
+            Application::unreachable('Fatal program error during migration: ' . $e->getMessage());
         } finally {
             $pdo->exec('PRAGMA foreign_keys = ON');
         }
@@ -247,11 +247,7 @@ final class Database
                 fn(array $v) => "table={$v['table']} rowid={$v['rowid']} parent={$v['parent']} fkid={$v['fkid']}",
                 $violations
             ));
-            Application::unreachable(
-                "Orphaned records found after migration: {$details}",
-                __FILE__,
-                __LINE__
-            );
+            Application::unreachable("Orphaned records found after migration: {$details}");
         }
     }
 }

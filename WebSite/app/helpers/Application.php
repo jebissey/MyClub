@@ -12,7 +12,9 @@ use LogicException;
 use PDO;
 use stdClass;
 use Throwable;
+use UnitEnum;
 use app\exceptions\DatabaseException;
+use app\exceptions\UnreachableException;
 use app\models\AuthorizationDataHelper;
 use app\models\Database;
 use app\models\DataHelper;
@@ -26,7 +28,7 @@ use app\modules\Common\valueObjects\Person;
 
 final class Application
 {
-    public const VERSION = '0.98.2';
+    public const VERSION = '0.99';
 
     // @formatter:off
     public const  EMOJI_LIST = [
@@ -106,7 +108,7 @@ final class Application
         $row = new DataHelper($this->getPdo(), $this->getErrorManager(), $this->getPdoForLog())
             ->get('Metadata', ['Id' => 1], 'Compact_everyXdays, Compact_removeOlderThanXmonths, Compact_compactOlderThanXmonths');
         if ($row === false) {
-            self::unreachable('Missing metadata', __FILE__, __LINE__);
+            self::unreachable('Missing metadata');
         }
         /** @var stdClass $row */
         $metadata = CompactSettingsRow::fromStdClass($row);
@@ -186,14 +188,17 @@ final class Application
      * Helper to signal an unreachable state.
      *
      * @param mixed $value Unexpected value (optional, useful for debugging)
-     * @throws LogicException Always thrown
-     * @return never
+     * @throws UnreachableException Always thrown
      */
-    public static function unreachable(mixed $value, string $file, int $line, bool $log = true): never
+    public static function unreachable(mixed $value = null, bool $log = true): never
     {
-        $msg = "Unreachable code executed in file {$file} at line {$line}";
+        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+        $file = $caller['file'] ?? 'unknown';
+        $line = $caller['line'] ?? 0;
+
+        $msg = "Unreachable code executed";
         if ($value !== null) {
-            if ($value instanceof \UnitEnum) {
+            if ($value instanceof UnitEnum) {
                 $msg .= " (enum " . $value::class . "::" . $value->name . ")";
             } elseif (is_object($value)) {
                 $msg .= " (object of type " . $value::class . ")";
@@ -201,17 +206,19 @@ final class Application
                 $msg .= " (value: " . var_export($value, true) . ")";
             }
         }
+
         if ($log) {
             try {
                 $pdoForLog = Database::getPdoForLogIfAvailable();
                 if ($pdoForLog !== null) {
-                    LogWriterDataHelper::insert($pdoForLog, 'UNREACHABLE', $msg);
+                    LogWriterDataHelper::insert($pdoForLog, 'UNREACHABLE', "{$msg} in file {$file} at line {$line}");
                 }
             } catch (Throwable) {
                 // A logging failure must never hide the original error.
             }
         }
-        throw new LogicException($msg);
+
+        throw new UnreachableException($msg, $file, $line);
     }
 
     public function setAuthenticationService(AuthenticationService $service): void

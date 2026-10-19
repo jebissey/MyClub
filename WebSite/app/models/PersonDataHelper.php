@@ -52,7 +52,7 @@ final class PersonDataHelper extends Data
     {
         $stmt = $this->pdo->query($sql);
         if ($stmt === false) {
-            Application::unreachable("Query failed", __FILE__, __LINE__);
+            Application::unreachable("Query failed");
         }
         return $stmt;
     }
@@ -313,7 +313,7 @@ final class PersonDataHelper extends Data
         ';
         $email = $this->queryOrFail($sql)->fetchColumn();
         if (!is_string($email)) {
-            Application::unreachable("Webmaster email not found", __FILE__, __LINE__);
+            Application::unreachable("Webmaster email not found");
         }
         return $email;
     }

@@ -101,7 +101,6 @@ final class AstronomyController extends AbstractController
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),
-            layout: $this->getLayout(),
         );
 
         $this->render('Astronomy/views/astronomy.latte', $viewModel->toArray());

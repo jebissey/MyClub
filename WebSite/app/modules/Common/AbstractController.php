@@ -84,15 +84,16 @@ abstract class AbstractController
         $navbar = To::str($_SESSION['navbar'] ?? '');
 
         return match ($navbar) {
-            'designer'          => '../../Designer/views/designer.latte',
-            'eventManager'      => '../../Event/views/eventManager.latte',
-            'personManager'     => '../../PersonManager/views/personManager.latte',
-            'redactor'          => '../../Article/views/redactor.latte',
-            'user'              => '../../User/views/user.latte',
-            'visitorInsights'   => '../../VisitorInsights/views/visitorInsights.latte',
-            'webmaster'         => '../../Webmaster/views/webmaster.latte',
-            ''                  => '../../Common/views/home.latte',
-            default => Application::unreachable("Fatal error in file with navbar={$navbar}", __FILE__, __LINE__),
+            'designer'        => '../../Designer/views/designer.latte',
+            'eventManager'    => '../../Event/views/eventManager.latte',
+            'games'           => '../../Games/views/gameManager.latte',
+            'personManager'   => '../../PersonManager/views/personManager.latte',
+            'redactor'        => '../../Article/views/redactor.latte',
+            'user'            => '../../User/views/user.latte',
+            'visitorInsights' => '../../VisitorInsights/views/visitorInsights.latte',
+            'webmaster'       => '../../Webmaster/views/webmaster.latte',
+            ''                => '../../Common/views/home.latte',
+            default => Application::unreachable("Fatal error in file with navbar={$navbar}"),
         };
     }
 
@@ -217,7 +218,7 @@ abstract class AbstractController
                         )
                     ),
                 ],
-                default => Application::unreachable("Fatal error in file with navItemType={$navItem->Type}", __FILE__, __LINE__),
+                default => Application::unreachable("Fatal error in file with navItemType={$navItem->Type}"),
             };
 
             $sidebarMenu[] = $entry;

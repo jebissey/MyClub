@@ -114,7 +114,7 @@ final class EventNeedApi extends AbstractApi
             'IdNeedType' => intval($idNeedType)
         ];
         $result = $this->dataHelper->set('Need', $needData, $id === null ? [] : ['Id' => intval($id)]);
-        $success = is_bool($result) ? $result : ($result > 0 ? true : Application::unreachable($result, __FILE__, __LINE__));
+        $success = is_bool($result) ? $result : ($result > 0 ? true : Application::unreachable($result));
         return new ApiResponse($success, $success ? ApplicationError::Ok->value : ApplicationError::Error->value);
     }
 }

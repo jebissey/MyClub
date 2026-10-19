@@ -507,7 +507,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         } elseif ($mode === EventSearchMode::Past->value) {
             return $this->getPassedEvents($person, $offset, $registeredOnly, $eventTypeId);
         } else {
-            Application::unreachable("Invalide mode ({$mode})", __FILE__, __LINE__);
+            Application::unreachable("Invalide mode ({$mode})");
         }
     }
 
@@ -727,7 +727,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
                 $this->delete('EventAttribute', ['IdEvent' => $eventId]);
                 $this->delete('EventNeed', ['IdEvent' => $eventId]);
             } else {
-                Application::unreachable($data['formMode'], __FILE__, __LINE__);
+                Application::unreachable($data['formMode']);
             }
             $this->insertEventAttributes($eventId, $this->normalizeAttributeIds($data['attributes'] ?? null));
             $this->insertEventNeeds($eventId, $this->normalizeNeeds($data['needs'] ?? null));

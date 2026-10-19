@@ -57,7 +57,7 @@ final class MyClubDateTime
             'week' => [$startDate->modify('monday this week'), $endDate->modify('monday next week')],
             'month' => [$startDate->modify('first day of this month'), $endDate->modify('first day of next month')],
             'year' => [$startDate->modify('first day of january this year'), $endDate->modify('first day of january next year')],
-            default => Application::Unreachable("Invalid period: {$period}", __FILE__, __LINE__),
+            default => Application::Unreachable("Invalid period: {$period}"),
         };
 
         return [$startDate, $endDate];

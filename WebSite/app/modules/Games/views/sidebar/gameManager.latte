@@ -1,4 +1,5 @@
-    <aside id="sidebar" class="d-flex flex-column flex-shrink-0 p-3">
+{block sidebar}
+    <aside id="sidebar" class="d-flex flex-column flex-shrink-0 p-3" data-forced-state="{$sidebarState ?? 'closed'}">
         <h6 class="sidebar-heading text-uppercase mb-3">
             {='gameManager.sidebar.heading'|translate}
         </h6>
@@ -6,20 +7,42 @@
         <ul id="sidebarNav" class="nav nav-pills flex-column mb-auto">
             {* Arcade games *}
             <li class="nav-item">
-                <a class="nav-link {if ($category ?? '') === 'arcade'}active{/if}"
-                   href="/gameManager/arcade">
+                <a class="nav-link d-flex align-items-center {if ($category ?? '') === 'arcade'}active{/if}"
+                   data-bs-toggle="collapse" href="#submenuArcade" role="button"
+                   aria-expanded="{if ($category ?? '') === 'arcade'}true{else}false{/if}"
+                   aria-controls="submenuArcade">
                     <i class="bi bi-joystick me-2"></i>
                     {='gameManager.sidebar.arcade'|translate}
+                    <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>
+                <ul class="nav flex-column ms-3 collapse collapse-submenu {if ($category ?? '') === 'arcade'}show{/if}"
+                    id="submenuArcade">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/game/leapfrog">
+                            {='gameManager.sidebar.arcade.leapfrog'|translate}
+                        </a>
+                    </li>
+                </ul>
             </li>
 
             {* Puzzle / logic games *}
             <li class="nav-item">
-                <a class="nav-link {if ($category ?? '') === 'puzzle'}active{/if}"
-                   href="/gameManager/puzzle">
+                <a class="nav-link d-flex align-items-center {if ($category ?? '') === 'puzzle'}active{/if}"
+                   data-bs-toggle="collapse" href="#submenuPuzzle" role="button"
+                   aria-expanded="{if ($category ?? '') === 'puzzle'}true{else}false{/if}"
+                   aria-controls="submenuPuzzle">
                     <i class="bi bi-puzzle-fill me-2"></i>
                     {='gameManager.sidebar.puzzle'|translate}
+                    <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>
+                <ul class="nav flex-column ms-3 collapse collapse-submenu {if ($category ?? '') === 'puzzle'}show{/if}"
+                    id="submenuPuzzle">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/game/makethetarget">
+                            {='gameManager.sidebar.puzzle.makethetarget'|translate}
+                        </a>
+                    </li>
+                </ul>
             </li>
 
             {* Memory games *}
@@ -33,11 +56,27 @@
 
             {* Other games *}
             <li class="nav-item">
-                <a class="nav-link {if ($category ?? '') === 'other'}active{/if}"
-                   href="/gameManager/other">
+                <a class="nav-link d-flex align-items-center {if ($category ?? '') === 'other'}active{/if}"
+                   data-bs-toggle="collapse" href="#submenuOther" role="button"
+                   aria-expanded="{if ($category ?? '') === 'other'}true{else}false{/if}"
+                   aria-controls="submenuOther">
                     <i class="bi bi-three-dots me-2"></i>
                     {='gameManager.sidebar.other'|translate}
+                    <i class="bi bi-chevron-down ms-auto small"></i>
                 </a>
+                <ul class="nav flex-column ms-3 collapse collapse-submenu {if ($category ?? '') === 'other'}show{/if}"
+                    id="submenuOther">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/astronomy">
+                            {='gameManager.sidebar.other.astronomy'|translate}
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </aside>
+{/block}
+
+{block script}
+<script type="module" src="{='/app/modules/Games/js/forceSidebarState.js'|version}"></script>
+{/block}

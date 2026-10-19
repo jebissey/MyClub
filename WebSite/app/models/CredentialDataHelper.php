@@ -85,7 +85,7 @@ final class CredentialDataHelper extends Data
         if (!is_file($dest)) {
             $model = self::SQLITE_MODEL_PATH . self::SQLITE_FILE;
             if (!copy($model, $dest)) {
-                Application::unreachable("Copy failed From: {$model} To: {$dest} in file ", __FILE__, __LINE__);
+                Application::unreachable("Copy failed From: {$model} To: {$dest} in file ");
             }
         }
 

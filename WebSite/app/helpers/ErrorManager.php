@@ -86,7 +86,7 @@ final readonly class ErrorManager implements ErrorManagerInterface
         if ($code != ApplicationError::Ok) {
             exit;
         }
-        Application::unreachable("Ok isn't an error", __FILE__, __LINE__);
+        Application::unreachable("Ok isn't an error");
     }
 
     private function isJsonExpected(): bool

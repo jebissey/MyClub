@@ -26,7 +26,7 @@ final class GameManager implements RouteInterface
     {
         $gameManagerController = fn() => $this->controllerFactory->makeGameManagerController();
 
-        $this->routes[] = new Route('GET /games', $gameManagerController, 'user');
+        $this->routes[] = new Route('GET /games', $gameManagerController, 'games');
         $this->routes[] = new Route('GET /games/help', $gameManagerController, 'help');
 
         return $this->routes;

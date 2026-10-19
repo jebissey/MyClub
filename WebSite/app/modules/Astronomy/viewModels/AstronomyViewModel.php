@@ -22,12 +22,11 @@ final readonly class AstronomyViewModel extends LayoutViewModel
         public readonly array $navItems,
         public readonly array $i18n,
         public readonly array $layoutParams,
-        public string $layout,
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
             btn_HistoryBack: true,
-            btn_Parent: "/",
+            btn_Parent: "/games",
         );
     }
 }
