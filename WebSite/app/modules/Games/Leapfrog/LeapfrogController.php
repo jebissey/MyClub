@@ -48,8 +48,7 @@ final class LeapfrogController extends TableController
 
     public function statistics(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdmin(), __FILE__, __LINE__)) {
             return;
         }
         $schema = [

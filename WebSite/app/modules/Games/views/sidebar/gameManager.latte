@@ -1,0 +1,43 @@
+    <aside id="sidebar" class="d-flex flex-column flex-shrink-0 p-3">
+        <h6 class="sidebar-heading text-uppercase mb-3">
+            {='gameManager.sidebar.heading'|translate}
+        </h6>
+
+        <ul id="sidebarNav" class="nav nav-pills flex-column mb-auto">
+            {* Arcade games *}
+            <li class="nav-item">
+                <a class="nav-link {if ($category ?? '') === 'arcade'}active{/if}"
+                   href="/gameManager/arcade">
+                    <i class="bi bi-joystick me-2"></i>
+                    {='gameManager.sidebar.arcade'|translate}
+                </a>
+            </li>
+
+            {* Puzzle / logic games *}
+            <li class="nav-item">
+                <a class="nav-link {if ($category ?? '') === 'puzzle'}active{/if}"
+                   href="/gameManager/puzzle">
+                    <i class="bi bi-puzzle-fill me-2"></i>
+                    {='gameManager.sidebar.puzzle'|translate}
+                </a>
+            </li>
+
+            {* Memory games *}
+            <li class="nav-item">
+                <a class="nav-link {if ($category ?? '') === 'memory'}active{/if}"
+                   href="/gameManager/memory">
+                    <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+                    {='gameManager.sidebar.memory'|translate}
+                </a>
+            </li>
+
+            {* Other games *}
+            <li class="nav-item">
+                <a class="nav-link {if ($category ?? '') === 'other'}active{/if}"
+                   href="/gameManager/other">
+                    <i class="bi bi-three-dots me-2"></i>
+                    {='gameManager.sidebar.other'|translate}
+                </a>
+            </li>
+        </ul>
+    </aside>

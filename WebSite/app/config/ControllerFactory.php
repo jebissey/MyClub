@@ -68,6 +68,7 @@ use app\modules\Event\EventGuestController;
 use app\modules\Event\EventNeedController;
 use app\modules\Event\EventTypeController;
 use app\modules\Exercise\ExerciseController;
+use app\modules\Games\GameManagerController;
 use app\modules\Games\Karaoke\KaraokeController;
 use app\modules\Games\Leapfrog\LeapfrogController;
 use app\modules\Games\Solfege\SolfegeController;
@@ -302,6 +303,11 @@ final readonly class ControllerFactory
     public function makeFfaController(): FFAController
     {
         return new FFAController($this->application);
+    }
+
+    public function makeGameManagerController(): GameManagerController
+    {
+        return new GameManagerController($this->application);
     }
 
     public function makeGroupController(): GroupController

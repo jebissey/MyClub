@@ -16,7 +16,7 @@ final readonly class UserDashboardViewModel extends LayoutViewModel
         array $layoutParams = []
     ) {
         $baseArgs = self::baseArgsFrom($layoutParams);
-        $baseArgs['page'] = ''; // Aucun item de la navbar mis en surbrillance sur le tableau de bord
+        $baseArgs['page'] = '';
 
         parent::__construct(...$baseArgs);
     }

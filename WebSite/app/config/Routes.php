@@ -36,6 +36,7 @@ use app\config\routes\Exercise;
 use app\config\routes\ExerciseApi;
 use app\config\routes\Export;
 use app\config\routes\Ffa;
+use app\config\routes\GameManager;
 use app\config\routes\Group;
 use app\config\routes\GroupApi;
 use app\config\routes\HelloAssoApi;
@@ -278,6 +279,7 @@ final class Routes
         $this->routes = array_merge($this->routes, (new ExerciseApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Export($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Ffa($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new GameManager($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Group($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new GroupApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new HelloAssoApi($this->apiFactory))->get());
