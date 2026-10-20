@@ -6,6 +6,7 @@ namespace app\models;
 
 use PDO;
 use RuntimeException;
+use stdClass;
 use app\helpers\Application;
 use app\models\interfaces\CarouselDataHelperInterface;
 
@@ -38,6 +39,17 @@ final class CarouselDataHelper extends Data implements CarouselDataHelperInterfa
             ]);
             return 'Élément ajouté avec succès';
         }
+    }
+
+
+    /**
+     * @return list<stdClass>
+     */
+    public function getCarouselItems(int $articleId): array
+    {
+        return array_values(
+            $this->gets('Carousel', ['IdArticle' => $articleId], 'Id, IdArticle, Item')
+        );
     }
 
     /**

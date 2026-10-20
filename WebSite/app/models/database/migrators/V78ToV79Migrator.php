@@ -12,8 +12,6 @@ final class V78ToV79Migrator implements DatabaseMigratorInterface
     public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $pdo->exec(<<<SQL
-ALTER TABLE Person ADD COLUMN PresentationLastUpdate TEXT;
-UPDATE Person SET PresentationLastUpdate = current_timestamp WHERE PresentationLastUpdate IS NULL;
 
 INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 ('communication.index.contact_email_tooltip',

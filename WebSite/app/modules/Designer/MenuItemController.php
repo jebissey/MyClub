@@ -6,13 +6,16 @@ namespace app\modules\Designer;
 
 use app\enums\ApplicationError;
 use app\enums\MenuItemTab;
+use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\models\ArwardsDataHelper;
+use app\models\CarouselDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Designer\viewModels\MenuArticleViewModel;
 
 final class MenuItemController extends AbstractController
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private readonly CarouselDataHelper $carouselDataHelper)
     {
         parent::__construct($application);
     }
@@ -108,20 +111,29 @@ final class MenuItemController extends AbstractController
 
     public function showArticle(int $id): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($this->menuItemDataHelper->authorizedUser("/menu/show/article/$id", $person)) {
-            $this->render('Article/views/showArticle.latte', $this->getAllParams([
-                'navItems'         => $this->getNavItems($person),
-                'chosenArticle'    => $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-                'page'             => $this->application->getConnectedUser()->getPage(),
-                'btn_HistoryBack'  => true,
-            ]));
-        } else {
+        $connectedUser = $this->application->getConnectedUser();
+        $person = $connectedUser->person;
+
+        if (!$this->menuItemDataHelper->authorizedUser("/menu/show/article/$id", $person)) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,
                 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
             );
+            return;
+        }
+
+        try {
+            $viewModel = new MenuArticleViewModel(
+                chosenArticle: $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
+                carouselItems: $this->carouselDataHelper->getCarouselItems($id),
+                navItems: $this->getNavItems($person),
+                hasAuthorization: $connectedUser->hasAutorization(),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->render('Article/views/showArticle.latte', $viewModel->toArray());
+        } catch (QueryException $e) {
+            $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 }

@@ -170,7 +170,8 @@ final readonly class ControllerFactory
             $this->emailService,
             $this->logDataHelper,
             $this->articleService,
-            $this->alertRecipientDataHelper
+            $this->alertRecipientDataHelper,
+            $this->carouselDataHelper
         );
     }
 
@@ -410,7 +411,10 @@ final readonly class ControllerFactory
 
     public function makeMenuItemController(): MenuItemController
     {
-        return new MenuItemController($this->application);
+        return new MenuItemController(
+            $this->application,
+            $this->carouselDataHelper
+        );
     }
 
     public function makeOrderController(): OrderController

@@ -1,0 +1,41 @@
+{*
+    Article gallery carousel (Bootstrap 5).
+
+    Parameters:
+    - $carouselItems : list of rows (Id, IdArticle, Item); Item holds trusted HTML
+    - $carouselId    : optional DOM id, defaults to "articleCarousel"
+*}
+{default $carouselItems = []}
+{default $carouselId = 'articleCarousel'}
+
+{if !empty($carouselItems)}
+<div class="mt-4">
+    <h4>{='article.show.gallery'|translate}</h4>
+    <div id="{$carouselId}" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            {foreach $carouselItems as $index => $item}
+                <button type="button"
+                        data-bs-target="#{$carouselId}"
+                        data-bs-slide-to="{$index}"
+                        {if $index === 0}class="active" aria-current="true"{/if}
+                        aria-label="Slide {$index + 1}"></button>
+            {/foreach}
+        </div>
+        <div class="carousel-inner">
+            {foreach $carouselItems as $index => $item}
+                <div class="carousel-item {if $index === 0}active{/if}">
+                    {$item->Item|noescape}
+                </div>
+            {/foreach}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#{$carouselId}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">{='article.show.previous'|translate}</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#{$carouselId}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">{='article.show.next'|translate}</span>
+        </button>
+    </div>
+</div>
+{/if}

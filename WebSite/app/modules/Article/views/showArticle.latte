@@ -1,11 +1,17 @@
-{layout '../../Common/views/layout.latte'}      
+{layout '../../Common/views/layout.latte'}
 
 {block navbar}
-{include '../../Common/views/navbar/_userLeft.latte'} 
+{include '../../Common/views/navbar/_userLeft.latte'}
+{/block}
+
+{block head}
+    <link href="/app/modules/Common/css/carousel.css" rel="stylesheet">
 {/block}
 
 {block content}
-    <div id="content-display">
-        {$chosenArticle->Content|noescape}
-    </div>
+<div id="content-display">
+    {$chosenArticle->Content|noescape}
+</div>
+
+{include 'partials/carousel.latte', carouselItems => $carouselItems}
 {/block}

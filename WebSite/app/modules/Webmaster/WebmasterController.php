@@ -344,7 +344,7 @@ final class WebmasterController extends TableController
             filterValues: $filterValues,
             filters: $filterConfig,
             columns: $columns,
-            resetUrl: '/webmaster/installations', // adjust to the real route
+            resetUrl: '/installations',
             navItems: $this->getNavItems($connectedUser->person),
             layoutParams: $this->getAllParams([
                 'page' => $connectedUser->getPage(),

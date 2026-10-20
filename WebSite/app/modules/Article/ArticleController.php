@@ -19,6 +19,7 @@ use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
 use app\models\AuthorizationDataHelper;
+use app\models\CarouselDataHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
@@ -58,6 +59,7 @@ final class ArticleController extends TableController
         private readonly LogDataHelper $logDataHelper,
         private readonly ArticleService $articleService,
         private readonly AlertRecipientDataHelper $alertRecipientDataHelper,
+        private readonly CarouselDataHelper $carouselDataHelper,
     ) {
         parent::__construct($application);
         $this->authorizationService = new ArticleAuthorizationService(
@@ -568,7 +570,7 @@ final class ArticleController extends TableController
                     $articleAuthorization,
                     $connectedUser
                 ),
-                carouselItems: $carouselItems,
+                carouselItems: $this->carouselDataHelper->getCarouselItems($id),
                 countOfMessages: count(
                     $this->dataHelper->gets(
                         'Message',
