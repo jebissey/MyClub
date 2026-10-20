@@ -323,7 +323,6 @@ final class ArticleController extends TableController
         $this->redirect('/article/' . $idArticle);
     }
 
-
     public function help(): void
     {
         $this->renderHelp('Help_Redactor', fn($u) => $u->isRedactor(), __FILE__, __LINE__);
@@ -582,6 +581,7 @@ final class ArticleController extends TableController
                 message: $message,
                 messageType: $messageType,
                 layoutParams: $layoutParams,
+                btnParent: $this->resolveParentUrl('/articles'),
             );
 
             $this->render('Article/views/article_show.latte', $viewModel->toArray());
@@ -829,5 +829,33 @@ final class ArticleController extends TableController
             return;
         }
         $this->redirect('/user/sign/in?redirect=' . urlencode($requestUri));
+    }
+
+    /**
+     * Resolves the target of the "parent" navbar button from the ?parent= query parameter.
+     *
+     * - parameter absent or invalid -> $default (current behavior)
+     * - parent=false                -> null (button hidden)
+     * - parent=/some/internal/path  -> that path
+     *
+     * Only local absolute paths are accepted to prevent open redirects
+     * and "javascript:" / external URLs.
+     */
+    private function resolveParentUrl(string $default): ?string
+    {
+        $parent = $_GET['parent'] ?? null;
+
+        if (!is_string($parent) || $parent === '') {
+            return $default;
+        }
+        if ($parent === 'false') {
+            return null;
+        }
+        // Must start with a single "/", no "//", no backslash, no whitespace
+        if (preg_match('#^/(?![/\\\\])[^\s\\\\]*$#', $parent) === 1) {
+            return $parent;
+        }
+
+        return $default;
     }
 }

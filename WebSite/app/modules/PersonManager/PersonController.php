@@ -318,7 +318,7 @@ final class PersonController extends TableController
                 $filterValues
             ),
 
-            default => Application::unreachable("Unknown status {$status}", __FILE__, __LINE__)
+            default => Application::unreachable("Unknown status {$status}")
         };
 
         $viewModel = new PersonsIndexViewModel(

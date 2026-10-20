@@ -35,12 +35,13 @@ final readonly class ArticleShowViewModel extends LayoutViewModel
         public bool $isCreator,
         public ?string $message,
         public ?string $messageType,
-        array $layoutParams
+        array $layoutParams,
+        ?string $btnParent = '/articles',
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
             btn_HistoryBack: true,
-            btn_Parent: '/articles',
+            btn_Parent: $btnParent,
         );
     }
 }
