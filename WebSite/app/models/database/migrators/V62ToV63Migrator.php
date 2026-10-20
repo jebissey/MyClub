@@ -9,7 +9,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class V62ToV63Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         // Les exercices sont stockés dans Article.Content (JSON).
         // On ajoute juste les autorisations et les traductions.

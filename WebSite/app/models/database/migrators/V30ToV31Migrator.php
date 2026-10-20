@@ -9,7 +9,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class V30ToV31Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $pdo->exec(<<<SQL
 UPDATE Languages SET en_US =

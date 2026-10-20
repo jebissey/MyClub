@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace app\modules\Webmaster;
 
 use DateTime;
+use Exception;
+use stdClass;
 use Minishlink\WebPush\VAPID;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\NotificationSender;
-use app\helpers\TranslationManager;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\LogDataHelper;
-use app\modules\Common\AbstractController;
+use app\modules\Common\TableController;
 use app\modules\Common\services\CredentialService;
-use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Webmaster\viewModels\AdminHomeViewModel;
 use app\modules\Webmaster\viewModels\ClubCustomizationViewModel;
 use app\modules\Webmaster\viewModels\EmailCredentialsViewModel;
@@ -26,7 +26,7 @@ use app\modules\Webmaster\viewModels\WebmasterHomeViewModel;
 use app\modules\Webmaster\viewModels\WebmasterInstallationsViewModel;
 use app\modules\Webmaster\viewModels\WebmasterNotificationsViewModel;
 
-final class WebmasterController extends AbstractController
+final class WebmasterController extends TableController
 {
     public function __construct(
         Application $application,
@@ -278,20 +278,40 @@ final class WebmasterController extends AbstractController
 
     public function showInstallations(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $installations = $this->logDataHelper->getInstallationsData();
-
-            $viewModel = new WebmasterInstallationsViewModel(
-                installations: array_values($installations),
-                totalInstallations: count($installations),
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
-                layoutParams: $this->getAllParams([
-                    'page' => $this->application->getConnectedUser()->getPage(),
-                ]),
-            );
-
-            $this->render('Webmaster/views/installations.latte', $viewModel->toArray());
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
+            return;
         }
+
+        $columns = [
+            ['field' => 'Host',           'label' => 'Host'],
+            ['field' => 'webappVersions', 'label' => 'Version Webapp'],
+            ['field' => 'phpVersions',    'label' => 'Version PHP'],
+            ['field' => 'lastCheck',      'label' => 'Dernière vérification'],
+            ['field' => 'timeAgo',        'label' => 'Il y a'],
+            ['field' => 'checkCount',     'label' => 'Nombre de vérifications'],
+            ['field' => 'status',         'label' => 'Statut'],
+        ];
+
+        $data = $this->prepareTableData($this->logDataHelper->getInstallations(), [], true);
+
+        /** @var array<int, stdClass> $items */
+        $items = $data['items'];
+
+        $viewModel = new WebmasterInstallationsViewModel(
+            installations: array_values($this->logDataHelper->enrichInstallations($items)),
+            currentPage: $data['currentPage'],
+            totalPages: $data['totalPages'],
+            filterValues: [],
+            filters: [],
+            columns: $columns,
+            resetUrl: '/webmaster/installations', // adjust to the real route
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+
+        $this->render('Webmaster/views/installations.latte', $viewModel->toArray());
     }
 
     public function sitemapGenerator(): void
@@ -320,7 +340,7 @@ final class WebmasterController extends AbstractController
         foreach ($articles as $article) {
             try {
                 $lastmod = (new DateTime($article->LastUpdate))->format(DateTime::ATOM);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $lastmod = (new DateTime())->format(DateTime::ATOM);
             }
 

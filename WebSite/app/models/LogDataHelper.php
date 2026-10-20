@@ -91,7 +91,7 @@ final class LogDataHelper extends Data
     #region Last visits
 
     /**
-    * @param list<MemberBasicRow> $activePersons
+     * @param list<MemberBasicRow> $activePersons
      * @return array<int, stdClass>
      */
     public function getLastVisitPerActivePersonWithTimeAgo(array $activePersons): array
@@ -346,98 +346,12 @@ final class LogDataHelper extends Data
 
     #region Installations
 
-    /**
-     * @return array<int, stdClass>
-     */
-    public function getInstallationsData(): array
+    public function getInstallations(): Select
     {
-        $query = "
-            SELECT
-                IpAddress,
-                COALESCE(
-                    (SELECT
-                        CASE
-                            WHEN INSTR(Uri,'url=') > 0 THEN
-                                CASE
-                                    WHEN INSTR(SUBSTR(Uri, INSTR(Uri,'url=')+4),'&') > 0 THEN
-                                        SUBSTR(
-                                            SUBSTR(Uri, INSTR(Uri,'url=')+4),
-                                            1,
-                                            INSTR(SUBSTR(Uri, INSTR(Uri,'url=')+4),'&')-1
-                                        )
-                                    ELSE SUBSTR(Uri, INSTR(Uri,'url=')+4)
-                                END
-                        END
-                     FROM Log l2
-                     WHERE l2.IpAddress = Log.IpAddress
-                       AND l2.Uri LIKE '/api/lastVersion%'
-                       AND INSTR(l2.Uri,'url=') > 0
-                     LIMIT 1),
-                    IpAddress
-                ) as Host,
-                MAX(CreatedAt) as lastCheck,
-                COUNT(*) as checkCount,
-                GROUP_CONCAT(DISTINCT
-                    CASE
-                        WHEN INSTR(Uri,'cv=') > 0 THEN
-                            CASE
-                                WHEN INSTR(SUBSTR(Uri, INSTR(Uri,'cv=')+3),'&') > 0 THEN
-                                    SUBSTR(
-                                        SUBSTR(Uri, INSTR(Uri,'cv=')+3),
-                                        1,
-                                        INSTR(SUBSTR(Uri, INSTR(Uri,'cv=')+3),'&')-1
-                                    )
-                                ELSE SUBSTR(Uri, INSTR(Uri,'cv=')+3)
-                            END
-                    END
-                ) as webappVersions,
-                GROUP_CONCAT(DISTINCT Message) as phpVersions
-            FROM Log
-            WHERE Uri LIKE '/api/lastVersion%'
-            GROUP BY IpAddress
-            ORDER BY MAX(CreatedAt) DESC
-        ";
-
-        $stmt = $this->pdoForLog->query($query);
-
-        if ($stmt === false) {
-            throw new RuntimeException(
-                'Unable to execute installations query.'
-            );
-        }
-
-        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        $dnsCache = [];
-
-        foreach ($results as &$installation) {
-            $installation->timeAgo = $this->getTimeAgo($installation->lastCheck);
-            $host = $installation->Host;
-
-            if (strpos($host, '%') !== false) {
-                $decoded = urldecode($host);
-                $parsedHost = parse_url($decoded, PHP_URL_HOST);
-                $installation->Host = $parsedHost ?: $decoded;
-                continue;
-            }
-
-            $hostname = null;
-
-            if (filter_var($host, FILTER_VALIDATE_IP)) {
-                if (isset($dnsCache[$host])) {
-                    $hostname = $dnsCache[$host];
-                } else {
-                    $hostname = @gethostbyaddr($host);
-                    $dnsCache[$host] = $hostname;
-                }
-
-                if ($hostname && $hostname !== $host) {
-                    $installation->Host = $hostname;
-                }
-            }
-        }
-
-        return $results;
+        return $this->fluentForLog->from('installation_list_view')
+            ->select(null)
+            ->select('IpAddress, Host, lastCheck, checkCount, webappVersions, phpVersions')
+            ->orderBy('lastCheck DESC');
     }
 
     private function getTimeAgo(string $datetime): string
@@ -663,6 +577,52 @@ final class LogDataHelper extends Data
 
         return max(1, (int) ($niceStep * $magnitude));
     }
+
+    /**
+     * Adds display fields (resolved host, time ago, status) to installation rows.
+     * Call it on the current page only, to limit reverse DNS lookups.
+     *
+     * @param array<int, stdClass> $rows
+     * @return array<int, stdClass>
+     */
+    public function enrichInstallations(array $rows): array
+    {
+        /** @var array<string, string|false> $dnsCache */
+        $dnsCache = [];
+
+        foreach ($rows as $installation) {
+            $host = (string) $installation->Host;
+
+            if (strpos($host, '%') !== false) {
+                $decoded = urldecode($host);
+                $installation->Host = parse_url($decoded, PHP_URL_HOST) ?: $decoded;
+            } elseif (filter_var($host, FILTER_VALIDATE_IP)) {
+                $dnsCache[$host] ??= @gethostbyaddr($host);
+                $hostname = $dnsCache[$host];
+
+                if ($hostname !== false && $hostname !== $host) {
+                    $installation->Host = $hostname;
+                }
+            }
+
+            $installation->webappVersions ??= 'Version inconnue';
+            $installation->phpVersions    ??= 'Version inconnue';
+
+            $lastCheck = (string) $installation->lastCheck;
+            $installation->timeAgo = $this->getTimeAgo($lastCheck);
+
+            $daysSinceLastCheck = (time() - strtotime($lastCheck)) / 86400;
+            $installation->status = match (true) {
+                $daysSinceLastCheck < 7  => 'Actif',
+                $daysSinceLastCheck < 30 => 'Récent',
+                default                  => 'Inactif',
+            };
+        }
+
+        return $rows;
+    }
+
+
 
     #region Backups
 

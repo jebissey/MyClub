@@ -10,7 +10,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class V92ToV93Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $statement = $pdo->query(<<<'SQL'
 SELECT Name, COUNT(*) AS Total

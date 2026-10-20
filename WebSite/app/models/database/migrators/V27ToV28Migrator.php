@@ -9,7 +9,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class V27ToV28Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $pdo->exec("
             CREATE TABLE ContactRateLimit (

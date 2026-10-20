@@ -9,7 +9,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class V3ToV4Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $pdo->exec("ALTER TABLE Metadata ADD COLUMN Compact_lastDate TEXT");
         $pdo->exec("ALTER TABLE Metadata ADD COLUMN Compact_everyXdays INTEGER NOT NULL DEFAULT 10");

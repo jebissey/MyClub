@@ -17,7 +17,6 @@ use app\models\LogStatisticsDataHelper;
 use app\models\MemberDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\TableController;
-use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\VisitorInsights\viewModels\AnalyticsViewModel;
 use app\modules\VisitorInsights\viewModels\CrossTabViewModel;
 use app\modules\VisitorInsights\viewModels\LastVisitsViewModel;

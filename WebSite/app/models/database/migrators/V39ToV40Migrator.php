@@ -9,7 +9,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class V39ToV40Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $pdo->exec("UPDATE Languages SET Name = 'close' WHERE Name = 'user_connections.modal.close'");
         $pdo->exec("

@@ -23,7 +23,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
  */
 final class V84ToV85Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $pdo->exec(<<<SQL
             CREATE TABLE "Invitation" (

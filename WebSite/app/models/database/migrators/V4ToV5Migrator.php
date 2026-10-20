@@ -9,7 +9,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class V4ToV5Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $pdo->exec("ALTER TABLE Metadata ADD COLUMN ThisIsProdSiteUrl TEXT");
         $pdo->exec("ALTER TABLE Metadata ADD COLUMN ThisIsTestSite INTEGER NOT NULL DEFAULT 0");

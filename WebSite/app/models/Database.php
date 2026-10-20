@@ -26,7 +26,7 @@ final class Database
     private const SQLITE_CREDENTIAL_FILE = 'Credential.db';
     private const MIGRATORS_DIR = __DIR__ . '/database/migrators';
     private const APPLICATION = 'MyClub';
-    private const DB_VERSION = 98;              //Don't forget to update here and in Metadata when database structure is modified
+    private const DB_VERSION = 99;              //Don't forget to update here and in Metadata when database structure is modified
 
     private static ?Database $instance = null;
     private static ?PDO $pdo = null;
@@ -118,7 +118,7 @@ final class Database
                 if ($row->DatabaseVersion > self::DB_VERSION) {
                     Application::unreachable('The database requires a more recent version of the application');
                 }
-                self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::DB_VERSION);
+                self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::DB_VERSION, self::$pdoForLog);
             }
             // Reached only when the database is at the current version: either it has just been
             // upgraded successfully (a failure ends the request in Application::unreachable above),
@@ -154,7 +154,7 @@ final class Database
         @rmdir(self::MIGRATORS_DIR);
     }
 
-    private function upgradeDatabase(PDO $pdo, int $from, int $to): void
+    private function upgradeDatabase(PDO $pdo, int $from, int $to, PDO $pdoForLog): void
     {
         $logMessage = LogMessage::getInstance((string)ApplicationError::Ok->value);
         $pdo->exec('PRAGMA foreign_keys = OFF');
@@ -174,7 +174,7 @@ final class Database
                 if (!($migrator instanceof DatabaseMigratorInterface)) {
                     throw new RuntimeException("$className must implement DatabaseMigratorInterface");
                 }
-                $newVersion = $migrator->upgrade($pdo, $currentVersion);
+                $newVersion = $migrator->upgrade($pdo, $currentVersion, $pdoForLog);
                 unset($migrator);
                 gc_collect_cycles();
                 $logMessage->setMessage("Database migrated from version {$currentVersion} to version {$newVersion} using {$className}");

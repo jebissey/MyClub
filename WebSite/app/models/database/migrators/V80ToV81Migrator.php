@@ -17,7 +17,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
  */
 final class V80ToV81Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         // Disable FK checks for the duration of structural changes
         $pdo->exec('PRAGMA foreign_keys = OFF');

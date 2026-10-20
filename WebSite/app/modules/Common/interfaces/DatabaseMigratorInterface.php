@@ -8,5 +8,5 @@ use PDO;
 
 interface DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int;
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int;
 }

@@ -11,7 +11,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class V15ToV16Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $pdo->exec('
             CREATE TABLE "MenuItem" (

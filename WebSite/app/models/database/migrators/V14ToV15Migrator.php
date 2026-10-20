@@ -9,7 +9,7 @@ use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class V14ToV15Migrator implements DatabaseMigratorInterface
 {
-    public function upgrade(PDO $pdo, int $currentVersion): int
+    public function upgrade(PDO $pdo, int $currentVersion, PDO $pdoForLog): int
     {
         $pdo->exec("ALTER TABLE Languages ADD COLUMN pl_PL TEXT NOT NULL DEFAULT ''");
         $pdo->exec("INSERT INTO 'Authorization' VALUES (11,'Translator')");
