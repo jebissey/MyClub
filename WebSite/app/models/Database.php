@@ -13,6 +13,7 @@ use RuntimeException;
 use SplFileInfo;
 use Throwable;
 use app\enums\ApplicationError;
+use app\exceptions\DatabaseException;
 use app\helpers\Application;
 use app\helpers\File;
 use app\helpers\LogMessage;
@@ -190,8 +191,13 @@ final class Database
             $stmt->execute([$to]);
             $pdo->commit();
         } catch (Throwable $e) {
-            $pdo->rollBack();
-            Application::unreachable('Fatal program error during migration: ' . $e->getMessage());
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw new DatabaseException(
+                'Fatal program error during migration: ' . $e->getMessage(),
+                previous: $e
+            );
         } finally {
             $pdo->exec('PRAGMA foreign_keys = ON');
         }

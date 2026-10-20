@@ -350,7 +350,7 @@ final class LogDataHelper extends Data
     {
         return $this->fluentForLog->from('installation_list_view')
             ->select(null)
-            ->select('IpAddress, Host, lastCheck, checkCount, webappVersions, phpVersions')
+            ->select('Host, lastCheck, checkCount, webappVersions, phpVersions, status')
             ->orderBy('lastCheck DESC');
     }
 
@@ -579,16 +579,18 @@ final class LogDataHelper extends Data
     }
 
     /**
-     * Adds display fields (resolved host, time ago, status) to installation rows.
+     * Adds display fields (resolved host, time ago, translated status) to installation rows.
      * Call it on the current page only, to limit reverse DNS lookups.
      *
      * @param array<int, stdClass> $rows
+     * @param callable(string): string $t Translator
      * @return array<int, stdClass>
      */
-    public function enrichInstallations(array $rows): array
+    public function enrichInstallations(array $rows, callable $t): array
     {
         /** @var array<string, string|false> $dnsCache */
         $dnsCache = [];
+        $unknownVersion = $t('webmaster.installations.unknown_version');
 
         foreach ($rows as $installation) {
             $host = (string) $installation->Host;
@@ -605,24 +607,24 @@ final class LogDataHelper extends Data
                 }
             }
 
-            $installation->webappVersions ??= 'Version inconnue';
-            $installation->phpVersions    ??= 'Version inconnue';
+            $installation->webappVersions ??= $unknownVersion;
+            $installation->phpVersions    ??= $unknownVersion;
 
             $lastCheck = (string) $installation->lastCheck;
             $installation->timeAgo = $this->getTimeAgo($lastCheck);
 
+            $installation->status = $t('webmaster.installations.status.' . $installation->status);
+
             $daysSinceLastCheck = (time() - strtotime($lastCheck)) / 86400;
-            $installation->status = match (true) {
-                $daysSinceLastCheck < 7  => 'Actif',
-                $daysSinceLastCheck < 30 => 'Récent',
-                default                  => 'Inactif',
-            };
+            $installation->status = $t(match (true) {
+                $daysSinceLastCheck < 7  => 'webmaster.installations.status.active',
+                $daysSinceLastCheck < 30 => 'webmaster.installations.status.recent',
+                default                  => 'webmaster.installations.status.inactive',
+            });
         }
 
         return $rows;
     }
-
-
 
     #region Backups
 

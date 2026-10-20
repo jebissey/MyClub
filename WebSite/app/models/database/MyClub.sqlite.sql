@@ -7004,7 +7004,20 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1446,'gameManager.sidebar.other','Other','Autres','Inne'),
  (1447,'gameManager.sidebar.arcade.leapfrog','Leapfrog','Leapfrog','Leapfrog'),
  (1448,'gameManager.sidebar.puzzle.makethetarget','Make the target','Make the target','Make the target'),
- (1449,'gameManager.sidebar.other.astronomy','Astronomy','Astronomie','Astronomia');
+ (1449,'gameManager.sidebar.other.astronomy','Astronomy','Astronomie','Astronomia'),
+ (1463,'webmaster.installations.label.host','Host','Hôte','Host'),
+ (1464,'webmaster.installations.label.webapp_version','Webapp version','Version de la webapp','Wersja aplikacji'),
+ (1465,'webmaster.installations.label.php_version','PHP version','Version de PHP','Wersja PHP'),
+ (1466,'webmaster.installations.label.last_check','Last check','Dernière vérification','Ostatnie sprawdzenie'),
+ (1467,'webmaster.installations.label.time_ago','Time ago','Il y a','Temu'),
+ (1468,'webmaster.installations.label.check_count','Number of checks','Nombre de vérifications','Liczba sprawdzeń'),
+ (1469,'webmaster.installations.label.status','Status','Statut','Status'),
+ (1470,'webmaster.installations.status.active','Active','Actif','Aktywna'),
+ (1471,'webmaster.installations.status.recent','Recent','Récent','Niedawna'),
+ (1472,'webmaster.installations.status.inactive','Inactive','Inactif','Nieaktywna'),
+ (1473,'webmaster.installations.unknown_version','Unknown version','Version inconnue','Nieznana wersja'),
+ (1474,'webmaster.installations.empty.title','No installation detected','Aucune installation détectée','Nie wykryto żadnej instalacji'),
+ (1475,'webmaster.installations.empty.message','No installation of the webapp has checked for updates yet.','Aucune installation de la webapp n''a encore vérifié les mises à jour.','Żadna instalacja aplikacji nie sprawdzała jeszcze aktualizacji.');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
 INSERT INTO "Metadata" VALUES (1,'MyClub',99,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);

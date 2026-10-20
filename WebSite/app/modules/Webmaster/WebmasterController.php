@@ -282,32 +282,72 @@ final class WebmasterController extends TableController
             return;
         }
 
-        $columns = [
-            ['field' => 'Host',           'label' => 'Host'],
-            ['field' => 'webappVersions', 'label' => 'Version Webapp'],
-            ['field' => 'phpVersions',    'label' => 'Version PHP'],
-            ['field' => 'lastCheck',      'label' => 'Dernière vérification'],
-            ['field' => 'timeAgo',        'label' => 'Il y a'],
-            ['field' => 'checkCount',     'label' => 'Nombre de vérifications'],
-            ['field' => 'status',         'label' => 'Statut'],
+        $connectedUser = $this->application->getConnectedUser();
+
+        $schema = [
+            'Host'           => FilterInputRule::Text->value,
+            'webappVersions' => FilterInputRule::String->value,
+            'phpVersions'    => FilterInputRule::String->value,
+            'lastCheck'      => FilterInputRule::DateTime->value,
+            'status'         => FilterInputRule::String->value,
+        ];
+        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        /** @var array<string, string> $filterValues */
+
+        $filterConfig = [
+            ['name' => 'Host',           'label' => ($this->t)('webmaster.installations.label.host')],
+            ['name' => 'webappVersions', 'label' => ($this->t)('webmaster.installations.label.webapp_version')],
+            ['name' => 'phpVersions',    'label' => ($this->t)('webmaster.installations.label.php_version')],
+            ['name' => 'lastCheck',      'label' => ($this->t)('webmaster.installations.label.last_check')],
+            ['name' => 'status',         'label' => ($this->t)('webmaster.installations.label.status')],
         ];
 
-        $data = $this->prepareTableData($this->logDataHelper->getInstallations(), [], true);
+        $query = $this->logDataHelper->getInstallations();
+
+        $sqlFilters = $filterValues;
+        unset($sqlFilters['status']);
+
+        $statusFilter = $filterValues['status'] ?? '';
+        if ($statusFilter !== '') {
+            $codes = [];
+            foreach (['active', 'recent', 'inactive'] as $code) {
+                $label = ($this->t)('webmaster.installations.status.' . $code);
+                if (mb_stripos($label, $statusFilter) !== false) {
+                    $codes[] = "'" . $code . "'";
+                }
+            }
+            $query = $query->where($codes === [] ? '1 = 0' : 'status IN (' . implode(', ', $codes) . ')');
+        }
+
+        $data = $this->prepareTableData($query, $sqlFilters, true);
+
+        $columns = [
+            ['field' => 'Host',           'label' => ($this->t)('webmaster.installations.label.host')],
+            ['field' => 'webappVersions', 'label' => ($this->t)('webmaster.installations.label.webapp_version')],
+            ['field' => 'phpVersions',    'label' => ($this->t)('webmaster.installations.label.php_version')],
+            ['field' => 'lastCheck',      'label' => ($this->t)('webmaster.installations.label.last_check')],
+            ['field' => 'timeAgo',        'label' => ($this->t)('webmaster.installations.label.time_ago')],
+            ['field' => 'checkCount',     'label' => ($this->t)('webmaster.installations.label.check_count')],
+            ['field' => 'status',         'label' => ($this->t)('webmaster.installations.label.status')],
+        ];
+
+        $query = $this->logDataHelper->getInstallations();
+        $data  = $this->prepareTableData($query, $filterValues, true);
 
         /** @var array<int, stdClass> $items */
         $items = $data['items'];
 
         $viewModel = new WebmasterInstallationsViewModel(
-            installations: array_values($this->logDataHelper->enrichInstallations($items)),
+            installations: array_values($this->logDataHelper->enrichInstallations($items, $this->t)),
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
-            filterValues: [],
-            filters: [],
+            filterValues: $filterValues,
+            filters: $filterConfig,
             columns: $columns,
             resetUrl: '/webmaster/installations', // adjust to the real route
-            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            navItems: $this->getNavItems($connectedUser->person),
             layoutParams: $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
+                'page' => $connectedUser->getPage(),
             ]),
         );
 

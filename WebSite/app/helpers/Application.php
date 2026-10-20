@@ -87,7 +87,10 @@ final class Application
                 new GravatarHandler(),
             );
         } catch (Throwable $e) {
-            throw new DatabaseException('Database error ' . $e->getMessage() . ' in ' . $e->getFile() . ' at ' . $e->getLine());
+            throw new DatabaseException(
+                'Database error ' . $e->getMessage() . ' in ' . $e->getFile() . ' at ' . $e->getLine(),
+                previous: $e
+            );
         }
     }
 
