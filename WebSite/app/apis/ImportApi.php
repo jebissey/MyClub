@@ -11,7 +11,6 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\MemberCustomFields;
 use app\helpers\To;
-use app\helpers\WebApp;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\PersonManager\services\MemberOdsImporter;
@@ -33,13 +32,7 @@ final class ImportApi extends AbstractApi
 
     public function getHeadersFromCSV(): void
     {
-        if (!$this->application->getConnectedUser()->isPersonManager()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
             return;
         }
 

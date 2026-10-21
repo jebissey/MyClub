@@ -6,7 +6,6 @@ namespace app\apis;
 
 use JsonException;
 use Throwable;
-use app\enums\ApplicationError;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -32,14 +31,10 @@ final class CarouselApi extends AbstractApi
 
     public function deleteItem(int $id): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->application->getConnectedUser()->isRedactor()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         /** @var object{IdArticle: int}|false $item */
         $item = $this->dataHelper->get('Carousel', ['Id' => $id], 'IdArticle');
         if (!$item) {
@@ -88,11 +83,11 @@ final class CarouselApi extends AbstractApi
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
-            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+            $this->renderJsonBadRequest("Invalid data", __FILE__, __LINE__);
             return;
         }
         if (!$data || !isset($data['idArticle']) || !isset($data['item'])) {
-            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+            $this->renderJsonBadRequest("Invalid data", __FILE__, __LINE__);
             return;
         }
 

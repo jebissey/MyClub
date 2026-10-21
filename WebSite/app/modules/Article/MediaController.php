@@ -36,10 +36,10 @@ final class MediaController extends AbstractController
 
     public function getSharedFile(string $token): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
+
         /**
          * @var object{
          *     Id: int|string,
@@ -77,14 +77,10 @@ final class MediaController extends AbstractController
 
     public function gpxViewer(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $viewModel = new PageViewModel(
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
@@ -159,11 +155,11 @@ final class MediaController extends AbstractController
 
     public function serveFile(string $year, string $month, string $filename): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
-        $connectedUser = $this->application->getConnectedUser();
+
+        $connectedUser = $this->application->getConnectedUser(true);
         if (
             $this->authorizationDataHelper->personCanReadMediaFile(
                 (int)$year,

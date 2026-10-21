@@ -24,14 +24,10 @@ final class EventEmailController extends AbstractController
 
     public function copyEmails(): void
     {
-        if (!$this->application->getConnectedUser()->isEventManager()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $schema = [
             'dayOfWeek' => FilterInputRule::Int->value,
             'timeOfDay' => FilterInputRule::HtmlSafeName->value,
@@ -74,14 +70,10 @@ final class EventEmailController extends AbstractController
 
     public function fetchEmails(): void
     {
-        if (!$this->application->getConnectedUser()->isEventManager()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $this->render('Event/views/getEmails.latte', $this->getAllParams([
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),

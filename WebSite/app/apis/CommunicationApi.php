@@ -44,14 +44,10 @@ final class CommunicationApi extends AbstractApi
 
     public function getMembers(): void
     {
-        if (!$this->connectedUser->isCommunicationManager()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
             $presentation = isset($data['presentation']) ? (bool)$data['presentation'] : null;
@@ -201,7 +197,7 @@ final class CommunicationApi extends AbstractApi
             try {
                 $body = $this->getJsonInput();
             } catch (JsonException $e) {
-                $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+                $this->renderJsonBadRequest("Invalid data", __FILE__, __LINE__);
                 return;
             }
             $value = trim(To::str($body['value'] ?? null));

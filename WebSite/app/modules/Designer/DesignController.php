@@ -41,14 +41,10 @@ final class DesignController extends AbstractController
 
     public function create(): void
     {
-        if (!$this->application->getConnectedUser()->isHomeDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isHomeDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $this->render('Article/views/design_create.latte', $this->getAllParams([
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'page' => $this->application->getConnectedUser()->getPage(),
@@ -57,14 +53,10 @@ final class DesignController extends AbstractController
 
     public function save(): void
     {
-        if (!$this->application->getConnectedUser()->isHomeDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isHomeDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $schema = [
             'id' => FilterInputRule::Int->value,
             'name' => FilterInputRule::HtmlSafeName->value,

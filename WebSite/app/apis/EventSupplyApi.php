@@ -34,15 +34,10 @@ final class EventSupplyApi extends AbstractApi
 
     public function participantsSupplies(): void
     {
-        $person = $this->application->getConnectedUser()->person ?? false;
-        if (!$person) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $eventId = WebApp::getFiltered(
             'eventId',
             FilterInputRule::Int->value,
@@ -53,7 +48,7 @@ final class EventSupplyApi extends AbstractApi
             return;
         }
         $eventId = (int)$eventId;
-        $userEmail = $person->Email;
+        $userEmail = $this->application->getConnectedUser(true)->person->Email;
         try {
             $this->render(
                 'Event/views/participants-supplies_partial.latte',
@@ -70,14 +65,10 @@ final class EventSupplyApi extends AbstractApi
 
     public function updateSupply(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $input = $this->getJsonInput();
             $this->validateSupplyData($input);

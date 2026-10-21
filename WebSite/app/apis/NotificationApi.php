@@ -6,10 +6,8 @@ namespace app\apis;
 
 use stdClass;
 use Throwable;
-use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\helpers\WebApp;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Notifications\valueObjects\PushSubscriptionRow;
@@ -27,20 +25,16 @@ final class NotificationApi extends AbstractApi
 
     public function registerPushSubscription(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $input = $this->getJsonInput();
         if (!isset($input['endpoint']) || !isset($input['auth']) || !isset($input['p256dh'])) {
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
-        $personId = $this->application->getConnectedUser()->person->Id;
+        $personId = $this->application->getConnectedUser(true)->person->Id;
         try {
             $existingRow = $this->dataHelper->get(
                 'PushSubscription',
@@ -77,14 +71,10 @@ final class NotificationApi extends AbstractApi
 
     public function deletePushSubscription(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $input = $this->getJsonInput();
         if (!isset($input['endpoint'])) {
             $this->renderJsonBadRequest('Endpoint manquant', __FILE__, __LINE__);

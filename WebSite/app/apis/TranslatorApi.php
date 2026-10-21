@@ -6,7 +6,6 @@ namespace app\apis;
 
 use JsonException;
 use Throwable;
-use app\enums\ApplicationError;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -28,20 +27,14 @@ final class TranslatorApi extends AbstractApi
 
     public function save(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $connectedUser = $this->application->getConnectedUser();
-        if (!($connectedUser->isTranslator())) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isTranslator(), __FILE__, __LINE__)) {
             return;
         }
 
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
-            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+            $this->renderJsonBadRequest("Invalid data", __FILE__, __LINE__);
             return;
         }
         if (
@@ -50,7 +43,7 @@ final class TranslatorApi extends AbstractApi
             !isset($data['lang']) ||
             !isset($data['value'])
         ) {
-            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+            $this->renderJsonBadRequest("Invalid data", __FILE__, __LINE__);
             return;
         }
 

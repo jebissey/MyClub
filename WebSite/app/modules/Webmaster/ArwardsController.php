@@ -20,15 +20,10 @@ final class ArwardsController extends AbstractController
 
     public function seeArwards(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if (!$this->application->getConnectedUser()->isHomeDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isHomeDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $arwardsDataHelper = new ArwardsDataHelper($this->application);
         $counterNames = $arwardsDataHelper->getCounterNames();
 
@@ -37,7 +32,7 @@ final class ArwardsController extends AbstractController
             data: $arwardsDataHelper->getData($counterNames),
             groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
             layout: $this->getLayout(),
-            navItems: $this->getNavItems($person),
+            navItems: $this->getNavItems($this->application->getConnectedUser(true)->person),
             layoutParams: $this->getAllParams([]),
         );
 

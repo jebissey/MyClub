@@ -196,15 +196,13 @@ abstract class AbstractApi
         string $file,
         int $line
     ): bool {
-        $user = $this->application->getConnectedUser();
-
-        if ($user->person === null || !$permissionCheck($user)) {
-            $this->renderJsonForbidden($file, $line);
+        if (WebApp::getRequestMethod() !== $method) {
+            $this->renderJsonMethodNotAllowed($file, $line);
             return false;
         }
 
-        if (WebApp::getRequestMethod() !== $method) {
-            $this->renderJsonMethodNotAllowed($file, $line);
+        if (!$permissionCheck($this->application->getConnectedUser())) {
+            $this->renderJsonForbidden($file, $line);
             return false;
         }
 

@@ -35,7 +35,7 @@ final class LeapfrogApi extends AbstractApi
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
-            $this->renderJsonBadRequest("Données invalides", __FILE__, __LINE__);
+            $this->renderJsonBadRequest("Invalid data", __FILE__, __LINE__);
             return;
         }
         $this->logWriterDataHelper->add((string)ApplicationError::Ok->value, To::str($data['message'] ?? ''));

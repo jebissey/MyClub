@@ -70,8 +70,7 @@ final class ArticleController extends TableController
 
     public function carousel(int $id): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -164,12 +163,7 @@ final class ArticleController extends TableController
 
     public function create(): void
     {
-        if (!$this->application->getConnectedUser()->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -183,14 +177,10 @@ final class ArticleController extends TableController
 
     public function delete(int $id): void
     {
-        if (!$this->application->getConnectedUser()->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
         if (!$article) {
             $msg = str_replace(
@@ -211,8 +201,7 @@ final class ArticleController extends TableController
 
     public function edit(int $id): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -266,14 +255,10 @@ final class ArticleController extends TableController
 
     public function fetchEmailsForArticle(int $idArticle): void
     {
-        if (!$this->application->getConnectedUser()->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $article = $this->dataHelper->get('Article', ['Id' => $idArticle], 'CreatedBy');
         if (!$article) {
             $this->raiseBadRequest("Article {$idArticle} doesn't exist", __FILE__, __LINE__);
@@ -633,14 +618,10 @@ final class ArticleController extends TableController
 
     public function showArticleCrosstab(): void
     {
-        if (!$this->application->getConnectedUser()->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $period = Period::from($this->flight->request()->query->period ?? 'month');
         $dateRange = $period->dateRange();
         $crosstabData = $this->articleCrosstabDataHelper->getItems($dateRange);
@@ -696,14 +677,10 @@ final class ArticleController extends TableController
 
     public function update(int $id): void
     {
-        if (!$this->application->getConnectedUser()->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $article = $this->articleDataHelper->getLatestArticle([$id]);
         if (!$article || ($this->application->getConnectedUser()->person->Id ?? 0) != $article->CreatedBy) {
             $this->application->getErrorManager()->raise(

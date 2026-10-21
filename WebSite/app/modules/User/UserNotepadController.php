@@ -19,15 +19,11 @@ final class UserNotepadController extends AbstractController
 
     public function editNotepad(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
+        $person = $this->application->getConnectedUser(true)->person;
         $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Notepad');
         /** @var object{Notepad: string|null}|false $row */
         $notepad = $row !== false ? ($row->Notepad ?? '') : '';
@@ -43,19 +39,14 @@ final class UserNotepadController extends AbstractController
 
     public function saveNotepad(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $schema = ['content' => FilterInputRule::Html->value];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $notepad = $input['content'] ?? '???';
-
+        $person = $this->application->getConnectedUser(true)->person;
         $this->dataHelper->set('Member', [
             'Notepad' => $notepad,
         ], ['Id' => $person->Id]);

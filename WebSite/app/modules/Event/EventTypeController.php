@@ -25,14 +25,10 @@ final class EventTypeController extends TableController
 
     public function create(): void
     {
-        if (!$this->application->getConnectedUser()->isEventDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $id = $this->dataHelper->set('EventType', ['Name' => '']);
         $this->redirect('/EventType/edit/' . $id);
     }

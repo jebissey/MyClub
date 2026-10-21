@@ -38,12 +38,7 @@ final class ArticleApi extends AbstractApi
 
     public function designVote(): void
     {
-        if (!$this->application->getConnectedUser()->isRedactor()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
         $json = file_get_contents('php://input');
@@ -75,15 +70,10 @@ final class ArticleApi extends AbstractApi
 
     public function saveOrderReply(): void
     {
-        $person = $this->application->getConnectedUser()->person ?? false;
-        if (!$person) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $json = file_get_contents('php://input');
         if ($json === false) {
             $this->renderJsonBadRequest('Corps de requête invalide', __FILE__, __LINE__);
@@ -107,6 +97,7 @@ final class ArticleApi extends AbstractApi
             $this->renderJsonError($e->getMessage(), __FILE__, __LINE__);
             return;
         }
+        $person = $this->application->getConnectedUser(true)->person;
         $this->orderReplyDataHelper->insertOrUpdate(
             To::int($person->Id),
             To::int($orderId),
@@ -117,15 +108,10 @@ final class ArticleApi extends AbstractApi
 
     public function saveSurveyReply(): void
     {
-        $person = $this->application->getConnectedUser()->person ?? false;
-        if (!$person) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $json = file_get_contents('php://input');
         if ($json === false) {
             $this->renderJsonBadRequest('Corps de requête invalide', __FILE__, __LINE__);
@@ -149,6 +135,7 @@ final class ArticleApi extends AbstractApi
             $this->renderJsonError($e->getMessage(), __FILE__, __LINE__);
             return;
         }
+        $person = $this->application->getConnectedUser(true)->person;
         $this->replyDataHelper->insertOrUpdate(
             $person->Id,
             To::int($surveyId),
@@ -159,15 +146,10 @@ final class ArticleApi extends AbstractApi
 
     public function showOrderReplyForm(int $articleId): void
     {
-        $person = $this->application->getConnectedUser()->person ?? false;
-        if ($person === false) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $orderData = $this->dataHelper->get('Order', ['IdArticle' => $articleId], 'Id, Question, Options');
         if (!$orderData) {
             $this->renderJsonBadRequest("Aucune commande trouvée pour l'article {$articleId}", __FILE__, __LINE__);
@@ -180,6 +162,7 @@ final class ArticleApi extends AbstractApi
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("JSON error: " . json_last_error_msg());
             }
+            $person = $this->application->getConnectedUser(true)->person;
             $previousReplyData = $this->dataHelper->get('OrderReply', ['IdOrder' => $order->Id, 'IdPerson' => $person->Id], 'Answers');
             $previousAnswers = null;
             if ($previousReplyData) {
@@ -201,15 +184,10 @@ final class ArticleApi extends AbstractApi
 
     public function showSurveyReplyForm(int $articleId): void
     {
-        $person = $this->application->getConnectedUser()->person ?? false;
-        if ($person === false) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $surveyData = $this->dataHelper->get('Survey', ['IdArticle' => $articleId], 'Id, Question, Options');
         if (!$surveyData) {
             $this->renderJsonBadRequest("Aucun sondage trouvé pour l'article {$articleId}", __FILE__, __LINE__);
@@ -222,6 +200,7 @@ final class ArticleApi extends AbstractApi
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("JSON error: " . json_last_error_msg());
             }
+            $person = $this->application->getConnectedUser(true)->person;
             $previousReplyData = $this->dataHelper->get('Reply', ['IdSurvey' => $survey->Id, 'IdPerson' => $person->Id], 'Answers');
             $previousAnswers = null;
             if ($previousReplyData) {

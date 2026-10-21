@@ -21,15 +21,11 @@ final class UserPreferencesController extends AbstractController
 
     public function preferences(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
+        $person = $this->application->getConnectedUser(true)->person;
         $eventTypes = $this->eventTypeDataHelper->getsFor($person->Id);
         $eventTypesWithAttributes = [];
         $attributeDataHelper = new AttributeDataHelper($this->application);
@@ -55,20 +51,16 @@ final class UserPreferencesController extends AbstractController
 
     public function preferencesSave(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $preferences = WebApp::getFiltered(
             'preferences',
             FilterInputRule::CheckboxMatrix->value,
             $this->flight->request()->data->getData()
         ) ?? '';
+        $person = $this->application->getConnectedUser(true)->person;
         $this->dataHelper->set('Member', ['Preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
         $this->redirect('/user');
     }

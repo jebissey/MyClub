@@ -61,12 +61,7 @@ final class MessageApi extends AbstractApi
 
     public function addMessage(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -100,7 +95,7 @@ final class MessageApi extends AbstractApi
                 $articleId,
                 $eventId,
                 $groupId,
-                $this->application->getConnectedUser()->person->Id,
+                $this->application->getConnectedUser(true)->person->Id,
                 To::str($data['text']),
                 $imagePath !== null ? WebApp::getBaseUrl() . $imagePath : null,
             );
@@ -122,17 +117,13 @@ final class MessageApi extends AbstractApi
 
     public function deleteMessage(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->doDeleteMessage(To::int($data['messageId']), $this->application->getConnectedUser()->person->Id);
+            $apiResponse = $this->doDeleteMessage(To::int($data['messageId']), $this->application->getConnectedUser(true)->person->Id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
@@ -141,13 +132,7 @@ final class MessageApi extends AbstractApi
 
     public function deleteMessageImage(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -185,14 +170,10 @@ final class MessageApi extends AbstractApi
 
     public function updateMessage(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $data = $this->getJsonInput();
         if (!isset($data['messageId']) || !isset($data['text'])) {
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
@@ -207,7 +188,7 @@ final class MessageApi extends AbstractApi
             $data = $this->getJsonInput();
             $apiResponse = $this->doUpdateMessage(
                 To::int($data['messageId']),
-                $this->application->getConnectedUser()->person->Id,
+                $this->application->getConnectedUser(true)->person->Id,
                 To::str($data['text'])
             );
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);

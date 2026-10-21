@@ -24,15 +24,11 @@ final class UserGroupsController extends AbstractController
 
     public function groups(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
+        $person = $this->application->getConnectedUser(true)->person;
         $currentGroups = $this->groupDataHelper->getCurrentGroups($person->Id);
 
         $viewModel = new UserGroupsViewModel(
@@ -47,15 +43,12 @@ final class UserGroupsController extends AbstractController
 
     public function groupsSave(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
+        $person = $this->application->getConnectedUser(true)->person;
+
         /** @var array<int, int> $groups */
         $groups = WebApp::getFiltered(
             'groups',

@@ -25,14 +25,10 @@ final class GroupApi extends AbstractApi
 
     public function addToGroup(int $personId, int $groupId): void
     {
-        if (!($this->application->getConnectedUser()->isGroupManager())) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         if ($groupId === 1) {
             $this->renderJsonBadRequest('group 1 is locked', __FILE__, __LINE__);
             return;
@@ -59,14 +55,10 @@ final class GroupApi extends AbstractApi
 
     public function getPersonsInGroup(?int $id): void
     {
-        if (!($this->application->getConnectedUser()->person ?? false)) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $this->renderJsonOk(['items' => $this->personDataHelper->getPersonsInGroup($id)]);
         } catch (Throwable $e) {
@@ -76,6 +68,10 @@ final class GroupApi extends AbstractApi
 
     public function removeFromGroup(int $personId, int $groupId): void
     {
+        if ($groupId === 1) {
+            $this->renderJsonBadRequest('group 1 is locked', __FILE__, __LINE__);
+            return;
+        }
         if (
             !($this->application->getConnectedUser()->isPersonManager()
                 || $this->application->getConnectedUser()->isWebmaster())
@@ -83,10 +79,7 @@ final class GroupApi extends AbstractApi
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
-        if ($groupId === 1) {
-            $this->renderJsonBadRequest('group 1 is locked', __FILE__, __LINE__);
-            return;
-        }
+
         if (WebApp::getRequestMethod() !== 'POST') {
             $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
             return;

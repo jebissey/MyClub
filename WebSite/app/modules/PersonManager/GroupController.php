@@ -183,14 +183,10 @@ final class GroupController extends AbstractController
 
     public function showGroupChat(int $groupId): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $group = $this->dataHelper->get('Group', ['Id' => $groupId], 'Id, Name');
         if (!$group) {
             $this->raiseBadRequest("Le groupe {$groupId} n'existe pas", __FILE__, __LINE__);

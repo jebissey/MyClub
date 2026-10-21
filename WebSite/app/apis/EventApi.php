@@ -15,7 +15,6 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\modules\Event\services\AuthorizationService;
 use app\modules\Common\interfaces\EventServiceInterface;
 use app\models\AlertRecipientDataHelper;
 use app\models\EventDataHelper;

@@ -36,15 +36,10 @@ final class UserConnectionsController extends AbstractController
 
     public function showConnections(int $idPerson): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $individual = $this->dataHelper->get(
             'Individual',
             ['Id' => $idPerson],

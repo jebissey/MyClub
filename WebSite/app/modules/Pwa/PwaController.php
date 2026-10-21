@@ -64,15 +64,7 @@ final class PwaController extends AbstractController
 
     public function handleShare(): void
     {
-        $user = $this->application->getConnectedUser();
-
-        if (!$user->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -97,7 +89,7 @@ final class PwaController extends AbstractController
              */
             $files = $_FILES['files'];
         }
-
+        $user = $this->application->getConnectedUser();
         $articleId = $this->articleService->createWithMedia(
             $user->person->Id ?? 0,
             $files,

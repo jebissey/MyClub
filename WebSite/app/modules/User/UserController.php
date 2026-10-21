@@ -29,8 +29,7 @@ final class UserController extends AbstractController
 
     public function forgotPassword(string $encodedEmail): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -114,14 +113,10 @@ final class UserController extends AbstractController
 
     public function signOut(): void
     {
-        if ($this->application->getConnectedUser()->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $userEmailRaw = $_SESSION['user'] ?? '';
         $userEmail = is_string($userEmailRaw) ? $userEmailRaw : '';
         $this->authService->signOut();

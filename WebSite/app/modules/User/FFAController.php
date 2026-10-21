@@ -20,17 +20,12 @@ final class FFAController extends AbstractController
 
     public function searchMember(): void
     {
-        $connectedUser = $this->application->getConnectedUser();
-        $person = $connectedUser->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 
+        $connectedUser = $this->application->getConnectedUser();
+        $person = $connectedUser->person;
         $schema = [
             'firstName' => FilterInputRule::PersonName->value,
             'lastName'  => FilterInputRule::PersonName->value,

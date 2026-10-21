@@ -6,11 +6,9 @@ namespace app\apis;
 
 use JsonException;
 use Throwable;
-use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\helpers\WebApp;
 use app\models\KanbanDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
@@ -30,14 +28,10 @@ final class KanbanApi extends AbstractApi
     #region Card
     public function createCard(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
@@ -74,14 +68,10 @@ final class KanbanApi extends AbstractApi
 
     public function deleteCard(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
@@ -111,14 +101,10 @@ final class KanbanApi extends AbstractApi
 
     public function getHistory(int $id): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         $this->renderJsonOk([
             'history' => $this->kanbanDataHelper->getKanbanHistory($id)
         ]);
@@ -126,12 +112,7 @@ final class KanbanApi extends AbstractApi
 
     public function moveCard(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -163,12 +144,7 @@ final class KanbanApi extends AbstractApi
 
     public function updateCard(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -210,12 +186,7 @@ final class KanbanApi extends AbstractApi
 
     public function updateCardStatus(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -252,14 +223,10 @@ final class KanbanApi extends AbstractApi
     #region Project
     public function createProject(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
@@ -293,14 +260,10 @@ final class KanbanApi extends AbstractApi
 
     public function deleteProject(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
@@ -330,12 +293,7 @@ final class KanbanApi extends AbstractApi
 
     public function getProject(int $id): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -357,14 +315,10 @@ final class KanbanApi extends AbstractApi
 
     public function updateProject(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
@@ -401,14 +355,10 @@ final class KanbanApi extends AbstractApi
     #region CardType
     public function createCardType(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
@@ -447,14 +397,10 @@ final class KanbanApi extends AbstractApi
 
     public function deleteCardType(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {
@@ -486,14 +432,10 @@ final class KanbanApi extends AbstractApi
 
     public function getProjectCards(int $id): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $query = $this->application->getFlight()->request()->query;
             $ct = filter_var($query['ct'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
@@ -511,12 +453,7 @@ final class KanbanApi extends AbstractApi
 
     public function getProjectCardTypes(int $id): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -533,14 +470,10 @@ final class KanbanApi extends AbstractApi
 
     public function updateCardType(): void
     {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isKanbanDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (!$this->connectedUser->isKanbanDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
         } catch (JsonException $e) {

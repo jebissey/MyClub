@@ -30,14 +30,10 @@ final class SurveyController extends AbstractController
 
     public function add(int $articleId): void
     {
-        if (!$this->application->getConnectedUser()->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $articleData = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id');
         if (!$articleData) {
             $this->redirect('/articles');
@@ -102,8 +98,7 @@ final class SurveyController extends AbstractController
 
     public function viewResults(int $articleId): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
 

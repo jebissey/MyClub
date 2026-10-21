@@ -9,7 +9,6 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\helpers\WebApp;
 use app\models\Data;
 use app\models\LanguagesDataHelper;
 use app\models\MenuItemDataHelper;
@@ -29,14 +28,10 @@ final class MenuItemApi extends AbstractApi
 
     public function deleteItem(int $id): void
     {
-        if (!$this->application->getConnectedUser()->isMenuDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $result = $this->menuItemDataHelper->del($id);
             $this->renderJson([], $result >= 1, ApplicationError::Ok->value);
@@ -47,18 +42,10 @@ final class MenuItemApi extends AbstractApi
 
     public function getMenuItem(int $id): void
     {
-        if (!$this->application->getConnectedUser()->isMenuDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJson(
-                ['message' => 'Not allowed method: ' . WebApp::getRequestMethod() . ' in file ' . __FILE__ . ' at line ' . __LINE__],
-                false,
-                ApplicationError::MethodNotAllowed->value
-            );
-            return;
-        }
+
         try {
             $this->renderJsonOk(['item' => $this->dataHelper->get(
                 'MenuItem',
@@ -72,14 +59,10 @@ final class MenuItemApi extends AbstractApi
 
     public function saveMenuItem(): void
     {
-        if (!$this->application->getConnectedUser()->isMenuDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
             if (!Data::requireFields($data, ['what', 'type', 'label', 'url', 'forMembers', 'forContacts', 'forAnonymous'])) {
@@ -131,14 +114,10 @@ final class MenuItemApi extends AbstractApi
 
     public function updatePositions(): void
     {
-        if (!$this->application->getConnectedUser()->isMenuDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $data = $this->getJsonInput();
             if (!isset($data['positions']) || !is_array($data['positions'])) {

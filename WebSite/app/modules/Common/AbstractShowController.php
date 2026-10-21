@@ -32,7 +32,7 @@ abstract class AbstractShowController extends AbstractController
     {
         $searchMode = To::str(WebApp::getFiltered(
             'from',
-            $this->application->enumToValues(\app\enums\Period::class),
+            $this->application->enumToValues(Period::class),
             $this->flight->request()->query->getData()
         ) ?: Period::Signout->value);
 

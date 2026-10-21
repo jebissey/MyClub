@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use DateTimeImmutable;
+use Exception;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
@@ -36,35 +39,38 @@ final class EventAvailabilitiesApi extends AbstractApi
 
     public function getSlotEvents(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
-            return;
-        }
+        $schema = [
+            'day'       => FilterInputRule::Int->value,
+            'slot'      => ['morning', 'afternoon', 'evening'],
+            'range'     => array_keys(self::RANGE_MODIFIERS),
+            'startDate' => FilterInputRule::DateTime->value,
+        ];
+        $input = WebApp::filterInput($schema, $this->application->getFlight()->request()->query->getData());
 
-        $day  = To::int($_GET['day'] ?? null);
-        $slot = $_GET['slot'] ?? null;
+        $day  = To::int($input['day']);
+        $slot = $input['slot'];
 
-        if ($day < 0 || $day > 6 || !in_array($slot, ['morning', 'afternoon', 'evening'], true)) {
+        if ($input['day'] === null || $day < 0 || $day > 6 || !is_string($slot)) {
             $this->renderJsonBadRequest('', __FILE__, __LINE__);
             return;
         }
 
-        $rangeParam = $_GET['range'] ?? null;
-        $rangeKey   = is_string($rangeParam) && isset(self::RANGE_MODIFIERS[$rangeParam]) ? $rangeParam : '6m';
+        $rangeKey = is_string($input['range']) ? $input['range'] : '6m';
+        $modifier = self::RANGE_MODIFIERS[$rangeKey];
 
-        $startParam = $_GET['startDate'] ?? null;
+        $startParam = $input['startDate'];
         try {
-            $start = (is_string($startParam) && $startParam !== '')
-                ? new \DateTimeImmutable($startParam)
-                : (new \DateTimeImmutable())->modify('-' . self::RANGE_MODIFIERS[$rangeKey]);
-        } catch (\Exception) {
-            $start = (new \DateTimeImmutable())->modify('-' . self::RANGE_MODIFIERS[$rangeKey]);
+            $start = is_string($startParam)
+                ? new DateTimeImmutable($startParam)
+                : (new DateTimeImmutable())->modify('-' . $modifier);
+        } catch (Exception) {
+            $start = (new DateTimeImmutable())->modify('-' . $modifier);
         }
-        $end = $start->modify('+' . self::RANGE_MODIFIERS[$rangeKey]);
+        $end = $start->modify('+' . $modifier);
 
         $events = $this->availabilityDataHelper->getEventsForSlot($start, $end, $day, $slot);
 

@@ -22,12 +22,11 @@ final class MakeTheTargetController extends TableController
 
     public function play(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
 
-        $connectedUser = $this->application->getConnectedUser();
+        $connectedUser = $this->application->getConnectedUser(true);
         $gameId = bin2hex(random_bytes(8));
 
         $i18n = [
@@ -72,8 +71,7 @@ final class MakeTheTargetController extends TableController
 
     public function statistics(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
 

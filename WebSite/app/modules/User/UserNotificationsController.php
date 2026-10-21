@@ -26,16 +26,11 @@ final class UserNotificationsController extends AbstractController
 
     public function notifications(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 
+        $person = $this->application->getConnectedUser(true)->person;
         $notification = '';
         if (isset($_GET['test'])) {
             $this->notificationSender->sendToRecipients(
@@ -72,15 +67,10 @@ final class UserNotificationsController extends AbstractController
 
     public function notificationsSave(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $notifications = WebApp::getFiltered(
             'notifications',
             FilterInputRule::CheckboxMatrix->value,
@@ -93,6 +83,7 @@ final class UserNotificationsController extends AbstractController
             $notifications['messageOnGroupSubscribed'],
             $notifications['messageOnGroupJoined']
         );
+        $person = $this->application->getConnectedUser(true)->person;
         $this->dataHelper->set('Member', ['Notifications' => json_encode($notifications)], ['Id' => $person->Id]);
         $this->redirect('/user');
     }

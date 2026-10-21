@@ -226,14 +226,10 @@ final class WebappSettingsController extends AbstractController
 
     public function saveLanguage(): void
     {
-        if (!$this->application->getConnectedUser()->isHomeDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isHomeDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $schema = [
             'lang'         => FilterInputRule::String->value,
             'use_language' => FilterInputRule::String->value,

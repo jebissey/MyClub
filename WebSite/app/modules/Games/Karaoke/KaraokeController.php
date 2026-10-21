@@ -20,10 +20,10 @@ final class KaraokeController extends AbstractController
 
     public function play(string $song): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
+
         try {
             $parser = new LyricsParser();
             $parser->parse(self::MEDIA_PATH . "{$song}.lrc");
@@ -54,8 +54,7 @@ final class KaraokeController extends AbstractController
 
     public function files(string $name): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
 

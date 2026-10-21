@@ -31,14 +31,10 @@ final class EventNeedTypeApi extends AbstractApi
 
     public function deleteNeedType(int $id): void
     {
-        if (!$this->application->getConnectedUser()->isEventDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $apiResponse = $this->doDeleteNeedType($id);
             $this->renderJson([], $apiResponse->success, $apiResponse->responseCode);
@@ -49,14 +45,10 @@ final class EventNeedTypeApi extends AbstractApi
 
     public function saveNeedType(): void
     {
-        if (!$this->application->getConnectedUser()->isEventDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $data = $this->getJsonInput();
         $name = To::str($data['name'] ?? null);
         if ($name === '') {

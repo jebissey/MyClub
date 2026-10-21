@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use Throwable;
-use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
@@ -28,14 +27,10 @@ final class EventAttributeApi extends AbstractApi
 
     public function createAttribute(): void
     {
-        if (!$this->application->getConnectedUser()->isEventDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $raw = $this->getJsonInput();
 
@@ -55,14 +50,10 @@ final class EventAttributeApi extends AbstractApi
 
     public function deleteAttribute(int $id): void
     {
-        if (!$this->application->getConnectedUser()->isEventDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             [$response, $statusCode] = $this->attributeDataHelper->deleteAttribute($id);
             $this->renderJson($response, true, $statusCode);
@@ -73,10 +64,10 @@ final class EventAttributeApi extends AbstractApi
 
     public function getAttributes(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
+
         try {
             $this->render(
                 'Event/views/attributes-list_partial.latte',
@@ -90,10 +81,10 @@ final class EventAttributeApi extends AbstractApi
 
     public function getAttributesByEventType(int $eventTypeId): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
+
         if ($this->dataHelper->get('EventType', ['Id' => $eventTypeId], 'Id') === false) {
             $this->renderJsonBadRequest("Unknown event type {$eventTypeId}", __FILE__, __LINE__);
             return;
@@ -107,14 +98,10 @@ final class EventAttributeApi extends AbstractApi
 
     public function updateAttribute(): void
     {
-        if (!$this->application->getConnectedUser()->isEventDesigner()) {
-            $this->renderJsonForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         try {
             $raw = $this->getJsonInput();
 

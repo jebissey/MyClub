@@ -32,13 +32,7 @@ final class UserDirectoryController extends AbstractController
 
     public function showDirectory(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -65,6 +59,7 @@ final class UserDirectoryController extends AbstractController
             );
         }
 
+        $person = $this->application->getConnectedUser(true)->person;
         $loggedPersonRow = $this->dataHelper->get(
             'Member',
             ['Id' => $person->Id],
@@ -108,18 +103,13 @@ final class UserDirectoryController extends AbstractController
 
     public function showMap(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
 
         $rows = $this->memberDirectoryDataHelper->getLocatedMembers();
         $locationData = $this->memberMapService->getLocationData($rows);
+        $person = $this->application->getConnectedUser()->person;
 
         $viewModel = new UsersMapViewModel(
             locationData: $locationData,
@@ -136,10 +126,7 @@ final class UserDirectoryController extends AbstractController
 
     public function showPublicMap(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
 
@@ -149,7 +136,7 @@ final class UserDirectoryController extends AbstractController
         $viewModel = new UsersMapViewModel(
             locationData: $locationData,
             membersCount: count($locationData),
-            navItems: $this->getNavItems($person),
+            navItems: $this->getNavItems($this->application->getConnectedUser(true)->person),
             title: 'Carte des membres publics',
             isPublic: true,
             maxZoom: 11,

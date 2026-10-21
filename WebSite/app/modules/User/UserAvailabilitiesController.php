@@ -19,15 +19,11 @@ final class UserAvailabilitiesController extends AbstractController
 
     public function availabilities(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
+        $person = $this->application->getConnectedUser(true)->person;
         $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Availabilities');
         /** @var object{Availabilities: string|null}|false $row */
         $availabilitiesJson = $row !== false ? ($row->Availabilities ?? '') : '';
@@ -46,20 +42,16 @@ final class UserAvailabilitiesController extends AbstractController
 
     public function availabilitiesSave(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
         $availabilities = WebApp::getFiltered(
             'availabilities',
             FilterInputRule::CheckboxMatrix->value,
             $this->flight->request()->data->getData()
         ) ?? '';
+        $person = $this->application->getConnectedUser(true)->person;
         if ($availabilities != '') {
             $this->dataHelper->set('Member', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
         }

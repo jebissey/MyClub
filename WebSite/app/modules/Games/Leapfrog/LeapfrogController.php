@@ -21,11 +21,11 @@ final class LeapfrogController extends TableController
 
     public function play(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
-        $connectedUser = $this->application->getConnectedUser();
+
+        $connectedUser = $this->application->getConnectedUser(true);
         $positions = [
             ['type' => 'bergerie', 'id' => 1],
             ['type' => 'bergerie', 'id' => 2],

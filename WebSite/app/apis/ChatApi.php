@@ -37,10 +37,10 @@ final class ChatApi extends AbstractApi
 
     public function getActiveUsers(): void
     {
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
+
         $previousLogId = To::int($_SESSION['last_log_id'] ?? null);
         $minutes = To::int($_GET['m'] ?? null, self::ACTIVE_WINDOW_MINUTES);
 

@@ -17,12 +17,12 @@ final class GameManagerController extends AbstractController
 
     public function help(): void
     {
-        $this->renderHelp('Help_Game', fn($u) => $u->isAdministrator(), __FILE__, __LINE__);
+        $this->renderHelp('Help_Game', fn($u) => $u->isAnybody(), __FILE__, __LINE__);
     }
 
     public function games(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator(), __FILE__, __LINE__)) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
         $_SESSION['navbar'] = 'games';

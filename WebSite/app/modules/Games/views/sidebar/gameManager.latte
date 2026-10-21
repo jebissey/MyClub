@@ -45,15 +45,6 @@
                 </ul>
             </li>
 
-            {* Memory games *}
-            <li class="nav-item">
-                <a class="nav-link {if ($category ?? '') === 'memory'}active{/if}"
-                   href="/gameManager/memory">
-                    <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-                    {='gameManager.sidebar.memory'|translate}
-                </a>
-            </li>
-
             {* Other games *}
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center {if ($category ?? '') === 'other'}active{/if}"

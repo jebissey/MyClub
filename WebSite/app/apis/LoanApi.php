@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace app\apis;
 
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
+use app\helpers\WebApp;
 use app\models\LanguagesDataHelper;
 use app\models\LoanDataHelper;
 use app\models\PersonDataHelper;
@@ -75,8 +77,15 @@ final class LoanApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
             $this->loanDataHelper->updateOverdueLoans();
-            $status = To::str($_GET['status'] ?? '');
-            $this->renderJsonOk($this->loanDataHelper->getAllLoans($status));
+
+            $status = WebApp::getFiltered(
+                'status',
+                FilterInputRule::String->value,
+                $this->application->getFlight()->request()->query->getData()
+            );
+
+            // Missing or invalid status means "no filter"
+            $this->renderJsonOk($this->loanDataHelper->getAllLoans(is_string($status) ? $status : ''));
         }
     }
 
@@ -152,14 +161,14 @@ final class LoanApi extends AbstractApi
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // RÉSERVATIONS – tout utilisateur connecté
+    // RESERVATIONS – any connected user
     // ══════════════════════════════════════════════════════════════════════════
 
     public function getReservations(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoan(), __FILE__, __LINE__)) {
             $user = $this->application->getConnectedUser();
-            // Un manager voit tout, un utilisateur ne voit que les siennes
+            // A manager sees everything, a regular user only sees their own
             $userId = $user->isLoanManager() ? 0 : $user->person->Id ?? 0;
             $this->renderJsonOk($this->loanDataHelper->getAllReservations($userId));
         }
@@ -189,13 +198,13 @@ final class LoanApi extends AbstractApi
                 }
             }
 
-            // Force l'utilisateur courant pour une réservation standard
+            // Force the current user for a standard reservation
             $user = $this->application->getConnectedUser();
             if (!$user->isLoanManager()) {
                 $data['userId'] = $user->person->Id ?? 0;
             }
 
-            // Contrôle disponibilité
+            // Availability check
             $available = $this->loanDataHelper->getAvailableQtyForReservation(
                 To::int($data['itemId']),
                 To::str($data['reservationDate']),
@@ -233,33 +242,47 @@ final class LoanApi extends AbstractApi
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // CALENDRIER & DISPONIBILITÉ
+    // CALENDAR & AVAILABILITY
     // ══════════════════════════════════════════════════════════════════════════
 
     public function getCalendarEvents(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
-            $start = To::str($_GET['start'] ?? date('Y-m-01'));
-            $end   = To::str($_GET['end']   ?? date('Y-m-t'));
-            $this->renderJsonOk(
-                $this->loanDataHelper->getCalendarEvents($start, $end)
-            );
+            $schema = [
+                'start' => FilterInputRule::DateTime->value,
+                'end'   => FilterInputRule::DateTime->value,
+            ];
+            $input = WebApp::filterInput($schema, $this->application->getFlight()->request()->query->getData());
+
+            $start = is_string($input['start']) ? $input['start'] : date('Y-m-01');
+            $end   = is_string($input['end']) ? $input['end'] : date('Y-m-t');
+
+            $this->renderJsonOk($this->loanDataHelper->getCalendarEvents($start, $end));
         }
     }
 
     public function getAvailability(int $itemId): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
-            $type  = To::str($_GET['type'] ?? 'loan');
-            $date  = To::str($_GET['date'] ?? date('Y-m-d'));
-            $start = To::str($_GET['start'] ?? '00:00');
-            $end   = To::str($_GET['end']   ?? '23:59');
+            $schema = [
+                'type'    => ['loan', 'reservation'],
+                'date'    => FilterInputRule::DateTime->value,
+                'start'   => FilterInputRule::DateTime->value,
+                'end'     => FilterInputRule::DateTime->value,
+                'dueDate' => FilterInputRule::DateTime->value,
+            ];
+            $input = WebApp::filterInput($schema, $this->application->getFlight()->request()->query->getData());
+
+            $type  = is_string($input['type']) ? $input['type'] : 'loan';
+            $date  = is_string($input['date']) ? $input['date'] : date('Y-m-d');
+            $start = is_string($input['start']) ? $input['start'] : '00:00';
+            $end   = is_string($input['end']) ? $input['end'] : '23:59';
 
             if ($type === 'loan') {
-                $due  = To::str($_GET['dueDate'] ?? $date);
-                $qty  = $this->loanDataHelper->getAvailableQtyForLoan($itemId, $date, $due);
+                $due = is_string($input['dueDate']) ? $input['dueDate'] : $date;
+                $qty = $this->loanDataHelper->getAvailableQtyForLoan($itemId, $date, $due);
             } else {
-                $qty  = $this->loanDataHelper->getAvailableQtyForReservation($itemId, $date, $start, $end);
+                $qty = $this->loanDataHelper->getAvailableQtyForReservation($itemId, $date, $start, $end);
             }
             $this->renderJsonOk(['available' => $qty]);
         }

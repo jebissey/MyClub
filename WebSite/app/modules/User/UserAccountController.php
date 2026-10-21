@@ -20,17 +20,11 @@ final class UserAccountController extends AbstractController
 
     public function account(): void
     {
-        $connectedUser = $this->application->getConnectedUser();
-        if ($connectedUser->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $person = $connectedUser->person;
 
+        $person = $this->application->getConnectedUser(true)->person;
         $imported = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Imported');
         $readOnly = $imported !== false && (bool)($imported->Imported ?? false);
 
@@ -64,15 +58,11 @@ final class UserAccountController extends AbstractController
 
     public function accountSave(): void
     {
-        $person = $this->application->getConnectedUser()->person;
-        if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
+
+        $person = $this->application->getConnectedUser(true)->person;
         $imported = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Imported');
         $isImported = $imported !== false && (bool)($imported->Imported ?? false);
 
