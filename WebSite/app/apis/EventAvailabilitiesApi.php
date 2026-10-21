@@ -7,6 +7,7 @@ namespace app\apis;
 use DateTimeImmutable;
 use Exception;
 use app\enums\FilterInputRule;
+use app\enums\TimeOfDay;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
@@ -45,7 +46,7 @@ final class EventAvailabilitiesApi extends AbstractApi
 
         $schema = [
             'day'       => FilterInputRule::Int->value,
-            'slot'      => ['morning', 'afternoon', 'evening'],
+            'slot'      => [TimeOfDay::Morning->value, TimeOfDay::Afternoon->value, TimeOfDay::Evening->value],
             'range'     => array_keys(self::RANGE_MODIFIERS),
             'startDate' => FilterInputRule::DateTime->value,
         ];

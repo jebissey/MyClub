@@ -288,6 +288,21 @@ final class TestExecutor
     {
         $dbId = $this->intValue($test['Id'] ?? null);
         $requestPath = $this->stringValue($test['Uri'] ?? null) ?? $route->path;
+        $getParams = $this->decodeJsonValue($test['JsonGetParameters'] ?? null);
+        if (is_array($getParams) && $getParams !== []) {
+            $query = http_build_query($getParams);
+            if ($query !== '') {
+                $fragmentPosition = strpos($requestPath, '#');
+                $path = $fragmentPosition === false
+                    ? $requestPath
+                    : substr($requestPath, 0, $fragmentPosition);
+                $fragment = $fragmentPosition === false
+                    ? ''
+                    : substr($requestPath, $fragmentPosition);
+                $separator = str_contains($path, '?') ? '&' : '?';
+                $requestPath = $path . $separator . $query . $fragment;
+            }
+        }
 
         $this->http->clearSession();
 

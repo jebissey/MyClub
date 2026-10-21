@@ -25,7 +25,7 @@ final class EventTypeController extends TableController
 
     public function create(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
