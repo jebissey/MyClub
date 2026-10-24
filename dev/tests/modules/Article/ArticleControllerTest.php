@@ -36,13 +36,17 @@ class ArticleControllerTest extends DataHelperTestCase
         ]);
 
         $this->assertColumnsExist($pdo, 'Survey', [
+            'Id',
             'IdArticle',
             'ClosingDate',
+            'Visibility',
         ]);
 
         $this->assertColumnsExist($pdo, 'Order', [
+            'Id',
             'IdArticle',
             'ClosingDate',
+            'Visibility',
         ]);
 
         $this->assertColumnsExist($pdo, 'Individual', [
@@ -56,8 +60,8 @@ class ArticleControllerTest extends DataHelperTestCase
             'ArticleId',
         ]);
 
-        // help() sélectionne dynamiquement la colonne de langue courante
-        // (ex. fr_FR, en_US, pl_PL) via $this->dataHelper->get('Languages', ..., $lang)
+        // help() dynamically selects the current language column
+        // (e.g. fr_FR, en_US, pl_PL) via $this->dataHelper->get('Languages', ..., $lang)
         $this->assertColumnsExist($pdo, 'Languages', [
             'Name',
             'fr_FR',

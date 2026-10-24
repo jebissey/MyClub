@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use DateTime;
 use PDO;
 use app\enums\EventAudience;
-use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\models\interfaces\AuthorizationDataHelperInterface;
+use app\helpers\To;
+use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
-use app\modules\Article\valueObjects\ArticleRow;
-use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 /**
  * @phpstan-import-type ArticleAuthorizationRowShape from ArticleAuthorizationRow
- * @phpstan-import-type ArticleRowShape from ArticleRow
- * @phpstan-import-type ClosingVisibilityRowShape from ClosingVisibilityRow
  */
-final class AuthorizationDataHelper extends Data implements AuthorizationDataHelperInterface
+final class AuthorizationDataHelper extends Data
 {
+    /** @var array<string, list<int>> Memoized per request, keyed by lower-cased email */
+    private array $userGroupsCache = [];
+
+    private ?ArticleAuthorizationService $articlePolicy = null;
+
     public function __construct(Application $application)
     {
         parent::__construct(
@@ -52,6 +52,11 @@ final class AuthorizationDataHelper extends Data implements AuthorizationDataHel
     }
 
     /**
+     * Whether the person can see a media file, through the article, carousel or message that uses it.
+     *
+     * The article rule is NOT duplicated here: it is delegated to ArticleAuthorizationService,
+     * so a media is protected exactly like the article that contains it.
+     *
      * @param array<int, object{Url?: string}> $navItems
      */
     public function personCanReadMediaFile(int $year, int $month, string $filename, ConnectedUser $connectedUser, array $navItems): bool
@@ -112,124 +117,62 @@ final class AuthorizationDataHelper extends Data implements AuthorizationDataHel
         return false;
     }
 
-
-    public function canPersonReadOrderResults(ArticleAuthorizationRow $article, ConnectedUser $connectedUser): bool
+    public function hasRepliedToSurvey(int $surveyId, int $personId): bool
     {
-        $row = $this->get('Order', ['IdArticle' => $article->Id], 'ClosingDate, Visibility, Id');
-        if (!$row || !($connectedUser->person ?? false)) {
-            return false;
-        }
-        /** @var ClosingVisibilityRowShape $row */
-        $order = ClosingVisibilityRow::fromStdClass($row);
-        $now = (new DateTime())->format('Y-m-d');
-        $closingDate = $order->ClosingDate;
-        if (
-            $article->CreatedBy === $connectedUser->person->Id
-            || $order->Visibility === 'all'
-            || ($order->Visibility === 'allAfterClosing' && $closingDate < $now)
-        ) {
-            return true;
-        }
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM OrderReply WHERE IdOrder = ? AND IdPerson = ?');
-        $stmt->execute([$order->Id, $connectedUser->person->Id]);
-        $hasOrdered = $stmt->fetchColumn() > 0;
-        if ($hasOrdered && ($order->Visibility === 'orderers' || ($order->Visibility === 'orderersAfterClosing' && $closingDate < $now))) {
-            return true;
-        }
-        return false;
+        $stmt = $this->pdo->prepare('SELECT 1 FROM Reply WHERE IdSurvey = ? AND IdPerson = ? LIMIT 1');
+        $stmt->execute([$surveyId, $personId]);
+
+        return $stmt->fetchColumn() !== false;
     }
 
-
-    public function canPersonReadSurveyResults(ArticleAuthorizationRow $article, ConnectedUser $connectedUser): bool
+    public function hasRepliedToOrder(int $orderId, int $personId): bool
     {
-        $row = $this->get('Survey', ['IdArticle' => $article->Id], 'ClosingDate, Visibility, Id');
-        if (!$row || !($connectedUser->person ?? false)) {
-            return false;
-        }
-        /** @var ClosingVisibilityRowShape $row */
-        $survey = ClosingVisibilityRow::fromStdClass($row);
-        $now = (new DateTime())->format('Y-m-d');
-        $closingDate = $survey->ClosingDate;
-        if (
-            $article->CreatedBy === $connectedUser->person->Id
-            || $survey->Visibility === 'all'
-            || ($survey->Visibility === 'allAfterClosing' && $closingDate < $now)
-        ) {
-            return true;
-        }
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Reply WHERE IdSurvey = ? AND IdPerson = ?');
-        $stmt->execute([$survey->Id, $connectedUser->person->Id]);
-        $hasVoted = $stmt->fetchColumn() > 0;
-        if ($hasVoted && ($survey->Visibility === 'voters' || ($survey->Visibility === 'votersAfterClosing' && $closingDate < $now))) {
-            return true;
-        }
-        return false;
+        $stmt = $this->pdo->prepare('SELECT 1 FROM OrderReply WHERE IdOrder = ? AND IdPerson = ? LIMIT 1');
+        $stmt->execute([$orderId, $personId]);
+
+        return $stmt->fetchColumn() !== false;
     }
-
-
-    public function getArticle(int $id, ConnectedUser $connectedUser): ArticleAuthorizationRow|false
-    {
-        $row = $this->get(
-            'Article',
-            ['Id' => $id],
-            'Id, CreatedBy, PublishedBy, OnlyForMembers, IdGroup, Title, Content, LastUpdate, Timestamp'
-        );
-        if ($row === false) {
-            throw new QueryException("Article {$id} doesn't exist");
-        }
-        /** @var ArticleRowShape $row */
-        $article = ArticleAuthorizationRow::fromArticleRow(ArticleRow::fromStdClass($row));
-        if (!$this->canReadArticle($article, $connectedUser)) {
-            return false;
-        }
-        return $article;
-    }
-
 
     /**
-     * @return array<int, int>
+     * @return list<int>
      */
     public function getUserGroups(string $userEmail): array
     {
-        $sql = '
-            SELECT MemberGroup.IdGroup AS IdGroup
+        // SQLite NOCASE only folds ASCII, strtolower() does the same
+        $key = strtolower($userEmail);
+        if (isset($this->userGroupsCache[$key])) {
+            return $this->userGroupsCache[$key];
+        }
+
+        $stmt = $this->pdo->prepare('
+            SELECT MemberGroup.IdGroup
             FROM MemberGroup
             INNER JOIN Member     ON Member.Id = MemberGroup.IdMember
             INNER JOIN Individual ON Individual.Id = Member.Id
             WHERE Individual.Email COLLATE NOCASE = :email
-        ';
-        $stmt = $this->pdo->prepare($sql);
+        ');
         $stmt->execute([':email' => $userEmail]);
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return array_column($rows, 'IdGroup');
-    }
 
+        return $this->userGroupsCache[$key] = $this->toIntList($stmt->fetchAll(PDO::FETCH_COLUMN));
+    }
 
     public function isUserInGroup(string $personEmail, string $groupsFilter): bool
     {
-        return !empty(array_intersect($this->getGroups($groupsFilter), $this->getUserGroups($personEmail)));
+        return array_intersect($this->getGroups($groupsFilter), $this->getUserGroups($personEmail)) !== [];
     }
 
 
     #region Private functions
+    private function articlePolicy(): ArticleAuthorizationService
+    {
+        // The policy only needs getUserGroups() / hasRepliedTo*() from this helper.
+        // Transitional: media access should move to its own service (see review).
+        return $this->articlePolicy ??= new ArticleAuthorizationService($this);
+    }
+
     private function canReadArticle(ArticleAuthorizationRow $article, ConnectedUser $connectedUser): bool
     {
-        if (
-            ($connectedUser->person ?? false)
-            && ($article->CreatedBy === $connectedUser->person->Id || $connectedUser->isEditor())
-        ) {
-            return true;
-        }
-        if ($article->PublishedBy === null) {
-            return false;
-        }
-        if ($connectedUser->person !== null && $article->IdGroup === null) {
-            return true;
-        }
-        return $article->IdGroup === null || !empty(array_intersect(
-            [$article->IdGroup],
-            $this->getUserGroups($connectedUser->person->Email ?? '')
-        ));
+        return $this->articlePolicy()->canRead($article, $connectedUser);
     }
 
 
@@ -273,7 +216,7 @@ final class AuthorizationDataHelper extends Data implements AuthorizationDataHel
     private function canReadMessageParent(object $message, ConnectedUser $connectedUser): bool
     {
         if (!empty($message->ArticleId)) {
-            $row = $this->get('Article', ['Id' => $message->ArticleId], 'CreatedBy, PublishedBy, OnlyForMembers, IdGroup');
+            $row = $this->get('Article', ['Id' => $message->ArticleId], 'Id, CreatedBy, PublishedBy, OnlyForMembers, IdGroup');
             if ($row === false) {
                 return false;
             }
@@ -289,7 +232,7 @@ final class AuthorizationDataHelper extends Data implements AuthorizationDataHel
             if (!($connectedUser->person ?? false)) {
                 return false;
             }
-            return in_array($message->GroupId, $this->getUserGroups($connectedUser->person->Email), true);
+            return in_array((int) $message->GroupId, $this->getUserGroups($connectedUser->person->Email), true);
         }
 
         return false;
@@ -297,12 +240,30 @@ final class AuthorizationDataHelper extends Data implements AuthorizationDataHel
 
 
     /**
-     * @return array<int, int>
+     * @return list<int>
      */
     private function getGroups(string $groupsFilter): array
     {
-        $groupsFilter = preg_replace('/[^\p{L}]/u', '', $groupsFilter);
-        $rows = $this->gets('Group', ['Name LIKE "%' . $groupsFilter . '%"' => null], '*');
-        return array_column($rows, 'Id');
+        $letters = preg_replace('/[^\p{L}]/u', '', $groupsFilter) ?? '';
+        if ($letters === '') {
+            // An empty filter would otherwise become LIKE '%%' and match every group
+            return [];
+        }
+
+        $stmt = $this->pdo->prepare('SELECT Id FROM `Group` WHERE Name LIKE :name');
+        $stmt->execute([':name' => '%' . $letters . '%']);
+
+        return $this->toIntList($stmt->fetchAll(PDO::FETCH_COLUMN));
     }
+
+
+    /**
+     * @param array<mixed> $values
+     * @return list<int>
+     */
+    private function toIntList(array $values): array
+    {
+        return array_values(array_map(static fn(mixed $value): int => To::int($value), $values));
+    }
+    #endregion
 }

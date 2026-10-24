@@ -4,67 +4,152 @@ declare(strict_types=1);
 
 namespace tests\modules\Article\services;
 
+use PDO;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionProperty;
+use app\enums\ArticleAccess;
 use app\enums\Authorization;
 use app\helpers\ConnectedUser;
+use app\models\AuthorizationDataHelper;
 use app\models\Data;
-use app\models\interfaces\AuthorizationDataHelperInterface;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
+use app\modules\Article\valueObjects\ArticleRow;
+use app\modules\Article\valueObjects\Result;
+use app\modules\Common\valueObjects\ClosingVisibilityRow;
 use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
 use app\modules\Common\valueObjects\Person;
 
 final class ArticleAuthorizationServiceTest extends TestCase
 {
+    private const PAST_DATE = '2000-01-01';
+    private const FUTURE_DATE = '2999-12-31';
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
     /**
-     * Construit un stub de Data (jamais DataHelper, qui est final) dont get()
-     * délègue à la closure fournie — permet de contrôler la réponse et/ou de
-     * capturer les arguments d'appel sans double de classe finale.
+     * AuthorizationDataHelper is final, so it cannot be mocked, stubbed or subclassed.
+     * The real class is used instead, on top of an in-memory SQLite database.
+     *
+     * The constructor is bypassed (it needs a full Application) and only the
+     * inherited $pdo property is set.
      */
-    private function makeDataHelperStub(callable $getBehavior): Data
+    private function makeHelper(?PDO $pdo = null): AuthorizationDataHelper
     {
-        return new class($getBehavior) extends Data {
-            /** @var callable */
-            private $getBehavior;
+        /** @var AuthorizationDataHelper $helper */
+        $helper = (new ReflectionClass(AuthorizationDataHelper::class))->newInstanceWithoutConstructor();
+        (new ReflectionProperty(Data::class, 'pdo'))->setValue($helper, $pdo ?? $this->makeSchemaPdo());
 
-            public function __construct(callable $getBehavior)
-            {
-                $this->getBehavior = $getBehavior;
-            }
-
-            public function get(string $table, array $where, string $fields = '*'): object|false
-            {
-                return ($this->getBehavior)($table, $where, $fields);
-            }
-        };
+        return $helper;
     }
 
-    private function makeService(
-        ?Data $dataHelper = null,
-        ?AuthorizationDataHelperInterface $authorizationDataHelper = null
-    ): ArticleAuthorizationService {
-        return new ArticleAuthorizationService(
-            $dataHelper ?? $this->makeDataHelperStub(fn() => false),
-            $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelperInterface::class)
+    /**
+     * A helper whose database has no table at all: any query throws a PDOException.
+     * Replaces `expects($this->never())`: if the service queries the database, the test fails.
+     */
+    private function makeForbiddingHelper(): AuthorizationDataHelper
+    {
+        return $this->makeHelper($this->makeEmptyPdo());
+    }
+
+    private function makeEmptyPdo(): PDO
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        return $pdo;
+    }
+
+    /**
+     * Minimal schema with the tables used by the helper methods called from the service.
+     * Empty tables behave like a default stub: no groups, no replies.
+     */
+    private function makeSchemaPdo(): PDO
+    {
+        $pdo = $this->makeEmptyPdo();
+        $pdo->exec('
+            CREATE TABLE Individual  (Id INTEGER PRIMARY KEY, Email TEXT);
+            CREATE TABLE Member      (Id INTEGER PRIMARY KEY);
+            CREATE TABLE MemberGroup (IdMember INTEGER, IdGroup INTEGER);
+            CREATE TABLE Reply       (IdSurvey INTEGER, IdPerson INTEGER);
+            CREATE TABLE OrderReply  (IdOrder INTEGER, IdPerson INTEGER);
+        ');
+
+        return $pdo;
+    }
+
+    /**
+     * The email follows the same convention as makePerson().
+     *
+     * @param list<int> $groupIds
+     */
+    private function givenMemberInGroups(PDO $pdo, int $personId, array $groupIds): void
+    {
+        $pdo->prepare('INSERT INTO Individual (Id, Email) VALUES (?, ?)')
+            ->execute([$personId, "person{$personId}@example.test"]);
+        $pdo->prepare('INSERT INTO Member (Id) VALUES (?)')
+            ->execute([$personId]);
+
+        foreach ($groupIds as $groupId) {
+            $pdo->prepare('INSERT INTO MemberGroup (IdMember, IdGroup) VALUES (?, ?)')
+                ->execute([$personId, $groupId]);
+        }
+    }
+
+    private function givenSurveyReply(PDO $pdo, int $surveyId, int $personId): void
+    {
+        $pdo->prepare('INSERT INTO Reply (IdSurvey, IdPerson) VALUES (?, ?)')
+            ->execute([$surveyId, $personId]);
+    }
+
+    private function givenOrderReply(PDO $pdo, int $orderId, int $personId): void
+    {
+        $pdo->prepare('INSERT INTO OrderReply (IdOrder, IdPerson) VALUES (?, ?)')
+            ->execute([$orderId, $personId]);
+    }
+
+    private function makeService(?AuthorizationDataHelper $helper = null): ArticleAuthorizationService
+    {
+        return new ArticleAuthorizationService($helper ?? $this->makeHelper());
+    }
+
+    private function makeArticle(
+        int $createdBy = 10,
+        ?int $publishedBy = 1,
+        ?int $idGroup = null,
+        bool $onlyForMembers = false,
+    ): ArticleRow {
+        return new ArticleRow(
+            Id: 1,
+            Title: 'Title',
+            Content: 'Content',
+            CreatedBy: $createdBy,
+            PublishedBy: $publishedBy,
+            IdGroup: $idGroup,
+            OnlyForMembers: $onlyForMembers,
+            LastUpdate: '2026-01-01 00:00:00',
+            Timestamp: '',
         );
     }
 
+    private function makeClosing(string $visibility, string $closingDate): ClosingVisibilityRow
+    {
+        return new ClosingVisibilityRow(Id: 1, ClosingDate: $closingDate, Visibility: $visibility);
+    }
+
     /**
-     * Construit un vrai helper ConnectedUser (final) sans passer par son
-     * constructeur (qui exige DataHelper/AuthorizationDataHelper/MetadataDataHelper,
-     * jamais utilisés par le code testé ici) et assigne directement ses
-     * propriétés publiques $person / $user avec de vraies instances des VO.
+     * Builds a real ConnectedUser (final) without its constructor and assigns
+     * the public $person / $user properties directly.
      *
-     * NB: en production $person et $user sont toujours renseignés ensemble ;
-     * ici on peut volontairement les découpler (ex. testCanPublish...NoPersonButIsEditor)
-     * pour isoler une branche logique du service, ce qui ne reflète pas un état
-     * atteignable en production mais teste correctement le || du service.
+     * In production $person and $user are always set together; here they can be
+     * decoupled on purpose (no person but editor) to isolate one branch of the
+     * service. That state is not reachable in production but tests the || correctly.
      */
-    private function makeConnectedUser(
-        ?Person $person = null,
-        bool $isEditor = false
-    ): ConnectedUser {
+    private function makeConnectedUser(?Person $person = null, bool $isEditor = false): ConnectedUser
+    {
         $ref = new ReflectionClass(ConnectedUser::class);
         /** @var ConnectedUser $helper */
         $helper = $ref->newInstanceWithoutConstructor();
@@ -72,8 +157,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
         $helper->person = $person;
 
         $authorizations = $isEditor ? [Authorization::Editor->value] : [];
-        // ConnectedUserVO exige une Person non-nulle ; on en fournit une factice
-        // quand $person est null mais qu'on veut quand même piloter isEditor().
+        // ConnectedUserVO requires a non-null Person: use a dummy one when $person is null
         $helper->user = new ConnectedUserVO($person ?? $this->makePerson(0), $authorizations);
 
         return $helper;
@@ -84,220 +168,457 @@ final class ArticleAuthorizationServiceTest extends TestCase
         return new Person(Id: $id, Email: "person{$id}@example.test");
     }
 
+    /**
+     * @param Result<ArticleRow> $result
+     */
+    private function denialOf(Result $result): ?ArticleAccess
+    {
+        return $result->match(
+            onOk: static fn(mixed $value): ?ArticleAccess => null,
+            onFail: static fn(ArticleAccess $reason): ArticleAccess => $reason,
+        );
+    }
+
+    private function denial(
+        ArticleRow $article,
+        ConnectedUser $user,
+        ?AuthorizationDataHelper $helper = null
+    ): ?ArticleAccess {
+        return $this->denialOf($this->makeService($helper)->authorizeRead($article, $user));
+    }
+
     // -------------------------------------------------------------------------
-    // canEdit / canDelete
+    // isOwner / canEdit / canDelete
     // -------------------------------------------------------------------------
+
+    public function testIsOwnerReturnsFalseWhenUserHasNoPerson(): void
+    {
+        $service = $this->makeService();
+
+        $this->assertFalse($service->isOwner($this->makeArticle(createdBy: 42), $this->makeConnectedUser(person: null)));
+    }
+
+    public function testIsOwnerWorksWithAnArticleAuthorizationRow(): void
+    {
+        $row = new ArticleAuthorizationRow(
+            Id: 1,
+            CreatedBy: 42,
+            PublishedBy: null,
+            IdGroup: null,
+            OnlyForMembers: false,
+        );
+
+        $this->assertTrue($this->makeService()->isOwner($row, $this->makeConnectedUser($this->makePerson(42))));
+        $this->assertFalse($this->makeService()->isOwner($row, $this->makeConnectedUser($this->makePerson(43))));
+    }
 
     public function testCanEditReturnsFalseWhenUserHasNoPerson(): void
     {
-        $user = $this->makeConnectedUser(person: null);
-
-        $result = $this->makeService()->canEdit(1, $user);
+        $result = $this->makeService()->canEdit($this->makeArticle(), $this->makeConnectedUser(person: null));
 
         $this->assertFalse($result);
-    }
-
-    public function testCanEditReturnsFalseWhenArticleDoesNotExist(): void
-    {
-        $calls = [];
-        $dataHelper = $this->makeDataHelperStub(function (string $table, array $where, string $fields) use (&$calls) {
-            $calls[] = [$table, $where, $fields];
-            return false;
-        });
-
-        $user = $this->makeConnectedUser($this->makePerson(42));
-
-        $result = $this->makeService($dataHelper)->canEdit(99, $user);
-
-        $this->assertFalse($result);
-        $this->assertSame([['Article', ['Id' => 99], 'CreatedBy']], $calls);
     }
 
     public function testCanEditReturnsTrueWhenUserIsAuthor(): void
     {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 42]);
-
-        $user = $this->makeConnectedUser($this->makePerson(42));
-
-        $result = $this->makeService($dataHelper)->canEdit(1, $user);
+        $result = $this->makeService()->canEdit(
+            $this->makeArticle(createdBy: 42),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
 
         $this->assertTrue($result);
     }
 
     public function testCanEditReturnsFalseWhenUserIsNotAuthor(): void
     {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 10]);
-
-        $user = $this->makeConnectedUser($this->makePerson(42));
-
-        $result = $this->makeService($dataHelper)->canEdit(1, $user);
+        $result = $this->makeService()->canEdit(
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
 
         $this->assertFalse($result);
     }
 
     public function testCanDeleteDelegatesToCanEdit(): void
     {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 42]);
+        $service = $this->makeService();
+        $article = $this->makeArticle(createdBy: 42);
 
-        $user = $this->makeConnectedUser($this->makePerson(42));
-
-        $service = $this->makeService($dataHelper);
-
-        $this->assertTrue($service->canDelete(1, $user));
-        $this->assertFalse($service->canDelete(1, $this->makeConnectedUser($this->makePerson(99))));
+        $this->assertTrue($service->canDelete($article, $this->makeConnectedUser($this->makePerson(42))));
+        $this->assertFalse($service->canDelete($article, $this->makeConnectedUser($this->makePerson(99))));
     }
 
     // -------------------------------------------------------------------------
-    // canPublish
+    // canPublish / canChangeOwner
     // -------------------------------------------------------------------------
 
     public function testCanPublishReturnsTrueWhenUserIsAuthor(): void
     {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 42]);
-
-        $user = $this->makeConnectedUser($this->makePerson(42), isEditor: false);
-
-        $result = $this->makeService($dataHelper)->canPublish(1, $user);
+        $result = $this->makeService()->canPublish(
+            $this->makeArticle(createdBy: 42),
+            $this->makeConnectedUser($this->makePerson(42), isEditor: false)
+        );
 
         $this->assertTrue($result);
     }
 
     public function testCanPublishReturnsTrueWhenUserIsEditorEvenIfNotAuthor(): void
     {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 10]);
-
-        $user = $this->makeConnectedUser($this->makePerson(42), isEditor: true);
-
-        $result = $this->makeService($dataHelper)->canPublish(1, $user);
+        $result = $this->makeService()->canPublish(
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42), isEditor: true)
+        );
 
         $this->assertTrue($result);
     }
 
     public function testCanPublishReturnsFalseWhenUserIsNeitherAuthorNorEditor(): void
     {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) ['CreatedBy' => 10]);
-
-        $user = $this->makeConnectedUser($this->makePerson(42), isEditor: false);
-
-        $result = $this->makeService($dataHelper)->canPublish(1, $user);
+        $result = $this->makeService()->canPublish(
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42), isEditor: false)
+        );
 
         $this->assertFalse($result);
     }
 
     public function testCanPublishReturnsFalseWhenUserHasNoPersonAndIsNotEditor(): void
     {
-        $user = $this->makeConnectedUser(person: null, isEditor: false);
-
-        $result = $this->makeService()->canPublish(1, $user);
+        $result = $this->makeService()->canPublish(
+            $this->makeArticle(),
+            $this->makeConnectedUser(person: null, isEditor: false)
+        );
 
         $this->assertFalse($result);
     }
 
     public function testCanPublishReturnsTrueWhenUserHasNoPersonButIsEditor(): void
     {
-        // canEdit renvoie false (pas de personne), mais isEditor() est vrai
-        $user = $this->makeConnectedUser(person: null, isEditor: true);
-
-        $result = $this->makeService()->canPublish(1, $user);
+        // canEdit is false (no person) but isEditor() is true
+        $result = $this->makeService()->canPublish(
+            $this->makeArticle(),
+            $this->makeConnectedUser(person: null, isEditor: true)
+        );
 
         $this->assertTrue($result);
+    }
+
+    public function testCanChangeOwnerIsReservedToEditors(): void
+    {
+        $service = $this->makeService();
+
+        $this->assertTrue($service->canChangeOwner($this->makeConnectedUser($this->makePerson(1), isEditor: true)));
+        $this->assertFalse($service->canChangeOwner($this->makeConnectedUser($this->makePerson(1), isEditor: false)));
     }
 
     // -------------------------------------------------------------------------
-    // canRead
+    // Read: public articles
     // -------------------------------------------------------------------------
 
-    public function testCanReadReturnsFalseWhenArticleDoesNotExist(): void
+    public function testReadIsGrantedToAnonymousOnPublishedPublicArticle(): void
     {
-        $calls = [];
-        $dataHelper = $this->makeDataHelperStub(function (string $table, array $where, string $fields) use (&$calls) {
-            $calls[] = [$table, $where, $fields];
-            return false;
-        });
+        // Forbidding helper: the test fails if the service queries the groups
+        $denial = $this->denial(
+            $this->makeArticle(),
+            $this->makeConnectedUser(person: null),
+            $this->makeForbiddingHelper()
+        );
 
-        $result = $this->makeService($dataHelper)->canRead(99, $this->makeConnectedUser());
-
-        $this->assertFalse($result);
-        $this->assertSame([['Article', ['Id' => 99], 'OnlyForMembers, IdGroup']], $calls);
+        $this->assertNull($denial);
     }
 
-    public function testCanReadReturnsTrueWhenArticleIsPublic(): void
+    public function testAuthorizeReadReturnsTheSameArticleOnSuccess(): void
     {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
-            'OnlyForMembers' => 0,
-            'IdGroup'        => null,
-        ]);
+        $article = $this->makeArticle();
 
-        // Même sans personne connectée
-        $result = $this->makeService($dataHelper)->canRead(1, $this->makeConnectedUser(person: null));
+        $result = $this->makeService()->authorizeRead($article, $this->makeConnectedUser(person: null));
+
+        $this->assertSame($article, $result->match(
+            onOk: static fn(mixed $value): mixed => $value,
+            onFail: static fn(ArticleAccess $reason): mixed => null,
+        ));
+    }
+
+    public function testCanReadMatchesTheDenialOfAuthorizeRead(): void
+    {
+        $service = $this->makeService();
+        $public = new ArticleAuthorizationRow(Id: 1, CreatedBy: 10, PublishedBy: 1, IdGroup: null, OnlyForMembers: false);
+        $membersOnly = new ArticleAuthorizationRow(Id: 1, CreatedBy: 10, PublishedBy: 1, IdGroup: null, OnlyForMembers: true);
+        $anonymous = $this->makeConnectedUser(person: null);
+
+        $this->assertTrue($service->canRead($public, $anonymous));
+        $this->assertFalse($service->canRead($membersOnly, $anonymous));
+    }
+
+    // -------------------------------------------------------------------------
+    // Read: members-only articles
+    // -------------------------------------------------------------------------
+
+    public function testReadRequiresLoginForAnonymousOnMembersOnlyArticle(): void
+    {
+        $denial = $this->denial(
+            $this->makeArticle(onlyForMembers: true),
+            $this->makeConnectedUser(person: null)
+        );
+
+        $this->assertSame(ArticleAccess::LoginRequired, $denial);
+    }
+
+    public function testReadIsGrantedToAnyMemberOnMembersOnlyArticleWithoutGroup(): void
+    {
+        // Forbidding helper: the test fails if the service queries the groups
+        $denial = $this->denial(
+            $this->makeArticle(onlyForMembers: true),
+            $this->makeConnectedUser($this->makePerson(42)),
+            $this->makeForbiddingHelper()
+        );
+
+        $this->assertNull($denial);
+    }
+
+    // -------------------------------------------------------------------------
+    // Read: group articles
+    // -------------------------------------------------------------------------
+
+    public function testReadIsGrantedWhenMemberBelongsToTheGroup(): void
+    {
+        $pdo = $this->makeSchemaPdo();
+        $this->givenMemberInGroups($pdo, 42, [5]);
+
+        $denial = $this->denial(
+            $this->makeArticle(idGroup: 5),
+            $this->makeConnectedUser($this->makePerson(42)),
+            $this->makeHelper($pdo)
+        );
+
+        $this->assertNull($denial);
+    }
+
+    public function testReadIsForbiddenWhenMemberIsNotInTheGroup(): void
+    {
+        $pdo = $this->makeSchemaPdo();
+        $this->givenMemberInGroups($pdo, 42, [7]);
+
+        $denial = $this->denial(
+            $this->makeArticle(idGroup: 5),
+            $this->makeConnectedUser($this->makePerson(42)),
+            $this->makeHelper($pdo)
+        );
+
+        $this->assertSame(ArticleAccess::Forbidden, $denial);
+    }
+
+    public function testReadRequiresLoginForAnonymousOnGroupArticleEvenIfNotMembersOnly(): void
+    {
+        // Forbidding helper: the test fails if the service queries the groups
+        $denial = $this->denial(
+            $this->makeArticle(idGroup: 5, onlyForMembers: false),
+            $this->makeConnectedUser(person: null),
+            $this->makeForbiddingHelper()
+        );
+
+        $this->assertSame(ArticleAccess::LoginRequired, $denial);
+    }
+
+    // -------------------------------------------------------------------------
+    // Read: drafts
+    // -------------------------------------------------------------------------
+
+    public function testDraftIsReadableByItsAuthorWithoutLoadingGroups(): void
+    {
+        // Forbidding helper: the test fails if the service queries the groups
+        $denial = $this->denial(
+            $this->makeArticle(createdBy: 42, publishedBy: null, idGroup: 5, onlyForMembers: true),
+            $this->makeConnectedUser($this->makePerson(42)),
+            $this->makeForbiddingHelper()
+        );
+
+        $this->assertNull($denial);
+    }
+
+    public function testDraftIsReadableByAnEditor(): void
+    {
+        $denial = $this->denial(
+            $this->makeArticle(createdBy: 10, publishedBy: null),
+            $this->makeConnectedUser($this->makePerson(42), isEditor: true)
+        );
+
+        $this->assertNull($denial);
+    }
+
+    public function testDraftIsForbiddenToAnotherMember(): void
+    {
+        $denial = $this->denial(
+            $this->makeArticle(createdBy: 10, publishedBy: null),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
+
+        $this->assertSame(ArticleAccess::Forbidden, $denial);
+    }
+
+    public function testDraftRequiresLoginForAnonymous(): void
+    {
+        $denial = $this->denial(
+            $this->makeArticle(publishedBy: null),
+            $this->makeConnectedUser(person: null)
+        );
+
+        $this->assertSame(ArticleAccess::LoginRequired, $denial);
+    }
+
+    // -------------------------------------------------------------------------
+    // Survey / order results
+    // -------------------------------------------------------------------------
+
+    public function testSurveyResultsAreHiddenWhenThereIsNoSurvey(): void
+    {
+        $result = $this->makeService()->canReadSurveyResults(
+            null,
+            $this->makeArticle(createdBy: 42),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
+
+        $this->assertFalse($result);
+    }
+
+    public function testSurveyResultsAreHiddenFromAnonymous(): void
+    {
+        $result = $this->makeService()->canReadSurveyResults(
+            $this->makeClosing('all', self::PAST_DATE),
+            $this->makeArticle(),
+            $this->makeConnectedUser(person: null)
+        );
+
+        $this->assertFalse($result);
+    }
+
+    public function testSurveyResultsAreVisibleToTheArticleOwnerWithoutQueryingReplies(): void
+    {
+        // Forbidding helper: the test fails if the service queries the replies
+        $result = $this->makeService($this->makeForbiddingHelper())->canReadSurveyResults(
+            $this->makeClosing('voters', self::FUTURE_DATE),
+            $this->makeArticle(createdBy: 42),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
 
         $this->assertTrue($result);
     }
 
-    public function testCanReadReturnsFalseWhenArticleIsMembersOnlyAndUserHasNoPerson(): void
+    public function testSurveyResultsWithVisibilityAllAreVisibleToAnyMember(): void
     {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
-            'OnlyForMembers' => 1,
-            'IdGroup'        => null,
-        ]);
-
-        $result = $this->makeService($dataHelper)->canRead(1, $this->makeConnectedUser(person: null));
-
-        $this->assertFalse($result);
-    }
-
-    public function testCanReadReturnsTrueWhenArticleIsMembersOnlyAndAuthorizationAllows(): void
-    {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
-            'OnlyForMembers' => 1,
-            'IdGroup'        => 5,
-        ]);
-
-        $authHelper = $this->createMock(AuthorizationDataHelperInterface::class);
-        $authHelper->expects($this->once())
-            ->method('getArticle')
-            ->with(1, $this->isInstanceOf(ConnectedUser::class))
-            ->willReturn(new ArticleAuthorizationRow(
-                Id: 1,
-                CreatedBy: 42,
-                PublishedBy: null,
-                IdGroup: 5,
-                OnlyForMembers: true,
-            ));
-
-        $user = $this->makeConnectedUser($this->makePerson(42));
-
-        $result = $this->makeService($dataHelper, $authHelper)->canRead(1, $user);
+        // Forbidding helper: the test fails if the service queries the replies
+        $result = $this->makeService($this->makeForbiddingHelper())->canReadSurveyResults(
+            $this->makeClosing('all', self::FUTURE_DATE),
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
 
         $this->assertTrue($result);
     }
 
-    public function testCanReadReturnsFalseWhenArticleIsMembersOnlyAndAuthorizationDenies(): void
+    public function testSurveyResultsWithVisibilityAllAfterClosingDependOnTheClosingDate(): void
     {
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
-            'OnlyForMembers' => 1,
-            'IdGroup'        => 5,
-        ]);
+        $service = $this->makeService();
+        $article = $this->makeArticle(createdBy: 10);
+        $member = $this->makeConnectedUser($this->makePerson(42));
 
-        $authHelper = $this->createStub(AuthorizationDataHelperInterface::class);
-        $authHelper->method('getArticle')->willReturn(false);
+        $this->assertTrue($service->canReadSurveyResults($this->makeClosing('allAfterClosing', self::PAST_DATE), $article, $member));
+        $this->assertFalse($service->canReadSurveyResults($this->makeClosing('allAfterClosing', self::FUTURE_DATE), $article, $member));
+    }
 
-        $user = $this->makeConnectedUser($this->makePerson(42));
+    public function testSurveyResultsWithVisibilityVotersDependOnParticipation(): void
+    {
+        $article = $this->makeArticle(createdBy: 10);
+        $member = $this->makeConnectedUser($this->makePerson(42));
+        $survey = $this->makeClosing('voters', self::FUTURE_DATE); // survey Id = 1
 
-        $result = $this->makeService($dataHelper, $authHelper)->canRead(1, $user);
+        $pdo = $this->makeSchemaPdo();
+
+        // No reply yet
+        $this->assertFalse($this->makeService($this->makeHelper($pdo))->canReadSurveyResults($survey, $article, $member));
+
+        // Person 42 replied to survey 1
+        $this->givenSurveyReply($pdo, surveyId: 1, personId: 42);
+        $this->assertTrue($this->makeService($this->makeHelper($pdo))->canReadSurveyResults($survey, $article, $member));
+    }
+
+    public function testSurveyResultsWithVisibilityVotersAfterClosingNeedParticipationAndClosing(): void
+    {
+        $article = $this->makeArticle(createdBy: 10);
+        $member = $this->makeConnectedUser($this->makePerson(42));
+
+        $pdo = $this->makeSchemaPdo();
+        $this->givenSurveyReply($pdo, surveyId: 1, personId: 42);
+
+        $this->assertTrue($this->makeService($this->makeHelper($pdo))->canReadSurveyResults(
+            $this->makeClosing('votersAfterClosing', self::PAST_DATE),
+            $article,
+            $member
+        ));
+
+        // Not closed yet: the replies are not even queried
+        $this->assertFalse($this->makeService($this->makeForbiddingHelper())->canReadSurveyResults(
+            $this->makeClosing('votersAfterClosing', self::FUTURE_DATE),
+            $article,
+            $member
+        ));
+    }
+
+    public function testSurveyResultsWithUnknownVisibilityAreHidden(): void
+    {
+        $result = $this->makeService()->canReadSurveyResults(
+            $this->makeClosing('somethingElse', self::PAST_DATE),
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
 
         $this->assertFalse($result);
     }
 
-    public function testCanReadTreatsTruthyOnlyForMembersAsRestricted(): void
+    public function testOrderResultsUseTheOrderRepliesAndVocabulary(): void
     {
-        // OnlyForMembers peut arriver en string "1" ou bool true
-        $dataHelper = $this->makeDataHelperStub(fn() => (object) [
-            'OnlyForMembers' => '1',
-            'IdGroup'        => null,
-        ]);
+        $article = $this->makeArticle(createdBy: 10);
+        $member = $this->makeConnectedUser($this->makePerson(42));
 
-        $result = $this->makeService($dataHelper)->canRead(1, $this->makeConnectedUser(person: null));
+        // Only an order reply exists: no survey reply that could make the test pass by mistake
+        $pdo = $this->makeSchemaPdo();
+        $this->givenOrderReply($pdo, orderId: 1, personId: 42);
+        $service = $this->makeService($this->makeHelper($pdo));
+
+        $this->assertTrue($service->canReadOrderResults(
+            $this->makeClosing('orderers', self::FUTURE_DATE),
+            $article,
+            $member
+        ));
+
+        // 'voters' is a survey vocabulary word: it means nothing for an order
+        $this->assertFalse($service->canReadOrderResults(
+            $this->makeClosing('voters', self::FUTURE_DATE),
+            $article,
+            $member
+        ));
+    }
+
+    public function testOrderResultsWithOrderersAfterClosingNeedClosing(): void
+    {
+        $article = $this->makeArticle(createdBy: 10);
+        $member = $this->makeConnectedUser($this->makePerson(42));
+
+        $pdo = $this->makeSchemaPdo();
+        $this->givenOrderReply($pdo, orderId: 1, personId: 42);
+        $service = $this->makeService($this->makeHelper($pdo));
+
+        $this->assertTrue($service->canReadOrderResults($this->makeClosing('orderersAfterClosing', self::PAST_DATE), $article, $member));
+        $this->assertFalse($service->canReadOrderResults($this->makeClosing('orderersAfterClosing', self::FUTURE_DATE), $article, $member));
+    }
+
+    public function testOrderResultsAreHiddenWhenThereIsNoOrder(): void
+    {
+        $result = $this->makeService()->canReadOrderResults(
+            null,
+            $this->makeArticle(createdBy: 42),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
 
         $this->assertFalse($result);
     }

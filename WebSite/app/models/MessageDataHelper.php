@@ -29,7 +29,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         );
     }
 
-
     public function addMessage(
         ?int $articleId,
         ?int $eventId,
@@ -65,7 +64,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return is_int($messageId) ? $messageId : false;
     }
 
-
     /**
      * @param list<EventParticipant> $participants
      * @return array<int, string>
@@ -85,6 +83,13 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return $bccList;
     }
 
+    public function countUserMessagesForArticle(int $articleId): int
+    {
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Message WHERE "From" = :from AND ArticleId = :articleId');
+        $stmt->execute([':from' => 'User', ':articleId' => $articleId]);
+
+        return (int) $stmt->fetchColumn();
+    }
 
     /** @return array<int, stdClass> */
     public function getArticleMessages(int $articleId): array
@@ -111,7 +116,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
-
     /** @return array<int, stdClass> */
     public function getEventMessages(int $eventId): array
     {
@@ -136,7 +140,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
-
 
     /** @return array<int, stdClass> */
     public function getGroupMessages(int $groupId): array
@@ -167,7 +170,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return $messages;
     }
 
-
     /** @return array<int, array<string, mixed>> */
     public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
     {
@@ -187,7 +189,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
             return $result;
         }, $rows);
     }
-
 
     /** @return array{0: int, 1: int, 2: string} */
     public function getImageInfoFromMessage(int $messageId): array
@@ -220,7 +221,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return [(int)$year, (int)$month, $filename];
     }
 
-
     /**
      * @param array{start: string, end: string} $season
      * @return array<string, int>
@@ -241,7 +241,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         ]);
         return $query->fetchAll(PDO::FETCH_KEY_PAIR);
     }
-
 
     /**
      * @return array{
@@ -290,7 +289,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
             'groups'   => $groups->fetchAll(PDO::FETCH_OBJ),
         ];
     }
-
 
     /**
      * @return array<int, array{
@@ -342,7 +340,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
-
     /**
      * @param array<int, string> $paths
      * @return array<string, bool>
@@ -371,7 +368,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return $used;
     }
 
-
     public function hasNewMessages(int $personId, int $lastLogId): bool
     {
         try {
@@ -391,7 +387,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
             return false;
         }
     }
-
 
     public function updateMessage(int $messageId, int $personId, string $text): true
     {
@@ -425,7 +420,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         }
         return $messages;
     }
-
 
     /** @return array<int, stdClass> */
     private function doGetGroupedMessages(int $personId, string $searchFrom): array
@@ -573,7 +567,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-
     private function getLastCreatedAt(int $lastLogId): ?string
     {
         $stmt = $this->pdoForLog->prepare("SELECT CreatedAt FROM Log WHERE Id = ?");
@@ -581,7 +574,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         $result = $stmt->fetchColumn();
         return $result !== false ? (string)$result : null;
     }
-
 
     private function hasRecentMessageApiCall(int $lastLogId): bool
     {

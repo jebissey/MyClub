@@ -8,6 +8,8 @@ use PDO;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
+use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\ArticleAuthorRow;
 use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Article\valueObjects\ArticleSitemapRow;
@@ -22,7 +24,8 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(
         Application $application,
-        private readonly AuthorizationDataHelper $authorizationDataHelper
+        private readonly AuthorizationDataHelper $authorizationDataHelper,
+        private readonly ArticleAuthorizationService $authorizationService
     ) {
         parent::__construct(
             $application->getPdo(),
@@ -283,8 +286,9 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
      */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
+        // The columns needed by the read rule come with the query: no extra article read per article
         $sql = "
-            SELECT a.Id, a.Title, a.LastUpdate
+            SELECT a.Id, a.Title, a.LastUpdate, a.CreatedBy, a.PublishedBy, a.IdGroup, a.OnlyForMembers
             FROM Article a
             WHERE a.LastUpdate >= :searchFrom
             AND a.PublishedBy IS NOT NULL
@@ -292,14 +296,22 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
+        /** @var list<object{Id: int|string, Title: string, LastUpdate: string, CreatedBy: int|string, PublishedBy: int|string|null, IdGroup: int|string|null, OnlyForMembers: int|bool|null}> $articles */
         $articles = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $news = [];
         foreach ($articles as $article) {
-            if ($this->authorizationDataHelper->getArticle($article->Id, $connectedUser)) {
+            $authorization = new ArticleAuthorizationRow(
+                Id: (int) $article->Id,
+                CreatedBy: (int) $article->CreatedBy,
+                PublishedBy: $article->PublishedBy === null ? null : (int) $article->PublishedBy,
+                IdGroup: $article->IdGroup === null ? null : (int) $article->IdGroup,
+                OnlyForMembers: (bool) $article->OnlyForMembers,
+            );
+            if ($this->authorizationService->canRead($authorization, $connectedUser)) {
                 $news[] = [
                     'type'  => 'article',
-                    'id'    => $article->Id,
+                    'id'    => (int) $article->Id,
                     'title' => $article->Title,
                     'date'  => $article->LastUpdate,
                     'url'   => '/article/' . $article->Id,
@@ -442,7 +454,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
             ? $noGroupArticleIds
             : array_merge($noGroupArticleIds, $forMembersOnlyArticleIds);
 
-        $userGroups = array_values($this->authorizationDataHelper->getUserGroups($userEmail));
+        $userGroups = $this->authorizationDataHelper->getUserGroups($userEmail);
         if (empty($userGroups)) {
             return $articleIds;
         }

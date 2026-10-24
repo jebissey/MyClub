@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Article;
 
 use app\enums\ApplicationError;
+use app\enums\ArticleAccess;
 use app\enums\FilterInputRule;
 use app\enums\Period;
 use app\exceptions\IntegrityException;
@@ -18,14 +19,13 @@ use app\models\AlertRecipientDataHelper;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
-use app\models\AuthorizationDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
-use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\ArticleRow;
+use app\modules\Article\valueObjects\Result;
 use app\modules\Article\viewModels\ArticleCarouselViewModel;
 use app\modules\Article\viewModels\ArticleEditViewModel;
 use app\modules\Article\viewModels\ArticleShowViewModel;
@@ -36,16 +36,19 @@ use app\modules\Common\TableController;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
+use app\modules\Common\valueObjects\ClosingVisibilityRow;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\viewModels\ChatViewModel;
 use app\modules\Common\viewModels\CrosstabViewModel;
 use app\modules\Common\viewModels\TableIndexViewModel;
 use app\modules\Common\viewModels\TopItemsByPeriodViewModel;
 
+/**
+ * @phpstan-import-type ClosingVisibilityRowShape from ClosingVisibilityRow
+ */
 final class ArticleController extends TableController
 {
     private const TOP = 50;
-    private readonly ArticleAuthorizationService $authorizationService;
 
     public function __construct(
         Application $application,
@@ -60,12 +63,9 @@ final class ArticleController extends TableController
         private readonly ArticleService $articleService,
         private readonly AlertRecipientDataHelper $alertRecipientDataHelper,
         private readonly CarouselDataHelper $carouselDataHelper,
+        private readonly ArticleAuthorizationService $authorizationService,
     ) {
         parent::__construct($application);
-        $this->authorizationService = new ArticleAuthorizationService(
-            $this->dataHelper,
-            new AuthorizationDataHelper($this->application)
-        );
     }
 
     public function carousel(int $id): void
@@ -74,32 +74,11 @@ final class ArticleController extends TableController
             return;
         }
 
-        $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
-        if (!$article) {
-            $msg = str_replace(
-                '{id}',
-                (string)$id,
-                ($this->t)('article.error.not_found')
-            );
-            $this->raiseBadRequest($msg, __FILE__, __LINE__);
-            return;
-        }
-
-        $connectedUser = $this->application->getConnectedUser();
-
-        $article = $this->articleDataHelper->getLatestArticle([$id]);
+        $article = $this->unwrapOrRespond(
+            $this->loadAuthorized($id, $this->authorizationService->canEdit(...)),
+            $id
+        );
         if ($article === null) {
-            $msg = str_replace(
-                '{id}',
-                (string)$id,
-                ($this->t)('article.error.not_found')
-            );
-            $this->raiseBadRequest($msg, __FILE__, __LINE__);
-            return;
-        }
-
-        if (!$this->authorizationService->canEdit($id, $connectedUser)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
 
@@ -114,12 +93,12 @@ final class ArticleController extends TableController
 
     public function changeOwner(int $id): void
     {
-        if (!$this->application->getConnectedUser()->isEditor()) {
+        if (!$this->authorizationService->canChangeOwner($this->application->getConnectedUser())) {
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
         if (!$this->dataHelper->get('Article', ['Id' => $id], 'Id')) {
-            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            $this->respondToDenial(ArticleAccess::NotFound, $id);
             return;
         }
         if (WebApp::getRequestMethod() === 'POST') {
@@ -147,7 +126,7 @@ final class ArticleController extends TableController
         } elseif (WebApp::getRequestMethod() === 'GET') {
             $article = $this->articleDataHelper->getWithAuthor($id);
             if ($article === false) {
-                $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+                $this->respondToDenial(ArticleAccess::NotFound, $id);
                 return;
             }
             $viewModel = new ChangeOwnerViewModel(
@@ -181,22 +160,16 @@ final class ArticleController extends TableController
             return;
         }
 
-        $article = $this->dataHelper->get('Article', ['Id' => $id], 'CreatedBy');
-        if (!$article) {
-            $msg = str_replace(
-                '{id}',
-                (string)$id,
-                ($this->t)('article.error.not_found')
-            );
-            $this->raiseBadRequest($msg, __FILE__, __LINE__);
+        $article = $this->unwrapOrRespond(
+            $this->loadAuthorized($id, $this->authorizationService->canDelete(...)),
+            $id
+        );
+        if ($article === null) {
             return;
         }
-        if ($this->authorizationService->canDelete($id, $this->application->getConnectedUser())) {
-            $this->dataHelper->delete('Article', ['Id' => $id]);
-            $this->redirect('/articles');
-        } else {
-            $this->raiseForbidden(__FILE__, __LINE__);
-        }
+
+        $this->dataHelper->delete('Article', ['Id' => $id]);
+        $this->redirect('/articles');
     }
 
     public function edit(int $id): void
@@ -211,19 +184,11 @@ final class ArticleController extends TableController
             return;
         }
 
-        $article = $this->articleDataHelper->getLatestArticle([$id]);
+        $article = $this->unwrapOrRespond(
+            $this->loadAuthorized($id, $this->authorizationService->canEdit(...)),
+            $id
+        );
         if ($article === null) {
-            $msg = str_replace(
-                '{id}',
-                (string)$id,
-                ($this->t)('article.error.not_found')
-            );
-            $this->raiseBadRequest($msg, __FILE__, __LINE__);
-            return;
-        }
-
-        if ((int)$connectedUser->person->Id !== (int)$article->CreatedBy) {
-            $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
 
@@ -237,8 +202,7 @@ final class ArticleController extends TableController
             hasOrder: $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate') ?: null,
             userConnected: $connectedUser->person ?? false,
             navItems: $this->getNavItems($connectedUser->person),
-            publishedBy: $article->PublishedBy != $article->CreatedBy
-                ? $this->personDataHelper->getPublisher($article->PublishedBy) : '',
+            publishedBy: $this->publisherName($article),
             carouselItems: array_values(
                 $this->dataHelper->gets('Carousel', ['IdArticle' => $id], 'Id, IdArticle, Item')
             ),
@@ -261,7 +225,7 @@ final class ArticleController extends TableController
 
         $article = $this->dataHelper->get('Article', ['Id' => $idArticle], 'CreatedBy');
         if (!$article) {
-            $this->raiseBadRequest("Article {$idArticle} doesn't exist", __FILE__, __LINE__);
+            $this->respondToDenial(ArticleAccess::NotFound, $idArticle);
             return;
         }
         /** @var object{CreatedBy: int} $article */
@@ -452,15 +416,17 @@ final class ArticleController extends TableController
             $this->raiseForbidden(__FILE__, __LINE__);
             return;
         }
-        if (!$this->dataHelper->get('Article', ['Id' => $id], 'Id')) {
-            $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+
+        // Applies to GET and POST: the form is only shown to someone who can submit it
+        $article = $this->unwrapOrRespond(
+            $this->loadAuthorized($id, $this->authorizationService->canPublish(...)),
+            $id
+        );
+        if ($article === null) {
             return;
         }
+
         if (WebApp::getRequestMethod() === 'POST') {
-            if (!$this->authorizationService->canPublish($id, $this->application->getConnectedUser())) {
-                $this->raiseForbidden(__FILE__, __LINE__);
-                return;
-            }
             $schema = [
                 'isSpotlightActive' => FilterInputRule::Bool->value,
                 'spotlightedUntil' => FilterInputRule::DateTime->value,
@@ -475,9 +441,10 @@ final class ArticleController extends TableController
                 }
                 $this->articleDataHelper->setSpotlightArticle($id, $spotlightedUntil);
             }
+            $isPublished = ($input['published'] ?? 0) === 1;
             $result = $this->dataHelper->set('Article', [
-                'PublishedBy'    => ($input['published'] ?? 0) === 1 ? $this->application->getConnectedUser()->person->Id ?? null : null,
-                'LastUpdate'     => date('Y-m-d H:i:s')
+                'PublishedBy' => $isPublished ? ($this->application->getConnectedUser()->person->Id ?? null) : null,
+                'LastUpdate'  => date('Y-m-d H:i:s')
             ], ['Id' => $id]);
             if ($result) {
                 $_SESSION['success'] = ($this->t)('article.success.updated');
@@ -487,13 +454,13 @@ final class ArticleController extends TableController
             }
             $this->redirect('/article/' . $id);
         } elseif (WebApp::getRequestMethod() === 'GET') {
-            $article = $this->articleDataHelper->getWithAuthor($id);
-            if ($article === false) {
-                $this->raiseBadRequest("Article {$id} doesn't exist", __FILE__, __LINE__);
+            $articleWithAuthor = $this->articleDataHelper->getWithAuthor($id);
+            if ($articleWithAuthor === false) {
+                $this->respondToDenial(ArticleAccess::NotFound, $id);
                 return;
             }
             $viewModel = new PublishViewModel(
-                article: $article,
+                article: $articleWithAuthor,
                 layoutParams: $this->getAllParams([
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
@@ -506,68 +473,46 @@ final class ArticleController extends TableController
 
     public function show(int $id): void
     {
-        $access = $this->getReadableArticle($id);
-        if ($access === null) {
+        $article = $this->readArticle($id);
+        if ($article === null) {
             return;
         }
-        $articleAuthorization = $access['authorization'];
-        $article = $access['latest'];
         $connectedUser = $this->application->getConnectedUser();
 
         try {
             [$message, $messageType] = MessageService::get();
 
-            $layoutParams = $this->getAllParams([]);
-
-            $groups = array_values(
-                $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')
-            );
-            $carouselItems = array_values(
-                $this->dataHelper->gets('Carousel', ['IdArticle' => $id], 'Id, IdArticle, Item')
-            );
-            $hasSurvey = $this->dataHelper->get(
-                'Survey',
-                ['IdArticle' => $id],
-                'ClosingDate'
-            ) ?: null;
-            $hasOrder = $this->dataHelper->get(
-                'Order',
-                ['IdArticle' => $id],
-                'ClosingDate'
-            ) ?: null;
+            // Survey and Order are read once: the same rows feed the view and the visibility rules
+            $survey = $this->dataHelper->get('Survey', ['IdArticle' => $id], 'Id, ClosingDate, Visibility');
+            $order = $this->dataHelper->get('Order', ['IdArticle' => $id], 'Id, ClosingDate, Visibility');
 
             $viewModel = new ArticleShowViewModel(
                 id: $id,
                 article: $article,
-                groups: $groups,
-                hasSurvey: $hasSurvey,
-                hasOrder: $hasOrder,
+                groups: array_values(
+                    $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')
+                ),
+                hasSurvey: $survey ?: null,
+                hasOrder: $order ?: null,
                 userConnected: $connectedUser->person !== null,
                 navItems: $this->getNavItems($connectedUser->person),
-                publishedBy: $article->PublishedBy && $article->PublishedBy != $article->CreatedBy
-                    ? $this->personDataHelper->getPublisher($article->PublishedBy) ?? ''
-                    : '',
-                canReadPool: $this->authorizationDataHelper->canPersonReadSurveyResults(
-                    $articleAuthorization,
+                publishedBy: $this->publisherName($article),
+                canReadPool: $this->authorizationService->canReadSurveyResults(
+                    $this->toClosingVisibility($survey),
+                    $article,
                     $connectedUser
                 ),
-                canReadOrder: $this->authorizationDataHelper->canPersonReadOrderResults(
-                    $articleAuthorization,
+                canReadOrder: $this->authorizationService->canReadOrderResults(
+                    $this->toClosingVisibility($order),
+                    $article,
                     $connectedUser
                 ),
                 carouselItems: $this->carouselDataHelper->getCarouselItems($id),
-                countOfMessages: count(
-                    $this->dataHelper->gets(
-                        'Message',
-                        ['"From"' => 'User', 'ArticleId' => $id],
-                        'Id'
-                    )
-                ),
-                isCreator: $connectedUser->person !== null
-                    && $connectedUser->person->Id === $article->CreatedBy,
+                countOfMessages: $this->messageDataHelper->countUserMessagesForArticle($id),
+                isCreator: $this->authorizationService->isOwner($article, $connectedUser),
                 message: $message,
                 messageType: $messageType,
-                layoutParams: $layoutParams,
+                layoutParams: $this->getAllParams([]),
                 btnParent: $this->resolveParentUrl('/articles'),
             );
 
@@ -579,11 +524,10 @@ final class ArticleController extends TableController
 
     public function showArticleChat(int $articleId): void
     {
-        $access = $this->getReadableArticle($articleId, 'Id, OnlyForMembers, Title, CreatedBy, IdGroup');
-        if ($access === null) {
+        $article = $this->readArticle($articleId);
+        if ($article === null) {
             return;
         }
-        $article = $access['row'];
 
         $connectedUser = $this->application->getConnectedUser();
         $person = $connectedUser->person;
@@ -681,14 +625,14 @@ final class ArticleController extends TableController
             return;
         }
 
-        $article = $this->articleDataHelper->getLatestArticle([$id]);
-        if (!$article || ($this->application->getConnectedUser()->person->Id ?? 0) != $article->CreatedBy) {
-            $this->application->getErrorManager()->raise(
-                ApplicationError::Forbidden,
-                'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__
-            );
+        $article = $this->unwrapOrRespond(
+            $this->loadAuthorized($id, $this->authorizationService->canEdit(...)),
+            $id
+        );
+        if ($article === null) {
             return;
         }
+
         $schema = [
             'title' => FilterInputRule::HtmlSafeName->value,
             'content' => FilterInputRule::Html->value,
@@ -697,26 +641,27 @@ final class ArticleController extends TableController
             'membersOnly' => FilterInputRule::Int->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        $title = $input['title'] ?? '???';
-        $content = $input['content'] ?? '???';
+        $title = $input['title'] ?? '';
+        $content = $input['content'] ?? '';
         if (empty($title) || empty($content)) {
             $_SESSION['error'] = ($this->t)('article.error.title_content_required');
             $this->redirect('/article/' . $id);
             return;
         }
+
+        $publishedBy = null;
+        if (($input['published'] ?? 0) === 1) {
+            $publishedBy = $this->application->getConnectedUser()->person->Id
+                ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+        }
+
         $result = $this->dataHelper->set(
             'Article',
             [
-                'Title'       => $title,
-                'Content'     => $content,
-                'PublishedBy' => $input['published'] == 1
-                    ? $this->application
-                    ->getConnectedUser()
-                    ->person->Id ?? throw new IntegrityException(
-                        'Fatal error in file ' . __FILE__ . ' at line ' . __LINE__
-                    )
-                    : null,
-                'IdGroup'        => $input['idGroup'],
+                'Title'          => $title,
+                'Content'        => $content,
+                'PublishedBy'    => $publishedBy,
+                'IdGroup'        => $input['idGroup'] ?? null,
                 'OnlyForMembers' => $input['membersOnly'] ?? 0,
                 'LastUpdate'     => date('Y-m-d H:i:s')
             ],
@@ -731,62 +676,141 @@ final class ArticleController extends TableController
         $this->redirect('/article/' . $id);
     }
 
+    #region Authorization pipeline
     /**
-     * Shared access gate for the article pages (article view, article chat).
+     * Access gate for the read-only article pages (article view, article chat).
      *
-     * Checks the HTTP method, the article existence, the read permission, the
-     * article authorization record and the availability of the latest version.
-     * When access is refused, the response (error page or redirect) has already
-     * been emitted and null is returned: the caller must simply stop.
-     *
-     * @return array{row: object, authorization: ArticleAuthorizationRow, latest: ArticleRow}|null
-     *         row: the article row limited to $columns,
-     *         authorization: the article authorization data,
-     *         latest: the latest version of the article,
-     *         or null if the request was already handled
+     * HTTP method -> latest version -> read policy, as one Result chain.
+     * Any failure has already been answered (error page or redirect) when null is returned:
+     * the caller must simply stop.
      */
-    private function getReadableArticle(int $id, string $columns = 'Id, OnlyForMembers'): ?array
+    private function readArticle(int $id): ?ArticleRow
     {
-        if (!in_array(WebApp::getRequestMethod(), ['GET', 'HEAD'], true)) {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return null;
-        }
-
-        $article = $this->dataHelper->get('Article', ['Id' => $id], $columns);
-        if (!$article) {
-            $msg = str_replace('{id}', (string)$id, ($this->t)('article.error.not_found'));
-            $this->raiseBadRequest($msg, __FILE__, __LINE__);
-            return null;
-        }
-
-        $connectedUser = $this->application->getConnectedUser();
-        if (!$this->authorizationService->canRead($id, $connectedUser)) {
-            if ($connectedUser->person === null) {
-                $this->handleAnonymousAccess();
-            } else {
-                $this->raiseForbidden(__FILE__, __LINE__, 10000, false);
-            }
-            return null;
-        }
+        $user = $this->application->getConnectedUser();
 
         try {
-            $authorization = $this->authorizationDataHelper->getArticle($id, $connectedUser);
-            if ($authorization === false) {
-                $this->raiseForbidden(__FILE__, __LINE__);
-                return null;
-            }
-
-            $latest = $this->articleDataHelper->getLatestArticle([$id]);
-            if ($latest === null) {
-                $this->raiseForbidden(__FILE__, __LINE__);
-                return null;
-            }
+            return $this->unwrapOrRespond(
+                $this->requireMethod(['GET', 'HEAD'])
+                    ->andThen(fn() => $this->loadLatest($id))
+                    ->andThen(fn(ArticleRow $article) => $this->authorizationService->authorizeRead($article, $user)),
+                $id,
+                readAccess: true,
+            );
         } catch (QueryException $e) {
             $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
             return null;
         }
+    }
 
-        return ['row' => $article, 'authorization' => $authorization, 'latest' => $latest];
+    /**
+     * @param list<string> $allowedMethods
+     * @return Result<null>
+     */
+    private function requireMethod(array $allowedMethods): Result
+    {
+        return in_array(WebApp::getRequestMethod(), $allowedMethods, true)
+            ? Result::ok(null)
+            : Result::fail(ArticleAccess::MethodNotAllowed);
+    }
+
+    /**
+     * @return Result<ArticleRow>
+     */
+    private function loadLatest(int $id): Result
+    {
+        $article = $this->articleDataHelper->getLatestArticle([$id]);
+
+        return $article === null
+            ? Result::fail(ArticleAccess::NotFound)
+            : Result::ok($article);
+    }
+
+    /**
+     * Loads the latest version of an article and checks one permission on it.
+     *
+     * @param callable(ArticleRow, \app\helpers\ConnectedUser): bool $isAllowed
+     * @return Result<ArticleRow>
+     */
+    private function loadAuthorized(int $id, callable $isAllowed): Result
+    {
+        $user = $this->application->getConnectedUser();
+
+        return $this->loadLatest($id)->andThen(
+            static fn(ArticleRow $article): Result => $isAllowed($article, $user)
+                ? Result::ok($article)
+                : Result::fail(ArticleAccess::Forbidden)
+        );
+    }
+
+    /**
+     * Single exit point of the pipelines: returns the success value, or emits the
+     * HTTP response matching the denial and returns null.
+     *
+     * @template T
+     * @param Result<T> $result
+     * @param bool $readAccess read denials keep their historical raiseForbidden() arguments
+     * @return T|null
+     */
+    private function unwrapOrRespond(Result $result, int $articleId, bool $readAccess = false): mixed
+    {
+        return $result->match(
+            onOk: static fn(mixed $value): mixed => $value,
+            onFail: function (ArticleAccess $reason) use ($articleId, $readAccess): mixed {
+                $this->respondToDenial($reason, $articleId, $readAccess);
+                return null;
+            },
+        );
+    }
+
+    /**
+     * The only place that turns an ArticleAccess denial into an HTTP response.
+     */
+    private function respondToDenial(ArticleAccess $reason, int $articleId, bool $readAccess = false): void
+    {
+        // switch rather than match: the raise*() methods return void.
+        // Keep one case per ArticleAccess case, a missing one would leave the request unanswered.
+        switch ($reason) {
+            case ArticleAccess::MethodNotAllowed:
+                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                break;
+            case ArticleAccess::NotFound:
+                $this->raiseBadRequest(
+                    str_replace('{id}', (string)$articleId, ($this->t)('article.error.not_found')),
+                    __FILE__,
+                    __LINE__
+                );
+                break;
+            case ArticleAccess::LoginRequired:
+                $this->handleAnonymousAccess();
+                break;
+            case ArticleAccess::Forbidden:
+                if ($readAccess) {
+                    $this->raiseForbidden(__FILE__, __LINE__, 10000, false);
+                } else {
+                    $this->raiseForbidden(__FILE__, __LINE__);
+                }
+                break;
+        }
+    }
+    #endregion
+
+    #region Private functions
+    private function publisherName(ArticleRow $article): string
+    {
+        if ($article->PublishedBy === null || $article->PublishedBy === $article->CreatedBy) {
+            return '';
+        }
+
+        return $this->personDataHelper->getPublisher($article->PublishedBy) ?? '';
+    }
+
+    private function toClosingVisibility(object|false $row): ?ClosingVisibilityRow
+    {
+        if ($row === false) {
+            return null;
+        }
+        /** @var ClosingVisibilityRowShape $row */
+        return ClosingVisibilityRow::fromStdClass($row);
     }
 
     /**
@@ -837,4 +861,5 @@ final class ArticleController extends TableController
 
         return $default;
     }
+    #endregion
 }

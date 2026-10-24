@@ -37,6 +37,7 @@ use app\helpers\MediaManager;
 use app\helpers\MemberCustomFields;
 use app\helpers\NotificationSender;
 use app\models\AlertRecipientDataHelper;
+use app\models\ArticleDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\AvailabilityDataHelper;
@@ -58,6 +59,7 @@ use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
+use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
@@ -70,8 +72,9 @@ final readonly class ApiFactory
     public function __construct(
         private AlertRecipientDataHelper $alertRecipientDataHelper,
         private Application $application,
+        private ArticleAuthorizationService $articleAuthorizationService,
+        private ArticleDataHelper $articleDataHelper,
         private AttributeDataHelper $attributeDataHelper,
-        private AuthorizationDataHelper $authorizationDataHelper,
         private AvailabilityDataHelper $availabilityDataHelper,
         private CarouselDataHelper $carouselDataHelper,
         private ConnectedUser $connectedUser,
@@ -122,8 +125,9 @@ final readonly class ApiFactory
             $this->connectedUser,
             $this->languagesDataHelper,
             $this->personDataHelper,
-            $this->authorizationDataHelper,
-            $this->carouselDataHelper
+            $this->articleDataHelper,
+            $this->carouselDataHelper,
+            $this->articleAuthorizationService,
         );
     }
 

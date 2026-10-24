@@ -10,12 +10,16 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\modules\Common\interfaces\NewsProviderInterface;
+use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\ReplyRow;
+use app\modules\Article\valueObjects\SurveyNewsRow;
 use app\modules\Article\valueObjects\SurveyWithCreatorRow;
+use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 final class SurveyDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application, private readonly AuthorizationDataHelper $authorizationDataHelper)
+    public function __construct(Application $application, private readonly ArticleAuthorizationService $authorizationService)
     {
         parent::__construct(
             $application->getPdo(),
@@ -120,31 +124,27 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    /**
-     * @return array<int, array{
-     *     type: string,
-     *     id: int,
-     *     title: string,
-     *     detail: string,
-     *     from: string,
-     *     date: string,
-     *     url: string
-     * }>
-     */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
-        $news = [];
         if (!($connectedUser->person ?? false)) {
-            return $news;
+            return [];
         }
+
+        // The article columns needed by the authorization rules are read here,
+        // so no extra article query is needed for each survey.
         $sql = "
             SELECT 
                 p.FirstName,
                 p.LastName,
+                s.Id AS SurveyId,
                 s.Question,
                 s.ClosingDate,
                 s.Visibility,
                 s.IdArticle,
+                a.CreatedBy,
+                a.PublishedBy,
+                a.IdGroup,
+                a.OnlyForMembers,
                 MAX(r.LastUpdate) AS LastActivity,
                 GROUP_CONCAT(
                     v.FirstName || ' ' || v.LastName || ' (' ||
@@ -162,22 +162,38 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
-        $surveys = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         $news = [];
-        foreach ($surveys as $survey) {
-            $article = $this->authorizationDataHelper->getArticle($survey->IdArticle, $connectedUser);
+        foreach ($rows as $row) {
+            $survey = SurveyNewsRow::fromStdClass($row);
+
+            $article = new ArticleAuthorizationRow(
+                Id: $survey->IdArticle,
+                CreatedBy: $survey->CreatedBy,
+                PublishedBy: $survey->PublishedBy,
+                IdGroup: $survey->IdGroup,
+                OnlyForMembers: $survey->OnlyForMembers,
+            );
+            $closing = new ClosingVisibilityRow(
+                Id: $survey->SurveyId,
+                ClosingDate: $survey->ClosingDate,
+                Visibility: $survey->Visibility->value, // ou adapte selon le constructeur de ClosingVisibilityRow
+            );
+
+            // Same two gates as the results page: read the article, then the visibility chosen by its creator
             if (
-                $article !== false
-                && $this->authorizationDataHelper->canPersonReadSurveyResults($article, $connectedUser)
+                $this->authorizationService->canRead($article, $connectedUser)
+                && $this->authorizationService->canReadSurveyResults($closing, $article, $connectedUser)
             ) {
                 $news[] = [
-                    'type'   => 'survey',
-                    'id'     => $survey->IdArticle,
-                    'title'  => $survey->Question,
-                    'detail' => 'Votes : ' . $survey->Voters,
-                    'from'   => $survey->FirstName . ' ' . $survey->LastName,
-                    'date'   => $survey->LastActivity,
-                    'url'    => '/survey/results/' . $survey->IdArticle
+                'type'   => 'survey',
+                'id'     => $survey->IdArticle,
+                'title'  => $survey->Question,
+                'detail' => 'Votes : ' . $survey->Voters,
+                'from'   => $survey->FirstName . ' ' . $survey->LastName,
+                'date'   => $survey->LastActivity,
+                'url'    => '/survey/results/' . $survey->IdArticle
                 ];
             }
         }

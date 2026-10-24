@@ -47,6 +47,7 @@ use app\models\TableControllerDataHelper;
 use app\modules\Article\ArticleController;
 use app\modules\Article\MediaController;
 use app\modules\Article\OrderController;
+use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\SurveyController;
 use app\modules\Astronomy\AstronomyController;
 use app\modules\Backup\BackupController;
@@ -114,6 +115,7 @@ final readonly class ControllerFactory
     public function __construct(
         private AlertRecipientDataHelper $alertRecipientDataHelper,
         private Application $application,
+        private ArticleAuthorizationService $articleAuthorizationService,
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
         private ArticleDataHelper $articleDataHelper,
         private ArticleService $articleService,
@@ -171,7 +173,8 @@ final readonly class ControllerFactory
             $this->logDataHelper,
             $this->articleService,
             $this->alertRecipientDataHelper,
-            $this->carouselDataHelper
+            $this->carouselDataHelper,
+            $this->articleAuthorizationService,
         );
     }
 
@@ -421,6 +424,8 @@ final readonly class ControllerFactory
     {
         return new OrderController(
             $this->application,
+            $this->articleDataHelper,
+            $this->articleAuthorizationService,
             $this->orderDataHelper
         );
     }
@@ -464,6 +469,8 @@ final readonly class ControllerFactory
     {
         return new SurveyController(
             $this->application,
+            $this->articleDataHelper,
+            $this->articleAuthorizationService,
             $this->surveyDataHelper
         );
     }

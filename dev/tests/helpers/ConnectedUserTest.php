@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace tests\helpers;
 
 use ReflectionClass;
+use ReflectionProperty;
 use PDO;
 use tests\models\DataHelperTestCase;
 use app\helpers\ConnectedUser;
@@ -14,8 +15,9 @@ use app\enums\Authorization;
 use app\enums\ApplicationError;
 use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
 use app\modules\Common\valueObjects\Person;
+use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
-use app\models\interfaces\AuthorizationDataHelperInterface;
+use app\models\Data;
 use app\models\interfaces\MetadataDataHelperInterface;
 
 /**
@@ -26,6 +28,9 @@ use app\models\interfaces\MetadataDataHelperInterface;
  *
  * Here we test everything that only depends on internal state or on
  * the injectable collaborators.
+ *
+ * AuthorizationDataHelper is final → real instance on in-memory SQLite
+ * (same pattern as ArticleAuthorizationServiceTest).
  */
 final class ConnectedUserTest extends DataHelperTestCase
 {
@@ -48,6 +53,10 @@ final class ConnectedUserTest extends DataHelperTestCase
         $_SESSION = $this->session;
         parent::tearDown();
     }
+
+    // -------------------------------------------------------------------------
+    // Helpers – DataHelper (real, light SQLite)
+    // -------------------------------------------------------------------------
 
     /**
      * Crée un DataHelper réel et très léger (SQLite en mémoire).
@@ -90,23 +99,110 @@ final class ConnectedUserTest extends DataHelperTestCase
         );
     }
 
+    // -------------------------------------------------------------------------
+    // Helpers – AuthorizationDataHelper (final → réflexion + PDO)
+    // -------------------------------------------------------------------------
+
+    /**
+     * AuthorizationDataHelper is final, so it cannot be mocked, stubbed or subclassed.
+     * The real class is used instead, on top of an in-memory SQLite database.
+     *
+     * The constructor is bypassed (it needs a full Application) and only the
+     * inherited $pdo property is set.
+     */
+    private function makeAuthorizationDataHelper(?PDO $pdo = null): AuthorizationDataHelper
+    {
+        /** @var AuthorizationDataHelper $helper */
+        $helper = (new ReflectionClass(AuthorizationDataHelper::class))
+            ->newInstanceWithoutConstructor();
+
+        (new ReflectionProperty(Data::class, 'pdo'))
+            ->setValue($helper, $pdo ?? $this->makeAuthorizationSchemaPdo());
+
+        return $helper;
+    }
+
+    /**
+     * Minimal schema used by AuthorizationDataHelper::getsFor().
+     * Tables/colonnes issues de la vraie requête.
+     */
+    private function makeAuthorizationSchemaPdo(): PDO
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $pdo->exec("
+        CREATE TABLE Member (
+            Id INTEGER PRIMARY KEY
+        );
+        CREATE TABLE MemberGroup (
+            IdMember INTEGER,
+            IdGroup  INTEGER
+        );
+        CREATE TABLE `Group` (
+            Id INTEGER PRIMARY KEY
+        );
+        CREATE TABLE GroupAuthorization (
+            IdGroup         INTEGER,
+            IdAuthorization INTEGER
+        );
+        CREATE TABLE Authorization (
+            Id   INTEGER PRIMARY KEY,
+            Name TEXT
+        );
+    ");
+
+        return $pdo;
+    }
+
+    /**
+     * Insère un membre, un groupe, le lien membre↔groupe,
+     * une autorisation et le lien groupe↔autorisation.
+     *
+     * @param list<string> $authorizationNames  valeurs de Authorization::*->value
+     */
+    private function givenAuthorizations(PDO $pdo, int $memberId, array $authorizationNames): void
+    {
+        $pdo->prepare('INSERT INTO Member (Id) VALUES (?)')
+            ->execute([$memberId]);
+
+        // Un groupe unique par membre pour les tests (IdGroup = 1 suffit)
+        $groupId = 1;
+        $pdo->prepare('INSERT OR IGNORE INTO `Group` (Id) VALUES (?)')
+            ->execute([$groupId]);
+        $pdo->prepare('INSERT INTO MemberGroup (IdMember, IdGroup) VALUES (?, ?)')
+            ->execute([$memberId, $groupId]);
+
+        foreach ($authorizationNames as $i => $name) {
+            $authId = $i + 1;
+            $pdo->prepare('INSERT INTO Authorization (Id, Name) VALUES (?, ?)')
+                ->execute([$authId, $name]);
+            $pdo->prepare('INSERT INTO GroupAuthorization (IdGroup, IdAuthorization) VALUES (?, ?)')
+                ->execute([$groupId, $authId]);
+        }
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Helpers – ConnectedUser factory
+    // -------------------------------------------------------------------------
+
     /**
      * Construit un ConnectedUser.
-     * DataHelper est toujours un vrai objet (car final).
+     * DataHelper et AuthorizationDataHelper sont toujours des vrais objets (car final).
      * Les autres collaborateurs restent mockables tant qu’ils ne sont pas final.
      */
-
     private function makeConnectedUser(
         ?DataHelper $dataHelper = null,
-        ?AuthorizationDataHelperInterface $authorizationDataHelper = null,
+        ?AuthorizationDataHelper $authorizationDataHelper = null,
         ?MetadataDataHelperInterface $metadataDataHelper = null,
-        ?GravatarHandlerInterface $gravatarHandler = null,   // ← interface
+        ?GravatarHandlerInterface $gravatarHandler = null,
         ?ErrorManagerInterface $errorManager = null,
     ): ConnectedUser {
         return new ConnectedUser(
             $errorManager            ?? $this->createStub(ErrorManagerInterface::class),
             $dataHelper              ?? $this->makeRealDataHelper(),
-            $authorizationDataHelper ?? $this->createStub(AuthorizationDataHelperInterface::class),
+            $authorizationDataHelper ?? $this->makeAuthorizationDataHelper(),
             $metadataDataHelper      ?? $this->createStub(MetadataDataHelperInterface::class),
             $gravatarHandler         ?? $this->createStub(GravatarHandlerInterface::class),
         );
@@ -356,7 +452,7 @@ final class ConnectedUserTest extends DataHelperTestCase
 
         $dataHelper = $this->makeRealDataHelper();
 
-        // On insère les données nécessaires
+        // On insère les données nécessaires dans DataHelper
         $pdo = (new ReflectionClass($dataHelper))->getProperty('pdo')->getValue($dataHelper);
         assert($pdo instanceof PDO);
         $pdo->exec("
@@ -369,10 +465,10 @@ final class ConnectedUserTest extends DataHelperTestCase
             VALUES ($id, NULL, 0)
         ");
 
-        $authorizationDataHelper = $this->createMock(AuthorizationDataHelperInterface::class);
-        $authorizationDataHelper->expects($this->once())
-            ->method('getsFor')
-            ->willReturn([Authorization::Editor->value]);
+        // AuthorizationDataHelper réel + données d’autorisation
+        $authPdo = $this->makeAuthorizationSchemaPdo();
+        $this->givenAuthorizations($authPdo, $id, [Authorization::Editor->value]);
+        $authorizationDataHelper = $this->makeAuthorizationDataHelper($authPdo);
 
         $metadataDataHelper = $this->createStub(MetadataDataHelperInterface::class);
         $metadataDataHelper->method('isTestSite')->willReturn(false);

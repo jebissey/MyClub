@@ -9,7 +9,7 @@ use app\helpers\interfaces\ErrorManagerInterface;
 use app\helpers\interfaces\GravatarHandlerInterface;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
-use app\models\interfaces\AuthorizationDataHelperInterface;
+use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\interfaces\MetadataDataHelperInterface;
 use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
@@ -23,7 +23,7 @@ final class ConnectedUser
     public function __construct(
         private readonly ErrorManagerInterface $errorManager,
         private readonly DataHelper $dataHelper,
-        private readonly AuthorizationDataHelperInterface $authorizationDataHelper,
+        private readonly AuthorizationDataHelper $authorizationDataHelper,
         private readonly MetadataDataHelperInterface $metadataDataHelper,
         private readonly GravatarHandlerInterface $gravatarHandler = new GravatarHandler(),
     ) {

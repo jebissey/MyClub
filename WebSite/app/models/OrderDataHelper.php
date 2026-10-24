@@ -9,9 +9,11 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\modules\Common\interfaces\NewsProviderInterface;
+use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\OrderWithCreatorRow;
 use app\modules\Article\valueObjects\OrderNewsRow;
+use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 /**
  * @phpstan-type PendingOrderResponse object{
@@ -33,13 +35,14 @@ use app\modules\Article\valueObjects\OrderNewsRow;
  *     url: string
  * }
  * @phpstan-import-type OrderNewsRowShape from OrderNewsRow
+ * @phpstan-import-type ClosingVisibilityRowShape from ClosingVisibilityRow
  */
 final class OrderDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(
         Application $application,
         private readonly ArticleDataHelper $articleDataHelper,
-        private readonly AuthorizationDataHelper $authorizationDataHelper
+        private readonly ArticleAuthorizationService $authorizationService
     ) {
         parent::__construct(
             $application->getPdo(),
@@ -172,23 +175,36 @@ final class OrderDataHelper extends Data implements NewsProviderInterface
             if ($articleRow === false) {
                 continue;
             }
+            $article = ArticleAuthorizationRow::fromArticleRow($articleRow);
+
+            // 1st gate: the article must be readable
+            if (!$this->authorizationService->canRead($article, $connectedUser)) {
+                continue;
+            }
+
+            // 2nd gate: the visibility chosen by the creator of the order
+            /** @var ClosingVisibilityRowShape|false $closingRow */
+            $closingRow = $this->get('Order', ['IdArticle' => $order->IdArticle], 'Id, ClosingDate, Visibility');
             if (
-                $this->authorizationDataHelper->getArticle($order->IdArticle, $connectedUser)
-                && $this->authorizationDataHelper->canPersonReadOrderResults(
-                    ArticleAuthorizationRow::fromArticleRow($articleRow),
+                $closingRow === false
+                || !$this->authorizationService->canReadOrderResults(
+                    ClosingVisibilityRow::fromStdClass($closingRow),
+                    $article,
                     $connectedUser
                 )
             ) {
-                $news[] = [
-                    'type'   => 'order',
-                    'id'     => $order->IdArticle,
-                    'title'  => $order->Question,
-                    'detail' => 'Commandes : ' . $order->Orderers,
-                    'from'   => $order->FirstName . ' ' . $order->LastName,
-                    'date'   => $order->LastActivity,
-                    'url'    => '/order/results/' . $order->IdArticle
-                ];
+                continue;
             }
+
+            $news[] = [
+                'type'   => 'order',
+                'id'     => $order->IdArticle,
+                'title'  => $order->Question,
+                'detail' => 'Commandes : ' . $order->Orderers,
+                'from'   => $order->FirstName . ' ' . $order->LastName,
+                'date'   => $order->LastActivity,
+                'url'    => '/order/results/' . $order->IdArticle
+            ];
         }
         return $news;
     }

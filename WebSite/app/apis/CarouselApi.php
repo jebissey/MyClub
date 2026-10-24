@@ -11,10 +11,12 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\models\AuthorizationDataHelper;
+use app\models\ArticleDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
+use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 
 final class CarouselApi extends AbstractApi
 {
@@ -23,8 +25,9 @@ final class CarouselApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private readonly AuthorizationDataHelper $authorizationDataHelper,
-        private readonly CarouselDataHelper $carouselDataHelper
+        private readonly ArticleDataHelper $articleDataHelper,
+        private readonly CarouselDataHelper $carouselDataHelper,
+        private readonly ArticleAuthorizationService $authorizationService,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
@@ -41,7 +44,14 @@ final class CarouselApi extends AbstractApi
             $this->renderJsonBadRequest("Item {$id} not found", __FILE__, __LINE__);
             return;
         }
-        if (!$this->authorizationDataHelper->getArticle($item->IdArticle, $this->application->getConnectedUser())) {
+
+        $article = $this->articleDataHelper->getLatestArticle([$item->IdArticle]);
+        if ($article === null) {
+            $this->renderJsonBadRequest("Article {$item->IdArticle} not found", __FILE__, __LINE__);
+            return;
+        }
+        // Deleting an item is an edition of the article, not a simple read
+        if (!$this->authorizationService->canEdit($article, $this->application->getConnectedUser())) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
@@ -57,10 +67,21 @@ final class CarouselApi extends AbstractApi
     {
         try {
             $connectedUser = $this->application->getConnectedUser();
-            if (!($connectedUser->person ?? false) || !$this->authorizationDataHelper->getArticle($idArticle, $connectedUser)) {
+            if (!($connectedUser->person ?? false)) {
                 $this->renderJsonForbidden(__FILE__, __LINE__);
                 return;
             }
+
+            $article = $this->articleDataHelper->getLatestArticle([$idArticle]);
+            if ($article === null) {
+                $this->renderJsonBadRequest("Article {$idArticle} not found", __FILE__, __LINE__);
+                return;
+            }
+            if (!$this->authorizationService->canRead(ArticleAuthorizationRow::fromArticleRow($article), $connectedUser)) {
+                $this->renderJsonForbidden(__FILE__, __LINE__);
+                return;
+            }
+
             $this->renderJsonOk(['items' => $this->dataHelper->gets(
                 'Carousel',
                 ['IdArticle' => $idArticle],
@@ -93,10 +114,26 @@ final class CarouselApi extends AbstractApi
 
         $idArticle = To::int($data['idArticle']);
 
-        if (!$this->authorizationDataHelper->getArticle($idArticle, $connectedUser)) {
+        $article = $this->articleDataHelper->getLatestArticle([$idArticle]);
+        if ($article === null) {
+            $this->renderJsonBadRequest("Article {$idArticle} not found", __FILE__, __LINE__);
+            return;
+        }
+        if (!$this->authorizationService->canEdit($article, $connectedUser)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
         }
+
+        // An existing item can only be updated through the article it belongs to
+        if (isset($data['id'])) {
+            /** @var object{IdArticle: int|string}|false $existing */
+            $existing = $this->dataHelper->get('Carousel', ['Id' => To::int($data['id'])], 'IdArticle');
+            if ($existing !== false && (int)$existing->IdArticle !== $idArticle) {
+                $this->renderJsonForbidden(__FILE__, __LINE__);
+                return;
+            }
+        }
+
         $item = WebApp::sanitizeHtml(To::str($data['item']));
         try {
             /** @var array{id?: int|string, idArticle: int|string} $payload */

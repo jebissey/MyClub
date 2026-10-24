@@ -4,214 +4,96 @@ declare(strict_types=1);
 
 namespace app\modules\Article;
 
-use DateTime;
-use app\enums\FilterInputRule;
 use app\enums\OrderVisibility;
-use app\exceptions\IntegrityException;
 use app\helpers\Application;
-use app\helpers\WebApp;
+use app\helpers\ConnectedUser;
+use app\models\ArticleDataHelper;
 use app\models\OrderDataHelper;
-use app\modules\Article\valueObjects\ArticleAuthorizationRow;
-use app\modules\Article\valueObjects\ArticleTitleRow;
-use app\modules\Article\valueObjects\OrderReplyRow;
-use app\modules\Article\valueObjects\PersonNameRow;
-use app\modules\Common\AbstractController;
+use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleRow;
-use app\modules\Article\valueObjects\IdRow;
+use app\modules\Article\valueObjects\OrderReplyRow;
+use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 /**
- * @phpstan-import-type ArticleRowShape from ArticleRow
  * @phpstan-import-type OrderReplyRowShape from OrderReplyRow
  */
-final class OrderController extends AbstractController
+final class OrderController extends ClosableFormController
 {
-    public function __construct(Application $application, private readonly OrderDataHelper $orderDataHelper)
-    {
-        parent::__construct($application);
+    public function __construct(
+        Application $application,
+        ArticleDataHelper $articleDataHelper,
+        ArticleAuthorizationService $articleAuthorizationService,
+        private readonly OrderDataHelper $orderDataHelper,
+    ) {
+        parent::__construct($application, $articleDataHelper, $articleAuthorizationService);
     }
 
-    public function add(int $articleId): void
+    protected function formName(): string
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            return;
-        }
-
-        $articleData = $this->dataHelper->get('Article', ['Id' => $articleId], 'Title, Id');
-        if (!$articleData) {
-            $this->redirect('/articles');
-            return;
-        }
-
-        /** @var object{Id: int|string, Title: string} $articleData */
-        $article = ArticleTitleRow::fromStdClass($articleData);
-
-        $this->render('Article/views/order_add.latte', $this->getAllParams([
-            'article' => $article,
-            'order'   => $this->dataHelper->get(
-                'Order',
-                ['IdArticle' => $article->Id],
-                'Question, Options, ClosingDate, Visibility'
-            ),
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+        return 'order';
     }
 
-    public function createOrUpdate(): void
+    protected function visibilityEnum(): string
     {
-        if (!($this->application->getConnectedUser()->isRedactor())) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-
-        $schema = [
-            'article_id'  => FilterInputRule::Int->value,
-            'question'    => FilterInputRule::HtmlSafeText->value,
-            'closingDate' => FilterInputRule::DateTime->value,
-            'visibility'  => $this->application->enumToValues(OrderVisibility::class),
-            'options'     => FilterInputRule::ArrayString->value,
-        ];
-
-        $input       = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        /** @var int $articleId */
-        $articleId   = $input['article_id']  ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
-        $question    = $input['question']    ?? '???';
-        $closingDate = $input['closingDate'] ?? new DateTime('+7 days');
-        $visibility  = $input['visibility']  ?? OrderVisibility::Redactor->value;
-
-        /** @var array<string> $rawOptions */
-        $rawOptions = $input['options'] ?? [];
-        $options = [];
-        foreach ($rawOptions as $option) {
-            $options[] = str_replace('"', "''", $option);
-        }
-        $optionsJson = json_encode($options);
-
-        $fields = [
-            'Question'    => $question,
-            'Options'     => $optionsJson,
-            'ClosingDate' => $closingDate,
-            'IdArticle'   => $articleId,
-            'Visibility'  => $visibility,
-        ];
-
-        $orderData = $this->dataHelper->get('Order', ['IdArticle' => $articleId], 'Id');
-        if ($orderData) {
-            /** @var object{Id: int|string} $orderData */
-            $order = IdRow::fromStdClass($orderData);
-            $this->dataHelper->set('Order', $fields, ['Id' => $order->Id]);
-        } else {
-            $this->dataHelper->set('Order', $fields);
-        }
-
-        $this->redirect('/article/' . $articleId);
+        return OrderVisibility::class;
     }
 
-    public function viewResults(int $articleId): void
+    protected function defaultVisibility(): string
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
-            return;
-        }
+        return OrderVisibility::Redactor->value;
+    }
 
-        if ($this->dataHelper->get('Article', ['Id' => $articleId], 'Id') === false) {
-            $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
-            return;
-        }
+    protected function canReadResults(ClosingVisibilityRow $form, ArticleRow $article, ConnectedUser $user): bool
+    {
+        return $this->authorizationService->canReadOrderResults($form, $article, $user);
+    }
 
-        $connectedUser = $this->application->getConnectedUser();
-        if ($connectedUser->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
-            return;
-        }
-
+    protected function buildResultsParams(int $articleId): ?array
+    {
         $order = $this->orderDataHelper->getWithCreator($articleId);
         if (!$order) {
-            $this->raiseBadRequest("No order for article {$articleId}", __FILE__, __LINE__);
-            $this->redirect('/article/' . $articleId);
-            return;
+            return null;
         }
 
-        /** @var ArticleRowShape|false $articleForAuth */
-        $articleForAuth = $this->dataHelper->get(
-            'Article',
-            ['Id' => $order->IdArticle],
-            'Id, Title, Content, CreatedBy, PublishedBy, IdGroup, OnlyForMembers, LastUpdate'
+        /** @var array<int, OrderReplyRowShape> $repliesData */
+        $repliesData = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id], '*');
+
+        $replies = array_map(
+            static fn(object $row): OrderReplyRow => OrderReplyRow::fromStdClass($row),
+            $repliesData
         );
 
-        if ($articleForAuth === false) {
-            $this->raiseBadRequest("Article {$order->IdArticle} doesn't exist", __FILE__, __LINE__);
-            return;
+        $participants = [];
+        /** @var array<string, float|int> $results */
+        $results = [];
+
+        /** @var array<string> $options */
+        $options = json_decode($order->Options) ?? [];
+        foreach ($options as $option) {
+            $results[$option] = 0;
         }
 
-        $articleAuthorization = ArticleAuthorizationRow::fromStdClass(ArticleRow::fromStdClass($articleForAuth));
+        foreach ($replies as $reply) {
+            /** @var array<string, float|int> $answers */
+            $answers = json_decode($reply->Answers) ?? [];
 
-        if (
-            $this->authorizationDataHelper->canPersonReadOrderResults(
-                $articleAuthorization,
-                $connectedUser
-            )
-        ) {
-            /** @var array<int, OrderReplyRowShape> $repliesData */
-            $repliesData = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id], '*');
+            $participants[] = [
+                'name'    => $this->participantName($reply->IdPerson),
+                'answers' => $answers,
+            ];
 
-            $replies = array_map(
-                static fn(object $row): OrderReplyRow => OrderReplyRow::fromStdClass($row),
-                $repliesData
-            );
-
-            $participants = [];
-            /** @var array<string, float|int> $results */
-            $results = [];
-
-            /** @var array<string> $options */
-            $options = json_decode($order->Options) ?? [];
-            foreach ($options as $option) {
-                $results[$option] = 0;
-            }
-
-            foreach ($replies as $reply) {
-                /** @var array<string, float|int> $answers */
-                $answers = json_decode($reply->Answers) ?? [];
-
-                $personData = $this->dataHelper->get(
-                    'Individual',
-                    ['Id' => $reply->IdPerson],
-                    'FirstName, LastName'
-                );
-
-                /** @var object{FirstName: string, LastName: string}|false $personData */
-                $person = $personData ? PersonNameRow::fromStdClass($personData) : null;
-
-                $participants[] = [
-                    'name' => $person === null
-                        ? '???'
-                        : $person->FirstName . ' ' . $person->LastName,
-                    'answers' => $answers,
-                ];
-
-                foreach ($answers as $article => $quantity) {
-                    if (isset($results[$article])) {
-                        $results[$article] += $quantity;
-                    }
+            foreach ($answers as $option => $quantity) {
+                if (isset($results[$option])) {
+                    $results[$option] += $quantity;
                 }
             }
-
-            $this->render('Article/views/order_results.latte', $this->getAllParams([
-                'order'          => $order,
-                'options'        => $options,
-                'results'        => $results,
-                'participants'   => $participants,
-                'articleId'      => $articleId,
-                'currentVersion' => Application::VERSION,
-                'page'           => $connectedUser->getPage(),
-                'btn_HistoryBack' => true,
-                'btn_Parent'      => "/article/{$articleId}",
-            ]));
-        } else {
-            $this->raiseForbidden(__FILE__, __LINE__);
         }
+
+        return [
+            'order'        => $order,
+            'options'      => $options,
+            'results'      => $results,
+            'participants' => $participants,
+        ];
     }
 }
