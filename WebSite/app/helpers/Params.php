@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use InvalidArgumentException;
+use app\modules\Common\valueObjects\NavbarColors;
 
 final class Params
 {
@@ -15,11 +16,6 @@ final class Params
 
     /**
      * @param array<string, mixed> $specificParams
-     * @param array{
-     *     navbarBgColor:string,
-     *     navbarInkColor:string,
-     *     navbarIconColor:string
-     * } $defaultColors
      *
      * @return array<string, mixed>
      */
@@ -27,7 +23,7 @@ final class Params
         array $specificParams,
         ?string $prodSiteUrl,
         ?string $memberAlert,
-        array $defaultColors
+        NavbarColors $defaultColors
     ): array {
         if (self::$commonParams === []) {
             $requestUri = $_SERVER['REQUEST_URI'] ?? '';
@@ -71,18 +67,11 @@ final class Params
         }
     }
 
-    /**
-     * @param array{
-     *     navbarBgColor:string,
-     *     navbarInkColor:string,
-     *     navbarIconColor:string
-     * } $defaultColors
-     */
     private static function setDefaultParams(
         string $requestUri,
         ?string $prodSiteUrl,
         ?string $memberAlert,
-        array $defaultColors
+        NavbarColors $defaultColors
     ): void {
         $path = parse_url($requestUri, PHP_URL_PATH);
 
@@ -122,9 +111,9 @@ final class Params
             'flag' => TranslationManager::getFlag($lang),
             'currentPath' => $path,
             'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-            'navbarBgColor'   => $defaultColors['navbarBgColor'],
-            'navbarInkColor'  => $defaultColors['navbarInkColor'],
-            'navbarIconColor' => $defaultColors['navbarIconColor'],
+            'navbarBgColor'   => $defaultColors->bgColor,
+            'navbarInkColor'  => $defaultColors->inkColor,
+            'navbarIconColor' => $defaultColors->iconColor,
         ];
 
         if ($prodSiteUrl !== null) {

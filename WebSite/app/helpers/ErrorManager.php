@@ -72,16 +72,16 @@ final readonly class ErrorManager implements ErrorManagerInterface
                 $result
             );
         }
-        $defaultColors = $this->dataHelper->getDefaultColors();
+        $navbarColors = $this->dataHelper->getNavbarColors();
         $this->application->getFlight()->response()->status($code->value);
         $this->emptyController->render('Common/views/info.latte', [
             'content' => $result,
             'btn_HistoryBack' => true,
             'previousPage' => true,
             'timer' => $timeout,
-            'navbarBgColor'   => $defaultColors['navbarBgColor'],
-            'navbarInkColor'  => $defaultColors['navbarInkColor'],
-            'navbarIconColor' => $defaultColors['navbarIconColor'],
+            'navbarBgColor'   => $navbarColors->bgColor,
+            'navbarInkColor'  => $navbarColors->inkColor,
+            'navbarIconColor' => $navbarColors->iconColor,
         ]);
         if ($code != ApplicationError::Ok) {
             exit;

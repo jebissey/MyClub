@@ -14,6 +14,7 @@ use stdClass;
 use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
 use app\helpers\interfaces\ErrorManagerInterface;
+use app\modules\Common\valueObjects\NavbarColors;
 
 abstract class Data
 {
@@ -149,14 +150,13 @@ abstract class Data
         }
     }
 
-    /** @return array{navbarBgColor: string, navbarInkColor: string, navbarIconColor: string} */
-    public function getDefaultColors(): array
+    public function getNavbarColors(): NavbarColors
     {
-        return [
-            'navbarBgColor'   => $this->get('Settings', ['Name' => 'Navbar_BgColor'], 'Value')->Value ?? '#212529',
-            'navbarInkColor'  => $this->get('Settings', ['Name' => 'Navbar_InkColor'], 'Value')->Value ?? '#ffffff',
-            'navbarIconColor' => $this->get('Settings', ['Name' => 'Navbar_IconColor'], 'Value')->Value ?? '#ffc107',
-        ];
+        return new NavbarColors(
+            bgColor: $this->get('Settings', ['Name' => 'Navbar_BgColor'], 'Value')->Value ?? '#212529',
+            inkColor: $this->get('Settings', ['Name' => 'Navbar_InkColor'], 'Value')->Value ?? '#ffffff',
+            iconColor: $this->get('Settings', ['Name' => 'Navbar_IconColor'], 'Value')->Value ?? '#ffc107',
+        );
     }
 
     public function getSetting(string $name, string $default): string

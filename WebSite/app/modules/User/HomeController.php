@@ -66,7 +66,7 @@ final class HomeController extends AbstractController
 
             $news = $this->news->anyNews($connectedUser);
         } else {
-            $defaultColors = $this->dataHelper->getDefaultColors();
+            $navbarColors = $this->dataHelper->getNavbarColors();
             Params::setParams(
                 [
                     'href'               => '/user/sign/in',
@@ -84,9 +84,9 @@ final class HomeController extends AbstractController
                         PHP_URL_PATH
                     ),
                     'isMyclubWebSite'    => WebApp::isMyClubWebSite(),
-                    'navbarBgColor'      => $defaultColors['navbarBgColor'],
-                    'navbarInkColor'     => $defaultColors['navbarInkColor'],
-                    'navbarIconColor'    => $defaultColors['navbarIconColor'],
+                    'navbarBgColor'      => $navbarColors->bgColor,
+                    'navbarInkColor'     => $navbarColors->inkColor,
+                    'navbarIconColor'    => $navbarColors->iconColor,
                 ],
                 $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl())
                     ? $prodSiteUrl

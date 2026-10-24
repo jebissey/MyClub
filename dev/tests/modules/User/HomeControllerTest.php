@@ -12,7 +12,7 @@ class HomeControllerTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        // home() via getDefaultColors() / getSetting() et Settings directes
+        // home() via getNavbarColors() / getSetting() et Settings directes
         $this->assertColumnsExist($pdo, 'Settings', [
             'Name',
             'Value',

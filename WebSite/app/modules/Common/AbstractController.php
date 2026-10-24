@@ -23,6 +23,7 @@ use app\models\MenuItemDataHelper;
 use app\models\MetadataDataHelper;
 use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\NavbarColors;
 use app\modules\Common\valueObjects\Person;
 
 abstract class AbstractController
@@ -37,6 +38,7 @@ abstract class AbstractController
     protected AuthorizationDataHelper $authorizationDataHelper;
     private readonly MetadataDataHelper $metadataDataHelper;
     private readonly ?string $prodSiteUrl;
+    private readonly NavbarColors $navbarColors;
     protected Closure $t;
 
     public function __construct(protected Application $application)
@@ -49,6 +51,7 @@ abstract class AbstractController
         $this->menuItemDataHelper = new MenuItemDataHelper($application, $this->authorizationDataHelper);
         $this->metadataDataHelper = new MetadataDataHelper($application);
         $this->prodSiteUrl = $this->metadataDataHelper->isTestSite() ? $this->metadataDataHelper->getProdSiteUrl() : null;
+        $this->navbarColors = $this->dataHelper->getNavbarColors();
         $this->t = fn(string $key): string => $this->languagesDataHelper->translate($key);
     }
 
@@ -76,7 +79,7 @@ abstract class AbstractController
      */
     protected function getAllParams(array $specificParams): array
     {
-        return Params::getAll($specificParams, $this->prodSiteUrl, null, $this->dataHelper->getDefaultColors());
+        return Params::getAll($specificParams, $this->prodSiteUrl, null, $this->navbarColors);
     }
 
     protected function getLayout(): string

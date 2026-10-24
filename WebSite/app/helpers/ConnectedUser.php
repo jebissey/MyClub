@@ -91,7 +91,7 @@ final class ConnectedUser
         }
 
         $lang = TranslationManager::getCurrentLanguage();
-        $defaultColors = $this->dataHelper->getDefaultColors();
+        $navbarColors = $this->dataHelper->getNavbarColors();
         $requestUri = $_SERVER['REQUEST_URI'] ?? '';
         $requestUri = is_string($requestUri) ? $requestUri : '';
 
@@ -130,9 +130,9 @@ final class ConnectedUser
                 'flag' => TranslationManager::getFlag($lang),
                 'currentPath' => parse_url($requestUri, PHP_URL_PATH),
                 'isMyclubWebSite' => WebApp::isMyClubWebSite(),
-                'navbarBgColor'   => $defaultColors['navbarBgColor'],
-                'navbarInkColor'  => $defaultColors['navbarInkColor'],
-                'navbarIconColor' => $defaultColors['navbarIconColor'],
+                'navbarBgColor'   => $navbarColors->bgColor,
+                'navbarInkColor'  => $navbarColors->inkColor,
+                'navbarIconColor' => $navbarColors->iconColor,
             ],
             $this->metadataDataHelper->isTestSite()
                 && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl())
