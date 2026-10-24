@@ -846,20 +846,20 @@ final class ArticleController extends TableController
      */
     private function resolveParentUrl(string $default): ?string
     {
-        $parent = $_GET['parent'] ?? null;
+        $raw = $this->flight->request()->query->getData()['parent'] ?? null;
 
-        if (!is_string($parent) || $parent === '') {
-            return $default;
-        }
-        if ($parent === 'false') {
+        if ($raw === 'false') {
             return null;
         }
-        // Must start with a single "/", no "//", no backslash, no whitespace
-        if (preg_match('#^/(?![/\\\\])[^\s\\\\]*$#', $parent) === 1) {
-            return $parent;
-        }
 
-        return $default;
+        $filtered = WebApp::filterInput(
+            ['parent' => FilterInputRule::LocalPath->value],
+            ['parent' => $raw]
+        );
+
+        $parent = $filtered['parent'] ?? $default;
+
+        return is_string($parent) ? $parent : $default;
     }
     #endregion
 }

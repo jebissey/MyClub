@@ -23,6 +23,7 @@ enum FilterInputRule: string
     case Int = 'int';
     case Integer = '/^\d+$/';
     case Json = '/^\s*(\{.*\}|\[.*\])\s*$/s';
+    case LocalPath = '/^\/(?![\/\\\\])[a-zA-Z0-9\/\-._~%]*$/';
     case Location = '/^-?\d{1,2}\.\d+,-?\d{1,3}\.\d+$/';
     case Password = '/^.{6,99}$/';
     case PersonName = '/^(?![ \-])[A-Za-zÀ-ÖØ-öø-ÿ\- ]{1,100}(?<![ \-])$/';
