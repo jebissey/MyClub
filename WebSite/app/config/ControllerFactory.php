@@ -51,6 +51,7 @@ use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\SurveyController;
 use app\modules\Astronomy\AstronomyController;
 use app\modules\Backup\BackupController;
+use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\CredentialService;
@@ -114,6 +115,7 @@ final readonly class ControllerFactory
 {
     public function __construct(
         private AlertRecipientDataHelper $alertRecipientDataHelper,
+        private AnonymousAccessService $anonymousAccessService,
         private Application $application,
         private ArticleAuthorizationService $articleAuthorizationService,
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
@@ -175,6 +177,7 @@ final readonly class ControllerFactory
             $this->alertRecipientDataHelper,
             $this->carouselDataHelper,
             $this->articleAuthorizationService,
+            $this->anonymousAccessService,
         );
     }
 

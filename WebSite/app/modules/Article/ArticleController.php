@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\modules\Article;
 
-use app\enums\ApplicationError;
 use app\enums\ArticleAccess;
 use app\enums\FilterInputRule;
 use app\enums\Period;
@@ -33,6 +32,7 @@ use app\modules\Article\viewModels\ChangeOwnerViewModel;
 use app\modules\Article\viewModels\PublishViewModel;
 use app\modules\Article\viewModels\RedactorHomeViewModel;
 use app\modules\Common\TableController;
+use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
@@ -64,6 +64,7 @@ final class ArticleController extends TableController
         private readonly AlertRecipientDataHelper $alertRecipientDataHelper,
         private readonly CarouselDataHelper $carouselDataHelper,
         private readonly ArticleAuthorizationService $authorizationService,
+        private readonly AnonymousAccessService $anonymousAccessService,
     ) {
         parent::__construct($application);
     }
@@ -319,8 +320,8 @@ final class ArticleController extends TableController
             ['name' => 'Id', 'label' => 'ID'],
         ];
         if ($connectedUser->isEditor()) {
-            $filterConfig[] = ['name' => 'published', 'label' => 'Publié'];
-            $filterConfig[] = ['name' => 'menu', 'label' => 'Menu'];
+            $filterConfig[] = ['name' => 'published', 'label' => ($this->t)('article.label.published')];
+            $filterConfig[] = ['name' => 'menu', 'label' => ($this->t)('article.label.menu')];
         }
         $columns = [
             ['field' => 'PersonName', 'label' => ($this->t)('article.label.created_by')],
@@ -575,8 +576,8 @@ final class ArticleController extends TableController
             period: $period->value,
             dateRange: $dateRange,
             availablePeriods: Period::gets($this->languagesDataHelper),
-            title: 'Rédacteurs vs audience',
-            totalLabels: ['articles', ''],
+            title: ($this->t)('article.crosstab.title'),
+            totalLabels: [($this->t)('article.crosstab.total_articles'), ''],
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(1),
             ]),
@@ -814,24 +815,14 @@ final class ArticleController extends TableController
     }
 
     /**
-     * Anonymous visitor on a protected page: try the "remember me" cookie,
-     * otherwise send the visitor to the sign-in page.
+     * Anonymous visitor on a protected page: see AnonymousAccessService.
      */
     private function handleAnonymousAccess(): void
     {
         $requestUri = is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '/';
-        $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
+        $target = $this->anonymousAccessService->resolve($requestUri);
 
-        if ($result && $result->isSuccess()) {
-            $this->application->getConnectedUser()->get();
-            $this->redirect(
-                $requestUri,
-                ApplicationError::Ok,
-                "Auto sign in succeeded for {$result->getUser()?->Email}"
-            );
-            return;
-        }
-        $this->redirect('/user/sign/in?redirect=' . urlencode($requestUri));
+        $this->redirect($target->url, $target->status, $target->message);
     }
 
     /**

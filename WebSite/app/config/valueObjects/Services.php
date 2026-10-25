@@ -10,6 +10,7 @@ use app\helpers\NotificationSender;
 use app\helpers\PersonPreferences;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
 use app\modules\PersonManager\services\MemberCsvImporter;
@@ -20,6 +21,7 @@ use app\modules\PersonManager\services\MemberCsvImporter;
 final readonly class Services
 {
     public function __construct(
+        public AnonymousAccessService $anonymousAccessService,
         public ArticleAuthorizationService $articleAuthorizationService,
         public AuthenticationService $authenticationService,
         public EmailService $emailService,

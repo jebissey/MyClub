@@ -622,4 +622,126 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
         $this->assertFalse($result);
     }
+
+    // -------------------------------------------------------------------------
+    // Read: editors on published group articles
+    // -------------------------------------------------------------------------
+
+    public function testPublishedGroupArticleIsReadableByAnEditorWithoutLoadingGroups(): void
+    {
+        // Forbidding helper: the test fails if the service queries the groups
+        $denial = $this->denial(
+            $this->makeArticle(createdBy: 10, publishedBy: 1, idGroup: 5, onlyForMembers: true),
+            $this->makeConnectedUser($this->makePerson(42), isEditor: true),
+            $this->makeForbiddingHelper()
+        );
+
+        $this->assertNull($denial);
+    }
+
+    // -------------------------------------------------------------------------
+    // Survey results: closing boundary and participation scope
+    // -------------------------------------------------------------------------
+
+    public function testSurveyResultsWithVisibilityAllAfterClosingAreHiddenOnTheClosingDay(): void
+    {
+        // A survey closing today is not closed yet: the comparison is strict
+        $result = $this->makeService()->canReadSurveyResults(
+            $this->makeClosing('allAfterClosing', date('Y-m-d')),
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
+
+        $this->assertFalse($result);
+    }
+
+    public function testSurveyResultsWithVisibilityVotersAfterClosingAreHiddenFromNonVotersEvenWhenClosed(): void
+    {
+        $result = $this->makeService()->canReadSurveyResults(
+            $this->makeClosing('votersAfterClosing', self::PAST_DATE),
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
+
+        $this->assertFalse($result);
+    }
+
+    public function testSurveyParticipationIsScopedToTheSurveyAndToThePerson(): void
+    {
+        $pdo = $this->makeSchemaPdo();
+        $this->givenSurveyReply($pdo, surveyId: 2, personId: 42); // another survey
+        $this->givenSurveyReply($pdo, surveyId: 1, personId: 43); // another person
+
+        $result = $this->makeService($this->makeHelper($pdo))->canReadSurveyResults(
+            $this->makeClosing('voters', self::FUTURE_DATE), // survey Id = 1
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
+
+        $this->assertFalse($result);
+    }
+
+    // -------------------------------------------------------------------------
+    // Order results: same rules, order vocabulary
+    // -------------------------------------------------------------------------
+
+    public function testOrderResultsAreHiddenFromAnonymous(): void
+    {
+        $result = $this->makeService()->canReadOrderResults(
+            $this->makeClosing('all', self::PAST_DATE),
+            $this->makeArticle(),
+            $this->makeConnectedUser(person: null)
+        );
+
+        $this->assertFalse($result);
+    }
+
+    public function testOrderResultsAreVisibleToTheArticleOwnerWithoutQueryingReplies(): void
+    {
+        // Forbidding helper: the test fails if the service queries the replies
+        $result = $this->makeService($this->makeForbiddingHelper())->canReadOrderResults(
+            $this->makeClosing('orderers', self::FUTURE_DATE),
+            $this->makeArticle(createdBy: 42),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
+
+        $this->assertTrue($result);
+    }
+
+    public function testOrderResultsWithOrderersAreHiddenFromNonOrderers(): void
+    {
+        $result = $this->makeService()->canReadOrderResults(
+            $this->makeClosing('orderers', self::FUTURE_DATE),
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
+
+        $this->assertFalse($result);
+    }
+
+    public function testOrderResultsWithOrderersAfterClosingAreHiddenFromNonOrderersEvenWhenClosed(): void
+    {
+        $result = $this->makeService()->canReadOrderResults(
+            $this->makeClosing('orderersAfterClosing', self::PAST_DATE),
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
+
+        $this->assertFalse($result);
+    }
+
+    public function testOrderParticipationIsScopedToTheOrderAndToThePerson(): void
+    {
+        $pdo = $this->makeSchemaPdo();
+        $this->givenOrderReply($pdo, orderId: 2, personId: 42); // another order
+        $this->givenOrderReply($pdo, orderId: 1, personId: 43); // another person
+
+        $result = $this->makeService($this->makeHelper($pdo))->canReadOrderResults(
+            $this->makeClosing('orderers', self::FUTURE_DATE), // order Id = 1
+            $this->makeArticle(createdBy: 10),
+            $this->makeConnectedUser($this->makePerson(42))
+        );
+
+        $this->assertFalse($result);
+    }
 }

@@ -146,6 +146,7 @@ use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\CredentialService;
@@ -630,6 +631,7 @@ final class Routes
         ];
 
         return new Services(
+            anonymousAccessService: new AnonymousAccessService($authenticationService, $this->application->getConnectedUser()),
             articleAuthorizationService: $this->articleAuthorizationService,
             authenticationService: $authenticationService,
             emailService: new EmailService(
@@ -656,6 +658,7 @@ final class Routes
     {
         $this->controllerFactory = new ControllerFactory(
             $dataHelpers->alertRecipientDataHelper,
+            $services->anonymousAccessService,
             $this->application,
             $services->articleAuthorizationService,
             $dataHelpers->articleCrosstabDataHelper,
