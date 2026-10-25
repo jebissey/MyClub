@@ -14,7 +14,6 @@ use app\helpers\Backup;
 use app\helpers\GravatarHandler;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
-use app\models\AlertRecipientDataHelper;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
@@ -22,6 +21,7 @@ use app\models\CarouselDataHelper;
 use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
+use app\modules\Article\services\ArticleAlertService;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Article\valueObjects\Result;
@@ -37,7 +37,6 @@ use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
-use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\viewModels\ChatViewModel;
 use app\modules\Common\viewModels\CrosstabViewModel;
 use app\modules\Common\viewModels\TableIndexViewModel;
@@ -61,10 +60,10 @@ final class ArticleController extends TableController
         private readonly EmailService $emailService,
         private readonly LogDataHelper $logDataHelper,
         private readonly ArticleService $articleService,
-        private readonly AlertRecipientDataHelper $alertRecipientDataHelper,
         private readonly CarouselDataHelper $carouselDataHelper,
         private readonly ArticleAuthorizationService $authorizationService,
         private readonly AnonymousAccessService $anonymousAccessService,
+        private readonly ArticleAlertService $articleAlertService,
     ) {
         parent::__construct($application);
     }
@@ -241,33 +240,11 @@ final class ArticleController extends TableController
             $this->errors->badRequest($msg, __FILE__, __LINE__);
             return;
         }
-        $filteredEmails = $this->alertRecipientDataHelper->getPersonWantedToBeAlerted($idArticle);
-        $root = Application::$root;
-        $articleLink = $root . '/article/' . $idArticle;
-        $unsubscribeLink = $root . '/user/preferences';
-        $title = str_replace(
-            '{root}',
-            $root,
-            ($this->t)('article.email.new_title')
-        );
-        $intro = ($this->t)('article.email.body_intro');
-        $unsubscribe = ($this->t)('article.email.unsubscribe');
-        $message =
-            $intro . "\n\n" .
-            $articleLink . "\n\n" .
-            $unsubscribe . "\n" .
-            $unsubscribeLink;
 
-        $emailMessage = new EmailMessage(
-            from: $articleCreator->Email,
-            to: $articleCreator->Email,
-            subject: $title,
-            body: $message,
-            isHtml: false,
-            cc: $filteredEmails
-        );
-        if ($this->emailService->send($emailMessage)) {
-            MessageService::set(($this->t)('article.success.email_sent') . ' (' . count($filteredEmails) . ')');
+        $alert = $this->articleAlertService->prepare($idArticle, $articleCreator->Email, $this->t);
+
+        if ($this->emailService->send($alert->message)) {
+            MessageService::set(($this->t)('article.success.email_sent') . ' (' . $alert->recipientCount . ')');
         } else {
             MessageService::set(($this->t)('article.error.email_failed'), 'danger');
         }

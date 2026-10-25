@@ -47,6 +47,7 @@ use app\models\TableControllerDataHelper;
 use app\modules\Article\ArticleController;
 use app\modules\Article\MediaController;
 use app\modules\Article\OrderController;
+use app\modules\Article\services\ArticleAlertService;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\SurveyController;
 use app\modules\Astronomy\AstronomyController;
@@ -117,6 +118,7 @@ final readonly class ControllerFactory
         private AlertRecipientDataHelper $alertRecipientDataHelper,
         private AnonymousAccessService $anonymousAccessService,
         private Application $application,
+        private ArticleAlertService $articleAlertService,
         private ArticleAuthorizationService $articleAuthorizationService,
         private ArticleCrosstabDataHelper $articleCrosstabDataHelper,
         private ArticleDataHelper $articleDataHelper,
@@ -174,10 +176,10 @@ final readonly class ControllerFactory
             $this->emailService,
             $this->logDataHelper,
             $this->articleService,
-            $this->alertRecipientDataHelper,
             $this->carouselDataHelper,
             $this->articleAuthorizationService,
             $this->anonymousAccessService,
+            $this->articleAlertService,
         );
     }
 
