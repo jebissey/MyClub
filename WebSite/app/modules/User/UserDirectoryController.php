@@ -98,7 +98,7 @@ final class UserDirectoryController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/users_directory.latte', $viewModel->toArray());
+        $this->views->render('User/views/users_directory.latte', $viewModel->toArray());
     }
 
     public function showMap(): void
@@ -121,7 +121,7 @@ final class UserDirectoryController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/users_map.latte', $viewModel->toArray());
+        $this->views->render('User/views/users_map.latte', $viewModel->toArray());
     }
 
     public function showPublicMap(): void
@@ -143,6 +143,6 @@ final class UserDirectoryController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/users_map.latte', $viewModel->toArray());
+        $this->views->render('User/views/users_map.latte', $viewModel->toArray());
     }
 }

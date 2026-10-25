@@ -17,11 +17,11 @@ final class SolfegeController extends AbstractController
     public function learn(): void
     {
         if (!$this->application->getConnectedUser()->isConnected()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
-        $this->render('Event/views/solfege_learn.latte', $this->getAllParams([
+        $this->views->render('Event/views/solfege_learn.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'title' => 'Apprentissage du Solfège',
             'page' => $this->application->getConnectedUser()->getPage(),
@@ -32,7 +32,7 @@ final class SolfegeController extends AbstractController
     public function saveScore(): void
     {
         if (!$this->application->getConnectedUser()->isConnected()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 

@@ -50,7 +50,7 @@ final class FFAController extends AbstractController
             ? $ffaScraper->searchAthleteRank($firstName, $lastName, $year, To::str($club))
             : $ffaScraper->searchAthleteResults($firstName, $lastName, $year, To::str($club));
 
-        $this->render('User/views/ffaSearch.latte', $this->getAllParams([
+        $this->views->render('User/views/ffaSearch.latte', $this->getAllParams([
             'firstName' => $firstName,
             'lastName'  => $lastName,
             'question'  => $question,

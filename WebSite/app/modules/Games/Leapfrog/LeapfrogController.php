@@ -37,7 +37,7 @@ final class LeapfrogController extends TableController
         ];
         $gameId = bin2hex(random_bytes(8));
 
-        $this->render('Games/Leapfrog/views/leapfrog.latte', $this->getAllParams([
+        $this->views->render('Games/Leapfrog/views/leapfrog.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($connectedUser->person),
             'page' => $this->application->getConnectedUser()->getPage(),
             'titre' => "Saute-Mouton",
@@ -78,7 +78,7 @@ final class LeapfrogController extends TableController
         ];
         $data = $this->prepareTableData($this->tableControllerDataHelper->getLeapfrogQuery(), $filterValues, true);
 
-        $this->render('Games/Leapfrog/views/statistics.latte', $this->getAllParams([
+        $this->views->render('Games/Leapfrog/views/statistics.latte', $this->getAllParams([
             'games' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],

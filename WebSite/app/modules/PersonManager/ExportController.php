@@ -54,7 +54,7 @@ final class ExportController extends AbstractController
         }
 
         $content = OdsWriter::build($header, $rows, ($this->t)('export.sheet_name'), hiddenLeadingColumns: 1);
-        $this->renderOds($content, $this->defaultFileName() . '.ods');
+        $this->downloads->ods($content, $this->defaultFileName() . '.ods');
     }
 
     public function showExportForm(): void
@@ -68,7 +68,7 @@ final class ExportController extends AbstractController
                 ]),
             );
 
-            $this->render('PersonManager/views/users_export.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/users_export.latte', $viewModel->toArray());
         }
     }
 

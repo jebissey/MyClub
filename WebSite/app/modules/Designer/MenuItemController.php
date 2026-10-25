@@ -26,7 +26,7 @@ final class MenuItemController extends AbstractController
         $tab = MenuItemTab::tryFrom($this->flight->request()->query->tab ?? '') ?? MenuItemTab::Navbar;
 
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
-            $this->render('Designer/views/menuItem.latte', $this->getAllParams([
+            $this->views->render('Designer/views/menuItem.latte', $this->getAllParams([
                 'navbarItems'  => array_filter($menuItems, fn($i) => $i->What === 'navbar'),
                 'sidebarItems' => array_filter($menuItems, fn($i) => $i->What === 'sidebar'),
                 'groups'       => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
@@ -93,7 +93,7 @@ final class MenuItemController extends AbstractController
         if ($person && $this->menuItemDataHelper->authorizedUser('/menuitem/show/arwards', $person)) {
             $arwardsDataHelper = new ArwardsDataHelper($this->application);
 
-            $this->render('Webmaster/views/arwards.latte', $this->getAllParams([
+            $this->views->render('Webmaster/views/arwards.latte', $this->getAllParams([
                 'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
                 'data'         => $arwardsDataHelper->getData($counterNames),
                 'groups'       => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
@@ -131,9 +131,9 @@ final class MenuItemController extends AbstractController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('Article/views/showArticle.latte', $viewModel->toArray());
+            $this->views->render('Article/views/showArticle.latte', $viewModel->toArray());
         } catch (QueryException $e) {
-            $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
+            $this->errors->badRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 }

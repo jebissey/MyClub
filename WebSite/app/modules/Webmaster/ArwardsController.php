@@ -36,17 +36,17 @@ final class ArwardsController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Webmaster/views/arwards.latte', $viewModel->toArray());
+        $this->views->render('Webmaster/views/arwards.latte', $viewModel->toArray());
     }
 
     public function setArward(): void
     {
         if (!$this->application->getConnectedUser()->isHomeDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
             return;
         }
         $schema = [

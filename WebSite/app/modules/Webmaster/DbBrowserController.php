@@ -48,7 +48,7 @@ final class DbBrowserController extends TableController
                 ]),
             );
 
-            $this->render('Webmaster/views/dbbrowser/index.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/dbbrowser/index.latte', $viewModel->toArray());
         }
     }
 
@@ -64,7 +64,7 @@ final class DbBrowserController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('Webmaster/views/dbbrowser/create.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/dbbrowser/create.latte', $viewModel->toArray());
         }
     }
 
@@ -82,7 +82,7 @@ final class DbBrowserController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('Webmaster/views/dbbrowser/edit.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/dbbrowser/edit.latte', $viewModel->toArray());
         }
     }
 
@@ -117,7 +117,7 @@ final class DbBrowserController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('Webmaster/views/dbbrowser/table.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/dbbrowser/table.latte', $viewModel->toArray());
         }
     }
 

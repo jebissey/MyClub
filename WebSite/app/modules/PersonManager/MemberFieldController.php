@@ -39,7 +39,7 @@ final class MemberFieldController extends AbstractController
                 ]),
             );
 
-            $this->render('PersonManager/views/memberFields.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/memberFields.latte', $viewModel->toArray());
         }
     }
 

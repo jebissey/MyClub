@@ -31,6 +31,6 @@ final class GameManagerController extends AbstractController
             content: ($this->t)('Games'),
             layoutParams: $this->getAllParams([]),
         );
-        $this->render('Games/views/gameManager.latte', $viewModel->toArray());
+        $this->views->render('Games/views/gameManager.latte', $viewModel->toArray());
     }
 }

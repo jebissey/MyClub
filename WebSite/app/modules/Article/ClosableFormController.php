@@ -79,12 +79,12 @@ abstract class ClosableFormController extends AbstractController
             return;
         }
         if (!$this->authorizationService->canEdit($article, $this->application->getConnectedUser())) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
         $name = $this->formName();
-        $this->render('Article/views/' . $name . '_add.latte', $this->getAllParams([
+        $this->views->render('Article/views/' . $name . '_add.latte', $this->getAllParams([
             'article' => $article,
             $name     => $this->dataHelper->get(
                 ucfirst($name),
@@ -99,11 +99,11 @@ abstract class ClosableFormController extends AbstractController
     {
         $connectedUser = $this->application->getConnectedUser();
         if (!$connectedUser->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
             return;
         }
 
@@ -120,11 +120,11 @@ abstract class ClosableFormController extends AbstractController
 
         $article = $this->articleDataHelper->getLatestArticle([$articleId]);
         if ($article === null) {
-            $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
+            $this->errors->badRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
             return;
         }
         if (!$this->authorizationService->canEdit($article, $connectedUser)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
@@ -168,19 +168,19 @@ abstract class ClosableFormController extends AbstractController
 
         $article = $this->articleDataHelper->getLatestArticle([$articleId]);
         if ($article === null) {
-            $this->raiseBadRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
+            $this->errors->badRequest("Article {$articleId} doesn't exist", __FILE__, __LINE__);
             return;
         }
 
         $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
         // 1st gate: the results are never visible to someone who cannot read the article
         if (!$this->authorizationService->canRead(ArticleAuthorizationRow::fromArticleRow($article), $connectedUser)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
@@ -193,7 +193,7 @@ abstract class ClosableFormController extends AbstractController
 
         // 2nd gate: the visibility chosen by the creator of the form
         if (!$this->canReadResults(ClosingVisibilityRow::fromStdClass($row), $article, $connectedUser)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
@@ -203,7 +203,7 @@ abstract class ClosableFormController extends AbstractController
             return;
         }
 
-        $this->render('Article/views/' . $this->formName() . '_results.latte', $this->getAllParams(array_merge($params, [
+        $this->views->render('Article/views/' . $this->formName() . '_results.latte', $this->getAllParams(array_merge($params, [
             'articleId'       => $articleId,
             'currentVersion'  => Application::VERSION,
             'page'            => $connectedUser->getPage(),
@@ -229,7 +229,7 @@ abstract class ClosableFormController extends AbstractController
 
     private function raiseFormNotFound(int $articleId): void
     {
-        $this->raiseBadRequest("No {$this->formName()} for article {$articleId}", __FILE__, __LINE__);
+        $this->errors->badRequest("No {$this->formName()} for article {$articleId}", __FILE__, __LINE__);
         $this->redirect('/article/' . $articleId);
     }
 }

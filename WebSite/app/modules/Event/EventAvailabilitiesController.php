@@ -153,6 +153,6 @@ final class EventAvailabilitiesController extends AbstractController
             layout: $this->getLayout(),
         );
 
-        $this->render('Event/views/availability_stats.latte', $viewModel->toArray());
+        $this->views->render('Event/views/availability_stats.latte', $viewModel->toArray());
     }
 }

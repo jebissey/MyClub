@@ -60,7 +60,7 @@ final class EventTypeController extends TableController
         ) {
             $eventTypeData = $this->dataHelper->get('EventType', ['Id' => $id], 'Name, IdGroup');
             if ($eventTypeData === false) {
-                $this->raiseBadRequest(
+                $this->errors->badRequest(
                     "Invalid EventType {$id} in file " . __FILE__ . ' at line ' . __LINE__,
                     __FILE__,
                     __LINE__
@@ -71,7 +71,7 @@ final class EventTypeController extends TableController
             $eventType = EventTypeNameGroupRow::fromStdClass($eventTypeData);
             $existingAttributes = $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'IdAttribute');
 
-            $this->render('Event/views/eventType_edit.latte', $this->getAllParams([
+            $this->views->render('Event/views/eventType_edit.latte', $this->getAllParams([
                 'name' => $eventType->Name,
                 'idGroup' => $eventType->IdGroup,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
@@ -85,7 +85,7 @@ final class EventTypeController extends TableController
     public function index(): void
     {
         if (!($this->application->getConnectedUser()->isEventDesigner())) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         $filterValues = [];
@@ -97,7 +97,7 @@ final class EventTypeController extends TableController
         ];
         $data = $this->prepareTableData($this->tableControllerDataHelper->getEventTypesQuery(), $filterValues);
 
-        $this->render('Event/views/eventTypes_index.latte', $this->getAllParams([
+        $this->views->render('Event/views/eventTypes_index.latte', $this->getAllParams([
             'eventTypes' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],
@@ -154,7 +154,7 @@ final class EventTypeController extends TableController
     {
         $eventType = $this->dataHelper->get('EventType', ['Id' => $eventTypeId], 'Id');
         if ($eventType === false) {
-            $this->raiseBadRequest(
+            $this->errors->badRequest(
                 "Invalid EventType {$eventTypeId} in file " . __FILE__ . ' at line ' . __LINE__,
                 __FILE__,
                 __LINE__

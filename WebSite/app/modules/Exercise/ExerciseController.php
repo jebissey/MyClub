@@ -39,11 +39,11 @@ final class ExerciseController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner(), __FILE__, __LINE__)) {
             $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
             if (!$exercise) {
-                $this->raiseForbidden(__FILE__, __LINE__);
+                $this->errors->forbidden(__FILE__, __LINE__);
                 return;
             }
 
-            $this->render('Exercise/views/editor.latte', $this->getAllParams([
+            $this->views->render('Exercise/views/editor.latte', $this->getAllParams([
                 'articleId'   => $id,
                 'title'       => $exercise->Title ?? '',
                 'exercises'   => json_decode($exercise->Content ?? '[]', true) ?? [],
@@ -89,7 +89,7 @@ final class ExerciseController extends TableController
         /** @var array<string, string> $stringFilterValues */
         $stringFilterValues = array_map(static fn(mixed $v): string => To::str($v), $filterValues);
         $data = $this->prepareTableData($query, $stringFilterValues);
-        $this->render('Exercise/views/exercises_index.latte', $this->getAllParams([
+        $this->views->render('Exercise/views/exercises_index.latte', $this->getAllParams([
             'exercises' => $data['items'],
             'currentPage' => $data['currentPage'],
             'totalPages' => $data['totalPages'],
@@ -114,13 +114,13 @@ final class ExerciseController extends TableController
 
         $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
         if (!$exercise) {
-            $this->raiseBadRequest("Exercise ({$id}) not found", __FILE__, __LINE__);
+            $this->errors->badRequest("Exercise ({$id}) not found", __FILE__, __LINE__);
             return;
         }
 
         $exercises = json_decode($exercise->Content ?? '[]', true) ?? [];
 
-        $this->render('Exercise/views/player.latte', $this->getAllParams([
+        $this->views->render('Exercise/views/player.latte', $this->getAllParams([
             'articleId' => $id,
             'title'     => $exercise->Title ?? '',
             'exercises' => $exercises,

@@ -52,7 +52,7 @@ final class WebmasterController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('Webmaster/views/clubCustomization.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/clubCustomization.latte', $viewModel->toArray());
         }
     }
 
@@ -90,7 +90,7 @@ final class WebmasterController extends TableController
     {
         $connectedUser = $this->application->getConnectedUser();
         if (!$connectedUser->isAdministrator()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         if ($connectedUser->hasOnlyOneAutorization()) {
@@ -116,7 +116,7 @@ final class WebmasterController extends TableController
             }
         } else {
             if (WebApp::getRequestMethod() !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                $this->errors->methodNotAllowed(__FILE__, __LINE__);
                 return;
             }
 
@@ -124,7 +124,7 @@ final class WebmasterController extends TableController
                 content: '',
                 layoutParams: $this->getAllParams([]),
             );
-            $this->render('Webmaster/views/admin.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/admin.latte', $viewModel->toArray());
         }
     }
 
@@ -139,7 +139,7 @@ final class WebmasterController extends TableController
                 previousPage: true,
                 layoutParams: $this->getAllParams([]),
             );
-            $this->render('Webmaster/views/webmaster.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/webmaster.latte', $viewModel->toArray());
         }
     }
 
@@ -186,7 +186,7 @@ final class WebmasterController extends TableController
                 ]),
             );
 
-            $this->render('Webmaster/views/notifications.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/notifications.latte', $viewModel->toArray());
         }
     }
 
@@ -212,7 +212,7 @@ final class WebmasterController extends TableController
                 ]),
             );
 
-            $this->render('Webmaster/views/emailCredentials.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/emailCredentials.latte', $viewModel->toArray());
         }
     }
 
@@ -351,7 +351,7 @@ final class WebmasterController extends TableController
             ]),
         );
 
-        $this->render('Webmaster/views/installations.latte', $viewModel->toArray());
+        $this->views->render('Webmaster/views/installations.latte', $viewModel->toArray());
     }
 
     public function sitemapGenerator(): void
@@ -390,7 +390,7 @@ final class WebmasterController extends TableController
         }
 
         header('Content-Type: application/xml; charset=utf-8');
-        $this->render('Webmaster/views/sitemap.latte', ['urls' => $urls]);
+        $this->views->render('Webmaster/views/sitemap.latte', ['urls' => $urls]);
     }
 
     public function turnstileCredentialsEdit(): void
@@ -405,7 +405,7 @@ final class WebmasterController extends TableController
                 ]),
             );
 
-            $this->render('Webmaster/views/turnstileCredentials.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/turnstileCredentials.latte', $viewModel->toArray());
         }
     }
 
@@ -440,7 +440,7 @@ final class WebmasterController extends TableController
                 ]),
             );
 
-            $this->render('Webmaster/views/helloassoCredentials.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/helloassoCredentials.latte', $viewModel->toArray());
         }
     }
 

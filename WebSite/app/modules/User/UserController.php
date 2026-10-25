@@ -46,7 +46,7 @@ final class UserController extends AbstractController
             $this->renderInfo(($this->t)('message_email_unknown'), 10000);
             return;
         } catch (InvalidArgumentException $e) {
-            $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
+            $this->errors->badRequest($e->getMessage(), $e->getFile(), $e->getLine());
             return;
         }
 
@@ -66,20 +66,20 @@ final class UserController extends AbstractController
         if (WebApp::getRequestMethod() === 'POST') {
             $newPassword = WebApp::getFiltered('password', FilterInputRule::Password->value, $this->flight->request()->data->getData());
             if (!is_string($newPassword) || $newPassword === '') {
-                $this->raiseBadRequest('Invalid password format', __FILE__, __LINE__);
+                $this->errors->badRequest('Invalid password format', __FILE__, __LINE__);
             } elseif ($this->authService->resetPassword($token, $newPassword)) {
                 $this->redirect('/', ApplicationError::Ok, 'Votre mot de passe est réinitialisé');
             } else {
-                $this->raiseBadRequest('Invalid or expired token', __FILE__, __LINE__);
+                $this->errors->badRequest('Invalid or expired token', __FILE__, __LINE__);
             }
         } elseif (WebApp::getRequestMethod() === 'GET') {
             $viewModel = new UserSetPasswordViewModel(
                 token: $token,
                 layoutParams: $this->getAllParams([]),
             );
-            $this->render('User/views/user_set_password.latte', $viewModel->toArray());
+            $this->views->render('User/views/user_set_password.latte', $viewModel->toArray());
         } else {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }
     }
 
@@ -93,7 +93,7 @@ final class UserController extends AbstractController
                 $this->application->getConnectedUser()->get();
                 $this->redirect($redirect, ApplicationError::Ok, "Sign in succeeded for {$result->getUser()?->Email}");
             } else {
-                $this->raiseBadRequest($result->getError(), __FILE__, __LINE__);
+                $this->errors->badRequest($result->getError(), __FILE__, __LINE__);
             }
         } elseif (WebApp::getRequestMethod() === 'GET') {
             $rememberMeResult = $this->authService->handleRememberMeLogin();
@@ -105,9 +105,9 @@ final class UserController extends AbstractController
                 redirect: $redirect,
                 layoutParams: $this->getAllParams([]),
             );
-            $this->render('User/views/user_sign_in.latte', $viewModel->toArray());
+            $this->views->render('User/views/user_sign_in.latte', $viewModel->toArray());
         } else {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }
     }
 

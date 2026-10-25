@@ -421,6 +421,10 @@ final class TerminalCallAnalyzer
         return (bool) preg_match('/^\$this\s*->\s*\w+\s*\(.*\)\s*;?\s*$/s', $text);
     }
 
+    // Controller collaborators whose every method ends the request:
+    // $this->errors->xxx(...) and $this->downloads->xxx(...).
+    private const TERMINAL_COLLABORATORS = ['errors', 'downloads'];
+
     private function matchesTerminalCall(string $text): bool
     {
         $alternation = implode('|', array_map(
@@ -428,7 +432,16 @@ final class TerminalCallAnalyzer
             self::TERMINAL_CALL_BASE_WORDS,
         ));
 
-        return (bool) preg_match('/\b(?:' . $alternation . ')\w*\s*\(/', $text);
+        if (preg_match('/\b(?:' . $alternation . ')\w*\s*\(/', $text) === 1) {
+            return true;
+        }
+
+        $collaborators = implode('|', array_map(
+            static fn(string $c): string => preg_quote($c, '/'),
+            self::TERMINAL_COLLABORATORS,
+        ));
+
+        return preg_match('/\$this\s*->\s*(?:' . $collaborators . ')\s*->\s*\w+\s*\(/', $text) === 1;
     }
 
     /**

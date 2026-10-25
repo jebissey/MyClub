@@ -15,7 +15,10 @@ use app\models\MetadataDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\valueObjects\Person;
 use app\modules\Common\viewModels\HomeViewModel;
+use app\modules\User\valueObjects\SidebarMenuChild;
+use app\modules\User\valueObjects\SidebarMenuItem;
 
 final class HomeController extends AbstractController
 {
@@ -48,7 +51,7 @@ final class HomeController extends AbstractController
         if ($userEmail) {
             if ($connectedUser->person === null) {
                 unset($_SESSION['user']);
-                $this->raiseBadRequest("Unknown user with this email address {$userEmail}", __FILE__, __LINE__);
+                $this->errors->badRequest("Unknown user with this email address {$userEmail}", __FILE__, __LINE__);
                 return;
             }
 
@@ -183,7 +186,7 @@ final class HomeController extends AbstractController
             ]),
         );
 
-        $this->render('Common/views/home.latte', $viewModel->toArray());
+        $this->views->render('Common/views/home.latte', $viewModel->toArray());
     }
 
     public function help(): void
@@ -200,12 +203,90 @@ final class HomeController extends AbstractController
     {
         $user = $this->application->getConnectedUser();
 
-        $this->render('Common/views/signpost.latte', $this->getAllParams([
+        $this->views->render('Common/views/signpost.latte', $this->getAllParams([
             'navItems'        => $this->getNavItems($user->person),
             'title'           => ($this->t)('home.signpost.title'),
             'page'            => $user->getPage(),
             'user'            => $user,
             'btn_HistoryBack' => true,
         ]));
+    }
+
+
+#region Privates functions
+    /**
+     * @return list<SidebarMenuItem>
+     */
+    private function getSidebarMenuItems(?Person $person, bool $all = false): array
+    {
+        $userGroups = [];
+        if ($person !== null) {
+            $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
+        }
+
+        $navItems = $this->dataHelper->gets(
+            'MenuItem',
+            ['What' => 'sidebar'],
+            'Id, ParentId, Type, Label, Icon, Url, IdGroup, ForMembers, ForContacts, ForAnonymous',
+            'Position'
+        );
+
+        $filteredNavItems = [];
+        foreach ($navItems as $navItem) {
+            if (
+                ($person === null && $navItem->ForAnonymous == 1) ||
+                ($person !== null && $navItem->ForMembers == 1 &&
+                    (
+                        $navItem->IdGroup === null ||
+                        (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups, true))
+                    )
+                ) ||
+                $all
+            ) {
+                $filteredNavItems[$navItem->Id] = $navItem;
+            }
+        }
+
+        // Build structured menu from flat filtered list
+        $sidebarMenu = [];
+        foreach ($filteredNavItems as $navItem) {
+            if ($navItem->ParentId !== null) {
+                continue; // children are attached below
+            }
+
+            $sidebarMenu[] = match ($navItem->Type) {
+                'heading' => new SidebarMenuItem(
+                    type: 'heading',
+                    label: (string) $navItem->Label,
+                ),
+                'divider' => new SidebarMenuItem(type: 'divider'),
+                'link' => new SidebarMenuItem(
+                    type: 'link',
+                    label: (string) $navItem->Label,
+                    icon: $navItem->Icon !== null ? (string) $navItem->Icon : null,
+                    url: $navItem->Url !== null ? (string) $navItem->Url : null,
+                ),
+                'submenu' => new SidebarMenuItem(
+                    type: 'submenu',
+                    label: (string) $navItem->Label,
+                    icon: $navItem->Icon !== null ? (string) $navItem->Icon : null,
+                    children: array_values(
+                        array_map(
+                            static fn($child) => new SidebarMenuChild(
+                                label: (string) $child->Label,
+                                url: $child->Url !== null ? (string) $child->Url : null,
+                            ),
+                            array_filter(
+                                $filteredNavItems,
+                                static fn($child) => $child->ParentId === $navItem->Id
+                            )
+                        )
+                    ),
+                ),
+                default => Application::unreachable("Fatal error in file with navItemType={$navItem->Type}"),
+            };
+        }
+
+        return $sidebarMenu;
     }
 }

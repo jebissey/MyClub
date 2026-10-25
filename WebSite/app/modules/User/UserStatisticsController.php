@@ -62,7 +62,7 @@ final class UserStatisticsController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/user_statistics.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_statistics.latte', $viewModel->toArray());
     }
 
     /**

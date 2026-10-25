@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace app\modules\Article;
 
+use RuntimeException;
 use app\helpers\Application;
 use app\helpers\MediaManager;
-use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\CarouselDataHelper;
@@ -55,20 +55,20 @@ final class MediaController extends AbstractController
         );
 
         if (!$row) {
-            $this->raiseBadRequest("Token unknown", __FILE__, __LINE__);
+            $this->errors->badRequest("Token unknown", __FILE__, __LINE__);
             return;
         }
         $sharedFile = SharedFileRow::fromStdClass($row);
         $connectedUser = $this->application->getConnectedUser();
         if ($sharedFile->OnlyForMembers !== 0) {
             if ($connectedUser->person === null) {
-                $this->raiseForbidden(__FILE__, __LINE__);
+                $this->errors->forbidden(__FILE__, __LINE__);
                 return;
             }
         }
         if ($sharedFile->IdGroup !== null) {
             if (!$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->Id ?? 0, $sharedFile->IdGroup)) {
-                $this->raiseForbidden(__FILE__, __LINE__);
+                $this->errors->forbidden(__FILE__, __LINE__);
                 return;
             }
         }
@@ -86,7 +86,7 @@ final class MediaController extends AbstractController
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),
         );
-        $this->render('Article/views/media_gpxViewer.latte', $viewModel->toArray());
+        $this->views->render('Article/views/media_gpxViewer.latte', $viewModel->toArray());
     }
 
     public function help(): void
@@ -149,7 +149,7 @@ final class MediaController extends AbstractController
                     'isEditor' => $connectedUser->isEditor(),
                 ]),
             );
-            $this->render('Article/views/media_index.latte', $viewModel->toArray());
+            $this->views->render('Article/views/media_index.latte', $viewModel->toArray());
         }
     }
 
@@ -171,7 +171,7 @@ final class MediaController extends AbstractController
         ) {
             $this->viewFile((int)$year, (int)$month, $filename);
         } else {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
         }
     }
 
@@ -188,7 +188,7 @@ final class MediaController extends AbstractController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->render('Article/views/media_upload.latte', $viewModel->toArray());
+            $this->views->render('Article/views/media_upload.latte', $viewModel->toArray());
         }
     }
 
@@ -203,7 +203,7 @@ final class MediaController extends AbstractController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->render('Article/views/media_uses_articles.latte', $viewModel->toArray());
+            $this->views->render('Article/views/media_uses_articles.latte', $viewModel->toArray());
         }
     }
 
@@ -221,7 +221,7 @@ final class MediaController extends AbstractController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->render('Article/views/media_uses_messages.latte', $viewModel->toArray());
+            $this->views->render('Article/views/media_uses_messages.latte', $viewModel->toArray());
         }
     }
 
@@ -238,7 +238,7 @@ final class MediaController extends AbstractController
         $fullPath = MediaManager::GetMediaPath() . $file;
         $realPath = realpath($fullPath);
         if (!$realPath || !file_exists($realPath) || !is_readable($realPath)) {
-            $this->raiseBadRequest("File {$realPath} ({$fullPath}) unknown", __FILE__, __LINE__);
+            $this->errors->badRequest("File {$realPath} ({$fullPath}) unknown", __FILE__, __LINE__);
             return;
         }
         $filename = basename($file);
@@ -450,9 +450,34 @@ final class MediaController extends AbstractController
         $filename = basename($filename);
         $filePath = sprintf('%s/%04d/%02d/%s', realpath(MediaManager::GetMediaPath()), $year, $month, basename($filename));
         if (!file_exists($filePath)) {
-            $this->raiseBadRequest("File $filePath not found", __FILE__, __LINE__);
+            $this->errors->badRequest("File $filePath not found", __FILE__, __LINE__);
             return;
         }
         $this->streamFile($filePath, $filename);
+    }
+
+    private function streamFile(string $filePath, string $filename): void
+    {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo === false) {
+            throw new RuntimeException('Unable to initialize fileinfo.');
+        }
+
+        $mime = finfo_file($finfo, $filePath);
+
+        if ($mime === false) {
+            throw new RuntimeException("Unable to determine MIME type for {$filePath}.");
+        }
+
+        $size = filesize($filePath);
+        if ($size === false) {
+            throw new RuntimeException("Unable to determine file size for {$filePath}.");
+        }
+
+        header('Content-Type: ' . $mime);
+        header('Content-Length: ' . $size);
+        header('Content-Disposition: inline; filename="' . $filename . '"');
+
+        readfile($filePath);
     }
 }

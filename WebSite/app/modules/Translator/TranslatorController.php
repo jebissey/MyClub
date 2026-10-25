@@ -25,7 +25,7 @@ final class TranslatorController extends AbstractController
         $user = $this->application->getConnectedUser();
 
         if (!$user->isTranslator()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
@@ -72,6 +72,6 @@ final class TranslatorController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Translator/views/translator.latte', $viewModel->toArray());
+        $this->views->render('Translator/views/translator.latte', $viewModel->toArray());
     }
 }

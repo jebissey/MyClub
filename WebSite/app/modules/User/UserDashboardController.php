@@ -31,6 +31,6 @@ final class UserDashboardController extends AbstractController
             content: ($this->t)('User'),
             layoutParams: $this->getAllParams([]),
         );
-        $this->render('User/views/user.latte', $viewModel->toArray());
+        $this->views->render('User/views/user.latte', $viewModel->toArray());
     }
 }

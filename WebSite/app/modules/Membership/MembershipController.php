@@ -78,7 +78,7 @@ final class MembershipController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Membership/views/index.latte', $viewModel->toArray());
+        $this->views->render('Membership/views/index.latte', $viewModel->toArray());
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────────

@@ -40,6 +40,6 @@ final class UserNewsController extends AbstractShowController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/news.latte', $viewModel->toArray());
+        $this->views->render('User/views/news.latte', $viewModel->toArray());
     }
 }

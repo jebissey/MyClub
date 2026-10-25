@@ -71,7 +71,7 @@ final class RegistrationController extends TableController
                 ]),
             );
 
-            $this->render('PersonManager/views/registration_groups_index.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/registration_groups_index.latte', $viewModel->toArray());
         }
     }
 
@@ -93,7 +93,7 @@ final class RegistrationController extends TableController
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->render('PersonManager/views/registration_user_groups_partial.latte', $viewModel->toArray());
+                $this->views->render('PersonManager/views/registration_user_groups_partial.latte', $viewModel->toArray());
             } catch (Throwable $e) {
                 http_response_code(500);
                 echo "<div class='alert alert-danger'>Erreur : " . htmlspecialchars($e->getMessage()) . "</div>";

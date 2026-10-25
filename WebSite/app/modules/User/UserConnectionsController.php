@@ -28,7 +28,7 @@ final class UserConnectionsController extends AbstractController
     {
         $person = $this->application->getConnectedUser()->person;
         if ($person === null) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         $this->showConnections($person->Id);
@@ -51,7 +51,7 @@ final class UserConnectionsController extends AbstractController
             'InPresentationDirectory, ShowPhoneInPresentationDirectory, ShowEmailInPresentationDirectory'
         );
         if ($individual === false || $member === false) {
-            $this->raiseBadRequest("User ({$idPerson}) not found", __FILE__, __LINE__);
+            $this->errors->badRequest("User ({$idPerson}) not found", __FILE__, __LINE__);
             return;
         } else {
             $user = (object) array_merge(
@@ -78,6 +78,6 @@ final class UserConnectionsController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/user_connections.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_connections.latte', $viewModel->toArray());
     }
 }

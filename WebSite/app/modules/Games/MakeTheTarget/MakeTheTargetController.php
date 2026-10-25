@@ -66,7 +66,7 @@ final class MakeTheTargetController extends TableController
             layout: $this->getLayout(),
         );
 
-        $this->render('Games/MakeTheTarget/views/makethetarget.latte', $viewModel->toArray());
+        $this->views->render('Games/MakeTheTarget/views/makethetarget.latte', $viewModel->toArray());
     }
 
     public function statistics(): void
@@ -110,7 +110,7 @@ final class MakeTheTargetController extends TableController
             true
         );
 
-        $this->render('Games/MakeTheTarget/views/statistics.latte', $this->getAllParams([
+        $this->views->render('Games/MakeTheTarget/views/statistics.latte', $this->getAllParams([
             'games'        => $data['items'],
             'currentPage'  => $data['currentPage'],
             'totalPages'   => $data['totalPages'],

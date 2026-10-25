@@ -20,10 +20,10 @@ final class EventNeedController extends AbstractController
     public function needs(): void
     {
         if (!$this->application->getConnectedUser()->isEventDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
-        $this->render('Event/views/event_needs.latte', $this->getAllParams([
+        $this->views->render('Event/views/event_needs.latte', $this->getAllParams([
             'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
             'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
             'needs' => $this->needDataHelper->getNeedsAndTheirTypes(),

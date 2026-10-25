@@ -32,7 +32,7 @@ final class BackupController extends AbstractController
 
         $content = $this->createDataZip();
         $this->dataHelper->set('Metadata', ['Backup_lastDate' => gmdate('Y-m-d H:i:s')], ['Id' => 1]);
-        $this->renderZip($content, 'MyClub-data.zip');
+        $this->downloads->zip($content, 'MyClub-data.zip');
     }
 
     public function showBackupForm(): void
@@ -58,7 +58,7 @@ final class BackupController extends AbstractController
                 ]),
             );
 
-            $this->render('Backup/views/backup.latte', $viewModel->toArray());
+            $this->views->render('Backup/views/backup.latte', $viewModel->toArray());
         }
     }
 

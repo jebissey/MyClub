@@ -27,7 +27,7 @@ final class DesignerController extends AbstractController
             $_SESSION['navbar'] = 'designer';
             $connectedUser = $this->application->getConnectedUser();
 
-            $this->render('Designer/views/designer.latte', $this->getAllParams([
+            $this->views->render('Designer/views/designer.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'content' => '',
                 'btn_HistoryBack' => true,

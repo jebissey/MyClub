@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Event;
 
 use app\enums\FilterInputRule;
+use app\enums\TimeOfDay;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
@@ -55,7 +56,7 @@ final class EventEmailController extends AbstractController
         $dayOfWeekName = $dayOfWeek !== null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
         $translatedTimeOfDay = ($this->t)($timeOfDay);
 
-        $this->render('Event/views/copyToClipBoard.latte', $this->getAllParams([
+        $this->views->render('Event/views/copyToClipBoard.latte', $this->getAllParams([
             'emailsJson' => json_encode($filteredEmails),
             'emails' => $filteredEmails,
             'filters' => "{$groupName} / {$eventTypeName} / {$dayOfWeekName} / {$translatedTimeOfDay}",
@@ -74,7 +75,7 @@ final class EventEmailController extends AbstractController
             return;
         }
 
-        $this->render('Event/views/getEmails.latte', $this->getAllParams([
+        $this->views->render('Event/views/getEmails.latte', $this->getAllParams([
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'weekdayNames' => TranslationManager::getWeekdayNames(),
@@ -87,5 +88,24 @@ final class EventEmailController extends AbstractController
     public function help(): void
     {
         $this->renderHelp('Help_Event_Email', fn($u) => $u->isEventManager(), __FILE__, __LINE__);
+    }
+
+
+#region Privates functions
+    /**
+     * @return list<array{
+     *     value:string,
+     *     label:string
+     * }>
+     */
+    private function getAllLabels(): array
+    {
+        return array_map(
+            fn(TimeOfDay $case) => [
+                'value' => $case->value,
+                'label' => ($this->t)($case->value)
+            ],
+            TimeOfDay::cases()
+        );
     }
 }

@@ -102,7 +102,7 @@ final class AstronomyController extends AbstractController
             ]),
         );
 
-        $this->render('Astronomy/views/astronomy.latte', $viewModel->toArray());
+        $this->views->render('Astronomy/views/astronomy.latte', $viewModel->toArray());
     }
 
     private function parseDateOrToday(?string $date): \DateTimeImmutable
@@ -119,7 +119,7 @@ final class AstronomyController extends AbstractController
     public function saveLocation(): void
     {
         if (WebApp::getRequestMethod() !== 'POST') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
             return;
         }
 

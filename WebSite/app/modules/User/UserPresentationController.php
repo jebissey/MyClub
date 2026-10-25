@@ -28,12 +28,12 @@ final class UserPresentationController extends AbstractController
     {
         if ($person = $this->application->getConnectedUser()->person ?? false) {
             if (WebApp::getRequestMethod() !== 'GET') {
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                $this->errors->methodNotAllowed(__FILE__, __LINE__);
                 return;
             }
             $row = $this->dataHelper->get('Member', ['Id' => $person->Id], '*');
             if ($row === false) {
-                $this->raiseBadRequest("Unknown person {$person->Id}", __FILE__, __LINE__);
+                $this->errors->badRequest("Unknown person {$person->Id}", __FILE__, __LINE__);
                 return;
             }
 
@@ -45,7 +45,7 @@ final class UserPresentationController extends AbstractController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('User/views/user_edit_presentation.latte', $viewModel->toArray());
+            $this->views->render('User/views/user_edit_presentation.latte', $viewModel->toArray());
         } else {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,
@@ -112,7 +112,7 @@ final class UserPresentationController extends AbstractController
         ], '*');
 
         if ($row === false) {
-            $this->raiseBadRequest("Unknown person {$personId}", __FILE__, __LINE__);
+            $this->errors->badRequest("Unknown person {$personId}", __FILE__, __LINE__);
             return;
         }
         /** @var PersonRow $row */
@@ -127,6 +127,6 @@ final class UserPresentationController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/user_presentation.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_presentation.latte', $viewModel->toArray());
     }
 }

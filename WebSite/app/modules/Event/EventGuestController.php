@@ -29,13 +29,13 @@ final class EventGuestController extends AbstractController
     public function guest(string $message = '', string $type = ''): void
     {
         if (!$this->application->getConnectedUser()->isEventManager()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         $events = $this->eventDataHelper->getEventsForAllOrGuest();
         $connectedUser = $this->application->getConnectedUser();
 
-        $this->render('Event/views/guest.latte', $this->getAllParams([
+        $this->views->render('Event/views/guest.latte', $this->getAllParams([
             'events' => $events,
             'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
             'layout' => $this->getLayout(),
@@ -50,7 +50,7 @@ final class EventGuestController extends AbstractController
     public function guestInvite(): void
     {
         if (!$this->application->getConnectedUser()->isEventManager()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         if (WebApp::getRequestMethod() === 'POST') {

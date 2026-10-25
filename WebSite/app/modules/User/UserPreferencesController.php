@@ -46,7 +46,7 @@ final class UserPreferencesController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/user_preferences.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_preferences.latte', $viewModel->toArray());
     }
 
     public function preferencesSave(): void

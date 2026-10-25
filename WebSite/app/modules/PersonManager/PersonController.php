@@ -72,7 +72,7 @@ final class PersonController extends TableController
                 'Imported, Alert, MemberInfo, CustomFields'
             );
             if ($individual === false || $member === false) {
-                $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
+                $this->errors->badRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
             /** @var object{Id: int|string, Email: string, FirstName: string|null, LastName: string|null} $individual */
@@ -109,7 +109,7 @@ final class PersonController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('User/views/user_account.latte', $viewModel->toArray());
+            $this->views->render('User/views/user_account.latte', $viewModel->toArray());
         }
     }
 
@@ -123,7 +123,7 @@ final class PersonController extends TableController
             );
             $member = $this->dataHelper->get('Member', ['Id' => $id], 'Imported, CustomFields');
             if ($individual === false || $member === false) {
-                $this->raiseBadRequest("Unknown person {$id}", __FILE__, __LINE__);
+                $this->errors->badRequest("Unknown person {$id}", __FILE__, __LINE__);
                 return;
             }
             /** @var object{Id: int|string, Email: string, FirstName: string|null, LastName: string|null} $individual */
@@ -146,7 +146,7 @@ final class PersonController extends TableController
 
             $email = strtolower(trim($input['email'] ?? ''));
             if (empty($email)) {
-                $this->raiseBadRequest("Missing email", __FILE__, __LINE__);
+                $this->errors->badRequest("Missing email", __FILE__, __LINE__);
                 return;
             }
             $existingIndividual = $this->dataHelper->get(
@@ -195,7 +195,7 @@ final class PersonController extends TableController
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->render('Common/views/info.latte', $viewModel->toArray());
+                $this->views->render('Common/views/info.latte', $viewModel->toArray());
 
                 return;
             }
@@ -256,7 +256,7 @@ final class PersonController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('PersonManager/views/personManager.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/personManager.latte', $viewModel->toArray());
         }
     }
 
@@ -336,7 +336,7 @@ final class PersonController extends TableController
             ]),
         );
 
-        $this->render('PersonManager/views/users_index.latte', $viewModel->toArray());
+        $this->views->render('PersonManager/views/users_index.latte', $viewModel->toArray());
     }
 
     public function membershipSettingsEdit(): void
@@ -356,7 +356,7 @@ final class PersonController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('PersonManager/views/membershipSettings.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/membershipSettings.latte', $viewModel->toArray());
         }
     }
 

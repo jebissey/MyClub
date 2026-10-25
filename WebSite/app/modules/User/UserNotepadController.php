@@ -34,7 +34,7 @@ final class UserNotepadController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/user_notepad.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_notepad.latte', $viewModel->toArray());
     }
 
     public function saveNotepad(): void

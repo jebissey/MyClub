@@ -127,7 +127,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->render('VisitorInsights/views/visitor.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/visitor.latte', $viewModel->toArray());
     }
 
     public function membersAlerts(): void
@@ -143,7 +143,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->render('VisitorInsights/views/membersAlerts.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/membersAlerts.latte', $viewModel->toArray());
     }
 
     public function visitorInsights(): void
@@ -159,7 +159,7 @@ final class VisitorInsightsController extends TableController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('VisitorInsights/views/visitorInsights.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/visitorInsights.latte', $viewModel->toArray());
     }
 
     public function referents(): void
@@ -182,7 +182,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->render('VisitorInsights/views/referent.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/referent.latte', $viewModel->toArray());
     }
 
     public function visitorsGraf(): void
@@ -220,7 +220,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->render('VisitorInsights/views/statistics.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/statistics.latte', $viewModel->toArray());
     }
 
     public function analytics(): void
@@ -248,7 +248,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->render('VisitorInsights/views/analytics.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/analytics.latte', $viewModel->toArray());
     }
 
     public function topPagesByPeriod(): void
@@ -271,7 +271,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->render('VisitorInsights/views/topPages.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/topPages.latte', $viewModel->toArray());
     }
 
     public function crossTab(): void
@@ -320,7 +320,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->render('VisitorInsights/views/crossTab.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/crossTab.latte', $viewModel->toArray());
     }
 
     public function showLastVisits(): void
@@ -340,7 +340,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->render('VisitorInsights/views/lastVisits.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/lastVisits.latte', $viewModel->toArray());
     }
 
     #region Private functions

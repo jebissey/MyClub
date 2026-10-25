@@ -53,7 +53,7 @@ final class UserAccountController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/user_account.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_account.latte', $viewModel->toArray());
     }
 
     public function accountSave(): void

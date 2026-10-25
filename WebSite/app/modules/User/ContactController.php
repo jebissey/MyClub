@@ -46,7 +46,7 @@ final class ContactController extends AbstractController
             return;
         }
         if ($method !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
             return;
         }
 
@@ -77,7 +77,7 @@ final class ContactController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Common/views/contact.latte', $viewModel->toArray());
+        $this->views->render('Common/views/contact.latte', $viewModel->toArray());
     }
 
     #region Private functions
@@ -249,7 +249,7 @@ final class ContactController extends AbstractController
             $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Summary');
             /** @var object{Id: int, Summary: string}|false $event */
             if (!$event) {
-                $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
+                $this->errors->badRequest("Unknown event {$eventId}", __FILE__, __LINE__);
                 return;
             }
             $emailSent = $this->registrationLinkService->send(

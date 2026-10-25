@@ -24,12 +24,12 @@ final class DesignController extends AbstractController
     public function index(): void
     {
         if (!$this->application->getConnectedUser()->isHomeDesigner()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($this->application->getConnectedUser()->person->Id ?? 0);
 
-        $this->render('Article/views/designs_index.latte', $this->getAllParams([
+        $this->views->render('Article/views/designs_index.latte', $this->getAllParams([
             'designs' => $designs,
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'userVotes' => $userVotes,
@@ -45,7 +45,7 @@ final class DesignController extends AbstractController
             return;
         }
 
-        $this->render('Article/views/design_create.latte', $this->getAllParams([
+        $this->views->render('Article/views/design_create.latte', $this->getAllParams([
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));
@@ -93,7 +93,7 @@ final class DesignController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'designer';
-            $this->render('Designer/views/designer.latte', $this->getAllParams([
+            $this->views->render('Designer/views/designer.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]));
         }

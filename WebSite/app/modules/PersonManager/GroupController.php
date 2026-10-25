@@ -39,7 +39,7 @@ final class GroupController extends AbstractController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->render('PersonManager/views/group_create.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/group_create.latte', $viewModel->toArray());
         }
     }
 
@@ -65,7 +65,7 @@ final class GroupController extends AbstractController
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->render('PersonManager/views/group_create.latte', $viewModel->toArray());
+                $this->views->render('PersonManager/views/group_create.latte', $viewModel->toArray());
                 return;
             }
             $selectedAuthorizations = $input['authorizations'] ?? [];
@@ -77,7 +77,7 @@ final class GroupController extends AbstractController
     public function groupDelete(int $id): void
     {
         if ($id === 1) {
-            $this->raiseBadRequest("Group {$id} can't be deleted", __FILE__, __LINE__);
+            $this->errors->badRequest("Group {$id} can't be deleted", __FILE__, __LINE__);
             return;
         }
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
@@ -85,9 +85,9 @@ final class GroupController extends AbstractController
                 $this->groupDataHelper->inactive($id);
                 $this->redirect('/groups');
             } catch (QueryException $e) {
-                $this->raiseBadRequest("Error {$e->getMessage()}", $e->getFile(), $e->getLine());
+                $this->errors->badRequest("Error {$e->getMessage()}", $e->getFile(), $e->getLine());
             } catch (Throwable $e) {
-                $this->raiseError($e->getMessage(), $e->getFile(), $e->getLine());
+                $this->errors->error($e->getMessage(), $e->getFile(), $e->getLine());
             }
         }
     }
@@ -95,13 +95,13 @@ final class GroupController extends AbstractController
     public function groupEdit(int $id): void
     {
         if ($id === 1) {
-            $this->raiseBadRequest("Group ({$id}) can't be edited", __FILE__, __LINE__);
+            $this->errors->badRequest("Group ({$id}) can't be edited", __FILE__, __LINE__);
             return;
         }
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
             if (!$group) {
-                $this->raiseBadRequest("Unknwon group $id", __FILE__, __LINE__);
+                $this->errors->badRequest("Unknwon group $id", __FILE__, __LINE__);
             } else {
                 $viewModel = new GroupEditViewModel(
                     group: $group,
@@ -114,7 +114,7 @@ final class GroupController extends AbstractController
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->render('PersonManager/views/group_edit.latte', $viewModel->toArray());
+                $this->views->render('PersonManager/views/group_edit.latte', $viewModel->toArray());
             }
         }
     }
@@ -123,7 +123,7 @@ final class GroupController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             if ($id === 1) {
-                $this->raiseBadRequest("Group {$id} can't be updated", __FILE__, __LINE__);
+                $this->errors->badRequest("Group {$id} can't be updated", __FILE__, __LINE__);
                 return;
             }
             $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');
@@ -140,7 +140,7 @@ final class GroupController extends AbstractController
             $selectedAuthorizations = $input['authorizations'] ?? [];
             if (empty($name)) {
                 if ($group === false) {
-                    $this->raiseBadRequest("Unknwon group $id", __FILE__, __LINE__);
+                    $this->errors->badRequest("Unknwon group $id", __FILE__, __LINE__);
                     return;
                 }
                 $viewModel = new GroupEditViewModel(
@@ -155,7 +155,7 @@ final class GroupController extends AbstractController
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->render('PersonManager/views/group_edit.latte', $viewModel->toArray());
+                $this->views->render('PersonManager/views/group_edit.latte', $viewModel->toArray());
             } else {
                 $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
                 $this->redirect('/groups');
@@ -177,7 +177,7 @@ final class GroupController extends AbstractController
                 ]),
             );
 
-            $this->render('PersonManager/views/groups_index.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/groups_index.latte', $viewModel->toArray());
         }
     }
 
@@ -189,12 +189,12 @@ final class GroupController extends AbstractController
 
         $group = $this->dataHelper->get('Group', ['Id' => $groupId], 'Id, Name');
         if (!$group) {
-            $this->raiseBadRequest("Le groupe {$groupId} n'existe pas", __FILE__, __LINE__);
+            $this->errors->badRequest("Le groupe {$groupId} n'existe pas", __FILE__, __LINE__);
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person === null || !$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->Id, $groupId)) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         $person = $connectedUser->person;
@@ -213,6 +213,6 @@ final class GroupController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Common/views/chat.latte', $viewModel->toArray());
+        $this->views->render('Common/views/chat.latte', $viewModel->toArray());
     }
 }

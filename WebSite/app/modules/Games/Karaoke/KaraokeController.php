@@ -29,7 +29,7 @@ final class KaraokeController extends AbstractController
             $parser->parse(self::MEDIA_PATH . "{$song}.lrc");
             $connectedUser = $this->application->getConnectedUser();
 
-            $this->render('Games/Karaoke/views/karaoke.latte', $this->getAllParams([
+            $this->views->render('Games/Karaoke/views/karaoke.latte', $this->getAllParams([
                 'navItems' => $this->getNavItems($connectedUser->person),
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'metadata' => $parser->getMetadata(),
@@ -41,7 +41,7 @@ final class KaraokeController extends AbstractController
             $content = ($this->t)($e->getMessage())
                 ?? ($this->t)('Error500');
 
-            $this->render('Common/views/info.latte', $this->getAllParams([
+            $this->views->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $content,
                 'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
                 'currentVersion' => Application::VERSION,
@@ -60,7 +60,7 @@ final class KaraokeController extends AbstractController
 
         $filePath = rtrim(self::MEDIA_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $name . '.mp3';
         if (!file_exists($filePath) || !is_readable($filePath)) {
-            $this->raiseBadRequest("Files {$name} not found", __FILE__, __LINE__);
+            $this->errors->badRequest("Files {$name} not found", __FILE__, __LINE__);
             return;
         }
 

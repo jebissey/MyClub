@@ -121,7 +121,7 @@ final class WebappSettingsController extends AbstractController
             $this->numericSettingsKeys
         );
 
-        $this->render('Designer/views/webappSettings.latte', $this->getAllParams([
+        $this->views->render('Designer/views/webappSettings.latte', $this->getAllParams([
             'navItems'            => $this->getNavItems($this->application->getConnectedUser()->person),
             'htmlSettingsKeys'    => $htmlSettingsLabels,
             'numericSettingsKeys' => $numericSettings,

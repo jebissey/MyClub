@@ -124,13 +124,13 @@ final class EventController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Event/views/nextEvents.latte', $viewModel->toArray());
+        $this->views->render('Event/views/nextEvents.latte', $viewModel->toArray());
     }
 
     public function weekEvents(): void
     {
         if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
             return;
         }
 
@@ -148,7 +148,7 @@ final class EventController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Event/views/weekEvents.latte', $viewModel->toArray());
+        $this->views->render('Event/views/weekEvents.latte', $viewModel->toArray());
     }
 
     public function showEventCrosstab(): void
@@ -177,13 +177,13 @@ final class EventController extends AbstractController
             historyBack: true,
         );
 
-        $this->render('Event/views/crosstab.latte', $viewModel->toArray());
+        $this->views->render('Event/views/crosstab.latte', $viewModel->toArray());
     }
 
     public function show(int $eventId, string $message = '', string $messageType = ''): void
     {
         if (!$this->dataHelper->get('Event', ['Id' => $eventId], 'Id')) {
-            $this->raiseBadRequest("Event {$eventId} doesn't exist", __FILE__, __LINE__);
+            $this->errors->badRequest("Event {$eventId} doesn't exist", __FILE__, __LINE__);
             return;
         }
         $person = $this->application->getConnectedUser()->person ?? false;
@@ -251,7 +251,7 @@ final class EventController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Event/views/event_detail.latte', $viewModel->toArray());
+        $this->views->render('Event/views/event_detail.latte', $viewModel->toArray());
     }
 
     public function registerSet(int $eventId, ?string $token = null): void
@@ -266,11 +266,11 @@ final class EventController extends AbstractController
     private function register(int $eventId, bool $set, ?string $token = null): void
     {
         if (WebApp::getRequestMethod() !== 'GET') {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
             return;
         }
         if (!$this->eventDataHelper->eventExists($eventId)) {
-            $this->raiseBadRequest("Event ({$eventId}) doesn't exist", __FILE__, __LINE__);
+            $this->errors->badRequest("Event ({$eventId}) doesn't exist", __FILE__, __LINE__);
             return;
         }
         try {
@@ -339,7 +339,7 @@ final class EventController extends AbstractController
                         $invitation->InvitedAt
                     );
 
-                    $this->render('Common/views/registration_success.latte', $this->getAllParams([
+                    $this->views->render('Common/views/registration_success.latte', $this->getAllParams([
                         'event' => $event,
                         'contact' => (object) [
                             'Id' => $individualId,
@@ -361,10 +361,10 @@ final class EventController extends AbstractController
                     if ($event->Audience === EventAudience::ForAll) {
                         $this->redirect('/contact/event/' . $eventId);
                     } else {
-                        $this->raiseForbidden(__FILE__, __LINE__);
+                        $this->errors->forbidden(__FILE__, __LINE__);
                     }
                 } else {
-                    $this->raiseForbidden(__FILE__, __LINE__);
+                    $this->errors->forbidden(__FILE__, __LINE__);
                 }
                 return;
             }
@@ -394,7 +394,7 @@ final class EventController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Event/views/eventManager.latte', $viewModel->toArray());
+        $this->views->render('Event/views/eventManager.latte', $viewModel->toArray());
     }
 
     public function showEventChat(int $eventId): void
@@ -406,7 +406,7 @@ final class EventController extends AbstractController
 
         $event = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary, Id, StartTime, Duration, Location');
         if ($event === false) {
-            $this->raiseBadRequest("Unknown event {$eventId}", __FILE__, __LINE__);
+            $this->errors->badRequest("Unknown event {$eventId}", __FILE__, __LINE__);
             return;
         }
         $person = $this->application->getConnectedUser(true)->person;
@@ -425,6 +425,6 @@ final class EventController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Common/views/chat.latte', $viewModel->toArray());
+        $this->views->render('Common/views/chat.latte', $viewModel->toArray());
     }
 }

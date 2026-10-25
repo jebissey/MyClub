@@ -88,13 +88,13 @@ final class ArticleController extends TableController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Article/views/article_carousel.latte', $viewModel->toArray());
+        $this->views->render('Article/views/article_carousel.latte', $viewModel->toArray());
     }
 
     public function changeOwner(int $id): void
     {
         if (!$this->authorizationService->canChangeOwner($this->application->getConnectedUser())) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
         if (!$this->dataHelper->get('Article', ['Id' => $id], 'Id')) {
@@ -134,9 +134,9 @@ final class ArticleController extends TableController
                 redactors: array_values($this->personDataHelper->getRedactors()),
                 layoutParams: $this->getAllParams([]),
             );
-            $this->render('User/views/changeOwner.latte', $viewModel->toArray());
+            $this->views->render('User/views/changeOwner.latte', $viewModel->toArray());
         } else {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }
     }
 
@@ -180,7 +180,7 @@ final class ArticleController extends TableController
 
         $connectedUser = $this->application->getConnectedUser();
         if ($connectedUser->person === null || !$connectedUser->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
@@ -214,7 +214,7 @@ final class ArticleController extends TableController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('Article/views/article_edit.latte', $viewModel->toArray());
+        $this->views->render('Article/views/article_edit.latte', $viewModel->toArray());
     }
 
     public function fetchEmailsForArticle(int $idArticle): void
@@ -237,7 +237,7 @@ final class ArticleController extends TableController
                 (string)$idArticle,
                 ($this->t)('article.error.unknown_author')
             );
-            $this->raiseBadRequest($msg, __FILE__, __LINE__);
+            $this->errors->badRequest($msg, __FILE__, __LINE__);
             return;
         }
         $filteredEmails = $this->alertRecipientDataHelper->getPersonWantedToBeAlerted($idArticle);
@@ -289,7 +289,7 @@ final class ArticleController extends TableController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->render('Article/views/redactor.latte', $viewModel->toArray());
+            $this->views->render('Article/views/redactor.latte', $viewModel->toArray());
         }
     }
 
@@ -362,7 +362,7 @@ final class ArticleController extends TableController
                 'btn_Parent' => '/',
             ]),
         );
-        $this->render('Article/views/articles_index.latte', $viewModel->toArray());
+        $this->views->render('Article/views/articles_index.latte', $viewModel->toArray());
     }
 
     public function publicIndex(): void
@@ -407,13 +407,13 @@ final class ArticleController extends TableController
                 'btn_Parent' => '/',
             ]),
         );
-        $this->render('Article/views/publicArticles_index.latte', $viewModel->toArray());
+        $this->views->render('Article/views/publicArticles_index.latte', $viewModel->toArray());
     }
 
     public function publish(int $id): void
     {
         if (!$this->application->getConnectedUser()->isRedactor()) {
-            $this->raiseForbidden(__FILE__, __LINE__);
+            $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
@@ -465,9 +465,9 @@ final class ArticleController extends TableController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->render('User/views/publish.latte', $viewModel->toArray());
+            $this->views->render('User/views/publish.latte', $viewModel->toArray());
         } else {
-            $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }
     }
 
@@ -516,9 +516,9 @@ final class ArticleController extends TableController
                 btnParent: $this->resolveParentUrl('/articles'),
             );
 
-            $this->render('Article/views/article_show.latte', $viewModel->toArray());
+            $this->views->render('Article/views/article_show.latte', $viewModel->toArray());
         } catch (QueryException $e) {
-            $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
+            $this->errors->badRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
@@ -557,7 +557,7 @@ final class ArticleController extends TableController
                 'userImg' => $userImg,
             ]),
         );
-        $this->render('Common/views/chat.latte', $viewModel->toArray());
+        $this->views->render('Common/views/chat.latte', $viewModel->toArray());
     }
 
     public function showArticleCrosstab(): void
@@ -581,7 +581,7 @@ final class ArticleController extends TableController
                 'page' => $this->application->getConnectedUser()->getPage(1),
             ]),
         );
-        $this->render('Article/views/crosstab.latte', $viewModel->toArray());
+        $this->views->render('Article/views/crosstab.latte', $viewModel->toArray());
     }
 
     public function topArticlesByPeriod(): void
@@ -616,7 +616,7 @@ final class ArticleController extends TableController
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),
         );
-        $this->render('Article/views/topArticles.latte', $viewModel->toArray());
+        $this->views->render('Article/views/topArticles.latte', $viewModel->toArray());
     }
 
     public function update(int $id): void
@@ -697,7 +697,7 @@ final class ArticleController extends TableController
                 readAccess: true,
             );
         } catch (QueryException $e) {
-            $this->raiseBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
+            $this->errors->badRequest($e->getMessage(), $e->getFile(), $e->getLine());
             return null;
         }
     }
@@ -771,10 +771,10 @@ final class ArticleController extends TableController
         // Keep one case per ArticleAccess case, a missing one would leave the request unanswered.
         switch ($reason) {
             case ArticleAccess::MethodNotAllowed:
-                $this->raiseMethodNotAllowed(__FILE__, __LINE__);
+                $this->errors->methodNotAllowed(__FILE__, __LINE__);
                 break;
             case ArticleAccess::NotFound:
-                $this->raiseBadRequest(
+                $this->errors->badRequest(
                     str_replace('{id}', (string)$articleId, ($this->t)('article.error.not_found')),
                     __FILE__,
                     __LINE__
@@ -785,9 +785,9 @@ final class ArticleController extends TableController
                 break;
             case ArticleAccess::Forbidden:
                 if ($readAccess) {
-                    $this->raiseForbidden(__FILE__, __LINE__, 10000, false);
+                    $this->errors->forbidden(__FILE__, __LINE__, 10000, false);
                 } else {
-                    $this->raiseForbidden(__FILE__, __LINE__);
+                    $this->errors->forbidden(__FILE__, __LINE__);
                 }
                 break;
         }

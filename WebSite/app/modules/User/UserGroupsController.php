@@ -38,7 +38,7 @@ final class UserGroupsController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->render('User/views/user_groups.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_groups.latte', $viewModel->toArray());
     }
 
     public function groupsSave(): void

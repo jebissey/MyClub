@@ -12,14 +12,14 @@ class HomeControllerTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        // home() via getNavbarColors() / getSetting() et Settings directes
+        // home() via getNavbarColors() / getSetting() and direct Settings queries
         $this->assertColumnsExist($pdo, 'Settings', [
             'Name',
             'Value',
         ]);
 
-        // home() / helpHome() / legalNotice() sélectionnent dynamiquement la colonne de langue courante
-        // (ex. fr_FR, en_US, pl_PL) via $this->dataHelper->get('Languages', ..., $lang)
+        // home() / help() / legalNotice() dynamically select the current language column
+        // (e.g. fr_FR, en_US, pl_PL) via $this->dataHelper->get('Languages', ..., $lang)
         $this->assertColumnsExist($pdo, 'Languages', [
             'Name',
             'fr_FR',
@@ -27,17 +27,33 @@ class HomeControllerTest extends DataHelperTestCase
             'pl_PL',
         ]);
 
-        // home() récupère le contenu de l'article de pied de page
+        // home() fetches the footer article content
         $this->assertColumnsExist($pdo, 'Article', [
             'Id',
             'Title',
             'Content',
         ]);
 
-        // home() récupère les items du carrousel
+        // home() fetches the carousel items
         $this->assertColumnsExist($pdo, 'Carousel', [
             'IdArticle',
             'Item',
+        ]);
+
+        // getSidebarMenuItems() fetches sidebar menu entries (filtered on What, ordered by Position)
+        $this->assertColumnsExist($pdo, 'MenuItem', [
+            'What',
+            'Id',
+            'ParentId',
+            'Type',
+            'Label',
+            'Icon',
+            'Url',
+            'IdGroup',
+            'ForMembers',
+            'ForContacts',
+            'ForAnonymous',
+            'Position',
         ]);
     }
 }
