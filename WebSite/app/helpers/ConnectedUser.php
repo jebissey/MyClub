@@ -11,7 +11,7 @@ use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
-use app\models\interfaces\MetadataDataHelperInterface;
+use app\models\MetadataDataHelper;
 use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
 use app\modules\Common\valueObjects\Person;
 
@@ -24,7 +24,7 @@ final class ConnectedUser
         private readonly ErrorManagerInterface $errorManager,
         private readonly DataHelper $dataHelper,
         private readonly AuthorizationDataHelper $authorizationDataHelper,
-        private readonly MetadataDataHelperInterface $metadataDataHelper,
+        private readonly MetadataDataHelper $metadataDataHelper,
         private readonly GravatarHandlerInterface $gravatarHandler = new GravatarHandler(),
     ) {
     }

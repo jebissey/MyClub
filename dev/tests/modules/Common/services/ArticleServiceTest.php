@@ -4,28 +4,30 @@ declare(strict_types=1);
 
 namespace tests\modules\Common\services;
 
+use PDO;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionProperty;
 use RuntimeException;
 use app\helpers\interfaces\MediaManagerInterface;
-use app\models\interfaces\CarouselDataHelperInterface;
+use app\models\CarouselDataHelper;
 use app\models\Data;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\valueObjects\UploadedFileInput;
+use app\modules\Common\valueObjects\UploadedFilesInput;
 use app\modules\Common\valueObjects\UploadedMedia;
 use app\modules\Common\valueObjects\UploadMediaResult;
 
 /**
- * Double de Data (jamais DataHelper, qui est final) dont set() renvoie une
- * valeur fixe, avec capture des arguments d'appel.
+ * Test double of Data (never DataHelper, which is final): set() returns a fixed
+ * value and the call arguments are recorded.
  */
 final class RecordingArticleDataStub extends Data
 {
     /** @var list<array{0: string, 1: array<string, mixed>, 2: array<string, mixed>}> */
     public array $setCalls = [];
 
-    public function __construct(private int|bool $setReturn = false)
-    {
-    }
+    public function __construct(private int|bool $setReturn = false) {}
 
     public function set(string $table, array $fields, array $where = []): int|bool
     {
@@ -35,47 +37,74 @@ final class RecordingArticleDataStub extends Data
     }
 }
 
-/**
- * Stub de CarouselDataHelperInterface qui enregistre les appels à addOrUpdate.
- */
-final class RecordingCarouselDataHelperStub implements CarouselDataHelperInterface
-{
-    /** @var list<array{0: array<string, mixed>, 1: string}> */
-    public array $addOrUpdateCalls = [];
-
-    public function addOrUpdate(array $data, string $item): string
-    {
-        $this->addOrUpdateCalls[] = [$data, $item];
-
-        return 'ok';
-    }
-}
-
 final class ArticleServiceTest extends TestCase
 {
+    private PDO $carouselPdo;
+
+    protected function setUp(): void
+    {
+        $this->carouselPdo = new PDO('sqlite::memory:');
+        $this->carouselPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->carouselPdo->exec(
+            'CREATE TABLE Carousel (Id INTEGER PRIMARY KEY AUTOINCREMENT, IdArticle INTEGER, Item TEXT)'
+        );
+    }
+
     private function makeDataHelperStub(int|bool $setReturn): RecordingArticleDataStub
     {
         return new RecordingArticleDataStub($setReturn);
     }
 
-    private function makeCarouselStub(): RecordingCarouselDataHelperStub
+    /**
+     * CarouselDataHelper is final and needs a full Application: its constructor is
+     * bypassed and only the inherited $pdo property is set.
+     */
+    private function makeCarouselHelper(): CarouselDataHelper
     {
-        return new RecordingCarouselDataHelperStub();
+        /** @var CarouselDataHelper $helper */
+        $helper = (new ReflectionClass(CarouselDataHelper::class))->newInstanceWithoutConstructor();
+        (new ReflectionProperty(Data::class, 'pdo'))->setValue($helper, $this->carouselPdo);
+
+        // Data's constructor normally loads the list of tables; it is bypassed here
+        $tables = $this->carouselPdo->query("SELECT name FROM sqlite_master WHERE type = 'table'");
+        $this->assertNotFalse($tables);
+        (new ReflectionProperty(Data::class, 'tables'))->setValue($helper, $tables->fetchAll(PDO::FETCH_COLUMN));
+
+        return $helper;
+    }
+
+    /**
+     * @return list<array{IdArticle: int, Item: string}>
+     */
+    private function carouselRows(): array
+    {
+        $statement = $this->carouselPdo->query('SELECT IdArticle, Item FROM Carousel ORDER BY Id');
+        $this->assertNotFalse($statement);
+
+        $rows = [];
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $rows[] = ['IdArticle' => (int)$row['IdArticle'], 'Item' => (string)$row['Item']];
+        }
+
+        return $rows;
     }
 
     private function makeService(
-        ?CarouselDataHelperInterface $carouselDataHelper = null,
+        ?CarouselDataHelper $carouselDataHelper = null,
         ?MediaManagerInterface $media = null,
         ?Data $dataHelper = null
     ): ArticleService {
         return new ArticleService(
-            $carouselDataHelper ?? $this->makeCarouselStub(),
+            $carouselDataHelper ?? $this->makeCarouselHelper(),
             $media ?? $this->createStub(MediaManagerInterface::class),
             $dataHelper ?? $this->makeDataHelperStub(false)
         );
     }
 
     /**
+     * Builds the files the way PHP exposes a multi-upload field, then converts them
+     * with the production factory.
+     *
      * @param list<array{
      *     tmp_name?: string,
      *     error?: int,
@@ -83,16 +112,8 @@ final class ArticleServiceTest extends TestCase
      *     type?: string,
      *     size?: int
      * }> $files
-     *
-     * @return array{
-     *     tmp_name: array<int, string>,
-     *     error: array<int, int>,
-     *     name: array<int, string>,
-     *     type: array<int, string>,
-     *     size: array<int, int>
-     * }
      */
-    private function makeFiles(array $files): array
+    private function makeFiles(array $files): UploadedFilesInput
     {
         $result = [
             'tmp_name' => [],
@@ -110,7 +131,7 @@ final class ArticleServiceTest extends TestCase
             $result['size'][$index] = $file['size'] ?? 1024;
         }
 
-        return $result;
+        return UploadedFilesInput::fromPhpFiles($result);
     }
 
     // -------------------------------------------------------------------------
@@ -120,12 +141,11 @@ final class ArticleServiceTest extends TestCase
     public function testCreateWithMediaSuccessWithoutFiles(): void
     {
         $dataHelper = $this->makeDataHelperStub(123);
-        $carouselDataHelper = $this->makeCarouselStub();
 
         $media = $this->createMock(MediaManagerInterface::class);
         $media->expects($this->never())->method('uploadFile');
 
-        $articleId = $this->makeService($carouselDataHelper, $media, $dataHelper)
+        $articleId = $this->makeService(null, $media, $dataHelper)
             ->createWithMedia(42, null, 'Mon titre', 'Mon contenu');
 
         $this->assertSame(123, $articleId);
@@ -140,15 +160,14 @@ final class ArticleServiceTest extends TestCase
                 [],
             ],
         ], $dataHelper->setCalls);
-        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
+        $this->assertSame([], $this->carouselRows());
     }
 
     public function testCreateWithMediaSuccessWithEmptyFilesArray(): void
     {
         $dataHelper = $this->makeDataHelperStub(10);
-        $carouselDataHelper = $this->makeCarouselStub();
 
-        $articleId = $this->makeService($carouselDataHelper, null, $dataHelper)
+        $articleId = $this->makeService(null, null, $dataHelper)
             ->createWithMedia(
                 7,
                 $this->makeFiles([]),
@@ -157,15 +176,14 @@ final class ArticleServiceTest extends TestCase
             );
 
         $this->assertSame(10, $articleId);
-        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
+        $this->assertSame([], $this->carouselRows());
     }
 
     public function testCreateWithMediaUsesDefaultEmptyTitleAndContent(): void
     {
         $dataHelper = $this->makeDataHelperStub(5);
-        $carouselDataHelper = $this->makeCarouselStub();
 
-        $articleId = $this->makeService($carouselDataHelper, null, $dataHelper)
+        $articleId = $this->makeService(null, null, $dataHelper)
             ->createWithMedia(1);
 
         $this->assertSame(5, $articleId);
@@ -180,7 +198,7 @@ final class ArticleServiceTest extends TestCase
                 [],
             ],
         ], $dataHelper->setCalls);
-        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
+        $this->assertSame([], $this->carouselRows());
     }
 
     // -------------------------------------------------------------------------
@@ -205,7 +223,6 @@ final class ArticleServiceTest extends TestCase
     public function testCreateWithMediaUploadsValidFilesAndAddsToCarousel(): void
     {
         $dataHelper = $this->makeDataHelperStub(55);
-        $carouselDataHelper = $this->makeCarouselStub();
 
         $uploadResult = new UploadMediaResult(
             file: new UploadedMedia(
@@ -238,19 +255,18 @@ final class ArticleServiceTest extends TestCase
             ],
         ]);
 
-        $articleId = $this->makeService($carouselDataHelper, $media, $dataHelper)
+        $articleId = $this->makeService(null, $media, $dataHelper)
             ->createWithMedia(42, $files, 'Titre', 'Contenu');
 
         $this->assertSame(55, $articleId);
         $this->assertSame([
-            [['idArticle' => 55], 'https://cdn.example.com/img1.jpg'],
-        ], $carouselDataHelper->addOrUpdateCalls);
+            ['IdArticle' => 55, 'Item' => 'https://cdn.example.com/img1.jpg'],
+        ], $this->carouselRows());
     }
 
     public function testCreateWithMediaSkipsFilesWithUploadError(): void
     {
         $dataHelper = $this->makeDataHelperStub(20);
-        $carouselDataHelper = $this->makeCarouselStub();
 
         $media = $this->createMock(MediaManagerInterface::class);
         $media->expects($this->never())->method('uploadFile');
@@ -263,17 +279,16 @@ final class ArticleServiceTest extends TestCase
             ],
         ]);
 
-        $articleId = $this->makeService($carouselDataHelper, $media, $dataHelper)
+        $articleId = $this->makeService(null, $media, $dataHelper)
             ->createWithMedia(1, $files);
 
         $this->assertSame(20, $articleId);
-        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
+        $this->assertSame([], $this->carouselRows());
     }
 
     public function testCreateWithMediaHandlesMultipleFilesAndSkipsFailedOnes(): void
     {
         $dataHelper = $this->makeDataHelperStub(77);
-        $carouselDataHelper = $this->makeCarouselStub();
 
         $uploadResult1 = new UploadMediaResult(
             file: new UploadedMedia(
@@ -322,36 +337,35 @@ final class ArticleServiceTest extends TestCase
             ],
         ]);
 
-        $articleId = $this->makeService($carouselDataHelper, $media, $dataHelper)
+        $articleId = $this->makeService(null, $media, $dataHelper)
             ->createWithMedia(99, $files, 'Multi', 'Test');
 
         $this->assertSame(77, $articleId);
         $this->assertSame([
-            [['idArticle' => 77], 'https://cdn.example.com/a.jpg'],
-            [['idArticle' => 77], 'https://cdn.example.com/b.png'],
-        ], $carouselDataHelper->addOrUpdateCalls);
+            ['IdArticle' => 77, 'Item' => 'https://cdn.example.com/a.jpg'],
+            ['IdArticle' => 77, 'Item' => 'https://cdn.example.com/b.png'],
+        ], $this->carouselRows());
     }
 
-    public function testCreateWithMediaDoesNothingWhenFilesHasNoTmpNameKey(): void
+    public function testCreateWithMediaDoesNothingWhenTmpNameListIsEmpty(): void
     {
         $dataHelper = $this->makeDataHelperStub(30);
-        $carouselDataHelper = $this->makeCarouselStub();
 
         $media = $this->createMock(MediaManagerInterface::class);
         $media->expects($this->never())->method('uploadFile');
 
-        $files = [
+        $files = UploadedFilesInput::fromPhpFiles([
             'tmp_name' => [],
             'error' => [UPLOAD_ERR_OK],
             'name' => ['x.jpg'],
             'type' => ['image/jpeg'],
             'size' => [100],
-        ];
+        ]);
 
-        $articleId = $this->makeService($carouselDataHelper, $media, $dataHelper)
+        $articleId = $this->makeService(null, $media, $dataHelper)
             ->createWithMedia(1, $files);
 
         $this->assertSame(30, $articleId);
-        $this->assertSame([], $carouselDataHelper->addOrUpdateCalls);
+        $this->assertSame([], $this->carouselRows());
     }
 }

@@ -4,33 +4,30 @@ declare(strict_types=1);
 
 namespace tests\helpers;
 
+use PDO;
 use ReflectionClass;
 use ReflectionProperty;
-use PDO;
-use tests\models\DataHelperTestCase;
+use app\enums\ApplicationError;
+use app\enums\Authorization;
 use app\helpers\ConnectedUser;
 use app\helpers\interfaces\ErrorManagerInterface;
 use app\helpers\interfaces\GravatarHandlerInterface;
-use app\enums\Authorization;
-use app\enums\ApplicationError;
+use app\models\AuthorizationDataHelper;
+use app\models\Data;
+use app\models\DataHelper;
+use app\models\MetadataDataHelper;
 use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
 use app\modules\Common\valueObjects\Person;
-use app\models\AuthorizationDataHelper;
-use app\models\DataHelper;
-use app\models\Data;
-use app\models\interfaces\MetadataDataHelperInterface;
+use tests\models\DataHelperTestCase;
+use tests\support\DataHelperFactory;
 
 /**
- * NOTE: getLastSignIn() / getLastSignOut() success paths and the full
- * success path of get() still touch static helpers (Person::fromRow,
- * Params::*, TranslationManager::*, WebApp::*). Those are left for a
- * later refactor that would make them injectable.
+ * The success paths of getLastSignIn(), getLastSignOut() and get() still touch
+ * static helpers (Person::fromRow, Params::*, TranslationManager::*, WebApp::*).
+ * They will be tested once those helpers are injectable.
  *
- * Here we test everything that only depends on internal state or on
- * the injectable collaborators.
- *
- * AuthorizationDataHelper is final → real instance on in-memory SQLite
- * (same pattern as ArticleAuthorizationServiceTest).
+ * DataHelper, AuthorizationDataHelper and MetadataDataHelper are final: real
+ * instances are used, on top of in-memory SQLite databases.
  */
 final class ConnectedUserTest extends DataHelperTestCase
 {
@@ -55,20 +52,18 @@ final class ConnectedUserTest extends DataHelperTestCase
     }
 
     // -------------------------------------------------------------------------
-    // Helpers – DataHelper (real, light SQLite)
+    // Helpers – DataHelper
     // -------------------------------------------------------------------------
 
     /**
-     * Crée un DataHelper réel et très léger (SQLite en mémoire).
-     * Parfait pour les tests qui n’ont pas besoin de contrôler
-     * finement le comportement de get()/set()/…
+     * Light real DataHelper on an in-memory SQLite database, for the tests that
+     * do not need to control get()/set() precisely.
      */
     private function makeRealDataHelper(): DataHelper
     {
         $pdo = new PDO('sqlite::memory:');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Schéma minimal nécessaire pour les tests qui touchent vraiment la DB
         $pdo->exec("
             CREATE TABLE Individual (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,7 +95,7 @@ final class ConnectedUserTest extends DataHelperTestCase
     }
 
     // -------------------------------------------------------------------------
-    // Helpers – AuthorizationDataHelper (final → réflexion + PDO)
+    // Helpers – AuthorizationDataHelper
     // -------------------------------------------------------------------------
 
     /**
@@ -123,8 +118,7 @@ final class ConnectedUserTest extends DataHelperTestCase
     }
 
     /**
-     * Minimal schema used by AuthorizationDataHelper::getsFor().
-     * Tables/colonnes issues de la vraie requête.
+     * Minimal schema used by AuthorizationDataHelper::getsFor(), taken from the real query.
      */
     private function makeAuthorizationSchemaPdo(): PDO
     {
@@ -132,41 +126,41 @@ final class ConnectedUserTest extends DataHelperTestCase
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $pdo->exec("
-        CREATE TABLE Member (
-            Id INTEGER PRIMARY KEY
-        );
-        CREATE TABLE MemberGroup (
-            IdMember INTEGER,
-            IdGroup  INTEGER
-        );
-        CREATE TABLE `Group` (
-            Id INTEGER PRIMARY KEY
-        );
-        CREATE TABLE GroupAuthorization (
-            IdGroup         INTEGER,
-            IdAuthorization INTEGER
-        );
-        CREATE TABLE Authorization (
-            Id   INTEGER PRIMARY KEY,
-            Name TEXT
-        );
-    ");
+            CREATE TABLE Member (
+                Id INTEGER PRIMARY KEY
+            );
+            CREATE TABLE MemberGroup (
+                IdMember INTEGER,
+                IdGroup  INTEGER
+            );
+            CREATE TABLE `Group` (
+                Id INTEGER PRIMARY KEY
+            );
+            CREATE TABLE GroupAuthorization (
+                IdGroup         INTEGER,
+                IdAuthorization INTEGER
+            );
+            CREATE TABLE Authorization (
+                Id   INTEGER PRIMARY KEY,
+                Name TEXT
+            );
+        ");
 
         return $pdo;
     }
 
     /**
-     * Insère un membre, un groupe, le lien membre↔groupe,
-     * une autorisation et le lien groupe↔autorisation.
+     * Inserts a member, a group, the member-group link, the authorizations and
+     * the group-authorization links.
      *
-     * @param list<string> $authorizationNames  valeurs de Authorization::*->value
+     * @param list<string> $authorizationNames values of Authorization::*->value
      */
     private function givenAuthorizations(PDO $pdo, int $memberId, array $authorizationNames): void
     {
         $pdo->prepare('INSERT INTO Member (Id) VALUES (?)')
             ->execute([$memberId]);
 
-        // Un groupe unique par membre pour les tests (IdGroup = 1 suffit)
+        // One group per member is enough for these tests
         $groupId = 1;
         $pdo->prepare('INSERT OR IGNORE INTO `Group` (Id) VALUES (?)')
             ->execute([$groupId]);
@@ -182,20 +176,44 @@ final class ConnectedUserTest extends DataHelperTestCase
         }
     }
 
-
     // -------------------------------------------------------------------------
-    // Helpers – ConnectedUser factory
+    // Helpers – MetadataDataHelper
     // -------------------------------------------------------------------------
 
     /**
-     * Construit un ConnectedUser.
-     * DataHelper et AuthorizationDataHelper sont toujours des vrais objets (car final).
-     * Les autres collaborateurs restent mockables tant qu’ils ne sont pas final.
+     * Real MetadataDataHelper on an in-memory SQLite database holding the single
+     * Metadata row (Id = 1) that the helper always reads.
      */
+    private function makeMetadataDataHelper(
+        bool $isTestSite = false,
+        ?string $forcedLanguage = null,
+        ?string $prodSiteUrl = null,
+    ): MetadataDataHelper {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec('
+            CREATE TABLE Metadata (
+                Id INTEGER PRIMARY KEY,
+                ThisIsTestSite INTEGER NOT NULL DEFAULT 0,
+                ThisIsForcedLanguage TEXT,
+                ThisIsProdSiteUrl TEXT
+            )
+        ');
+        $pdo->prepare(
+            'INSERT INTO Metadata (Id, ThisIsTestSite, ThisIsForcedLanguage, ThisIsProdSiteUrl) VALUES (1, ?, ?, ?)'
+        )->execute([(int)$isTestSite, $forcedLanguage, $prodSiteUrl]);
+
+        return DataHelperFactory::create(MetadataDataHelper::class, $pdo);
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers – ConnectedUser
+    // -------------------------------------------------------------------------
+
     private function makeConnectedUser(
         ?DataHelper $dataHelper = null,
         ?AuthorizationDataHelper $authorizationDataHelper = null,
-        ?MetadataDataHelperInterface $metadataDataHelper = null,
+        ?MetadataDataHelper $metadataDataHelper = null,
         ?GravatarHandlerInterface $gravatarHandler = null,
         ?ErrorManagerInterface $errorManager = null,
     ): ConnectedUser {
@@ -203,7 +221,7 @@ final class ConnectedUserTest extends DataHelperTestCase
             $errorManager            ?? $this->createStub(ErrorManagerInterface::class),
             $dataHelper              ?? $this->makeRealDataHelper(),
             $authorizationDataHelper ?? $this->makeAuthorizationDataHelper(),
-            $metadataDataHelper      ?? $this->createStub(MetadataDataHelperInterface::class),
+            $metadataDataHelper      ?? $this->makeMetadataDataHelper(),
             $gravatarHandler         ?? $this->createStub(GravatarHandlerInterface::class),
         );
     }
@@ -217,7 +235,7 @@ final class ConnectedUserTest extends DataHelperTestCase
     }
 
     // -------------------------------------------------------------------------
-    // isXxx() unit tests
+    // isXxx()
     // -------------------------------------------------------------------------
 
     public function testIsEditorTrueWhenAuthorizationPresent(): void
@@ -350,7 +368,7 @@ final class ConnectedUserTest extends DataHelperTestCase
     {
         $user = $this->makeConnectedUser();
 
-        // Person is final readonly → cannot be mocked.
+        // Person is final readonly: it cannot be mocked
         $person = (new ReflectionClass(Person::class))->newInstanceWithoutConstructor();
         $user->person = $person;
         $user->user   = new ConnectedUserVO($person, []);
@@ -403,7 +421,7 @@ final class ConnectedUserTest extends DataHelperTestCase
     }
 
     // -------------------------------------------------------------------------
-    // get() : isolable guard branches
+    // get(): guard branches
     // -------------------------------------------------------------------------
 
     public function testGetEarlyReturnWhenNoSessionUser(): void
@@ -429,7 +447,7 @@ final class ConnectedUserTest extends DataHelperTestCase
                 $this->stringContains('Unknown user with this email address unknown@example.com')
             );
 
-        // DataHelper réel + base vide → get() retourne false
+        // Empty database: get() returns false
         $user = $this->makeConnectedUser(
             dataHelper: $this->makeRealDataHelper(),
             errorManager: $errorManager,
@@ -443,7 +461,7 @@ final class ConnectedUserTest extends DataHelperTestCase
     }
 
     // -------------------------------------------------------------------------
-    // get() success path (partial)
+    // get(): success path (partial)
     // -------------------------------------------------------------------------
 
     public function testGetSuccessPathSetsPersonAndAuthorizations(): void
@@ -452,7 +470,6 @@ final class ConnectedUserTest extends DataHelperTestCase
 
         $dataHelper = $this->makeRealDataHelper();
 
-        // On insère les données nécessaires dans DataHelper
         $pdo = (new ReflectionClass($dataHelper))->getProperty('pdo')->getValue($dataHelper);
         assert($pdo instanceof PDO);
         $pdo->exec("
@@ -465,18 +482,12 @@ final class ConnectedUserTest extends DataHelperTestCase
             VALUES ($id, NULL, 0)
         ");
 
-        // AuthorizationDataHelper réel + données d’autorisation
         $authPdo = $this->makeAuthorizationSchemaPdo();
         $this->givenAuthorizations($authPdo, $id, [Authorization::Editor->value]);
-        $authorizationDataHelper = $this->makeAuthorizationDataHelper($authPdo);
-
-        $metadataDataHelper = $this->createStub(MetadataDataHelperInterface::class);
-        $metadataDataHelper->method('isTestSite')->willReturn(false);
 
         $user = $this->makeConnectedUser(
             dataHelper: $dataHelper,
-            authorizationDataHelper: $authorizationDataHelper,
-            metadataDataHelper: $metadataDataHelper,
+            authorizationDataHelper: $this->makeAuthorizationDataHelper($authPdo),
         );
 
         $user->get();
@@ -487,6 +498,10 @@ final class ConnectedUserTest extends DataHelperTestCase
         $this->assertInstanceOf(Person::class, $user->person);
         $this->assertSame('known@example.com', $user->person->Email);
     }
+
+    // -------------------------------------------------------------------------
+    // Database schema
+    // -------------------------------------------------------------------------
 
     public function testQueriedColumnsExistInDatabaseSchema(): void
     {

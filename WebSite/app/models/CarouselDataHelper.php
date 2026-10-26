@@ -8,9 +8,8 @@ use PDO;
 use RuntimeException;
 use stdClass;
 use app\helpers\Application;
-use app\models\interfaces\CarouselDataHelperInterface;
 
-final class CarouselDataHelper extends Data implements CarouselDataHelperInterface
+final class CarouselDataHelper extends Data
 {
     public function __construct(Application $application)
     {

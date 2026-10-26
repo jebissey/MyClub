@@ -4,32 +4,27 @@ declare(strict_types=1);
 
 namespace app\modules\Common\services;
 
-use app\helpers\interfaces\MediaManagerInterface;
-use app\models\interfaces\CarouselDataHelperInterface;
-use app\models\Data;
-use app\modules\Common\valueObjects\UploadedFileInput;
 use RuntimeException;
+use app\helpers\interfaces\MediaManagerInterface;
+use app\models\CarouselDataHelper;
+use app\models\Data;
+use app\modules\Common\valueObjects\UploadedFilesInput;
 
 final readonly class ArticleService
 {
     public function __construct(
-        private CarouselDataHelperInterface $carouselDataHelper,
+        private CarouselDataHelper $carouselDataHelper,
         private MediaManagerInterface $media,
         private Data $dataHelper
     ) {
     }
 
-    /**
-     * @param array{
-     *     tmp_name?: array<int, string>,
-     *     error: array<int, int>,
-     *     name: array<int, string>,
-     *     type: array<int, string>,
-     *     size: array<int, int>
-     * }|null $files
-     */
-    public function createWithMedia(int $userId, ?array $files = null, string $title = '', string $content = ''): int
-    {
+    public function createWithMedia(
+        int $userId,
+        ?UploadedFilesInput $files = null,
+        string $title = '',
+        string $content = ''
+    ): int {
         $result = $this->dataHelper->set('Article', [
             'Title'     => $title,
             'Content'   => $content,
@@ -41,25 +36,12 @@ final readonly class ArticleService
         }
         $articleId = $result;
 
-        if (!empty($files) && isset($files['tmp_name'])) {
-            foreach ($files['tmp_name'] as $index => $tmpName) {
-                if ($files['error'][$index] !== UPLOAD_ERR_OK) {
-                    continue;
-                }
+        foreach ($files->files ?? [] as $file) {
+            $upload = $this->media->uploadFile($file);
 
-                $file = new UploadedFileInput(
-                    name: $files['name'][$index],
-                    tmpName: $tmpName,
-                    size: $files['size'][$index],
-                    type: $files['type'][$index],
-                );
-
-                $upload = $this->media->uploadFile($file);
-
-                $this->carouselDataHelper->addOrUpdate([
-                    'idArticle' => $articleId
-                ], $upload->file->url);
-            }
+            $this->carouselDataHelper->addOrUpdate([
+                'idArticle' => $articleId
+            ], $upload->file->url);
         }
 
         return $articleId;

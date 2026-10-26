@@ -40,20 +40,20 @@
         <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
         {if isset($sidebarMenu) && is_array($sidebarMenu) && count($sidebarMenu) > 0}
             {foreach $sidebarMenu as $item}
-                {if $item['type'] === 'heading'}
-                    <li class="sidebar-heading fw-bold">{$item['label']}</li>
-                {elseif $item['type'] === 'divider'}
+                {if $item->type === 'heading'}
+                    <li class="sidebar-heading fw-bold">{$item->label}</li>
+                {elseif $item->type === 'divider'}
                     <li><hr class="my-2 mx-3"
                             style="border-color: var(--sidebar-link-color-muted); opacity:.5;"></li>
-                {elseif $item['type'] === 'link'}
+                {elseif $item->type === 'link'}
                     <li class="nav-item">
-                        <a href="{$item['url']}"
-                           class="nav-link fw-bold{if isset($currentPath) && $currentPath === $item['url']} active{/if}">
-                            <i class="bi {isset($item['icon']) ? $item['icon'] : 'bi-circle'}"></i>
-                            {$item['label']}
+                        <a href="{$item->url}"
+                           class="nav-link fw-bold{if isset($currentPath) && $currentPath === $item->url} active{/if}">
+                            <i class="bi {$item->icon ?? 'bi-circle'}"></i>
+                            {$item->label}
                         </a>
                     </li>
-                {elseif $item['type'] === 'submenu'}
+                {elseif $item->type === 'submenu'}
                     {var $submenuId = 'submenu-' . $iterator->counter}
                     <li class="nav-item">
                         <a class="nav-link fw-bold d-flex align-items-center justify-content-between"
@@ -62,19 +62,19 @@
                            role="button"
                            aria-expanded="false">
                             <span>
-                                <i class="bi {isset($item['icon']) ? $item['icon'] : 'bi-folder'}"></i>
-                                {$item['label']}
+                                <i class="bi {$item->icon ?? 'bi-folder'}"></i>
+                                {$item->label}
                             </span>
                             <i class="bi bi-chevron-down small ms-1" style="transition:transform .2s"></i>
                         </a>
                         <div class="collapse collapse-submenu" id="{$submenuId}">
                             <ul class="nav flex-column ms-3 gap-1 mt-1">
-                                {foreach $item['children'] as $child}
+                                {foreach $item->children as $child}
                                     <li>
-                                        <a href="{$child['url']}"
-                                           class="nav-link fw-bold py-1{if isset($currentPath) && $currentPath === $child['url']} active{/if}">
+                                        <a href="{$child->url}"
+                                           class="nav-link fw-bold py-1{if isset($currentPath) && $currentPath === $child->url} active{/if}">
                                             <i class="bi bi-dash"></i>
-                                            {$child['label']}
+                                            {$child->label}
                                         </a>
                                     </li>
                                 {/foreach}

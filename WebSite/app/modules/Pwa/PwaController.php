@@ -8,6 +8,7 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\ArticleService;
+use app\modules\Common\valueObjects\UploadedFilesInput;
 
 final class PwaController extends AbstractController
 {
@@ -76,19 +77,9 @@ final class PwaController extends AbstractController
             ? $_POST['text']
             : '';
 
-        $files = null;
-
-        if (isset($_FILES['files']) && is_array($_FILES['files'])) {
-            /** @var array{
-             *     tmp_name?: array<int, string>,
-             *     error: array<int, int>,
-             *     name: array<int, string>,
-             *     type: array<int, string>,
-             *     size: array<int, int>
-             * } $files
-             */
-            $files = $_FILES['files'];
-        }
+        $files = UploadedFilesInput::fromPhpFiles(
+            isset($_FILES['files']) && is_array($_FILES['files']) ? $_FILES['files'] : null
+        );
         $user = $this->application->getConnectedUser();
         $articleId = $this->articleService->createWithMedia(
             $user->person->Id ?? 0,
