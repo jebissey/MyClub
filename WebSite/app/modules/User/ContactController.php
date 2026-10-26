@@ -31,7 +31,6 @@ final class ContactController extends AbstractController
         private readonly EmailService $emailService,
         private readonly PersonDataHelper $personDataHelper,
         private readonly RegistrationLinkService $registrationLinkService,
-        private readonly WebApp $webApp,
         private readonly CredentialService $credentials
     ) {
         parent::__construct($application);
@@ -206,7 +205,7 @@ final class ContactController extends AbstractController
 
     private function silentFail(string $message): void
     {
-        $url = '/contact' . $this->webApp->buildUrl([]);
+        $url = '/contact' . $this->buildUrl([]);
         $this->redirect($url, ApplicationError::Ok, $message);
     }
 
@@ -270,7 +269,7 @@ final class ContactController extends AbstractController
         }
 
         if ($emailSent) {
-            $url = '/contact' . $this->webApp->buildUrl([
+            $url = '/contact' . $this->buildUrl([
                 'success' => ($this->t)('contact.success.sent'),
                 'who'     => $email,
             ]);
@@ -298,6 +297,16 @@ final class ContactController extends AbstractController
             'old_message' => $message,
         ];
         $this->redirect('/contact?' . http_build_query($params));
+    }
+
+    /**
+     * @param array<string, scalar|null> $newParams
+     */
+    private function buildUrl(array $newParams): string
+    {
+        /** @var array<string, scalar|null> $params */
+        $params = array_merge($_GET, $newParams);
+        return '?' . http_build_query($params);
     }
     #endregion
 }

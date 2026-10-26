@@ -703,7 +703,6 @@ final class Routes
             $dataHelpers->sharedFileDataHelper,
             $dataHelpers->surveyDataHelper,
             $dataHelpers->tableControllerDataHelper,
-            new WebApp(),
         );
 
         $this->apiFactory = new ApiFactory(

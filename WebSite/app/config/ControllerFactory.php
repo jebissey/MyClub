@@ -161,7 +161,6 @@ final readonly class ControllerFactory
         private SharedFileDataHelper $sharedFileDataHelper,
         private SurveyDataHelper $surveyDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
-        private WebApp $webapp,
     ) {
     }
 
@@ -239,7 +238,6 @@ final readonly class ControllerFactory
             $this->emailService,
             $this->personDataHelper,
             $this->registrationLinkService,
-            $this->webapp,
             CredentialService::getInstance()
         );
     }

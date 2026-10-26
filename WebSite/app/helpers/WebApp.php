@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
-use InvalidArgumentException;
-use Latte\Engine as LatteEngine;
-use Latte\Loaders\StringLoader;
 use app\enums\FilterInputRule;
 use app\helpers\interfaces\GravatarHandlerInterface;
 use app\modules\Common\valueObjects\Person;
@@ -14,16 +11,6 @@ use app\modules\Common\valueObjects\Person;
 final class WebApp
 {
     public const MYCLUB_WEBAPP = "https://myclub.ovh/";
-
-    /**
-     * @param array<string, scalar|null> $newParams
-     */
-    public function buildUrl(array $newParams): string
-    {
-        /** @var array<string, scalar|null> $params */
-        $params = array_merge($_GET, $newParams);
-        return '?' . http_build_query($params);
-    }
 
     /**
      * Sanitize and validate input based on a schema.
@@ -60,24 +47,6 @@ final class WebApp
     }
 
     /**
-     * @param array<string, mixed> $params
-     */
-    public static function getCompiledContent(string $content, array $params): string
-    {
-        $cacheDir = dirname(__DIR__, 2) . '/var/latte/admin_runtime';
-        if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0775, true);
-        }
-
-        $latte = new LatteEngine();
-        $latte->setLoader(new StringLoader(['main' => $content]));
-        $latte->setCacheDirectory($cacheDir);
-        $latte->setAutoRefresh(true);
-
-        return $latte->renderToString('main', $params);
-    }
-
-    /**
      * @param string|list<string> $rule
      * @param array<string, mixed> $source
      */
@@ -107,24 +76,6 @@ final class WebApp
     public static function isMyClubWebSite(): bool
     {
         return self::getBaseUrl() === self::MYCLUB_WEBAPP;
-    }
-
-    public static function nullableCast(mixed $value, string $type): int|float|bool|null
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        if (!is_scalar($value)) {
-            throw new InvalidArgumentException('Value must be scalar to cast.');
-        }
-
-        return match ($type) {
-            'int'    => (int)$value,
-            'float'  => (float)$value,
-            'bool'   => (bool)$value,
-            default  => throw new InvalidArgumentException("Unsupported cast type: $type"),
-        };
     }
 
     public static function sanitizeHtml(string $html): string
