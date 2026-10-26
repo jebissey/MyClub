@@ -32,6 +32,10 @@ final readonly class UserDirectoryViewModel extends LayoutViewModel
         public int $numberOfPublicMembers,
         public int $totalWithPresentation,
         public int $totalPersons,
+        public bool $filterMyGroups,
+        public bool $filterSelfEnroll,
+        public bool $filterWithAuth,
+        public string $allGroupsUrl,
         array $layoutParams = []
     ) {
         $baseArgs = self::baseArgsFrom($layoutParams);

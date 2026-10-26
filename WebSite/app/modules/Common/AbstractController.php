@@ -9,6 +9,7 @@ use flight\Engine;
 use Closure;
 use Latte\Engine as LatteEngine;
 use app\enums\ApplicationError;
+use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\Params;
 use app\helpers\To;
@@ -143,6 +144,27 @@ abstract class AbstractController
         );
     }
 
+    /**
+     * Retrieve an optional boolean query parameter.
+     *
+     * Accepts "1"/"on"/"true" as true and "0"/"off"/"false" as false.
+     * Returns $default when the parameter is missing or invalid.
+     */
+    protected function getQueryBool(string $key, ?bool $default = null): ?bool
+    {
+        $value = $this->getQueryParam($key, FilterInputRule::Bool->value);
+        return is_int($value) ? $value === 1 : $default;
+    }
+
+    /**
+     * Retrieve an optional integer query parameter.
+     */
+    protected function getQueryInt(string $key, ?int $default = null): ?int
+    {
+        $value = $this->getQueryParam($key, FilterInputRule::Int->value, $default);
+        return is_int($value) ? $value : $default;
+    }
+
     protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
     {
         if ($applicationError !== null) {
@@ -262,5 +284,30 @@ abstract class AbstractController
             layoutParams: $this->getAllParams([]),
         );
         $this->views->render('Common/views/info.latte', $viewModel->toArray());
+    }
+
+    #region Private funcions
+
+    /**
+     * Retrieve and filter a query-string parameter.
+     *
+     * Uses WebApp::filterInput / FilterInputRule.
+     * Returns $default when the parameter is missing, empty or invalid.
+     *
+     * Examples:
+     *   $groupId = $this->getQueryParam('group', FilterInputRule::Int);          // int|null
+     *   $page    = $this->getQueryParam('page',  FilterInputRule::Int, 1);       // int (default 1)
+     *   $search  = $this->getQueryParam('q',     FilterInputRule::Text);         // string|null
+     *   $ids     = $this->getQueryParam('ids',   FilterInputRule::ArrayInt);     // list<int>|null
+     *
+     * @param string|list<string> $rule  A FilterInputRule value or a list of allowed values
+     */
+    private function getQueryParam(string $key, string|array $rule, mixed $default = null): mixed
+    {
+        $source = $this->flight->request()->query->getData();
+        $filtered = WebApp::getFiltered($key, $rule, $source);
+
+        // getFiltered returns false when the value is missing / empty / invalid
+        return ($filtered !== false && $filtered !== null) ? $filtered : $default;
     }
 }

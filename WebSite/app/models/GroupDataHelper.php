@@ -101,6 +101,51 @@ final class GroupDataHelper extends Data
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /**
+     * Returns active groups, optionally filtered for the directory page.
+     *
+     * @return list<object{Id: int, Name: string, url?: string}>
+     */
+    public function getGroupsForDirectory(
+        int $personId,
+        bool $onlyMyGroups = false,
+        bool $onlySelfEnrollable = false,
+        bool $onlyWithAuthorization = false
+    ): array {
+        $sql = 'SELECT g.Id, g.Name
+            FROM "Group" g
+            WHERE g.Inactivated = 0';
+
+        $params = [];
+
+        if ($onlyMyGroups) {
+            // Groups the person belongs to
+            $sql .= ' AND EXISTS (
+                      SELECT 1 FROM MemberGroup mg
+                      WHERE mg.IdGroup = g.Id AND mg.IdMember = ?
+                  )';
+            $params[] = $personId;
+        }
+
+        if ($onlySelfEnrollable) {
+            $sql .= ' AND g.SelfRegistration = 1';
+        }
+
+        if ($onlyWithAuthorization) {
+            // Groups linked to at least one authorization
+            $sql .= ' AND EXISTS (
+                      SELECT 1 FROM GroupAuthorization ga
+                      WHERE ga.IdGroup = g.Id
+                  )';
+        }
+
+        $sql .= ' ORDER BY g.Name';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
 
     /** @return array<int, stdClass>|false */
     public function getGroupsWithAuthorizations(ConnectedUser $connectedUser): array|false

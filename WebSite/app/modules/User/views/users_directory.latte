@@ -1,4 +1,53 @@
-{extends "user.latte"}
+{layout '../../Common/views/layout.latte'}
+
+{block navbar}
+  <div class="container-fluid">
+    {include '../../Common/views/navbar/_userLeft.latte'}
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      {* Single list, centered, items vertically aligned and evenly spaced *}
+      <ul class="navbar-nav mx-auto flex-lg-row align-items-lg-center gap-2">
+        <li class="nav-item">
+          {if $loggedPersonInPresentationDirectory}
+            <a href="/user/presentation/edit" class="btn btn-primary text-nowrap">
+              <i class="bi bi-person-badge"></i> {='directory.index.edit_presentation'|translate}
+            </a>
+          {else}
+            <a href="/user/presentation/edit" class="btn btn-primary text-nowrap">
+              <i class="bi bi-plus-circle"></i> {='directory.index.create_presentation'|translate}
+            </a>
+          {/if}
+        </li>
+
+        <li class="nav-item">
+          <a href="/user/directory/map" class="btn btn-secondary text-nowrap">
+            <span class="position-relative me-1">
+              <i class="bi bi-map"></i>
+              <i class="bi bi-geo-alt-fill position-absolute top-0 start-50 translate-middle text-danger"></i>
+            </span>{='directory.index.locate_members'|translate} ({$countOfLocatedMembers})
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a href="/user/directory/public/map" class="btn btn-secondary text-nowrap">
+            <span class="position-relative me-1">
+              <i class="bi bi-map"></i>
+              <i class="bi bi-geo-alt-fill position-absolute top-0 start-50 translate-middle text-danger"></i>
+            </span>{='directory.index.locate_public'|translate} ({$numberOfPublicMembers})
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="d-flex align-items-center">
+      {include '../../Common/views/navbar/_userRight.latte'}
+    </div>
+  </div>
+{/block}
 
 {block content}
 <div class="container-fluid">
@@ -7,45 +56,58 @@
             <h1>{='directory.index.title'|translate}</h1>
             <p class="text-muted">{='directory.index.subtitle'|translate}</p>
         </div>
-        <div class="col-md-4 mt-3 text-end">
-            <a href="/user/directory/public/map" class="btn btn-secondary">
-                <span class="position-relative">
-                    <i class="bi bi-map"></i>
-                    <i class="bi bi-geo-alt-fill position-absolute top-0 start-50 translate-middle text-danger"></i>
-                </span>{='directory.index.locate_public'|translate} ({$numberOfPublicMembers})
-            </a>
-            <a href="/user/directory/map" class="btn btn-secondary">
-                <span class="position-relative">
-                    <i class="bi bi-map"></i>
-                    <i class="bi bi-geo-alt-fill position-absolute top-0 start-50 translate-middle text-danger"></i>
-                </span>{='directory.index.locate_members'|translate} ({$countOfLocatedMembers})
-            </a>
-            {if $loggedPersonInPresentationDirectory}
-            <a href="/user/presentation/edit" class="btn btn-primary">
-                <i class="bi bi-person-badge"></i> {='directory.index.edit_presentation'|translate}
-            </a>
-            {else}
-            <a href="/user/presentation/edit" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> {='directory.index.create_presentation'|translate}
-            </a>
-            {/if}
-        </div>
     </div>
 
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">{='directory.index.filter_by_group'|translate}</h5>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h5 class="card-title mb-0">{='directory.index.filter_by_group'|translate}</h5>
+
+                        {* Filter checkboxes: behavior is wired in directory.js through data-filter *}
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" id="filterMyGroups"
+                                    data-filter="my" {if $filterMyGroups}checked{/if}>
+                                <label class="form-check-label" for="filterMyGroups">
+                                    {='directory.index.my_groups'|translate}
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" id="filterSelfEnroll"
+                                    data-filter="self" {if $filterSelfEnroll}checked{/if}>
+                                <label class="form-check-label" for="filterSelfEnroll">
+                                    {='directory.index.self_enrollable_groups'|translate}
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" id="filterWithAuth"
+                                    data-filter="auth" {if $filterWithAuth}checked{/if}>
+                                <label class="form-check-label" for="filterWithAuth">
+                                    {='directory.index.groups_with_authorization'|translate}
+                                </label>
+                            </div>
+
+                            <div id="directoryLoading" class="d-none align-items-center" role="status" aria-live="polite">
+                                <span class="spinner-border spinner-border-sm text-primary me-2" aria-hidden="true"></span>
+                                <span class="text-muted">{='directory.index.loading'|translate}</span>
+                            </div>                            
+                        </div>
+                    </div>
+
                     <div class="d-flex flex-wrap gap-2">
-                         <a href="/user/directory" class="btn {if $selectedGroup === null}btn-primary{else}btn-outline-primary{/if}">
-                             {='directory.index.all'|translate}
-                             <span class="badge bg-light text-dark">
-                                 ({$totalWithPresentation}/{$totalPersons})
-                             </span>
-                         </a>
+                        {* URLs are built by the controller so that the active filters are preserved *}
+                        <a href="{$allGroupsUrl}" class="btn {if $selectedGroup === null}btn-primary{else}btn-outline-primary{/if}">
+                            {='directory.index.all'|translate}
+                            <span class="badge bg-light text-dark">
+                                ({$totalWithPresentation}/{$totalPersons})
+                            </span>
+                        </a>
                         {foreach $groups as $group}
-                        <a href="/user/directory?group={$group->Id}" class="btn {if $selectedGroup === $group->Id}btn-primary{else}btn-outline-primary{/if}">
+                        <a href="{$group->url}" class="btn {if $selectedGroup === $group->Id}btn-primary{else}btn-outline-primary{/if}">
                             {$group->Name}
                             {if isset($groupCounts[$group->Id])}
                                 <span class="badge bg-light text-dark">
@@ -68,52 +130,52 @@
     </div>
 
     {if count($persons) > 0}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6 g-3">
-            {foreach $persons as $person}
-                <div class="col">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <a href="/user/presentation/{$person->Id}" class="text-decoration-none">
-                                <div class="mt-2 mb-2">
-                                    {include '../../Common/views/partials/avatar.latte',
-                                        useGravatar: $person->UseGravatar,
-                                        email: $person->Email,
-                                        avatar: $person->Avatar,
-                                        userImg: $person->UserImg,
-                                        size: 64}
-                                </div>
-
-                                <h5 class="card-title">{$person->FirstName} {$person->LastName}</h5>
-                                {if $person->NickName}
-                                    <p class="text-muted mb-0">{$person->NickName}</p>
-                                {/if}
-                                {if isset($person->Groups) && count($person->Groups) > 0}
-                                    {foreach $person->Groups as $group}
-                                        <span class="badge bg-secondary me-1">{$group->Name}</span>
-                                    {/foreach}
-                                {/if}
-                            </a>
-
-                            <div class="mt-3">
-                                <a href="/user/presentation/{$person->Id}" class="btn btn-sm btn-primary">
-                                    {='directory.index.view_profile'|translate}
-                                </a>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6 g-3">
+        {foreach $persons as $person}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <a href="/user/presentation/{$person->Id}" class="text-decoration-none">
+                            <div class="mt-2 mb-2">
+                                {include '../../Common/views/partials/avatar.latte',
+                                    useGravatar: $person->UseGravatar,
+                                    email: $person->Email,
+                                    avatar: $person->Avatar,
+                                    userImg: $person->UserImg,
+                                    size: 64}
                             </div>
+
+                            <h5 class="card-title">{$person->FirstName} {$person->LastName}</h5>
+                            {if $person->NickName}
+                                <p class="text-muted mb-0">{$person->NickName}</p>
+                            {/if}
+                            {if isset($person->Groups) && count($person->Groups) > 0}
+                                {foreach $person->Groups as $group}
+                                    <span class="badge bg-secondary me-1">{$group->Name}</span>
+                                {/foreach}
+                            {/if}
+                        </a>
+
+                        <div class="mt-3">
+                            <a href="/user/presentation/{$person->Id}" class="btn btn-sm btn-primary">
+                                {='directory.index.view_profile'|translate}
+                            </a>
                         </div>
                     </div>
                 </div>
-            {/foreach}
-        </div>
+            </div>
+        {/foreach}
+    </div>
     {else}
-        <div class="alert alert-info">
-            <p class="mb-0">
-                {if isset($selectedGroup)}
-                    {='directory.index.no_members_group'|translate}
-                {else}
-                    {='directory.index.no_members'|translate}
-                {/if}
-            </p>
-        </div>
+    <div class="alert alert-info">
+        <p class="mb-0">
+            {if isset($selectedGroup)}
+                {='directory.index.no_members_group'|translate}
+            {else}
+                {='directory.index.no_members'|translate}
+            {/if}
+        </p>
+    </div>
     {/if}
 </div>
 {/block}

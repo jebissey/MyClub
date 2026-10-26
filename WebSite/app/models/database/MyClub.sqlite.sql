@@ -6934,7 +6934,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1367,'common.crosstab.selected_period','Selected period','Période sélectionnée','Wybrany okres'),
  (1368,'common.crosstab.no_data','No results found for the selected period.','Aucun résultat trouvé pour la période sélectionnée.','Nie znaleziono wyników dla wybranego okresu.'),
  (1369,'common.crosstab.total','Total','Total','Razem'),
- (1370,'article.crosstab.title','Editors vs audience','Rédacteurs vs audience','Redaktorzy a odbiorcy'),
  (1371,'article.crosstab.total.articles','articles','articles','artykuły'),
  (1372,'event.crosstab.title','Organizers vs event type','Animateurs vs type d''événement','Organizatorzy a typ wydarzenia'),
  (1373,'event.crosstab.total.events','events','événements','wydarzenia'),
@@ -7017,10 +7016,16 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1472,'webmaster.installations.status.inactive','Inactive','Inactif','Nieaktywna'),
  (1473,'webmaster.installations.unknown_version','Unknown version','Version inconnue','Nieznana wersja'),
  (1474,'webmaster.installations.empty.title','No installation detected','Aucune installation détectée','Nie wykryto żadnej instalacji'),
- (1475,'webmaster.installations.empty.message','No installation of the webapp has checked for updates yet.','Aucune installation de la webapp n''a encore vérifié les mises à jour.','Żadna instalacja aplikacji nie sprawdzała jeszcze aktualizacji.');
+ (1475,'webmaster.installations.empty.message','No installation of the webapp has checked for updates yet.','Aucune installation de la webapp n''a encore vérifié les mises à jour.','Żadna instalacja aplikacji nie sprawdzała jeszcze aktualizacji.'),
+ (1476,'article.crosstab.title','Editors vs audience','Rédacteurs vs audience','Redaktorzy a odbiorcy'),
+ (1477,'article.crosstab.total_articles','articles','articles','artykuły'),
+ (1478,'directory.index.my_groups','My groups','Mes groupes','Moje grupy'),
+ (1479,'directory.index.self_enrollable_groups','Self-enrollable groups','Les groupes auto-inscriptibles','Grupy z auto-zapisem'),
+ (1480,'directory.index.groups_with_authorization','Groups with authorization(s)','Les groupes avec autorisation(s)','Grupy z autoryzacją'),
+ (1481,'directory.index.loading','Searching...','Recherche en cours...','Wyszukiwanie...');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',99,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',100,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),
