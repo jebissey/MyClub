@@ -25,7 +25,10 @@ final class Article implements RouteInterface
     public function get(): array
     {
         $articleController = fn() => $this->controllerFactory->makeArticleController();
+        $articleListController = fn() => $this->controllerFactory->makeArticleListController();
+        $articleStatisticsController = fn() => $this->controllerFactory->makeArticleStatisticsController();
 
+        // Single article: display and editing
         $this->routes[] = new Route('GET  /article/carousel/@id:[0-9]+', $articleController, 'carousel');
         $this->routes[] = new Route('GET  /article/chat/@id:[0-9]+', $articleController, 'showArticleChat');
         $this->routes[] = new Route('GET  /article/change-owner/@id:[0-9]+', $articleController, 'changeOwner');
@@ -35,15 +38,19 @@ final class Article implements RouteInterface
         $this->routes[] = new Route('POST /article/edit/@id:[0-9]+', $articleController, 'update');
         $this->routes[] = new Route('POST /article/delete/@id:[0-9]+', $articleController, 'delete');
         $this->routes[] = new Route('GET  /article/@id:[0-9]+', $articleController, 'show');
-        $this->routes[] = new Route('GET  /articles', $articleController, 'index');
-        $this->routes[] = new Route('GET  /articles/crosstab', $articleController, 'showArticleCrosstab');
-        $this->routes[] = new Route('GET  /articles/public', $articleController, 'publicIndex');
         $this->routes[] = new Route('GET  /emails/article/@id:[0-9]+', $articleController, 'fetchEmailsForArticle');
         $this->routes[] = new Route('GET  /publish/article/@id:[0-9]+', $articleController, 'publish');
         $this->routes[] = new Route('POST /publish/article/@id:[0-9]+', $articleController, 'publish');
         $this->routes[] = new Route('GET  /redactor', $articleController, 'home');
         $this->routes[] = new Route('GET  /redactor/help', $articleController, 'help');
-        $this->routes[] = new Route('GET  /topArticles', $articleController, 'topArticlesByPeriod');
+
+        // Listings
+        $this->routes[] = new Route('GET  /articles', $articleListController, 'index');
+        $this->routes[] = new Route('GET  /articles/public', $articleListController, 'publicIndex');
+
+        // Statistics
+        $this->routes[] = new Route('GET  /articles/crosstab', $articleStatisticsController, 'showArticleCrosstab');
+        $this->routes[] = new Route('GET  /topArticles', $articleStatisticsController, 'topArticlesByPeriod');
 
         return $this->routes;
     }

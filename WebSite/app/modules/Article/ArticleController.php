@@ -6,66 +6,56 @@ namespace app\modules\Article;
 
 use app\enums\ArticleAccess;
 use app\enums\FilterInputRule;
-use app\enums\Period;
 use app\exceptions\IntegrityException;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\Backup;
 use app\helpers\GravatarHandler;
-use app\helpers\TranslationManager;
 use app\helpers\WebApp;
-use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
-use app\models\ArticleTableDataHelper;
 use app\models\CarouselDataHelper;
-use app\models\LogDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAlertService;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleRow;
-use app\modules\Article\valueObjects\Result;
 use app\modules\Article\viewModels\ArticleCarouselViewModel;
 use app\modules\Article\viewModels\ArticleEditViewModel;
 use app\modules\Article\viewModels\ArticleShowViewModel;
 use app\modules\Article\viewModels\ChangeOwnerViewModel;
 use app\modules\Article\viewModels\PublishViewModel;
 use app\modules\Article\viewModels\RedactorHomeViewModel;
-use app\modules\Common\TableController;
 use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 use app\modules\Common\viewModels\ChatViewModel;
-use app\modules\Common\viewModels\CrosstabViewModel;
-use app\modules\Common\viewModels\TableIndexViewModel;
-use app\modules\Common\viewModels\TopItemsByPeriodViewModel;
 
 /**
  * @phpstan-import-type ClosingVisibilityRowShape from ClosingVisibilityRow
  */
-final class ArticleController extends TableController
+final class ArticleController extends ArticleAccessController
 {
-    private const TOP = 50;
-
     public function __construct(
         Application $application,
-        private readonly ArticleDataHelper $articleDataHelper,
-        private readonly ArticleTableDataHelper $articleTableDataHelper,
+        ArticleDataHelper $articleDataHelper,
+        ArticleAuthorizationService $authorizationService,
+        AnonymousAccessService $anonymousAccessService,
         private readonly PersonDataHelper $personDataHelper,
         private readonly Backup $backup,
-        private readonly ArticleCrosstabDataHelper $articleCrosstabDataHelper,
         private readonly MessageDataHelper $messageDataHelper,
         private readonly EmailService $emailService,
-        private readonly LogDataHelper $logDataHelper,
         private readonly ArticleService $articleService,
         private readonly CarouselDataHelper $carouselDataHelper,
-        private readonly ArticleAuthorizationService $authorizationService,
-        private readonly AnonymousAccessService $anonymousAccessService,
         private readonly ArticleAlertService $articleAlertService,
     ) {
-        parent::__construct($application);
+        parent::__construct(
+            $application,
+            $articleDataHelper,
+            $authorizationService,
+            $anonymousAccessService,
+        );
     }
 
     public function carousel(int $id): void
@@ -271,123 +261,6 @@ final class ArticleController extends TableController
         }
     }
 
-    public function index(): void
-    {
-        $connectedUser = $this->application->getConnectedUser();
-        $schema = [
-            'PersonName' => FilterInputRule::PersonName->value,
-            'title'      => FilterInputRule::Content->value,
-            'lastUpdate' => FilterInputRule::DateTime->value,
-            'published'  => ['oui', 'non'],
-            'pool'       => ['oui', 'non'],
-            'menu'       => ['oui', 'non'],
-            'GroupName'  => FilterInputRule::HtmlSafeName->value,
-            'Content'    => FilterInputRule::Content->value,
-            'Id'         => FilterInputRule::Int->value,
-        ];
-        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-        /** @var array<string, string> $filterValues */
-        $filterConfig = [
-            ['name' => 'PersonName', 'label' => ($this->t)('article.label.created_by')],
-            ['name' => 'title', 'label' => ($this->t)('article.label.title')],
-            ['name' => 'lastUpdate', 'label' => ($this->t)('article.label.last_update')],
-            ['name' => 'pool', 'label' => ($this->t)('article.label.pool')],
-            ['name' => 'GroupName', 'label' => ($this->t)('article.label.group')],
-            ['name' => 'Content', 'label' => ($this->t)('article.label.content')],
-            ['name' => 'Id', 'label' => 'ID'],
-        ];
-        if ($connectedUser->isEditor()) {
-            $filterConfig[] = ['name' => 'published', 'label' => ($this->t)('article.label.published')];
-            $filterConfig[] = ['name' => 'menu', 'label' => ($this->t)('article.label.menu')];
-        }
-        $columns = [
-            ['field' => 'PersonName', 'label' => ($this->t)('article.label.created_by')],
-            ['field' => 'Title', 'label' => ($this->t)('article.label.title')],
-            ['field' => 'LastUpdate', 'label' => ($this->t)('article.label.last_update')],
-            ['field' => 'Pool', 'label' => ($this->t)('article.label.pool')],
-            ['field' => 'PoolDetail', 'label' => ($this->t)('article.label.pool_detail')],
-            ['field' => 'Messages', 'label' => ($this->t)('article.label.messages')],
-            ['field' => 'GroupName', 'label' => ($this->t)('article.label.group')],
-            ['field' => 'ForMembers', 'label' => ($this->t)('article.label.for_members')],
-        ];
-        if ($connectedUser->isEditor()) {
-            $columns[] = ['field' => 'Menu', 'label' => ($this->t)('article.label.menu')];
-            $columns[] = ['field' => 'Published', 'label' => ($this->t)('article.label.published')];
-        }
-        $spotlight = $this->articleDataHelper->getSpotlightArticle();
-        $spotlightArticleId = isset($spotlight['articleId']) && is_numeric($spotlight['articleId'])
-            ? (int)$spotlight['articleId']
-            : -1;
-        $query = $this->articleTableDataHelper->getQuery(
-            $connectedUser,
-            $spotlightArticleId
-        );
-        $data = $this->prepareTableData($query, $filterValues);
-
-        $viewModel = new TableIndexViewModel(
-            articles: array_values($data['items']),
-            currentPage: $data['currentPage'],
-            totalPages: $data['totalPages'],
-            filterValues: $filterValues,
-            filters: $filterConfig,
-            columns: $columns,
-            resetUrl: '/articles',
-            userConnected: $connectedUser->person ?? false,
-            navItems: $this->getNavItems($connectedUser->person),
-            layoutParams: $this->getAllParams([
-                'page' => $connectedUser->getPage(),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/',
-            ]),
-        );
-        $this->views->render('Article/views/articles_index.latte', $viewModel->toArray());
-    }
-
-    public function publicIndex(): void
-    {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEditor(), __FILE__, __LINE__)) {
-            return;
-        }
-        $connectedUser = $this->application->getConnectedUser();
-        $schema = [
-            'title'      => FilterInputRule::Content->value,
-            'lastUpdate' => FilterInputRule::DateTime->value,
-            'Id'         => FilterInputRule::Int->value,
-        ];
-        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-        /** @var array<string, string> $filterValues */
-        $filterConfig = [
-            ['name' => 'title', 'label' => ($this->t)('article.label.title')],
-            ['name' => 'lastUpdate', 'label' => ($this->t)('article.label.last_update')],
-            ['name' => 'Id', 'label' => 'ID'],
-        ];
-        $columns = [
-            ['field' => 'Title', 'label' => ($this->t)('article.label.title')],
-            ['field' => 'LastUpdate', 'label' => ($this->t)('article.label.last_update')],
-            ['field' => 'ReferenceSource', 'label' => ($this->t)('article.label.reference_source')],
-        ];
-        $query = $this->articleTableDataHelper->getQueryForPublicArticles();
-        $data = $this->prepareTableData($query, $filterValues);
-
-        $viewModel = new TableIndexViewModel(
-            articles: array_values($data['items']),
-            currentPage: $data['currentPage'],
-            totalPages: $data['totalPages'],
-            filterValues: $filterValues,
-            filters: $filterConfig,
-            columns: $columns,
-            resetUrl: '/articles',
-            userConnected: $connectedUser->person ?? false,
-            navItems: $this->getNavItems($connectedUser->person),
-            layoutParams: $this->getAllParams([
-                'page' => $connectedUser->getPage(),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/',
-            ]),
-        );
-        $this->views->render('Article/views/publicArticles_index.latte', $viewModel->toArray());
-    }
-
     public function publish(int $id): void
     {
         if (!$this->application->getConnectedUser()->isRedactor()) {
@@ -538,65 +411,6 @@ final class ArticleController extends TableController
         $this->views->render('Common/views/chat.latte', $viewModel->toArray());
     }
 
-    public function showArticleCrosstab(): void
-    {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            return;
-        }
-
-        $period = Period::from($this->flight->request()->query->period ?? 'month');
-        $dateRange = $period->dateRange();
-        $crosstabData = $this->articleCrosstabDataHelper->getItems($dateRange);
-
-        $viewModel = new CrosstabViewModel(
-            crosstabData: $crosstabData,
-            period: $period->value,
-            dateRange: $dateRange,
-            availablePeriods: Period::gets($this->languagesDataHelper),
-            title: ($this->t)('article.crosstab.title'),
-            totalLabels: [($this->t)('article.crosstab.total_articles'), ''],
-            layoutParams: $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(1),
-            ]),
-        );
-        $this->views->render('Article/views/crosstab.latte', $viewModel->toArray());
-    }
-
-    public function topArticlesByPeriod(): void
-    {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            return;
-        }
-
-        $period        = Period::fromRequest($this->application, $this->flight->request());
-        $dateCondition = $period->dateConditions('CreatedAt');
-        $topPages      = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
-
-        $articleIds = array_values(array_filter(
-            array_map(fn($p) => $p->articleId ?? null, $topPages)
-        ));
-        $authors = $this->articleDataHelper->getAuthorsByArticleIds($articleIds);
-
-        foreach ($topPages as $page) {
-            $author             = $authors[$page->articleId ?? null] ?? null;
-            $page->AuthorName   = $author?->PersonName;
-            $page->ArticleTitle = $author?->ArticleTitle;
-        }
-
-        $viewModel = new TopItemsByPeriodViewModel(
-            title: ($this->t)('visitor_insights.top_articles.title'),
-            period: $period->value,
-            periodFrom: $period->getStart()->format('Y-m-d H:i:s'),
-            periodTo: $period->getEnd()->format('Y-m-d H:i:s'),
-            topPages: array_values($topPages),
-            translations: TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
-            layoutParams: $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]),
-        );
-        $this->views->render('Article/views/topArticles.latte', $viewModel->toArray());
-    }
-
     public function update(int $id): void
     {
         if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
@@ -654,124 +468,6 @@ final class ArticleController extends TableController
         $this->redirect('/article/' . $id);
     }
 
-    #region Authorization pipeline
-    /**
-     * Access gate for the read-only article pages (article view, article chat).
-     *
-     * HTTP method -> latest version -> read policy, as one Result chain.
-     * Any failure has already been answered (error page or redirect) when null is returned:
-     * the caller must simply stop.
-     */
-    private function readArticle(int $id): ?ArticleRow
-    {
-        $user = $this->application->getConnectedUser();
-
-        try {
-            return $this->unwrapOrRespond(
-                $this->requireMethod(['GET', 'HEAD'])
-                    ->andThen(fn() => $this->loadLatest($id))
-                    ->andThen(fn(ArticleRow $article) => $this->authorizationService->authorizeRead($article, $user)),
-                $id,
-                readAccess: true,
-            );
-        } catch (QueryException $e) {
-            $this->errors->badRequest($e->getMessage(), $e->getFile(), $e->getLine());
-            return null;
-        }
-    }
-
-    /**
-     * @param list<string> $allowedMethods
-     * @return Result<null>
-     */
-    private function requireMethod(array $allowedMethods): Result
-    {
-        return in_array(WebApp::getRequestMethod(), $allowedMethods, true)
-            ? Result::ok(null)
-            : Result::fail(ArticleAccess::MethodNotAllowed);
-    }
-
-    /**
-     * @return Result<ArticleRow>
-     */
-    private function loadLatest(int $id): Result
-    {
-        $article = $this->articleDataHelper->getLatestArticle([$id]);
-
-        return $article === null
-            ? Result::fail(ArticleAccess::NotFound)
-            : Result::ok($article);
-    }
-
-    /**
-     * Loads the latest version of an article and checks one permission on it.
-     *
-     * @param callable(ArticleRow, \app\helpers\ConnectedUser): bool $isAllowed
-     * @return Result<ArticleRow>
-     */
-    private function loadAuthorized(int $id, callable $isAllowed): Result
-    {
-        $user = $this->application->getConnectedUser();
-
-        return $this->loadLatest($id)->andThen(
-            static fn(ArticleRow $article): Result => $isAllowed($article, $user)
-                ? Result::ok($article)
-                : Result::fail(ArticleAccess::Forbidden)
-        );
-    }
-
-    /**
-     * Single exit point of the pipelines: returns the success value, or emits the
-     * HTTP response matching the denial and returns null.
-     *
-     * @template T
-     * @param Result<T> $result
-     * @param bool $readAccess read denials keep their historical raiseForbidden() arguments
-     * @return T|null
-     */
-    private function unwrapOrRespond(Result $result, int $articleId, bool $readAccess = false): mixed
-    {
-        return $result->match(
-            onOk: static fn(mixed $value): mixed => $value,
-            onFail: function (ArticleAccess $reason) use ($articleId, $readAccess): mixed {
-                $this->respondToDenial($reason, $articleId, $readAccess);
-                return null;
-            },
-        );
-    }
-
-    /**
-     * The only place that turns an ArticleAccess denial into an HTTP response.
-     */
-    private function respondToDenial(ArticleAccess $reason, int $articleId, bool $readAccess = false): void
-    {
-        // switch rather than match: the raise*() methods return void.
-        // Keep one case per ArticleAccess case, a missing one would leave the request unanswered.
-        switch ($reason) {
-            case ArticleAccess::MethodNotAllowed:
-                $this->errors->methodNotAllowed(__FILE__, __LINE__);
-                break;
-            case ArticleAccess::NotFound:
-                $this->errors->badRequest(
-                    str_replace('{id}', (string)$articleId, ($this->t)('article.error.not_found')),
-                    __FILE__,
-                    __LINE__
-                );
-                break;
-            case ArticleAccess::LoginRequired:
-                $this->handleAnonymousAccess();
-                break;
-            case ArticleAccess::Forbidden:
-                if ($readAccess) {
-                    $this->errors->forbidden(__FILE__, __LINE__, 10000, false);
-                } else {
-                    $this->errors->forbidden(__FILE__, __LINE__);
-                }
-                break;
-        }
-    }
-    #endregion
-
     #region Private functions
     private function publisherName(ArticleRow $article): string
     {
@@ -789,45 +485,6 @@ final class ArticleController extends TableController
         }
         /** @var ClosingVisibilityRowShape $row */
         return ClosingVisibilityRow::fromStdClass($row);
-    }
-
-    /**
-     * Anonymous visitor on a protected page: see AnonymousAccessService.
-     */
-    private function handleAnonymousAccess(): void
-    {
-        $requestUri = is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '/';
-        $target = $this->anonymousAccessService->resolve($requestUri);
-
-        $this->redirect($target->url, $target->status, $target->message);
-    }
-
-    /**
-     * Resolves the target of the "parent" navbar button from the ?parent= query parameter.
-     *
-     * - parameter absent or invalid -> $default (current behavior)
-     * - parent=false                -> null (button hidden)
-     * - parent=/some/internal/path  -> that path
-     *
-     * Only local absolute paths are accepted to prevent open redirects
-     * and "javascript:" / external URLs.
-     */
-    private function resolveParentUrl(string $default): ?string
-    {
-        $raw = $this->flight->request()->query->getData()['parent'] ?? null;
-
-        if ($raw === 'false') {
-            return null;
-        }
-
-        $filtered = WebApp::filterInput(
-            ['parent' => FilterInputRule::LocalPath->value],
-            ['parent' => $raw]
-        );
-
-        $parent = $filtered['parent'] ?? $default;
-
-        return is_string($parent) ? $parent : $default;
     }
     #endregion
 }

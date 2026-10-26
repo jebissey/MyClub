@@ -45,6 +45,8 @@ use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Article\ArticleController;
+use app\modules\Article\ArticleListController;
+use app\modules\Article\ArticleStatisticsController;
 use app\modules\Article\MediaController;
 use app\modules\Article\OrderController;
 use app\modules\Article\services\ArticleAlertService;
@@ -168,18 +170,34 @@ final readonly class ControllerFactory
         return new ArticleController(
             $this->application,
             $this->articleDataHelper,
-            $this->articleTableDataHelper,
-            $this->personDataHelper,
-            $this->backup,
-            $this->articleCrosstabDataHelper,
-            $this->messageDataHelper,
-            $this->emailService,
-            $this->logDataHelper,
-            $this->articleService,
-            $this->carouselDataHelper,
             $this->articleAuthorizationService,
             $this->anonymousAccessService,
+            $this->personDataHelper,
+            $this->backup,
+            $this->messageDataHelper,
+            $this->emailService,
+            $this->articleService,
+            $this->carouselDataHelper,
             $this->articleAlertService,
+        );
+    }
+
+    public function makeArticleListController(): ArticleListController
+    {
+        return new ArticleListController(
+            $this->application,
+            $this->articleDataHelper,
+            $this->articleTableDataHelper,
+        );
+    }
+
+    public function makeArticleStatisticsController(): ArticleStatisticsController
+    {
+        return new ArticleStatisticsController(
+            $this->application,
+            $this->articleDataHelper,
+            $this->articleCrosstabDataHelper,
+            $this->logDataHelper,
         );
     }
 
