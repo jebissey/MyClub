@@ -8,7 +8,6 @@ use DateTime;
 use PDO;
 use app\helpers\Application;
 use app\helpers\To;
-use app\models\interfaces\MemberDataHelperInterface;
 use app\modules\Common\valueObjects\IdentityRow;
 use app\modules\Common\valueObjects\LocatedMemberRow;
 use app\modules\Common\valueObjects\MemberBasicRow;
@@ -24,7 +23,7 @@ use app\modules\Common\valueObjects\SignInRow;
  * @phpstan-import-type IndividualShape from IdentityRow
  * @phpstan-import-type JoinedShape from MemberBasicRow
  */
-final class MemberDataHelper extends Data implements MemberDataHelperInterface
+final class MemberDataHelper extends Data
 {
     public function __construct(Application $application)
     {
@@ -217,7 +216,8 @@ final class MemberDataHelper extends Data implements MemberDataHelperInterface
                 Member.InPresentationDirectory,
                 Member.ShowPhoneInPresentationDirectory,
                 Member.ShowEmailInPresentationDirectory,
-                Member.Location
+                Member.Location,
+                NULL as MyPublicDataInPresentationDirectory
             FROM Member
             INNER JOIN Individual ON Individual.Id = Member.Id
             WHERE Member.InPresentationDirectory = 1
