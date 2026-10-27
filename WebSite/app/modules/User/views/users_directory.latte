@@ -94,7 +94,7 @@
                             <div id="directoryLoading" class="d-none align-items-center" role="status" aria-live="polite">
                                 <span class="spinner-border spinner-border-sm text-primary me-2" aria-hidden="true"></span>
                                 <span class="text-muted">{='directory.index.loading'|translate}</span>
-                            </div>                            
+                            </div>
                         </div>
                     </div>
 
@@ -135,29 +135,24 @@
             <div class="col">
                 <div class="card h-100">
                     <div class="card-body text-center">
-                        <a href="/user/presentation/{$person->Id}" class="text-decoration-none">
+                        <a href="/user/presentation/{$person->id}" class="text-decoration-none">
                             <div class="mt-2 mb-2">
                                 {include '../../Common/views/partials/avatar.latte',
-                                    useGravatar: $person->UseGravatar,
-                                    email: $person->Email,
-                                    avatar: $person->Avatar,
-                                    userImg: $person->UserImg,
+                                    useGravatar: $person->useGravatar,
+                                    email: $person->email,
+                                    avatar: $person->avatar,
+                                    userImg: $person->userImg,
                                     size: 64}
                             </div>
 
-                            <h5 class="card-title">{$person->FirstName} {$person->LastName}</h5>
-                            {if $person->NickName}
-                                <p class="text-muted mb-0">{$person->NickName}</p>
-                            {/if}
-                            {if isset($person->Groups) && count($person->Groups) > 0}
-                                {foreach $person->Groups as $group}
-                                    <span class="badge bg-secondary me-1">{$group->Name}</span>
-                                {/foreach}
+                            <h5 class="card-title">{$person->firstName} {$person->lastName}</h5>
+                            {if $person->nickName}
+                                <p class="text-muted mb-0">{$person->nickName}</p>
                             {/if}
                         </a>
 
                         <div class="mt-3">
-                            <a href="/user/presentation/{$person->Id}" class="btn btn-sm btn-primary">
+                            <a href="/user/presentation/{$person->id}" class="btn btn-sm btn-primary">
                                 {='directory.index.view_profile'|translate}
                             </a>
                         </div>
@@ -169,7 +164,7 @@
     {else}
     <div class="alert alert-info">
         <p class="mb-0">
-            {if isset($selectedGroup)}
+            {if $selectedGroup !== null}
                 {='directory.index.no_members_group'|translate}
             {else}
                 {='directory.index.no_members'|translate}

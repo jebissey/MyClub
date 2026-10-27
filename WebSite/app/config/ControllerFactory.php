@@ -554,7 +554,6 @@ final readonly class ControllerFactory
             $this->application,
             $this->groupDataHelper,
             $this->personGroupDataHelper,
-            $this->memberDataHelper,
             $this->memberMapService,
             $this->memberDirectoryDataHelper
         );

@@ -4,6 +4,17 @@ declare(strict_types=1);
 
 namespace app\modules\Common\valueObjects;
 
+/**
+ * @phpstan-type DirectoryPersonRowShape object{
+ *     Id: int|string,
+ *     FirstName: string,
+ *     LastName: string|null,
+ *     NickName: string|null,
+ *     Avatar: string|null,
+ *     UseGravatar: string,
+ *     Email: string
+ * }
+ */
 final readonly class DirectoryPersonRow
 {
     public function __construct(
@@ -19,15 +30,7 @@ final readonly class DirectoryPersonRow
     }
 
     /**
-     * @param object{
-     *     Id: int|string,
-     *     FirstName: string,
-     *     LastName: string|null,
-     *     NickName: string|null,
-     *     Avatar: string|null,
-     *     UseGravatar: string,
-     *     Email: string
-     * } $row
+     * @param DirectoryPersonRowShape $row
      */
     public static function fromStdClass(object $row, string $userImg): self
     {

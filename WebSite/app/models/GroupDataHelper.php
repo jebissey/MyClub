@@ -11,7 +11,11 @@ use app\enums\ApplicationError;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\modules\Common\valueObjects\DirectoryGroupRow;
 
+/**
+ * @phpstan-import-type DirectoryGroupRowShape from DirectoryGroupRow
+ */
 final class GroupDataHelper extends Data
 {
     public function __construct(private readonly Application $application)
@@ -104,7 +108,7 @@ final class GroupDataHelper extends Data
     /**
      * Returns active groups, optionally filtered for the directory page.
      *
-     * @return list<object{Id: int, Name: string, url?: string}>
+     * @return list<DirectoryGroupRow>
      */
     public function getGroupsForDirectory(
         int $personId,
@@ -119,11 +123,9 @@ final class GroupDataHelper extends Data
         $params = [];
 
         if ($onlyMyGroups) {
-            // Groups the person belongs to
             $sql .= ' AND EXISTS (
-                      SELECT 1 FROM MemberGroup mg
-                      WHERE mg.IdGroup = g.Id AND mg.IdMember = ?
-                  )';
+                        SELECT 1 FROM MemberGroup mg
+                        WHERE mg.IdGroup = g.Id AND mg.IdMember = ? )';
             $params[] = $personId;
         }
 
@@ -132,11 +134,9 @@ final class GroupDataHelper extends Data
         }
 
         if ($onlyWithAuthorization) {
-            // Groups linked to at least one authorization
             $sql .= ' AND EXISTS (
-                      SELECT 1 FROM GroupAuthorization ga
-                      WHERE ga.IdGroup = g.Id
-                  )';
+                        SELECT 1 FROM GroupAuthorization ga
+                        WHERE ga.IdGroup = g.Id )';
         }
 
         $sql .= ' ORDER BY g.Name';
@@ -144,7 +144,13 @@ final class GroupDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<DirectoryGroupRowShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(
+            static fn(object $row): DirectoryGroupRow => DirectoryGroupRow::fromStdClass($row),
+            $rows
+        );
     }
 
     /** @return array<int, stdClass>|false */

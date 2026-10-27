@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace app\modules\User\viewModels;
 
-use stdClass;
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\DirectoryGroupRow;
 use app\modules\Common\valueObjects\DirectoryPersonRow;
-use app\modules\Common\valueObjects\LocatedMemberRow;
 use app\modules\Common\valueObjects\MenuItemRow;
 
 final readonly class UserDirectoryViewModel extends LayoutViewModel
 {
     /**
-     * @param list<DirectoryPersonRow|LocatedMemberRow> $persons
+     * @param list<DirectoryPersonRow> $persons
      * @param list<MenuItemRow> $navItems
-     * @param list<stdClass> $groups
+     * @param list<DirectoryGroupRow> $groups
      * @param array<int|string, mixed> $groupCounts
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */

@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace app\modules\User;
 
 use app\helpers\Application;
-use app\helpers\GravatarHandler;
-use app\helpers\WebApp;
 use app\models\GroupDataHelper;
-use app\models\MemberDataHelper;
 use app\models\MemberDirectoryDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\MemberMapService;
+use app\modules\Common\valueObjects\DirectoryGroupRow;
 use app\modules\User\viewModels\UserDirectoryViewModel;
 use app\modules\User\viewModels\UsersMapViewModel;
-use app\modules\Common\valueObjects\LocatedMemberRow;
 
 final class UserDirectoryController extends AbstractController
 {
@@ -23,12 +20,12 @@ final class UserDirectoryController extends AbstractController
         Application $application,
         private readonly GroupDataHelper $groupDataHelper,
         private readonly PersonGroupDataHelper $personGroupDataHelper,
-        private readonly MemberDataHelper $memberDataHelper,
         private readonly MemberMapService $memberMapService,
         private readonly MemberDirectoryDataHelper $memberDirectoryDataHelper
     ) {
         parent::__construct($application);
     }
+
 
     public function showDirectory(): void
     {
@@ -36,32 +33,18 @@ final class UserDirectoryController extends AbstractController
             return;
         }
 
-        $filterMyGroups   = $this->getQueryBool('my') ?? false;
-        $filterSelfEnroll = $this->getQueryBool('self') ?? false;
-        $filterWithAuth   = $this->getQueryBool('auth') ?? false;
-        $selectedGroup    = $this->getQueryInt('group');
+        $filterMyGroups = $this->getQueryBool('my') ?? false;
+        $filterWithAuth = $this->getQueryBool('auth') ?? false;
+        // "Self-enrollable" and "with authorization" are mutually exclusive; "auth" wins
+        $filterSelfEnroll = $filterWithAuth ? false : ($this->getQueryBool('self') ?? false);
+        $selectedGroup = $this->getQueryInt('group');
 
         $person = $this->application->getConnectedUser(true)->person;
 
-        // Persons list
-        if ($selectedGroup !== null) {
-            $persons = $this->memberDirectoryDataHelper->getPersonsInGroupForDirectory($selectedGroup);
-        } else {
-            $gravatarHandler = new GravatarHandler();
-            $persons = array_map(
-                static fn(LocatedMemberRow $member): LocatedMemberRow => $member->withUserImg(
-                    WebApp::computeUserImg(
-                        (bool) $member->UseGravatar,
-                        $member->Email,
-                        $member->Avatar,
-                        $gravatarHandler,
-                    ),
-                ),
-                $this->memberDataHelper->getActiveMembersDirectoryInfo(),
-            );
-        }
+        $persons = $selectedGroup !== null
+            ? $this->memberDirectoryDataHelper->getPersonsInGroupForDirectory($selectedGroup)
+            : $this->memberDirectoryDataHelper->getPersonsForDirectory();
 
-        // Logged person presentation status
         $loggedPersonRow = $this->dataHelper->get(
             'Member',
             ['Id' => $person->Id],
@@ -69,18 +52,9 @@ final class UserDirectoryController extends AbstractController
         );
         /** @var object{InPresentationDirectory: bool|int|string|null}|false $loggedPersonRow */
         $loggedPersonInPresentationDirectory = $loggedPersonRow !== false
-            ? (bool) ($loggedPersonRow->InPresentationDirectory ?? false)
-            : false;
+            && (bool) ($loggedPersonRow->InPresentationDirectory ?? false);
 
-        // Filtered groups
-        $groups = $this->groupDataHelper->getGroupsForDirectory(
-            personId: $person->Id,
-            onlyMyGroups: $filterMyGroups,
-            onlySelfEnrollable: $filterSelfEnroll,
-            onlyWithAuthorization: $filterWithAuth
-        );
-
-        // Preserve current filters in all generated URLs
+        // Preserve the active filters in every generated URL
         $queryFilters = array_filter([
             'my'   => $filterMyGroups   ? '1' : null,
             'self' => $filterSelfEnroll ? '1' : null,
@@ -89,10 +63,17 @@ final class UserDirectoryController extends AbstractController
 
         $allGroupsUrl = '/user/directory' . ($queryFilters ? '?' . http_build_query($queryFilters) : '');
 
-        foreach ($groups as $group) {
-            $params = $queryFilters + ['group' => $group->Id];
-            $group->url = '/user/directory?' . http_build_query($params);
-        }
+        $groups = array_map(
+            static fn(DirectoryGroupRow $group): DirectoryGroupRow => $group->withUrl(
+                '/user/directory?' . http_build_query($queryFilters + ['group' => $group->id])
+            ),
+            $this->groupDataHelper->getGroupsForDirectory(
+                personId: $person->Id,
+                onlyMyGroups: $filterMyGroups,
+                onlySelfEnrollable: $filterSelfEnroll,
+                onlyWithAuthorization: $filterWithAuth
+            )
+        );
 
         $viewModel = new UserDirectoryViewModel(
             persons: $persons,

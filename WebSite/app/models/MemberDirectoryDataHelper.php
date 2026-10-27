@@ -12,9 +12,7 @@ use app\modules\Common\valueObjects\DirectoryPersonRow;
 use app\modules\Common\valueObjects\LocatedMemberRow;
 
 /**
- * Member queries serving the presentation directory, the members map
- * and the contact lists.
- *
+ * @phpstan-import-type DirectoryPersonRowShape from DirectoryPersonRow
  * @phpstan-import-type LocatedMemberRowShape from LocatedMemberRow
  */
 final class MemberDirectoryDataHelper extends Data
@@ -29,19 +27,18 @@ final class MemberDirectoryDataHelper extends Data
     }
 
     /**
-     * Contact details (Email, Phone, FirstName, LastName, NickName) of every active
-     * member, indexed by Email — used by the clipboard copy of the contacts of a
-     * filtered group/event type (EventEmailController::copyEmails()).
+     * Contact details of every active member, indexed by email. Used by the clipboard
+     * copy of the contacts of a filtered group/event type (EventEmailController::copyEmails()).
      *
      * @return array<string, object{Email: string, Phone: string|null, FirstName: string, LastName: string|null, NickName: string|null}>
      */
     public function getActiveMembersContactInfoByEmail(): array
     {
-        $sql = "
+        $sql = '
             SELECT i.Email, i.Phone, i.FirstName, i.LastName, i.NickName
-            " . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN . "
+            ' . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN . '
             WHERE m.Inactivated = 0
-        ";
+        ';
         $stmt = $this->pdo->query($sql);
         if ($stmt === false) {
             return [];
@@ -55,15 +52,15 @@ final class MemberDirectoryDataHelper extends Data
     }
 
     /**
-     * Returns the members who have a location and are in the presentation directory.
+     * Returns the members who have a location.
      *
-     * Modes :
-     * - $memberIds === null && $onlyWithPublicData === false
-     *     → membres actifs présents dans le trombinoscope (comportement historique)
-     * - $memberIds !== null
-     *     → restriction aux IDs fournis (Inactivated ignoré)
-     * - $onlyWithPublicData === true
-     *     → membres actifs ayant MyPublicDataInPresentationDirectory non null et != ''
+     * Modes:
+     * - $memberIds === null && $onlyWithPublicData === false:
+     *     active members who are in the presentation directory (historical behavior)
+     * - $memberIds !== null:
+     *     restricted to the given ids (Inactivated is ignored)
+     * - $onlyWithPublicData === true:
+     *     active members whose MyPublicDataInPresentationDirectory is neither null nor empty
      *
      * @param list<int>|null $memberIds Restricts the result to these members; null means no restriction
      * @param bool $onlyWithPublicData When true, returns active members that have non-empty public data
@@ -74,7 +71,7 @@ final class MemberDirectoryDataHelper extends Data
         bool $onlyWithPublicData = false
     ): array {
         // An empty restriction matches nobody (and "IN ()" is invalid SQL)
-        if ($memberIds !== null && $memberIds === []) {
+        if ($memberIds === []) {
             return [];
         }
 
@@ -90,20 +87,16 @@ final class MemberDirectoryDataHelper extends Data
         $params = [];
 
         if ($memberIds !== null) {
-            // Mode "liste d'IDs" – on ignore Inactivated
             $placeholders = implode(', ', array_fill(0, count($memberIds), '?'));
             $sql .= " AND i.Id IN ({$placeholders})";
             $params = $memberIds;
         } else {
-            // Mode "tous les actifs"
             $sql .= ' AND m.Inactivated = 0';
 
             if ($onlyWithPublicData) {
-                // Nouveau mode : public data non null et non vide
-                $sql .= " AND m.MyPublicDataInPresentationDirectory IS NOT NULL"
-                    .  " AND m.MyPublicDataInPresentationDirectory != ''";
+                $sql .= ' AND m.MyPublicDataInPresentationDirectory IS NOT NULL'
+                    . " AND m.MyPublicDataInPresentationDirectory != ''";
             } else {
-                // Comportement historique
                 $sql .= ' AND m.InPresentationDirectory = 1';
             }
         }
@@ -121,38 +114,75 @@ final class MemberDirectoryDataHelper extends Data
     }
 
     /**
+     * Active members who agreed to appear in the presentation directory.
+     *
+     * @return list<DirectoryPersonRow>
+     */
+    public function getPersonsForDirectory(): array
+    {
+        $sql = '
+        SELECT
+            i.Id,
+            m.UseGravatar,
+            i.Email,
+            i.Avatar,
+            i.FirstName,
+            i.LastName,
+            i.NickName
+        ' . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN . '
+        WHERE m.InPresentationDirectory = 1
+          AND m.Inactivated = 0
+        ORDER BY i.FirstName, i.LastName
+    ';
+        $stmt = $this->pdo->query($sql);
+        if ($stmt === false) {
+            return [];
+        }
+
+        /** @var list<DirectoryPersonRowShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $gravatarHandler = new GravatarHandler();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $userImg = WebApp::computeUserImg(
+                $row->UseGravatar === 'yes',
+                $row->Email,
+                $row->Avatar,
+                $gravatarHandler
+            );
+            $result[] = DirectoryPersonRow::fromStdClass($row, $userImg);
+        }
+
+        return $result;
+    }
+
+    /**
      * @return list<DirectoryPersonRow>
      */
     public function getPersonsInGroupForDirectory(int $groupId): array
     {
-        $sql = "
-            SELECT DISTINCT 
+        $sql = '
+            SELECT DISTINCT
                 i.Id,
-                m.UseGravatar, 
+                m.UseGravatar,
                 i.Email,
                 i.Avatar,
                 i.FirstName,
                 i.LastName,
                 i.NickName
-" . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN . "
+            ' . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN . '
             INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
             WHERE mg.IdGroup = ?
               AND m.InPresentationDirectory = 1
               AND m.Inactivated = 0
             ORDER BY i.FirstName, i.LastName
-";
+        ';
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$groupId]);
 
-        /** @var list<object{
-         *     Id: int|string,
-         *     FirstName: string,
-         *     LastName: string|null,
-         *     NickName: string|null,
-         *     Avatar: string|null,
-         *     UseGravatar: string,
-         *     Email: string
-         * }> $rows */
+        /** @var list<DirectoryPersonRowShape> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $gravatarHandler = new GravatarHandler();
