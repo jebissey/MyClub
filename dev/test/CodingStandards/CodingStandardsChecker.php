@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace test\CodingStandards;
 
+use test\CodingStandards\Analysis\MethodSignatureAnalyzer;
 use test\CodingStandards\Analysis\PropertyAnalyzer;
 use test\CodingStandards\Analysis\TerminalCallAnalyzer;
 use test\CodingStandards\Analysis\ValueObjectReferenceAnalyzer;
@@ -14,12 +15,16 @@ use test\CodingStandards\Rules\DatabaseAccessRule;
 use test\CodingStandards\Rules\FinalClassesRule;
 use test\CodingStandards\Rules\FinalReadonlyRule;
 use test\CodingStandards\Rules\ImportsRule;
+use test\CodingStandards\Rules\MethodParametersRule;
 use test\CodingStandards\Rules\ObjectShapeDocblockRule;
 use test\CodingStandards\Rules\ReadonlyPropertiesRule;
 use test\CodingStandards\Rules\RuleInterface;
 use test\CodingStandards\Rules\UnusedPublicMembersRule;
 use test\CodingStandards\Rules\ValueObjectModuleBoundaryRule;
 use test\CodingStandards\ValueObjects\ClassInfo;
+
+
+// in the rules list:
 
 final readonly class CodingStandardsChecker
 {
@@ -49,6 +54,7 @@ final readonly class CodingStandardsChecker
                 new CommonValueObjectUsageRule($paths, $valueObjectReferences),
                 new ImportsRule($paths),
                 //new UnusedPublicMembersRule($paths), // TODO(unused-members): re-enable once false positives are fixed
+                //new MethodParametersRule($paths, new MethodSignatureAnalyzer(), new PropertyAnalyzer()), //TODO
             ],
             (new ClassScanner())->scan($appDir),
         );

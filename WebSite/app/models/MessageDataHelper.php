@@ -16,6 +16,7 @@ use app\helpers\MyClubDateTime;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\modules\Common\interfaces\NewsProviderInterface;
+use app\modules\Common\valueObjects\MessageTarget;
 use app\modules\Event\valueObjects\EventParticipant;
 
 final class MessageDataHelper extends Data implements NewsProviderInterface
@@ -30,37 +31,26 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
     }
 
     public function addMessage(
-        ?int $articleId,
-        ?int $eventId,
-        ?int $groupId,
+        MessageTarget $target,
         int $personId,
         string $text,
-        ?string $imagePath = null
+        ?string $imagePath = null,
     ): int|false {
-        $nonNullCount = ($articleId !== null) + ($eventId !== null) + ($groupId !== null);
-        if ($nonNullCount !== 1) {
+        [$table, $id] = $target->reference();
+        if ($this->get($table, ['Id' => $id], 'Id') === false) {
             return false;
         }
-        if ($articleId !== null && $this->get('Article', ['Id' => $articleId], '*') === false) {
-            return false;
-        }
-        if ($eventId !== null && $this->get('Event', ['Id' => $eventId], '*') === false) {
-            return false;
-        }
-        if ($groupId !== null && $this->get('Group', ['Id' => $groupId], '*') === false) {
-            return false;
-        }
-
 
         $messageId = $this->set('Message', [
-            'ArticleId' => $articleId,
-            'EventId'   => $eventId,
-            'GroupId'   => $groupId,
+            'ArticleId' => $target->articleId,
+            'EventId'   => $target->eventId,
+            'GroupId'   => $target->groupId,
             'PersonId'  => $personId,
             'Text'      => $text,
             'From'      => 'User',
-            'ImagePath' => $imagePath
+            'ImagePath' => $imagePath,
         ]);
+
         return is_int($messageId) ? $messageId : false;
     }
 

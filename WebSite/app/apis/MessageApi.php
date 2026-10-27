@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\apis;
 
 use PDOException;
+use RuntimeException;
 use Throwable;
 use finfo;
 use app\enums\ApplicationError;
@@ -25,6 +26,7 @@ use app\modules\Event\valueObjects\EventCreatorSummaryRow;
 use app\modules\Common\valueObjects\GroupNameRow;
 use app\modules\Common\valueObjects\MessageContext;
 use app\modules\Common\valueObjects\MessageOwnerRow;
+use app\modules\Common\valueObjects\MessageTarget;
 use app\modules\Common\valueObjects\UploadedFileInput;
 
 use function imagecreatefromstring;
@@ -207,7 +209,12 @@ final class MessageApi extends AbstractApi
         ?string $imagePath = null
     ): ApiResponse {
         try {
-            $messageId = $this->messageDataHelper->addMessage($articleId, $eventId, $groupId, $personId, $text, $imagePath);
+            $messageId = $this->messageDataHelper->addMessage(
+                MessageTarget::fromIds($articleId, $eventId, $groupId) ?? throw new RuntimeException("Exactly 1 Id not null"),
+                $personId,
+                $text,
+                $imagePath
+            );
             return new ApiResponse(
                 $messageId !== false,
                 $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value,
