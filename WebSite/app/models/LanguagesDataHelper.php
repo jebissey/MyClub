@@ -141,7 +141,7 @@ final class LanguagesDataHelper extends Data
     {
         $stmt = $this->pdo->query("PRAGMA table_info(Languages)");
         if ($stmt === false) {
-            throw new \RuntimeException('Failed to query Languages table schema');
+            throw new RuntimeException('Failed to query Languages table schema');
         }
         /** @var array<int, array{name: string}> $columns */
         $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);

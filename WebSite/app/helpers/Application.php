@@ -7,6 +7,7 @@ namespace app\helpers;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
 use Latte\Loaders\FileLoader;
+use Latte\Bridges\Tracy\TracyExtension;
 use BackedEnum;
 use LogicException;
 use PDO;
@@ -237,7 +238,7 @@ final class Application
     #region Private functions
     private function setupLatteFilters(): void
     {
-        self::$latte->addExtension(new \Latte\Bridges\Tracy\TracyExtension());
+        self::$latte->addExtension(new TracyExtension());
 
         self::$latte->addFilter('json', function ($value) {
             return json_encode($value, JSON_HEX_APOS | JSON_HEX_QUOT);

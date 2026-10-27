@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Common\valueObjects;
 
+use stdClass;
+
 final readonly class EventRegistrationRow
 {
     public function __construct(
@@ -12,7 +14,7 @@ final readonly class EventRegistrationRow
     ) {
     }
 
-    public static function fromStdClass(\stdClass $row): self
+    public static function fromStdClass(stdClass $row): self
     {
         return new self(
             Id: (int) $row->Id,

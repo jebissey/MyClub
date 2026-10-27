@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use DateTimeImmutable;
+use RuntimeException;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
 
@@ -33,7 +34,7 @@ final class AvailabilityDataHelper extends Data
             'SELECT COUNT(*) FROM Member WHERE Inactivated = 0'
         );
         if ($totalActiveStmt === false) {
-            throw new \RuntimeException('Failed to query total active members');
+            throw new RuntimeException('Failed to query total active members');
         }
         $totalActive = (int) $totalActiveStmt->fetchColumn();
 
@@ -41,7 +42,7 @@ final class AvailabilityDataHelper extends Data
             'SELECT Availabilities FROM Member WHERE Inactivated = 0 AND Availabilities IS NOT NULL AND Availabilities != \'\''
         );
         if ($stmt === false) {
-            throw new \RuntimeException('Failed to query member availabilities');
+            throw new RuntimeException('Failed to query member availabilities');
         }
         $rows = $stmt->fetchAll(\PDO::FETCH_COLUMN);
         $withAvailability = count($rows);
@@ -101,7 +102,7 @@ final class AvailabilityDataHelper extends Data
 
         $stmt = $this->pdo->prepare($sql);
         if ($stmt === false) {
-            throw new \RuntimeException('Failed to prepare slot events query');
+            throw new RuntimeException('Failed to prepare slot events query');
         }
         $stmt->execute([
             ':start' => $start->format('Y-m-d H:i:s'),
@@ -144,7 +145,7 @@ final class AvailabilityDataHelper extends Data
     /**
      * @return array<int, array<string, array{average: float, total: int, eventCount: int}>>
      */
-    public function getParticipationStats(\DateTimeImmutable $start, \DateTimeImmutable $end): array
+    public function getParticipationStats(DateTimeImmutable $start, DateTimeImmutable $end): array
     {
         $sql = 'SELECT e.Id, e.StartTime, COUNT(p.Id) AS ParticipantCount
             FROM Event e
@@ -156,7 +157,7 @@ final class AvailabilityDataHelper extends Data
 
         $stmt = $this->pdo->prepare($sql);
         if ($stmt === false) {
-            throw new \RuntimeException('Failed to prepare participation stats query');
+            throw new RuntimeException('Failed to prepare participation stats query');
         }
         $stmt->execute([
             ':start' => $start->format('Y-m-d H:i:s'),
@@ -175,7 +176,7 @@ final class AvailabilityDataHelper extends Data
         }
 
         foreach ($rows as $row) {
-            $startTime = new \DateTimeImmutable((string) $row['StartTime']);
+            $startTime = new DateTimeImmutable((string) $row['StartTime']);
             $day       = ((int) $startTime->format('N')) - 1; // 1=lundi..7=dimanche -> 0..6
 
             $slot = match (TimeOfDay::fromDateTime($startTime)) {

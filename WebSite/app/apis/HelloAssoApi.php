@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\apis;
 
 use JsonException;
+use RuntimeException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
@@ -61,7 +62,7 @@ final class HelloAssoApi extends AbstractApi
             $amountCents
         );
 
-        $root = \app\helpers\Application::$root;
+        $root = Application::$root;
 
         try {
             $result = HelloAssoService::getInstance($this->dataHelper)
@@ -83,7 +84,7 @@ final class HelloAssoApi extends AbstractApi
             );
 
             $this->renderJsonOk(['redirectUrl' => $result['redirectUrl']]);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->membershipDataHelper->cancel($membershipId);
             $this->renderJsonBadRequest($e->getMessage(), __FILE__, __LINE__);
         }

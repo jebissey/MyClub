@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Event;
 
+use DateTimeImmutable;
+use Exception;
 use app\helpers\Application;
 use app\models\AvailabilityDataHelper;
 use app\modules\Common\AbstractController;
@@ -76,10 +78,10 @@ final class EventAvailabilitiesController extends AbstractController
         $startParamStr = is_string($startParam) ? $startParam : null;
         try {
             $start = ($startParamStr !== null && $startParamStr !== '')
-                ? new \DateTimeImmutable($startParamStr)
-                : (new \DateTimeImmutable())->modify('-' . self::RANGE_MODIFIERS[$rangeKey]);
-        } catch (\Exception) {
-            $start = (new \DateTimeImmutable())->modify('-' . self::RANGE_MODIFIERS[$rangeKey]);
+                ? new DateTimeImmutable($startParamStr)
+                : (new DateTimeImmutable())->modify('-' . self::RANGE_MODIFIERS[$rangeKey]);
+        } catch (Exception) {
+            $start = (new DateTimeImmutable())->modify('-' . self::RANGE_MODIFIERS[$rangeKey]);
         }
 
         $end = $start->modify('+' . self::RANGE_MODIFIERS[$rangeKey]);

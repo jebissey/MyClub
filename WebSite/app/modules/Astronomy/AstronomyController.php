@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Astronomy;
 
+use DateTimeImmutable;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\To;
@@ -105,15 +106,15 @@ final class AstronomyController extends AbstractController
         $this->views->render('Astronomy/views/astronomy.latte', $viewModel->toArray());
     }
 
-    private function parseDateOrToday(?string $date): \DateTimeImmutable
+    private function parseDateOrToday(?string $date): DateTimeImmutable
     {
         if ($date !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) === 1) {
-            $parsed = \DateTimeImmutable::createFromFormat('Y-m-d', $date);
+            $parsed = DateTimeImmutable::createFromFormat('Y-m-d', $date);
             if ($parsed !== false) {
                 return $parsed->setTime(0, 0);
             }
         }
-        return new \DateTimeImmutable('today');
+        return new DateTimeImmutable('today');
     }
 
     public function saveLocation(): void

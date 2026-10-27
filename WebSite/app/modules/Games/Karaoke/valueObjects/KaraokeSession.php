@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Games\Karaoke\valueObjects;
 
+use stdClass;
+
 final readonly class KaraokeSession
 {
     public function __construct(
@@ -14,7 +16,7 @@ final readonly class KaraokeSession
     ) {
     }
 
-    public static function fromStdClass(\stdClass $row): self
+    public static function fromStdClass(stdClass $row): self
     {
         return new self(
             Id: (int)$row->Id,

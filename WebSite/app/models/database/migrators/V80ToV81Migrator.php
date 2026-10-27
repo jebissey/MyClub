@@ -6,6 +6,7 @@ namespace app\models\database\migrators;
 
 use PDO;
 use RuntimeException;
+use Throwable;
 use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 /**
@@ -25,7 +26,7 @@ final class V80ToV81Migrator implements DatabaseMigratorInterface
         // 1. Add Language column to Article (idempotent-ish; will be present in rebuild)
         try {
             $pdo->exec("ALTER TABLE Article ADD COLUMN Language TEXT NOT NULL DEFAULT 'fr_FR'");
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Column may already exist in some test runs
         }
 

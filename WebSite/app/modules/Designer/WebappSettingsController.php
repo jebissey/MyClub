@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Designer;
 
+use finfo;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\TranslationManager;
@@ -215,7 +216,7 @@ final class WebappSettingsController extends AbstractController
         if ($bytes === false || strlen($bytes) < 8) {
             return;
         }
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $finfo    = new finfo(FILEINFO_MIME_TYPE);
         $detected = $finfo->buffer($bytes);
         if (!in_array($detected, $allowed, true)) {
             return;

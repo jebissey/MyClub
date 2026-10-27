@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use DateTimeImmutable;
+use stdClass;
 use app\enums\CustomFieldType;
 use app\models\DataHelper;
 use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
-use DateTimeImmutable;
 
 final readonly class MemberCustomFields
 {
@@ -107,7 +108,7 @@ final readonly class MemberCustomFields
     /** @param array<string, string|int|float> $values */
     public static function encodeValues(array $values): string
     {
-        return json_encode($values === [] ? new \stdClass() : $values, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        return json_encode($values === [] ? new stdClass() : $values, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Common\valueObjects;
 
+use Override;
 use app\helpers\To;
 
 /**
@@ -52,7 +53,7 @@ final readonly class MemberBasicRow extends IdentityRow
         );
     }
 
-    #[\Override]
+    #[Override]
     public function toPerson(): Person
     {
         return new Person(

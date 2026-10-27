@@ -6,6 +6,7 @@ namespace app\models;
 
 use DateTime;
 use PDO;
+use RuntimeException;
 use stdClass;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
@@ -118,14 +119,14 @@ final class LogAnalyticsDataHelper extends Data
         );
 
         if ($query === false) {
-            throw new \RuntimeException('Impossible d\'exécuter la requête des statistiques de navigation.');
+            throw new RuntimeException('Impossible d\'exécuter la requête des statistiques de navigation.');
         }
 
         $range = $query->fetch(PDO::FETCH_OBJ);
         /** @var object{first: string|null, last: string|null}|false $range */
 
         if ($range === false || $range->first === null || $range->last === null) {
-            throw new \RuntimeException('Aucune donnée disponible dans le journal.');
+            throw new RuntimeException('Aucune donnée disponible dans le journal.');
         }
 
         return [

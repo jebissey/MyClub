@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use DateTimeImmutable;
 use stdClass;
 use app\helpers\Application;
 use app\helpers\To;
@@ -28,7 +29,7 @@ final class MembershipDataHelper extends Data
     public function currentSeason(): string
     {
         $startMonth = (int)$this->getSetting('Membership_SeasonStart', '09');
-        $now        = new \DateTimeImmutable();
+        $now        = new DateTimeImmutable();
         $month      = (int)$now->format('n');
         $year       = (int)$now->format('Y');
 

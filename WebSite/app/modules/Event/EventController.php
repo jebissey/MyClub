@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Event;
 
 use DateTime;
+use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
 use app\enums\EventAudience;
@@ -102,15 +103,15 @@ final class EventController extends AbstractController
             )),
             person: $connectedUser->person,
             eventTypes: array_map(
-                static fn(\stdClass $row): EventTypeRow => EventTypeRow::fromStdClass($row),
+                static fn(stdClass $row): EventTypeRow => EventTypeRow::fromStdClass($row),
                 array_values($this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name, Inactivated, IdGroup'))
             ),
             needTypes: array_map(
-                static fn(\stdClass $row): NeedTypeRow => NeedTypeRow::fromStdClass($row),
+                static fn(stdClass $row): NeedTypeRow => NeedTypeRow::fromStdClass($row),
                 array_values($this->dataHelper->gets('NeedType', [], 'Id, Name'))
             ),
             eventAttributes: array_map(
-                static fn(\stdClass $row): EventAttributeRow => EventAttributeRow::fromStdClass($row),
+                static fn(stdClass $row): EventAttributeRow => EventAttributeRow::fromStdClass($row),
                 array_values($this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'))
             ),
             offset: $offset,
@@ -137,11 +138,11 @@ final class EventController extends AbstractController
         $viewModel = new EventWeekEventsViewModel(
             events: $this->eventDataHelper->getNextWeekEvents(),
             eventTypes: array_map(
-                static fn(\stdClass $row): EventTypeRow => EventTypeRow::fromStdClass($row),
+                static fn(stdClass $row): EventTypeRow => EventTypeRow::fromStdClass($row),
                 array_values($this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name, Inactivated, IdGroup'))
             ),
             eventAttributes: array_map(
-                static fn(\stdClass $row): EventAttributeRow => EventAttributeRow::fromStdClass($row),
+                static fn(stdClass $row): EventAttributeRow => EventAttributeRow::fromStdClass($row),
                 array_values($this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'))
             ),
             attributes: $this->eventDataHelper->getAttributesForNextWeekEvents(),
@@ -226,7 +227,7 @@ final class EventController extends AbstractController
             eventId: $eventId,
             event: $event,
             attributes: array_map(
-                static fn(\stdClass $row): EventAttributeRow => new EventAttributeRow(
+                static fn(stdClass $row): EventAttributeRow => new EventAttributeRow(
                     id: (string) $row->AttributeId,
                     name: $row->Name,
                     detail: $row->Detail,

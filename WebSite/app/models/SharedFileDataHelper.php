@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use RuntimeException;
 use app\helpers\Application;
 
 final class SharedFileDataHelper extends Data
@@ -33,7 +34,7 @@ final class SharedFileDataHelper extends Data
         );
 
         if ($stmt === false) {
-            throw new \RuntimeException('Unable to query shared files.');
+            throw new RuntimeException('Unable to query shared files.');
         }
 
         /** @var array<int, string> $items */

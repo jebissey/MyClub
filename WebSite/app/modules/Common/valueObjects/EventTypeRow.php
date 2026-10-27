@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Common\valueObjects;
 
+use stdClass;
+
 final readonly class EventTypeRow
 {
     /**
@@ -21,7 +23,7 @@ final readonly class EventTypeRow
     /**
      * Expects a row shaped as {Id: int, Name: string, Inactivated: int, IdGroup: int|null}.
      */
-    public static function fromStdClass(\stdClass $row): self
+    public static function fromStdClass(stdClass $row): self
     {
         return new self(
             Id: (int) $row->Id,

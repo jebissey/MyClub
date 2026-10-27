@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\apis;
 
 use DateTimeImmutable;
+use Exception;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
@@ -43,7 +44,7 @@ final class VisitorInsightsApi extends AbstractApi
         try {
             $dateFrom = new DateTimeImmutable($from);
             $dateTo   = new DateTimeImmutable($to);
-        } catch (\Exception) {
+        } catch (Exception) {
             $this->renderJsonBadRequest('Invalid date format for from/to', __FILE__, __LINE__);
             return;
         }
@@ -71,7 +72,7 @@ final class VisitorInsightsApi extends AbstractApi
         try {
             $dateFrom = new DateTimeImmutable($from);
             $dateTo   = new DateTimeImmutable($to);
-        } catch (\Exception) {
+        } catch (Exception) {
             $this->renderJsonBadRequest('Invalid date format for from/to', __FILE__, __LINE__);
             return;
         }

@@ -13,6 +13,7 @@ use test\CodingStandards\Rules\ControllersRule;
 use test\CodingStandards\Rules\DatabaseAccessRule;
 use test\CodingStandards\Rules\FinalClassesRule;
 use test\CodingStandards\Rules\FinalReadonlyRule;
+use test\CodingStandards\Rules\ImportsRule;
 use test\CodingStandards\Rules\ObjectShapeDocblockRule;
 use test\CodingStandards\Rules\ReadonlyPropertiesRule;
 use test\CodingStandards\Rules\RuleInterface;
@@ -46,6 +47,7 @@ final readonly class CodingStandardsChecker
                 new ObjectShapeDocblockRule($paths),
                 new ValueObjectModuleBoundaryRule($paths, $valueObjectReferences),
                 new CommonValueObjectUsageRule($paths, $valueObjectReferences),
+                new ImportsRule($paths),
             ],
             (new ClassScanner())->scan($appDir),
         );

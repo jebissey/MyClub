@@ -107,11 +107,11 @@
                             </span>
                         </a>
                         {foreach $groups as $group}
-                        <a href="{$group->url}" class="btn {if $selectedGroup === $group->Id}btn-primary{else}btn-outline-primary{/if}">
-                            {$group->Name}
-                            {if isset($groupCounts[$group->Id])}
+                        <a href="{$group->url}" class="btn {if $selectedGroup === $group->id}btn-primary{else}btn-outline-primary{/if}">
+                            {$group->name}
+                            {if isset($groupCounts[$group->id])}
                                 <span class="badge bg-light text-dark">
-                                    ({$groupCounts[$group->Id]['withPresentation']}/{$groupCounts[$group->Id]['total']})
+                                    ({$groupCounts[$group->id]['withPresentation']}/{$groupCounts[$group->id]['total']})
                                 </span>
                             {/if}
                         </a>

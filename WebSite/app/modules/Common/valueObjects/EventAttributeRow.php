@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Common\valueObjects;
 
+use stdClass;
+
 final readonly class EventAttributeRow
 {
     public function __construct(
@@ -32,7 +34,7 @@ final readonly class EventAttributeRow
      * as used e.g. for filter dropdowns in nextEvents/weekEvents.
      * Expects a row shaped as {Id: int|string, Name: string, Detail: string, Color: string}.
      */
-    public static function fromStdClass(\stdClass $row): self
+    public static function fromStdClass(stdClass $row): self
     {
         return new self(
             id: (string) $row->Id,
