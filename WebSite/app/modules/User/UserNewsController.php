@@ -27,7 +27,8 @@ final class UserNewsController extends AbstractShowController
 
         [$searchMode, $searchFrom] = $this->resolveSearchPeriod(
             $connectedUser,
-            default: date('Y-m-d H:i:s', strtotime('-1 day'))
+            default: date('Y-m-d H:i:s', strtotime('-1 day')),
+            cookieName: 'period_user_news',
         );
 
         $viewModel = new UserNewsViewModel(

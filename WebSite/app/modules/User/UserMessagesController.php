@@ -26,7 +26,10 @@ final class UserMessagesController extends AbstractShowController
             return;
         }
 
-        [$searchMode, $searchFrom] = $this->resolveSearchPeriod($connectedUser);
+        [$searchMode, $searchFrom] = $this->resolveSearchPeriod(
+            $connectedUser,
+            cookieName: 'period_user_messages',
+        );
 
         $viewModel = new UserMessagesViewModel(
             searchFrom: $searchFrom,

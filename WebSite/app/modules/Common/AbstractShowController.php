@@ -28,13 +28,21 @@ abstract class AbstractShowController extends AbstractController
     /**
      * @return array{0: string, 1: string}
      */
-    protected function resolveSearchPeriod(ConnectedUser $connectedUser, string $default = ''): array
-    {
-        $searchMode = To::str(WebApp::getFiltered(
-            'from',
-            $this->application->enumToValues(Period::class),
-            $this->flight->request()->query->getData()
-        ) ?: Period::Signout->value);
+    protected function resolveSearchPeriod(
+        ConnectedUser $connectedUser,
+        string $default = '',
+        ?string $cookieName = null,
+    ): array {
+        $allowed = $this->application->enumToValues(Period::class);
+        $requested = $this->getQueryString('from', $allowed);
+
+        if ($requested !== null && $cookieName !== null) {
+            $this->rememberPeriod($cookieName, $requested);
+        }
+
+        $searchMode = $requested
+            ?? $this->getRememberedPeriod($cookieName, $allowed)
+            ?? Period::Signout->value;
 
         $searchFrom = match ($searchMode) {
             Period::Signin->value   => $connectedUser->getLastSignIn()  ?? '',
@@ -63,5 +71,37 @@ abstract class AbstractShowController extends AbstractController
             'btn_HistoryBack' => true,
             'btn_Parent'      => $parentUrl,
         ]);
+    }
+
+
+    /**
+     * Stores the period explicitly chosen by the user for one year.
+     */
+    private function rememberPeriod(string $cookieName, string $mode): void
+    {
+        setcookie($cookieName, $mode, [
+            'expires'  => time() + 31536000,
+            'path'     => '/',
+            'secure'   => !empty($_SERVER['HTTPS']),
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+    }
+
+    /**
+     * Returns the remembered period, or null if absent or not a known mode.
+     *
+     * @param string[] $allowed
+     */
+    private function getRememberedPeriod(?string $cookieName, array $allowed): ?string
+    {
+        if ($cookieName === null) {
+            return null;
+        }
+
+        $value = $_COOKIE[$cookieName] ?? null;
+
+        // The cookie is client-controlled: only accept known modes
+        return is_string($value) && in_array($value, $allowed, true) ? $value : null;
     }
 }

@@ -144,6 +144,8 @@ abstract class AbstractController
         );
     }
 
+
+
     /**
      * Retrieve an optional boolean query parameter.
      *
@@ -164,6 +166,25 @@ abstract class AbstractController
         $value = $this->getQueryParam($key, FilterInputRule::Int->value, $default);
         return is_int($value) ? $value : $default;
     }
+
+    /**
+     * Retrieve an optional string query parameter.
+     *
+     * When $allowed is provided, the value must be one of the allowed values.
+     * Otherwise any non-empty string is accepted.
+     * Returns $default when the parameter is missing, empty or invalid.
+     *
+     * @param list<string> $allowed
+     */
+    protected function getQueryString(string $key, array $allowed = [], ?string $default = null): ?string
+    {
+        $rule = $allowed !== [] ? $allowed : FilterInputRule::Text->value;
+        $value = $this->getQueryParam($key, $rule);
+
+        return is_string($value) && $value !== '' ? $value : $default;
+    }
+
+    
 
     protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
     {
