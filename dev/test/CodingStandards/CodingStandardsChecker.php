@@ -17,6 +17,7 @@ use test\CodingStandards\Rules\ImportsRule;
 use test\CodingStandards\Rules\ObjectShapeDocblockRule;
 use test\CodingStandards\Rules\ReadonlyPropertiesRule;
 use test\CodingStandards\Rules\RuleInterface;
+use test\CodingStandards\Rules\UnusedPublicMembersRule;
 use test\CodingStandards\Rules\ValueObjectModuleBoundaryRule;
 use test\CodingStandards\ValueObjects\ClassInfo;
 
@@ -43,11 +44,11 @@ final readonly class CodingStandardsChecker
                 new ApisRule($paths),
                 new DatabaseAccessRule($paths),
                 new ReadonlyPropertiesRule($paths, new PropertyAnalyzer(), $dedicated),
-                new ReadonlyPropertiesRule($paths, new PropertyAnalyzer(), $dedicated),
                 new ObjectShapeDocblockRule($paths),
                 new ValueObjectModuleBoundaryRule($paths, $valueObjectReferences),
                 new CommonValueObjectUsageRule($paths, $valueObjectReferences),
                 new ImportsRule($paths),
+                //new UnusedPublicMembersRule($paths), // TODO(unused-members): re-enable once false positives are fixed
             ],
             (new ClassScanner())->scan($appDir),
         );

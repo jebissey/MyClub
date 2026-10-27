@@ -60,7 +60,7 @@ final class MediaApi extends AbstractApi
                 return;
             }
 
-            $fullPath = MediaManager::GetMediaPath() . '/' . $path;
+            $fullPath = MediaManager::getMediaPath() . '/' . $path;
             if (!file_exists($fullPath)) {
                 $this->renderJsonBadRequest(
                     'File not found',

@@ -30,8 +30,6 @@ final class TranslationManager
     ];
 
     private const COOKIE_NAME = 'user_language';
-    private const COOKIE_EXPIRATION = 86400 * 30; // 30 days
-    private const COOKIE_PATH = '/';
 
     private static ?string $forcedLanguage = null;
 
@@ -43,26 +41,6 @@ final class TranslationManager
     public static function setForcedLanguage(?string $forcedLanguage): void
     {
         self::$forcedLanguage = $forcedLanguage ?? '';
-    }
-
-    public static function setLanguage(string $language): void
-    {
-        $language = in_array($language, self::SUPPORTED_LANGUAGES, true)
-            ? $language
-            : self::DEFAULT_LANGUAGE;
-
-        setcookie(
-            self::COOKIE_NAME,
-            $language,
-            time() + self::COOKIE_EXPIRATION,
-            self::COOKIE_PATH
-        );
-
-        $_COOKIE[self::COOKIE_NAME] = $language;
-
-        $phpSelf = $_SERVER['PHP_SELF'] ?? '';
-
-        header('Location: ' . (is_string($phpSelf) ? $phpSelf : ''));
     }
 
     public static function getCurrentLanguage(): string

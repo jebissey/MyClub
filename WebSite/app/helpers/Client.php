@@ -58,11 +58,6 @@ final class Client
         );
     }
 
-    public function getMethod(): string
-    {
-        return WebApp::getRequestMethod();
-    }
-
     public function getReferer(): string
     {
         return To::str($_SERVER['HTTP_REFERER'] ?? '');

@@ -16,7 +16,6 @@ final class Backup
     private readonly array $monthFolders;
     /** @var array<int, string> */
     private readonly array $weekDays;
-    private static ?string $lastBackupFolder = null;
 
     public function __construct(string $backupRoot = self::BACKUP_PATH, string $sourceFile = self::SQLITE_PATH . self::SQLITE_FILE)
     {
@@ -38,14 +37,12 @@ final class Backup
         $yearFile = $yearPath . '/' . basename($this->sourceFile);
 
         if (!file_exists($yearFile)) {
-            self::$lastBackupFolder = $yearFile;
             return copy($this->sourceFile, $yearFile);
         }
 
         $monthPath = "$yearPath/$currentMonth";
         $monthFile = $monthPath . '/' . basename($this->sourceFile);
         if (!file_exists($monthFile)) {
-            self::$lastBackupFolder = $monthFile;
             return copy($this->sourceFile, $monthFile);
         }
 
@@ -54,14 +51,9 @@ final class Backup
         if (file_exists($dayFile)) {
             unlink($dayFile);
         }
-        self::$lastBackupFolder = $dayFile;
         return copy($this->sourceFile, $dayFile);
     }
 
-    public function getLastBackupFolder(): ?string
-    {
-        return self::$lastBackupFolder;
-    }
 
     #region Private functions
     private function initializeStructure(): void

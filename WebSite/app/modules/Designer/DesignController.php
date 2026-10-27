@@ -7,7 +7,6 @@ namespace app\modules\Designer;
 use RuntimeException;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\DesignDataHelper;
 use app\modules\Common\AbstractController;

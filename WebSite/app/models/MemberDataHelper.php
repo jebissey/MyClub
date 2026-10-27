@@ -196,48 +196,6 @@ final class MemberDataHelper extends Data
         return true;
     }
 
-    /**
-     * Directory information for every active member who agreed
-     * to appear in the presentation directory.
-     *
-     * @return list<LocatedMemberRow>
-     */
-    public function getActiveMembersDirectoryInfo(): array
-    {
-        $sql = "
-            SELECT
-                Individual.Id,
-                Individual.LastName,
-                Individual.FirstName,
-                Individual.NickName,
-                Individual.Avatar,
-                Individual.Email,
-                Member.UseGravatar,
-                Member.InPresentationDirectory,
-                Member.ShowPhoneInPresentationDirectory,
-                Member.ShowEmailInPresentationDirectory,
-                Member.Location,
-                NULL as MyPublicDataInPresentationDirectory
-            FROM Member
-            INNER JOIN Individual ON Individual.Id = Member.Id
-            WHERE Member.InPresentationDirectory = 1
-            AND Member.Inactivated = 0
-            ORDER BY Individual.FirstName, Individual.LastName
-        ";
-        $stmt = $this->pdo->query($sql);
-        if ($stmt === false) {
-            return [];
-        }
-
-        /** @var list<LocatedMemberRowShape> $rows */
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        return array_map(
-            static fn(object $row): LocatedMemberRow => LocatedMemberRow::fromStdClass($row),
-            $rows
-        );
-    }
-
     public function setRememberToken(int $id, string $token): void
     {
         $this->set('Member', ['Token' => $token], ['Id' => $id]);

@@ -14,9 +14,7 @@ final readonly class SourcePaths
     public const MODULES = 'modules';
     public const MIGRATORS = 'migrators';
 
-    public function __construct(private string $appDir)
-    {
-    }
+    public function __construct(private string $appDir) {}
 
     public function rel(ClassInfo $class): string
     {
@@ -38,5 +36,28 @@ final readonly class SourcePaths
             '#^' . preg_quote(self::MODULES, '#') . '/[^/]+/[^/]+\.php$#',
             $this->rel($class),
         );
+    }
+
+    /**
+     * PHP files that may call application code: the entry points next to
+     * the app directory (index.php...) and every file inside it.
+     *
+     * @return list<string> absolute paths
+     */
+    public function phpFiles(): array
+    {
+        $files = glob(dirname($this->appDir) . '/*.php') ?: [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($this->appDir, \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file instanceof \SplFileInfo && $file->getExtension() === 'php') {
+                $files[] = $file->getPathname();
+            }
+        }
+
+        return $files;
     }
 }

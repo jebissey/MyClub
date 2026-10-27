@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Designer;
 
 use app\helpers\Application;
-use app\helpers\TranslationManager;
-use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
 
 final class DesignerController extends AbstractController

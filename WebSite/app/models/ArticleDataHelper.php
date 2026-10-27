@@ -35,55 +35,6 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
-     * @param array{
-     *     authors: list<object{Id:int}>,
-     *     audiences: list<array{id:int}>,
-     *     data: array<int, array<int, int>>
-     * } $crosstabData
-     *
-     * @return array{
-     *     byAuthor: array<int,int>,
-     *     byAudience: array<int,int>
-     * }
-     */
-    public function calculateTotals(array $crosstabData): array
-    {
-        $totals = [
-            'byAuthor' => [],
-            'byAudience' => []
-        ];
-
-        foreach ($crosstabData['authors'] as $author) {
-            $authorId = $author->Id;
-            $total = 0;
-
-            foreach ($crosstabData['audiences'] as $audience) {
-                $audienceId = $audience['id'];
-                if (isset($crosstabData['data'][$audienceId][$authorId])) {
-                    $total += $crosstabData['data'][$audienceId][$authorId];
-                }
-            }
-
-            $totals['byAuthor'][$authorId] = $total;
-        }
-
-        foreach ($crosstabData['audiences'] as $audience) {
-            $audienceId = $audience['id'];
-            $total = 0;
-
-            if (isset($crosstabData['data'][$audienceId])) {
-                foreach ($crosstabData['data'][$audienceId] as $count) {
-                    $total += $count;
-                }
-            }
-
-            $totals['byAudience'][$audienceId] = $total;
-        }
-
-        return $totals;
-    }
-
-    /**
      * @return list<ArticleSitemapRow>
      */
     public function getArticlesForAll(): array
@@ -410,16 +361,6 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt->execute([':path' => '%' . $path . '%']);
 
         return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
-    }
-
-    public function isSpotlightActive(): bool
-    {
-        $spotlight = $this->getSpotlightArticle();
-        if ($spotlight === null) {
-            return false;
-        }
-        $spotlightUntil = strtotime(To::str($spotlight['spotlightUntil'] ?? ''));
-        return $spotlightUntil !== false && time() < $spotlightUntil;
     }
 
     public function isUserAllowedToReadArticle(string $userEmail, int $id): bool

@@ -193,19 +193,6 @@ final class ClientTest extends TestCase
         $this->assertSame('abc123', $client->getToken());
     }
 
-    // --- getMethod() / getUri() ---
-    // NOTE: assumes WebApp::getRequestMethod() reflects $_SERVER['REQUEST_METHOD'].
-    // Adjust these two tests if WebApp derives the method differently.
-
-    public function testGetMethodReturnsRequestMethod(): void
-    {
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-
-        $client = new Client();
-
-        $this->assertSame('POST', $client->getMethod());
-    }
-
     public function testGetUriIncludesPathAndMethod(): void
     {
         $_SERVER['REQUEST_URI'] = '/foo/bar?baz=1';
