@@ -77,7 +77,7 @@ final class UserDirectoryController extends AbstractController
 
         $viewModel = new UserDirectoryViewModel(
             persons: $persons,
-            navItems: $this->getNavItems($person),
+            navItems: $this->getNavItems($person->Email),
             loggedPersonInPresentationDirectory: $loggedPersonInPresentationDirectory,
             groups: $groups,
             groupCounts: $this->groupDataHelper->getGroupCount(),
@@ -123,7 +123,7 @@ final class UserDirectoryController extends AbstractController
         $viewModel = new UsersMapViewModel(
             locationData: $locationData,
             membersCount: count($locationData),
-            navItems: $this->getNavItems($person),
+            navItems: $this->getNavItems($person?->Email),
             title: 'Carte des membres',
             isPublic: false,
             maxZoom: 12,
@@ -145,7 +145,7 @@ final class UserDirectoryController extends AbstractController
         $viewModel = new UsersMapViewModel(
             locationData: $locationData,
             membersCount: count($locationData),
-            navItems: $this->getNavItems($this->application->getConnectedUser(true)->person),
+            navItems: $this->getNavItems($this->application->getConnectedUser(true)->person->Email),
             title: 'Carte des membres publics',
             isPublic: true,
             maxZoom: 11,

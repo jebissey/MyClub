@@ -166,7 +166,7 @@ final class MediaController extends AbstractController
                 (int)$month,
                 $filename,
                 $connectedUser,
-                $this->getNavItems($connectedUser->person)
+                $this->getNavItems($connectedUser->person->Email)
             )
         ) {
             $this->viewFile((int)$year, (int)$month, $filename);

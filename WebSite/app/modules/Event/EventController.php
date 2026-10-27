@@ -347,7 +347,7 @@ final class EventController extends AbstractController
                             'Email' => $invitation->Email,
                             'NickName' => $invitation->NickName,
                         ],
-                        'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+                        'navItems' => $this->getNavItems($this->application->getConnectedUser(true)->person->Email),
                         'page' => $this->application->getConnectedUser()->getPage()
                     ]));
                     return;

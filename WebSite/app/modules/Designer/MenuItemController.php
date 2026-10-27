@@ -22,7 +22,7 @@ final class MenuItemController extends AbstractController
 
     public function index(): void
     {
-        $menuItems = $this->getNavItems($this->application->getConnectedUser()->person, true);
+        $menuItems = $this->getNavItems($this->application->getConnectedUser()->person?->Email, true);
         $tab = MenuItemTab::tryFrom($this->flight->request()->query->tab ?? '') ?? MenuItemTab::Navbar;
 
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
@@ -98,7 +98,7 @@ final class MenuItemController extends AbstractController
                 'data'         => $arwardsDataHelper->getData($counterNames),
                 'groups'       => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'layout'       => $this->getLayout(),
-                'navItems'     => $this->getNavItems($person),
+                'navItems'     => $this->getNavItems($person->Email),
                 'page'         => $this->application->getConnectedUser()->getPage(),
             ]));
         } else {
@@ -126,7 +126,7 @@ final class MenuItemController extends AbstractController
             $viewModel = new MenuArticleViewModel(
                 chosenArticle: $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
                 carouselItems: $this->carouselDataHelper->getCarouselItems($id),
-                navItems: $this->getNavItems($person),
+                navItems: $this->getNavItems($person?->Email),
                 hasAuthorization: $connectedUser->hasAutorization(),
                 layoutParams: $this->getAllParams([]),
             );

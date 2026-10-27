@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use RuntimeException;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
@@ -49,6 +50,35 @@ final class MemberDirectoryDataHelper extends Data
             $result[$row->Email] = $row;
         }
         return $result;
+    }
+
+    /**
+     * @throws RuntimeException If no member matches the given identifier.
+     */
+    public function getLocatedMember(int $memberId): LocatedMemberRow
+    {
+        $sql = 'SELECT i.Id, i.FirstName, i.LastName, i.NickName, i.Avatar, '
+            . 'm.UseGravatar, i.Email, m.Location, '
+            . 'm.MyPublicDataInPresentationDirectory, '
+            . 'm.InPresentationDirectory, '
+            . 'm.ShowPhoneInPresentationDirectory, '
+            . 'm.ShowEmailInPresentationDirectory '
+            . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN
+            . ' WHERE m.Id = ?';
+
+        $params = [$memberId];
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        /** @var LocatedMemberRowShape|false $row */
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($row === false) {
+            throw new RuntimeException("Member $memberId not found.");
+        }
+
+        return LocatedMemberRow::fromStdClass($row);
     }
 
     /**

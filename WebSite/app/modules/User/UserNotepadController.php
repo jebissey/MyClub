@@ -30,7 +30,7 @@ final class UserNotepadController extends AbstractController
 
         $viewModel = new UserNotepadViewModel(
             notepad: $notepad,
-            navItems: $this->getNavItems($person),
+            navItems: $this->getNavItems($person->Email),
             layoutParams: $this->getAllParams([]),
         );
 

@@ -69,7 +69,12 @@ final class ChatApi extends AbstractApi
                 'minutesAgo'    => $visit->MinutesAgo,
                 'formattedDate' => $visit->FormattedDate,
                 'useGravatar'   => $visit->UseGravatar,
-                'userImg'       => WebApp::getUserImg($visitPerson, $this->gravatarHandler),
+                'userImg'       => WebApp::getUserImg(
+                    $visitPerson->UseGravatar,
+                    $visitPerson->Email,
+                    $visitPerson->Avatar,
+                    $this->gravatarHandler
+                ),
                 'os'            => $visit->Os,
                 'browser'       => $visit->Browser,
             ];

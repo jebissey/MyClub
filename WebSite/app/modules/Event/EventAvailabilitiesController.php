@@ -139,7 +139,7 @@ final class EventAvailabilitiesController extends AbstractController
             selectedRange: $rangeKey,
             selectedStartDate: $start->format('Y-m-d'),
             rangeOptions: $rangeOptions,
-            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
             i18n: [
                 'morning'   => ($this->t)('availability.morning'),
                 'afternoon' => ($this->t)('availability.afternoon'),

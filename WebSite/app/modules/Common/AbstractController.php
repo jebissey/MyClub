@@ -94,11 +94,11 @@ abstract class AbstractController
     /**
      * @return list<MenuItemRow>
      */
-    protected function getNavItems(?Person $person, bool $all = false): array
+    protected function getNavItems(?string $email, bool $all = false): array
     {
         $userGroups = [];
-        if ($person != null) {
-            $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
+        if ($email != null) {
+            $userGroups = $this->authorizationDataHelper->getUserGroups($email);
         }
         $filter = !$all ? ['What' => 'navbar'] : [];
 
@@ -115,8 +115,8 @@ abstract class AbstractController
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
             if (
-                ($person === null && $navItem->ForAnonymous === 1) ||
-                ($person !== null && $navItem->ForMembers === 1 &&
+                ($email === null && $navItem->ForAnonymous === 1) ||
+                ($email !== null && $navItem->ForMembers === 1 &&
                     (
                         $navItem->IdGroup === null ||
                         (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups, true))
@@ -184,7 +184,7 @@ abstract class AbstractController
         return is_string($value) && $value !== '' ? $value : $default;
     }
 
-    
+
 
     protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
     {

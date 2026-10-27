@@ -35,7 +35,7 @@ final class GroupController extends AbstractController
             $viewModel = new GroupCreateViewModel(
                 availableAuthorizations: array_values($this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name')),
                 layout: $this->getLayout(),
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
                 layoutParams: $this->getAllParams([]),
             );
 
@@ -60,7 +60,7 @@ final class GroupController extends AbstractController
                 $viewModel = new GroupCreateViewModel(
                     availableAuthorizations: array_values($availableAuthorizations),
                     layout: $this->getLayout(),
-                    navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+                    navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
                     error: 'Le nom du groupe est requis',
                     layoutParams: $this->getAllParams([]),
                 );
@@ -171,7 +171,7 @@ final class GroupController extends AbstractController
             $viewModel = new GroupIndexViewModel(
                 groups: $this->groupDataHelper->getGroupsWithAuthorizations($connectedUser),
                 layout: $this->getLayout(),
-                navItems: $this->getNavItems($connectedUser->person),
+                navItems: $this->getNavItems($connectedUser->person?->Email),
                 layoutParams: $this->getAllParams([
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
@@ -207,7 +207,7 @@ final class GroupController extends AbstractController
             group: $group,
             messages: $this->messageDataHelper->getGroupMessages($groupId),
             person: $person,
-            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
             btnParent: "/user/directory?group={$groupId}",
             newMessages: $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
             layoutParams: $this->getAllParams([]),

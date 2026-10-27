@@ -73,7 +73,7 @@ final class UserConnectionsController extends AbstractController
             connections: $data['connections'],
             maxEvents: $data['maxEvents'],
             layout: $this->getLayout(),
-            navItems: $this->getNavItems($person),
+            navItems: $this->getNavItems($person->Email),
             user: $person->FirstName . ' ' . $person->LastName . ($person->NickName != '' ? ' (' . $person->NickName . ')' : ''),
             layoutParams: $this->getAllParams([]),
         );

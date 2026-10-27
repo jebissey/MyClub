@@ -96,7 +96,7 @@ final class AstronomyController extends AbstractController
             locationName: $location['name'],
             locationSaved: $locationSaved,
             currentDate: $currentDate->format('Y-m-d'),
-            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
             i18n: $i18n,
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),

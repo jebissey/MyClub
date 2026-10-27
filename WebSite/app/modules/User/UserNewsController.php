@@ -34,7 +34,7 @@ final class UserNewsController extends AbstractShowController
         $viewModel = new UserNewsViewModel(
             searchFrom: $searchFrom,
             searchMode: $searchMode,
-            navItems: $this->getNavItems($connectedUser->person),
+            navItems: $this->getNavItems($connectedUser->person?->Email),
             person: $connectedUser->person,
             news: $this->news->getNewsForPerson($connectedUser, $searchFrom),
             btnParent: '/user',

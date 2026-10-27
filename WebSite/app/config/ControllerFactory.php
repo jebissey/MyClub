@@ -609,7 +609,7 @@ final readonly class ControllerFactory
 
     public function makeUserPresentationController(): UserPresentationController
     {
-        return new UserPresentationController($this->application);
+        return new UserPresentationController($this->application, $this->memberDirectoryDataHelper);
     }
 
     public function makeUserStatisticsController(): UserStatisticsController

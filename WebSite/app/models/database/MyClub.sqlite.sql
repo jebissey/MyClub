@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS "KaraokeSession" (
 );
 CREATE TABLE IF NOT EXISTS "Languages" (
 	"Id"	INTEGER,
-	"Name"	TEXT NOT NULL,
+	"Name"	TEXT NOT NULL UNIQUE,
 	"en_US"	TEXT NOT NULL,
 	"fr_FR"	TEXT NOT NULL,
 	"pl_PL"	TEXT NOT NULL,
@@ -2075,9 +2075,7 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (343,'home.action.directory.title','Member directory','Trombinoscope','Katalog członków'),
  (344,'home.action.directory.desc','View club members and create/edit my presentation','Voir les membres du club et créer/modifier ma présentation','Przeglądaj członków klubu i utwórz/edytuj swoją prezentację'),
  (345,'home.action.news.title','News','News','Aktualności'),
- (346,'home.action.news.desc','View club news (articles, events, surveys, presentations...) from the last 7 days','Voir les nouvelles du club (articles, événements, sondages, présentation ...) des 7 derniers jours','Zobacz nowości klubu (artykuły, wydarzenia, ankiety, prezentacje...) z ostatnich 7 dni'),
  (347,'home.action.messages.title','Messages','Messages','Wiadomości'),
- (348,'home.action.messages.desc','View messages from the last 7 days','Voir les messages des 7 derniers jours','Zobacz wiadomości z ostatnich 7 dni'),
  (349,'home.role.event_manager','🗓️ Event manager','🗓️ Animateur','🗓️ Animator'),
  (350,'home.action.manage_sessions.title','Manage sessions','Gérer les séances','Zarządzaj sesjami'),
  (351,'home.action.manage_sessions.desc','Create, edit, cancel a session and track registrations','Créer, modifier, annuler une séance et suivre les inscriptions','Twórz, edytuj, anuluj sesję i śledź rejestracje'),
@@ -7022,7 +7020,9 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1478,'directory.index.my_groups','My groups','Mes groupes','Moje grupy'),
  (1479,'directory.index.self_enrollable_groups','Self-enrollable groups','Les groupes auto-inscriptibles','Grupy z auto-zapisem'),
  (1480,'directory.index.groups_with_authorization','Groups with authorization(s)','Les groupes avec autorisation(s)','Grupy z autoryzacją'),
- (1481,'directory.index.loading','Searching...','Recherche en cours...','Wyszukiwanie...');
+ (1481,'directory.index.loading','Searching...','Recherche en cours...','Wyszukiwanie...'),
+ (1482,'home.action.news.desc','View club news (articles, events, surveys, presentations...)','Voir les nouvelles du club (articles, événements, sondages, présentation ...)','Zobacz nowości klubu (artykuły, wydarzenia, ankiety, prezentacje...)'),
+ (1483,'home.action.messages.desc','View messages','Voir les messages','Zobacz wiadomości');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
 INSERT INTO "Metadata" VALUES (1,'MyClub',100,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);

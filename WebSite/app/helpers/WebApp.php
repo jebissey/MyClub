@@ -56,9 +56,13 @@ final class WebApp
         return $result[$key] !== '' ? $result[$key] : false;
     }
 
-    public static function getUserImg(Person $person, GravatarHandler $gravatarHandler): string
-    {
-        return self::computeUserImg($person->UseGravatar, $person->Email, $person->Avatar, $gravatarHandler);
+    public static function getUserImg(
+        bool $useGravatar,
+        ?string $email,
+        ?string $avatar,
+        GravatarHandler $gravatarHandler
+    ): string {
+        return self::computeUserImg($useGravatar, $email, $avatar, $gravatarHandler);
     }
 
     public static function computeUserImg(

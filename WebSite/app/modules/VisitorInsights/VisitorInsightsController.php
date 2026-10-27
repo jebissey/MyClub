@@ -334,7 +334,7 @@ final class VisitorInsightsController extends TableController
         $viewModel = new LastVisitsViewModel(
             lastVisits: $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
             totalActiveUsers: count($activePersons),
-            navItems: $this->getNavItems($this->application->getConnectedUser()->person),
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),

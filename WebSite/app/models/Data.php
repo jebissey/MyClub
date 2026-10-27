@@ -117,7 +117,7 @@ abstract class Data
     /**
      * @param array<string, mixed> $where
      */
-    public function get(string $table, array $where, string $fields = '*'): object|false
+    public function get(string $table, array $where, string $fields): object|false
     {
         $this->validateTableName($table);
         $sql = '';

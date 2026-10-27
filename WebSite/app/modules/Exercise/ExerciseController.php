@@ -99,7 +99,7 @@ final class ExerciseController extends TableController
             'resetUrl' => '/articles',
             'userConnected' => $connectedUser->person ?? false,
             'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($connectedUser->person),
+            'navItems' => $this->getNavItems($connectedUser->person?->Email),
             'page' => $connectedUser->getPage(),
             'btn_HistoryBack' => true,
             'btn_Parent'      => "/designer",

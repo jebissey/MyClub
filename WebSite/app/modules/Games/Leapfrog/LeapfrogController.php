@@ -38,7 +38,7 @@ final class LeapfrogController extends TableController
         $gameId = bin2hex(random_bytes(8));
 
         $this->views->render('Games/Leapfrog/views/leapfrog.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($connectedUser->person),
+            'navItems' => $this->getNavItems($connectedUser->person->Email),
             'page' => $this->application->getConnectedUser()->getPage(),
             'titre' => "Saute-Mouton",
             'positions' => $positions,

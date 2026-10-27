@@ -191,7 +191,7 @@ final class ArticleController extends ArticleAccessController
             hasSurvey: $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate') ?: null,
             hasOrder: $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate') ?: null,
             userConnected: $connectedUser->person ?? false,
-            navItems: $this->getNavItems($connectedUser->person),
+            navItems: $this->getNavItems($connectedUser->person->Email),
             publishedBy: $this->publisherName($article),
             carouselItems: array_values(
                 $this->dataHelper->gets('Carousel', ['IdArticle' => $id], 'Id, IdArticle, Item')
@@ -346,7 +346,7 @@ final class ArticleController extends ArticleAccessController
                 hasSurvey: $survey ?: null,
                 hasOrder: $order ?: null,
                 userConnected: $connectedUser->person !== null,
-                navItems: $this->getNavItems($connectedUser->person),
+                navItems: $this->getNavItems($connectedUser->person?->Email),
                 publishedBy: $this->publisherName($article),
                 canReadPool: $this->authorizationService->canReadSurveyResults(
                     $this->toClosingVisibility($survey),
@@ -389,7 +389,12 @@ final class ArticleController extends ArticleAccessController
             return;
         }
 
-        $userImg = WebApp::getUserImg($person, new GravatarHandler());
+        $userImg = WebApp::getUserImg(
+            $person->UseGravatar,
+            $person->Email,
+            $person->Avatar,
+            new GravatarHandler()
+        );
         $lastLogId = isset($_SESSION['last_log_id']) && is_numeric($_SESSION['last_log_id'])
             ? (int)$_SESSION['last_log_id']
             : 0;
@@ -400,7 +405,7 @@ final class ArticleController extends ArticleAccessController
             group: null,
             messages: array_values($this->messageDataHelper->getArticleMessages($articleId)),
             person: $person,
-            navItems: $this->getNavItems($person),
+            navItems: $this->getNavItems($person->Email),
             newMessages: $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
             btnParent: "/article/{$articleId}",
             layoutParams: $this->getAllParams([

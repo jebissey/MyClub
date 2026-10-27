@@ -171,7 +171,7 @@ final class HomeController extends AbstractController
             latestArticlesCount: $latestArticlesCount,
             homeHeader: $homeHeader,
             homeFooter: $homeFooter,
-            navItems: $this->getNavItems($connectedUser->person),
+            navItems: $this->getNavItems($connectedUser->person?->Email),
             sidebarMenu: $this->getSidebarMenuItems($connectedUser->person),
             publishedBy: $publishedBy,
             latestArticleHasSurvey: $latestArticleHasSurvey,
@@ -204,7 +204,7 @@ final class HomeController extends AbstractController
         $user = $this->application->getConnectedUser();
 
         $this->views->render('Common/views/signpost.latte', $this->getAllParams([
-            'navItems'        => $this->getNavItems($user->person),
+            'navItems'        => $this->getNavItems($user->person?->Email),
             'title'           => ($this->t)('home.signpost.title'),
             'page'            => $user->getPage(),
             'user'            => $user,

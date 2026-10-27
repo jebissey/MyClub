@@ -65,7 +65,7 @@ final class ContactController extends AbstractController
 
         // A connected user cannot change identity: prefill and lock the fields.
         $viewModel = new ContactViewModel(
-            navItems: $this->getNavItems($connectedUser->person),
+            navItems: $this->getNavItems($connectedUser->person?->Email),
             event: $event,
             turnstileSiteKey: (string)($this->credentials->get('turnstile', 'site_key') ?? ''),
             name: $identity['name'] ?? '',

@@ -34,7 +34,7 @@ final class UserMessagesController extends AbstractShowController
         $viewModel = new UserMessagesViewModel(
             searchFrom: $searchFrom,
             searchMode: $searchMode,
-            navItems: $this->getNavItems($connectedUser->person),
+            navItems: $this->getNavItems($connectedUser->person?->Email),
             person: $connectedUser->person,
             messages: $this->messageDataHelper->getGroupedMessages(
                 $connectedUser->person->Id ?? 0,

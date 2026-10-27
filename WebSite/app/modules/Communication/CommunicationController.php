@@ -28,7 +28,7 @@ final class CommunicationController extends AbstractController
 
             $viewModel = new CommunicationEditViewModel(
                 groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
-                navItems: $this->getNavItems($connectedUser->person),
+                navItems: $this->getNavItems($connectedUser->person?->Email),
                 smtpFrom: $this->emailService->getSmtpConfig()?->getSenderAddress($userEmail),
                 i18n: [
                     'subjectRequired'     => ($this->t)('communication.email.subject_required'),

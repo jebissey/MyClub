@@ -150,7 +150,7 @@ final class ArticleListController extends TableController
             columns: $columns,
             resetUrl: '/articles',
             userConnected: $connectedUser->person ?? false,
-            navItems: $this->getNavItems($connectedUser->person),
+            navItems: $this->getNavItems($connectedUser->person?->Email),
             layoutParams: $this->getAllParams([
                 'page' => $connectedUser->getPage(),
                 'btn_HistoryBack' => true,

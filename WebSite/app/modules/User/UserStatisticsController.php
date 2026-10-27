@@ -47,7 +47,7 @@ final class UserStatisticsController extends AbstractController
             stats: $this->personalStatisticsDataHelper->getStats($person, $season['start'], $season['end']),
             seasons: $this->personalStatisticsDataHelper->getAvailableSeasons(),
             currentSeason: $season,
-            navItems: $this->getNavItems($person),
+            navItems: $this->getNavItems($person->Email),
             chartData: $this->buildChartData($this->getVisitCounts($season), $person),
             participationChartData: $this->buildChartData($this->getParticipationCounts($season), $person),
             messageChartData: $this->buildChartData($this->getMessageCounts($season), $person),

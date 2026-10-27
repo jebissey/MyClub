@@ -24,7 +24,7 @@ final class EventNeedController extends AbstractController
             return;
         }
         $this->views->render('Event/views/event_needs.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person),
+            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person?->Email),
             'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
             'needs' => $this->needDataHelper->getNeedsAndTheirTypes(),
             'page' => $this->application->getConnectedUser()->getPage(),

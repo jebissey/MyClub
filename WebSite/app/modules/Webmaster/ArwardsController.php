@@ -32,7 +32,7 @@ final class ArwardsController extends AbstractController
             data: $arwardsDataHelper->getData($counterNames),
             groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
             layout: $this->getLayout(),
-            navItems: $this->getNavItems($this->application->getConnectedUser(true)->person),
+            navItems: $this->getNavItems($this->application->getConnectedUser(true)->person->Email),
             layoutParams: $this->getAllParams([]),
         );
 

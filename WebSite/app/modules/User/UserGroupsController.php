@@ -34,7 +34,7 @@ final class UserGroupsController extends AbstractController
         $viewModel = new UserGroupsViewModel(
             groups: array_values($currentGroups),
             layout: $this->getLayout(),
-            navItems: $this->getNavItems($person),
+            navItems: $this->getNavItems($person->Email),
             layoutParams: $this->getAllParams([]),
         );
 

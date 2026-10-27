@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace app\modules\Common\services;
 
 use app\helpers\GravatarHandler;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Common\valueObjects\AvatarInfo;
 use app\modules\Common\valueObjects\LocatedMemberRow;
 use app\modules\Common\valueObjects\MemberMapMarker;
-use app\modules\Common\valueObjects\Person;
 
 final readonly class MemberMapService
 {
@@ -43,7 +43,12 @@ final readonly class MemberMapService
                     useGravatar: $member->UseGravatar,
                     email: $member->Email,
                     avatar: $member->Avatar,
-                    userImg: WebApp::getUserImg(Person::fromRow($member), $this->gravatarHandler),
+                    userImg: WebApp::getUserImg(
+                        To::bool($member->UseGravatar),
+                        $member->Email,
+                        $member->Avatar,
+                        $this->gravatarHandler
+                    ),
                 ),
                 Lat: trim($lat),
                 Lng: trim($lng),
