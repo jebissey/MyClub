@@ -76,11 +76,19 @@
                             </div>
 
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="filterSelfEnroll"
-                                    data-filter="self" {if $filterSelfEnroll}checked{/if}>
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="filterSelfEnroll"
+                                    data-filter="self"
+                                    {if $filterSelfEnroll}checked{/if}
+                                >
                                 <label class="form-check-label" for="filterSelfEnroll">
                                     {='directory.index.self_enrollable_groups'|translate}
                                 </label>
+                                <a href="/user/groups" class="ms-1" aria-label="Afficher les groupes">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
                             </div>
 
                             <div class="form-check mb-0">
