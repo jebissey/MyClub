@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint:
-    name: Style (phpcbf/phpcs)
+    name: Style (phpcbf/phpcs/naming)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +38,10 @@ jobs:
       - name: Check coding style (phpcs, PSR-12)
         working-directory: WebSite
         run: vendor/bin/phpcs --standard=../dev/phpcs.xml app
+
+      - name: Check naming conventions
+        working-directory: WebSite
+        run: php ../dev/test/CheckNaming.php --level=4
 
   phpstan:
     name: Analyse statique (PHPStan niveau 9)
