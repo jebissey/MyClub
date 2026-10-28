@@ -19,12 +19,12 @@ namespace app\modules\Common\valueObjects;
 readonly class IdentityRow
 {
     public function __construct(
-        public int $Id,
-        public string $Email,
-        public string $FirstName,
-        public ?string $LastName,
-        public ?string $NickName,
-        public ?string $Avatar,
+        public int $id,
+        public string $email,
+        public string $firstName,
+        public ?string $lastName,
+        public ?string $nickName,
+        public ?string $avatar,
     ) {
     }
 
@@ -34,24 +34,24 @@ readonly class IdentityRow
     public static function fromIndividual(object $individual): self
     {
         return new self(
-            Id: $individual->Id,
-            Email: $individual->Email,
-            FirstName: $individual->FirstName,
-            LastName: $individual->LastName,
-            NickName: $individual->NickName,
-            Avatar: $individual->Avatar,
+            id: $individual->Id,
+            email: $individual->Email,
+            firstName: $individual->FirstName,
+            lastName: $individual->LastName,
+            nickName: $individual->NickName,
+            avatar: $individual->Avatar,
         );
     }
 
     public function toPerson(): Person
     {
         return new Person(
-            Id: $this->Id,
-            Email: $this->Email,
-            FirstName: $this->FirstName,
-            LastName: $this->LastName,
-            NickName: $this->NickName,
-            Avatar: $this->Avatar,
+            id: $this->id,
+            email: $this->email,
+            firstName: $this->firstName,
+            lastName: $this->lastName,
+            nickName: $this->nickName,
+            avatar: $this->avatar,
         );
     }
 }

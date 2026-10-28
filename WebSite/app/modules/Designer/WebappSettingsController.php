@@ -123,7 +123,7 @@ final class WebappSettingsController extends AbstractController
         );
 
         $this->views->render('Designer/views/webappSettings.latte', $this->getAllParams([
-            'navItems'            => $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+            'navItems'            => $this->getNavItems($this->application->getConnectedUser()->person?->email),
             'htmlSettingsKeys'    => $htmlSettingsLabels,
             'numericSettingsKeys' => $numericSettings,
             'settings'            => $settings,
@@ -131,8 +131,8 @@ final class WebappSettingsController extends AbstractController
             'supportedLanguages'  => TranslationManager::getSupportedLanguages(),
             'currentLanguage'     => $lang,
             'forcedLanguage'      => $this->metadataDataHelper->getForcedLanguage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/designer",
+            'btnHistoryBack' => true,
+            'btnParent'      => "/designer",
             'i18n' => [
                 'imageProcessing' => ($this->t)('designer.home_settings.image_processing'),
                 'imageToSave'     => ($this->t)('designer.home_settings.image_to_save'),

@@ -30,16 +30,16 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 final readonly class EventFullRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public string $Summary,
-        public ?string $Description,
-        public ?string $Location,
-        public string $StartTime,
-        public int $Duration,
-        public int $IdEventType,
-        public int $CreatedBy,
-        public ?int $MaxParticipants,
-        public string $Audience,
+        public int $id,
+        public string $summary,
+        public ?string $description,
+        public ?string $location,
+        public string $startTime,
+        public int $duration,
+        public int $idEventType,
+        public int $createdBy,
+        public ?int $maxParticipants,
+        public string $audience,
     ) {
     }
 
@@ -47,16 +47,16 @@ final readonly class EventFullRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Summary: $row->Summary,
-            Description: $row->Description ?? null,
-            Location: $row->Location ?? null,
-            StartTime: $row->StartTime,
-            Duration: (int) $row->Duration,
-            IdEventType: (int) $row->IdEventType,
-            CreatedBy: (int) $row->CreatedBy,
-            MaxParticipants: isset($row->MaxParticipants) ? (int) $row->MaxParticipants : null,
-            Audience: $row->Audience,
+            id: (int) $row->Id,
+            summary: $row->Summary,
+            description: $row->Description ?? null,
+            location: $row->Location ?? null,
+            startTime: $row->StartTime,
+            duration: (int) $row->Duration,
+            idEventType: (int) $row->IdEventType,
+            createdBy: (int) $row->CreatedBy,
+            maxParticipants: isset($row->MaxParticipants) ? (int) $row->MaxParticipants : null,
+            audience: $row->Audience,
         );
     }
 }

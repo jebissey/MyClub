@@ -9,10 +9,10 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 final readonly class ArticleSitemapRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public string $LastUpdate,
-        public string $Title,
-        public string $ReferenceSource,
+        public int $id,
+        public string $lastUpdate,
+        public string $title,
+        public string $referenceSource,
     ) {
     }
 
@@ -22,10 +22,10 @@ final readonly class ArticleSitemapRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            LastUpdate: (string) $row->LastUpdate,
-            Title: (string) $row->Title,
-            ReferenceSource: (string) $row->ReferenceSource,
+            id: (int) $row->Id,
+            lastUpdate: (string) $row->LastUpdate,
+            title: (string) $row->Title,
+            referenceSource: (string) $row->ReferenceSource,
         );
     }
 }

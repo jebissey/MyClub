@@ -34,15 +34,10 @@ final class NotificationApi extends AbstractApi
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
-        $personId = $this->application->getConnectedUser(true)->person->Id;
+        $personId = $this->application->getConnectedUser(true)->person->id;
         try {
-            $existingRow = $this->dataHelper->get(
-                'PushSubscription',
-                ['EndPoint' => $input['endpoint']],
-                'Id'
-            );
-            if ($existingRow instanceof stdClass) {
-                $existing = PushSubscriptionRow::fromStdClass($existingRow);
+            $existingId = $this->findSubscriptionId($input['endpoint']);
+            if ($existingId !== null) {
                 $this->dataHelper->set(
                     'PushSubscription',
                     [
@@ -50,7 +45,7 @@ final class NotificationApi extends AbstractApi
                         'Auth' => $input['auth'],
                         'P256dh' => $input['p256dh']
                     ],
-                    ['Id' => $existing->Id]
+                    ['Id' => $existingId]
                 );
             } else {
                 $this->dataHelper->set(
@@ -81,19 +76,26 @@ final class NotificationApi extends AbstractApi
             return;
         }
         try {
-            $existingRow = $this->dataHelper->get(
-                'PushSubscription',
-                ['EndPoint' => $input['endpoint']],
-                'Id'
-            );
-
-            if ($existingRow instanceof stdClass) {
-                $existing = PushSubscriptionRow::fromStdClass($existingRow);
-                $this->dataHelper->delete('PushSubscription', ['Id' => $existing->Id]);
+            $existingId = $this->findSubscriptionId($input['endpoint']);
+            if ($existingId !== null) {
+                $this->dataHelper->delete('PushSubscription', ['Id' => $existingId]);
             }
             $this->renderJsonOk();
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
+    }
+
+    /**
+     * Id of the push subscription registered for the given endpoint, or null when there is none.
+     */
+    private function findSubscriptionId(mixed $endpoint): ?int
+    {
+        $row = $this->dataHelper->get('PushSubscription', ['EndPoint' => $endpoint], 'Id');
+        if ($row === false) {
+            return null;
+        }
+        /** @var object{Id: int|string} $row */
+        return (int) $row->Id;
     }
 }

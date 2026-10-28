@@ -30,7 +30,7 @@ final class KaraokeController extends AbstractController
             $connectedUser = $this->application->getConnectedUser();
 
             $this->views->render('Games/Karaoke/views/karaoke.latte', $this->getAllParams([
-                'navItems' => $this->getNavItems($connectedUser->person?->Email),
+                'navItems' => $this->getNavItems($connectedUser->person?->email),
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'metadata' => $parser->getMetadata(),
                 'lines' => $parser->getLines(),

@@ -9,14 +9,14 @@ use stdClass;
 final readonly class EventTypeRow
 {
     /**
-     * @param list<object> $Attributes
+     * @param list<object> $attributes
      */
     public function __construct(
-        public readonly int $Id,
-        public readonly string $Name,
-        public readonly int $Inactivated,
-        public readonly ?int $IdGroup,
-        public readonly array $Attributes = [],
+        public readonly int $id,
+        public readonly string $name,
+        public readonly int $inactivated,
+        public readonly ?int $idGroup,
+        public readonly array $attributes = [],
     ) {
     }
 
@@ -26,10 +26,10 @@ final readonly class EventTypeRow
     public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Name: (string) $row->Name,
-            Inactivated: (int) $row->Inactivated,
-            IdGroup: $row->IdGroup !== null ? (int) $row->IdGroup : null,
+            id: (int) $row->Id,
+            name: (string) $row->Name,
+            inactivated: (int) $row->Inactivated,
+            idGroup: $row->IdGroup !== null ? (int) $row->IdGroup : null,
         );
     }
 
@@ -39,11 +39,11 @@ final readonly class EventTypeRow
     public function withAttributes(array $attributes): self
     {
         return new self(
-            Id: $this->Id,
-            Name: $this->Name,
-            Inactivated: $this->Inactivated,
-            IdGroup: $this->IdGroup,
-            Attributes: $attributes,
+            id: $this->id,
+            name: $this->name,
+            inactivated: $this->inactivated,
+            idGroup: $this->idGroup,
+            attributes: $attributes,
         );
     }
 }

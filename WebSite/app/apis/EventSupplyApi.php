@@ -48,7 +48,7 @@ final class EventSupplyApi extends AbstractApi
             return;
         }
         $eventId = (int)$eventId;
-        $userEmail = $this->application->getConnectedUser(true)->person->Email;
+        $userEmail = $this->application->getConnectedUser(true)->person->email;
         try {
             $this->render(
                 'Event/views/participants-supplies_partial.latte',
@@ -74,7 +74,7 @@ final class EventSupplyApi extends AbstractApi
             $this->validateSupplyData($input);
             $apiResponse = $this->doUpdateSupply(
                 To::int($input['eventId'] ?? null),
-                $this->application->getConnectedUser()->person->Email ?? '',
+                $this->application->getConnectedUser()->person->email ?? '',
                 To::int($input['needId'] ?? null),
                 To::int($input['supply'] ?? null)
             );

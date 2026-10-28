@@ -31,8 +31,8 @@ final class RegistrationLinkService
         $emailMessage = new EmailMessage(
             from: $adminEmail,
             to: $emailContact,
-            subject: "Lien d'inscription pour " . $event->Summary,
-            body: WebApp::getBaseUrl() . "event/{$event->Id}/{$token}",
+            subject: "Lien d'inscription pour " . $event->summary,
+            body: WebApp::getBaseUrl() . "event/{$event->id}/{$token}",
             isHtml: false
         );
         return $this->emailService->send($emailMessage);

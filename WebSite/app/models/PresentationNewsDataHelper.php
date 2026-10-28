@@ -44,7 +44,7 @@ final class PresentationNewsDataHelper extends Data implements NewsProviderInter
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             ':searchFrom' => $searchFrom,
-            ':email'      => $connectedUser->person->Email
+            ':email'      => $connectedUser->person->email
         ]);
 
         /** @var array<int, object{Id: int, Email: string, FirstName: string, LastName: string, PresentationLastUpdate: string}> $presentations */

@@ -27,19 +27,19 @@ use app\enums\SurveyVisibility;
 final readonly class SurveyNewsRow extends AbstractValueObject
 {
     public function __construct(
-        public string $FirstName,
-        public string $LastName,
-        public int $SurveyId,
-        public string $Question,
-        public string $ClosingDate,
-        public SurveyVisibility $Visibility,
-        public int $IdArticle,
-        public int $CreatedBy,
-        public ?int $PublishedBy,
-        public ?int $IdGroup,
-        public bool $OnlyForMembers,
-        public string $LastActivity,
-        public string $Voters,
+        public string $firstName,
+        public string $lastName,
+        public int $surveyId,
+        public string $question,
+        public string $closingDate,
+        public SurveyVisibility $visibility,
+        public int $idArticle,
+        public int $createdBy,
+        public ?int $publishedBy,
+        public ?int $idGroup,
+        public bool $onlyForMembers,
+        public string $lastActivity,
+        public string $voters,
     ) {
     }
 
@@ -47,19 +47,19 @@ final readonly class SurveyNewsRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            FirstName: $row->FirstName,
-            LastName: $row->LastName,
-            SurveyId: (int) $row->SurveyId,
-            Question: $row->Question,
-            ClosingDate: $row->ClosingDate,
-            Visibility: SurveyVisibility::from($row->Visibility),
-            IdArticle: (int) $row->IdArticle,
-            CreatedBy: (int) $row->CreatedBy,
-            PublishedBy: $row->PublishedBy === null ? null : (int) $row->PublishedBy,
-            IdGroup: $row->IdGroup === null ? null : (int) $row->IdGroup,
-            OnlyForMembers: (bool) $row->OnlyForMembers,
-            LastActivity: $row->LastActivity,
-            Voters: $row->Voters,
+            firstName: $row->FirstName,
+            lastName: $row->LastName,
+            surveyId: (int) $row->SurveyId,
+            question: $row->Question,
+            closingDate: $row->ClosingDate,
+            visibility: SurveyVisibility::from($row->Visibility),
+            idArticle: (int) $row->IdArticle,
+            createdBy: (int) $row->CreatedBy,
+            publishedBy: $row->PublishedBy === null ? null : (int) $row->PublishedBy,
+            idGroup: $row->IdGroup === null ? null : (int) $row->IdGroup,
+            onlyForMembers: (bool) $row->OnlyForMembers,
+            lastActivity: $row->LastActivity,
+            voters: $row->Voters,
         );
     }
 }

@@ -8,9 +8,9 @@ namespace app\modules\Article\valueObjects;
 final readonly class QuestionRow
 {
     public function __construct(
-        public int $Id,
-        public string $Question,
-        public string $Options,
+        public int $id,
+        public string $question,
+        public string $options,
     ) {
     }
 

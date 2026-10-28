@@ -117,8 +117,8 @@ final class Application
         /** @var stdClass $row */
         $metadata = CompactSettingsRow::fromStdClass($row);
         new LogCompactDataHelper($this)->compactLog(
-            $metadata->Compact_removeOlderThanXmonths,
-            $metadata->Compact_compactOlderThanXmonths
+            $metadata->removeOlderThanXmonths,
+            $metadata->compactOlderThanXmonths
         );
     }
 

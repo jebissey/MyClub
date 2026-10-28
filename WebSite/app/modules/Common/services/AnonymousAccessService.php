@@ -34,7 +34,7 @@ final readonly class AnonymousAccessService
             return new RedirectInfo(
                 url: $requestUri,
                 status: ApplicationError::Ok,
-                message: "Auto sign in succeeded for {$result->getUser()?->Email}",
+                message: "Auto sign in succeeded for {$result->getUser()?->email}",
             );
         }
 

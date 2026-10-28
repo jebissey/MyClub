@@ -35,18 +35,18 @@ final class UserPresentationController extends AbstractController
 
         $row = $this->dataHelper->get(
             'Member',
-            ['Id' => $person->Id],
+            ['Id' => $person->id],
             'Presentation, Location, InPresentationDirectory, ShowPhoneInPresentationDirectory,' .
                 'showEmailInPresentationDirectory, myPublicDataInPresentationDirectory'
         );
         if ($row === false) {
-            $this->errors->badRequest("Unknown person {$person->Id}", __FILE__, __LINE__);
+            $this->errors->badRequest("Unknown person {$person->id}", __FILE__, __LINE__);
             return;
         }
 
         $viewModel = new UserEditPresentationViewModel(
             person: $row,
-            navItems: $this->getNavItems($person->Email),
+            navItems: $this->getNavItems($person->email),
             validationMsg: ($this->t)('presentation.edit.validation.noContent'),
             maxZoom: 18,
             layoutParams: $this->getAllParams([]),
@@ -82,7 +82,7 @@ final class UserPresentationController extends AbstractController
             'ShowPhoneInPresentationDirectory' => $input['showPhoneInPresentationDirectory'] ?? 0,
             'ShowEmailInPresentationDirectory' => $input['showEmailInPresentationDirectory'] ?? 0,
             'MyPublicDataInPresentationDirectory' => $input['myPublicDataInPresentationDirectory'] ?? '',
-        ], ['Id' => $this->application->getConnectedUser(true)->person->Id]);
+        ], ['Id' => $this->application->getConnectedUser(true)->person->id]);
         $this->redirect('/user/directory');
     }
 
@@ -96,23 +96,22 @@ final class UserPresentationController extends AbstractController
             'Id' => $personId,
             'Inactivated' => 0,
             'InPresentationDirectory' => 1,
-        ], '*');
-
+        ], 'Id');
         if ($row === false) {
             $this->errors->badRequest("Unknown person {$personId}", __FILE__, __LINE__);
             return;
         }
-        /** @var PersonRow $row */
+
         $person = $this->memberDirectoryDataHelper->getLocatedMember($personId);
 
         $viewModel = new UserPresentationViewModel(
-            person: $row,
+            person: $person,
             loggedPerson: $this->application->getConnectedUser(true)->person,
-            navItems: $this->getNavItems($person->Email),
-            userImg_: WebApp::getUserImg(
-                To::bool($person->UseGravatar),
-                $person->UseGravatar,
-                $person->UseGravatar,
+            navItems: $this->getNavItems($person->email),
+            personImg: WebApp::getUserImg(
+                To::bool($person->useGravatar),
+                $person->email,
+                $person->avatar,
                 new GravatarHandler()
             ),
             maxZoom: 12,

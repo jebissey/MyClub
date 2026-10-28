@@ -24,13 +24,13 @@ use app\enums\SurveyVisibility;
 final readonly class SurveyWithCreatorRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public string $Question,
-        public string $Options,
-        public int $IdArticle,
-        public string $ClosingDate,
-        public SurveyVisibility $Visibility,
-        public int $CreatedBy,
+        public int $id,
+        public string $question,
+        public string $options,
+        public int $idArticle,
+        public string $closingDate,
+        public SurveyVisibility $visibility,
+        public int $createdBy,
     ) {
     }
 
@@ -38,13 +38,13 @@ final readonly class SurveyWithCreatorRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Question: $row->Question,
-            Options: $row->Options,
-            IdArticle: (int) $row->IdArticle,
-            ClosingDate: $row->ClosingDate,
-            Visibility: SurveyVisibility::from($row->Visibility),
-            CreatedBy: (int) $row->CreatedBy,
+            id: (int) $row->Id,
+            question: $row->Question,
+            options: $row->Options,
+            idArticle: (int) $row->IdArticle,
+            closingDate: $row->ClosingDate,
+            visibility: SurveyVisibility::from($row->Visibility),
+            createdBy: (int) $row->CreatedBy,
         );
     }
 }

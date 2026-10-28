@@ -29,8 +29,8 @@ final readonly class UserMessagesViewModel extends LayoutViewModel
 
         parent::__construct(
             ...$baseArgs,
-            btn_HistoryBack: true,
-            btn_Parent: $btnParent,
+            btnHistoryBack: true,
+            btnParent: $btnParent,
         );
     }
 }

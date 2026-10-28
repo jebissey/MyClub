@@ -91,14 +91,14 @@ final class UserController extends AbstractController
             $result = $this->authService->handleSignIn($this->flight->request()->data->getData());
             if ($result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
-                $this->redirect($redirect, ApplicationError::Ok, "Sign in succeeded for {$result->getUser()?->Email}");
+                $this->redirect($redirect, ApplicationError::Ok, "Sign in succeeded for {$result->getUser()?->email}");
             } else {
                 $this->errors->badRequest($result->getError(), __FILE__, __LINE__);
             }
         } elseif (WebApp::getRequestMethod() === 'GET') {
             $rememberMeResult = $this->authService->handleRememberMeLogin();
             if ($rememberMeResult && $rememberMeResult->isSuccess()) {
-                $this->redirect($redirect, ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()?->Email}");
+                $this->redirect($redirect, ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()?->email}");
                 return;
             }
             $viewModel = new UserSignInViewModel(

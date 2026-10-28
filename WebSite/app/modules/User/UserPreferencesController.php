@@ -26,21 +26,21 @@ final class UserPreferencesController extends AbstractController
         }
 
         $person = $this->application->getConnectedUser(true)->person;
-        $eventTypes = $this->eventTypeDataHelper->getsFor($person->Id);
+        $eventTypes = $this->eventTypeDataHelper->getsFor($person->id);
         $eventTypesWithAttributes = [];
         $attributeDataHelper = new AttributeDataHelper($this->application);
         foreach ($eventTypes as $eventType) {
             $eventTypesWithAttributes[] = $eventType->withAttributes(
-                $attributeDataHelper->getAttributesOf($eventType->Id)
+                $attributeDataHelper->getAttributesOf($eventType->id)
             );
         }
 
-        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Preferences');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->id], 'Preferences');
         /** @var object{Preferences: string|null}|false $row */
         $preferencesJson = $row !== false ? ($row->Preferences ?? '') : '';
 
         $viewModel = new UserPreferencesViewModel(
-            navItems: $this->getNavItems($person->Email),
+            navItems: $this->getNavItems($person->email),
             currentPreferences: json_decode($preferencesJson, true),
             eventTypes: $eventTypesWithAttributes,
             layoutParams: $this->getAllParams([]),
@@ -61,7 +61,7 @@ final class UserPreferencesController extends AbstractController
             $this->flight->request()->data->getData()
         ) ?? '';
         $person = $this->application->getConnectedUser(true)->person;
-        $this->dataHelper->set('Member', ['Preferences' =>  json_encode($preferences)], ['Id' => $person->Id]);
+        $this->dataHelper->set('Member', ['Preferences' =>  json_encode($preferences)], ['Id' => $person->id]);
         $this->redirect('/user');
     }
 }

@@ -24,8 +24,8 @@ final readonly class ChatViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
-            btn_Parent: $btnParent,
+            btnHistoryBack: true,
+            btnParent: $btnParent,
         );
     }
 }

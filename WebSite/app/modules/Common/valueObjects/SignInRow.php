@@ -15,18 +15,18 @@ use app\helpers\To;
 final readonly class SignInRow extends IdentityRow
 {
     public function __construct(
-        int $Id,
-        string $Email,
-        string $FirstName,
-        ?string $LastName,
-        ?string $NickName,
-        ?string $Avatar,
-        public bool $UseGravatar,
-        public ?string $Password,
-        public bool $Inactivated,
-        public ?string $Alert,
+        int $id,
+        string $email,
+        string $firstName,
+        ?string $lastName,
+        ?string $nickName,
+        ?string $avatar,
+        public bool $useGravatar,
+        public ?string $password,
+        public bool $inactivated,
+        public ?string $alert,
     ) {
-        parent::__construct($Id, $Email, $FirstName, $LastName, $NickName, $Avatar);
+        parent::__construct($id, $email, $firstName, $lastName, $nickName, $avatar);
     }
 
     /**
@@ -41,16 +41,16 @@ final readonly class SignInRow extends IdentityRow
     public static function fromRows(object $individual, object $member): self
     {
         return new self(
-            Id: $individual->Id,
-            Email: $individual->Email,
-            FirstName: $individual->FirstName,
-            LastName: $individual->LastName,
-            NickName: $individual->NickName,
-            Avatar: $individual->Avatar,
-            UseGravatar: To::bool($member->UseGravatar),
-            Password: $member->Password,
-            Inactivated: To::bool($member->Inactivated),
-            Alert: is_string($member->Alert) ? $member->Alert : null,
+            id: $individual->Id,
+            email: $individual->Email,
+            firstName: $individual->FirstName,
+            lastName: $individual->LastName,
+            nickName: $individual->NickName,
+            avatar: $individual->Avatar,
+            useGravatar: To::bool($member->UseGravatar),
+            password: $member->Password,
+            inactivated: To::bool($member->Inactivated),
+            alert: is_string($member->Alert) ? $member->Alert : null,
         );
     }
 
@@ -58,13 +58,13 @@ final readonly class SignInRow extends IdentityRow
     public function toPerson(): Person
     {
         return new Person(
-            Id: $this->Id,
-            Email: $this->Email,
-            FirstName: $this->FirstName,
-            LastName: $this->LastName,
-            NickName: $this->NickName,
-            UseGravatar: $this->UseGravatar,
-            Avatar: $this->Avatar,
+            id: $this->id,
+            email: $this->email,
+            firstName: $this->firstName,
+            lastName: $this->lastName,
+            nickName: $this->nickName,
+            useGravatar: $this->useGravatar,
+            avatar: $this->avatar,
         );
     }
 }

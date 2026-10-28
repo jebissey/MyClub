@@ -60,19 +60,19 @@ final class MediaController extends AbstractController
         }
         $sharedFile = SharedFileRow::fromStdClass($row);
         $connectedUser = $this->application->getConnectedUser();
-        if ($sharedFile->OnlyForMembers !== 0) {
+        if ($sharedFile->onlyForMembers !== 0) {
             if ($connectedUser->person === null) {
                 $this->errors->forbidden(__FILE__, __LINE__);
                 return;
             }
         }
-        if ($sharedFile->IdGroup !== null) {
-            if (!$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->Id ?? 0, $sharedFile->IdGroup)) {
+        if ($sharedFile->idGroup !== null) {
+            if (!$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->id ?? 0, $sharedFile->idGroup)) {
                 $this->errors->forbidden(__FILE__, __LINE__);
                 return;
             }
         }
-        $this->download($sharedFile->Item);
+        $this->download($sharedFile->item);
     }
 
     public function gpxViewer(): void
@@ -166,7 +166,7 @@ final class MediaController extends AbstractController
                 (int)$month,
                 $filename,
                 $connectedUser,
-                $this->getNavItems($connectedUser->person->Email)
+                $this->getNavItems($connectedUser->person->email)
             )
         ) {
             $this->viewFile((int)$year, (int)$month, $filename);

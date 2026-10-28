@@ -25,19 +25,19 @@ final class UserAccountController extends AbstractController
         }
 
         $person = $this->application->getConnectedUser(true)->person;
-        $imported = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Imported');
+        $imported = $this->dataHelper->get('Member', ['Id' => $person->id], 'Imported');
         $readOnly = $imported !== false && (bool)($imported->Imported ?? false);
 
         $viewModel = new UserAccountViewModel(
-            navItems: $this->getNavItems($person->Email),
+            navItems: $this->getNavItems($person->email),
             readOnly: $readOnly,
-            email: filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
-            firstName: WebApp::sanitizeInput($person->FirstName ?? ''),
-            lastName: WebApp::sanitizeInput($person->LastName ?? ''),
-            nickName: WebApp::sanitizeInput($person->NickName ?? ''),
-            avatar: WebApp::sanitizeInput($person->Avatar ?? ''),
+            email: filter_var($person->email, FILTER_VALIDATE_EMAIL) ?: '',
+            firstName: WebApp::sanitizeInput($person->firstName ?? ''),
+            lastName: WebApp::sanitizeInput($person->lastName ?? ''),
+            nickName: WebApp::sanitizeInput($person->nickName ?? ''),
+            avatar: WebApp::sanitizeInput($person->avatar ?? ''),
             useGravatar: WebApp::sanitizeInput(
-                $person->UseGravatar ? YesNo::Yes->value : YesNo::No->value,
+                $person->useGravatar ? YesNo::Yes->value : YesNo::No->value,
                 $this->application->enumToValues(YesNo::class),
                 YesNo::No->value
             ),
@@ -63,7 +63,7 @@ final class UserAccountController extends AbstractController
         }
 
         $person = $this->application->getConnectedUser(true)->person;
-        $imported = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Imported');
+        $imported = $this->dataHelper->get('Member', ['Id' => $person->id], 'Imported');
         $isImported = $imported !== false && (bool)($imported->Imported ?? false);
 
         $schema = [
@@ -80,14 +80,14 @@ final class UserAccountController extends AbstractController
             'LastName' => $input['lastName'] ?? '???',
             'NickName' => $input['nickName'] ?? '',
             'Avatar' => ($input['useGravatar'] ?? YesNo::No->value) == YesNo::Yes->value ? '' : $input['avatar'] ?? '🤔',
-        ], ['Id' => $person->Id]);
+        ], ['Id' => $person->id]);
         $this->dataHelper->set('Member', [
             'useGravatar' => $input['useGravatar'] ?? YesNo::No->value,
-        ], ['Id' => $person->Id]);
+        ], ['Id' => $person->id]);
         if (!$isImported) {
             $emailInput = $input['email'] ?? '';
             $email = is_string($emailInput) ? urldecode($emailInput) : '';
-            $this->dataHelper->set('Individual', ['Email' => $email], ['Id' => $person->Id]);
+            $this->dataHelper->set('Individual', ['Email' => $email], ['Id' => $person->id]);
             $_SESSION['user'] = $email;
         }
         $this->redirect('/user');

@@ -25,7 +25,7 @@ final readonly class PersonPreferences
             return $events;
         }
 
-        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Preferences, Availabilities');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->id], 'Preferences, Availabilities');
         /** @var object{Preferences: string|null, Availabilities: string|null}|false $row */
         if ($row === false) {
             return $events;

@@ -13,8 +13,8 @@ namespace app\modules\Event\valueObjects;
 final readonly class EventCreatorSummaryRow
 {
     public function __construct(
-        public int $CreatedBy,
-        public string $Summary,
+        public int $createdBy,
+        public string $summary,
     ) {
     }
 
@@ -24,8 +24,8 @@ final readonly class EventCreatorSummaryRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            CreatedBy: (int) $row->CreatedBy,
-            Summary: (string) $row->Summary,
+            createdBy: (int) $row->CreatedBy,
+            summary: (string) $row->Summary,
         );
     }
 }

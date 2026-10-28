@@ -35,14 +35,14 @@ namespace app\modules\Common\valueObjects;
 final readonly class Person extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public string $Email,
-        public ?string $Alert = null,
-        public ?string $FirstName = null,
-        public ?string $LastName = null,
-        public ?string $NickName = null,
-        public bool $UseGravatar = false,
-        public ?string $Avatar = null,
+        public int $id,
+        public string $email,
+        public ?string $alert = null,
+        public ?string $firstName = null,
+        public ?string $lastName = null,
+        public ?string $nickName = null,
+        public bool $useGravatar = false,
+        public ?string $avatar = null,
     ) {
     }
 
@@ -54,14 +54,14 @@ final readonly class Person extends AbstractValueObject
         $useGravatar = isset($row->UseGravatar) && $row->UseGravatar === 'yes';
 
         return new self(
-            Id: (int) $row->Id,
-            Email: $row->Email,
-            Alert: $row->Alert ?? null,
-            FirstName: $row->FirstName ?? null,
-            LastName: $row->LastName ?? null,
-            NickName: $row->NickName ?? null,
-            UseGravatar: $useGravatar,
-            Avatar: $row->Avatar ?? null,
+            id: (int) $row->Id,
+            email: $row->Email,
+            alert: $row->Alert ?? null,
+            firstName: $row->FirstName ?? null,
+            lastName: $row->LastName ?? null,
+            nickName: $row->NickName ?? null,
+            useGravatar: $useGravatar,
+            avatar: $row->Avatar ?? null,
         );
     }
 
@@ -73,14 +73,14 @@ final readonly class Person extends AbstractValueObject
         $useGravatar = isset($row['UseGravatar']) && $row['UseGravatar'] === 'yes';
 
         return new self(
-            Id: (int) $row['Id'],
-            Email: $row['Email'],
-            Alert: $row['Alert'] ?? null,
-            FirstName: $row['FirstName'] ?? null,
-            LastName: $row['LastName'] ?? null,
-            NickName: $row['NickName'] ?? null,
-            UseGravatar: $useGravatar,
-            Avatar: $row['Avatar'] ?? null,
+            id: (int) $row['Id'],
+            email: $row['Email'],
+            alert: $row['Alert'] ?? null,
+            firstName: $row['FirstName'] ?? null,
+            lastName: $row['LastName'] ?? null,
+            nickName: $row['NickName'] ?? null,
+            useGravatar: $useGravatar,
+            avatar: $row['Avatar'] ?? null,
         );
     }
 }

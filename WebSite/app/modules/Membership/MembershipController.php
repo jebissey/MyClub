@@ -43,7 +43,7 @@ final class MembershipController extends AbstractController
         }
 
         $user     = $this->application->getConnectedUser();
-        $personId = (int)($user->person->Id ?? 0);
+        $personId = (int)($user->person->id ?? 0);
         $season   = $this->membershipDataHelper->currentSeason();
 
         $current  = $this->membershipDataHelper->getForPersonAndSeason($personId, $season);
@@ -59,9 +59,9 @@ final class MembershipController extends AbstractController
                 formType: 'adhesions',
                 formSlug: 'saison-2026-2027',
                 options: [
-                    'firstName' => $user->person->FirstName ?? '',
-                    'lastName'  => $user->person->LastName  ?? '',
-                    'email'     => $user->person->Email     ?? '',
+                    'firstName' => $user->person->firstName ?? '',
+                    'lastName'  => $user->person->lastName  ?? '',
+                    'email'     => $user->person->email     ?? '',
                 ],
             );
         }

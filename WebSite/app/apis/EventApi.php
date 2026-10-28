@@ -27,7 +27,6 @@ use app\modules\Common\valueObjects\ApiResponse;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Event\valueObjects\EventDetailRow;
 use app\modules\Event\valueObjects\EventParticipant;
-use app\modules\Common\valueObjects\PersonEmailRow;
 
 /**
  * @phpstan-import-type EventParticipantShape from EventParticipant
@@ -80,7 +79,7 @@ final class EventApi extends AbstractApi
                 );
                 $apiResponse = $this->eventService->duplicateEvent(
                     $id,
-                    $this->application->getConnectedUser()->person->Id ?? 0,
+                    $this->application->getConnectedUser()->person->id ?? 0,
                     Period::from($modeString)
                 );
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
@@ -155,17 +154,17 @@ final class EventApi extends AbstractApi
     {
         if ($recipients === 'registered') {
             /** @var list<EventParticipantShape> $rows */
-            $rows = $this->participantDataHelper->getEventParticipants($event->Id);
+            $rows = $this->participantDataHelper->getEventParticipants($event->id);
             $participants = $this->toEmailParticipants($rows);
         } elseif ($recipients === 'unregistered') {
-            $participants = []; //TODO
+            $participants = []; //_TODO_
         } elseif ($recipients === 'all') {
             /** @var list<object{PersonId: int|string, Email: string|null}> $rows */
             $rows = $this->alertRecipientDataHelper->getInterestedPeople(
-                $this->eventDataHelper->getEventGroup($event->Id),
-                $event->IdEventType,
-                (new DateTime($event->StartTime))->format('N') - 1,
-                TimeOfDay::fromDateTime($event->StartTime)->value
+                $this->eventDataHelper->getEventGroup($event->id),
+                $event->idEventType,
+                (new DateTime($event->startTime))->format('N') - 1,
+                TimeOfDay::fromDateTime($event->startTime)->value
             );
             $participants = $this->toEmailParticipants($rows);
         } else {
@@ -174,14 +173,12 @@ final class EventApi extends AbstractApi
 
         if ($participants) {
             $root = Application::$root;
-            $eventLink = $root . '/event/' . $event->Id;
+            $eventLink = $root . '/event/' . $event->id;
             $unsubscribeLink = $root . '/user/preferences';
 
             /** @var object{Email: string|null}|false $eventCreatorRow */
-            $eventCreatorRow = $this->dataHelper->get('Individual', ['Id' => $event->CreatedBy], 'Email');
-            $eventCreatorEmail = ($eventCreatorRow !== false)
-                ? PersonEmailRow::fromStdClass($eventCreatorRow)->Email
-                : null;
+            $eventCreatorRow = $this->dataHelper->get('Individual', ['Id' => $event->createdBy], 'Email');
+            $eventCreatorEmail = $eventCreatorRow !== false ? $eventCreatorRow->Email : null;
 
             if ($eventCreatorEmail === null || $eventCreatorEmail === '') {
                 return new ApiResponse(
@@ -191,7 +188,7 @@ final class EventApi extends AbstractApi
                     'Invalid Email in file ' . __FILE__ . ' at line ' . __LINE__
                 );
             }
-            $ccList = $this->messageDataHelper->addWebAppMessages($event->Id, $participants, $title . "\n\n" . $body);
+            $ccList = $this->messageDataHelper->addWebAppMessages($event->id, $participants, $title . "\n\n" . $body);
             $link = htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8');
             $htmlBody = nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8')) . "<br>" .
                 '<a href="' . $link . '">' . $link . '</a><br><br>' .

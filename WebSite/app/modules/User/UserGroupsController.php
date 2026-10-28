@@ -29,12 +29,12 @@ final class UserGroupsController extends AbstractController
         }
 
         $person = $this->application->getConnectedUser(true)->person;
-        $currentGroups = $this->groupDataHelper->getCurrentGroups($person->Id);
+        $currentGroups = $this->groupDataHelper->getCurrentGroups($person->id);
 
         $viewModel = new UserGroupsViewModel(
             groups: array_values($currentGroups),
             layout: $this->getLayout(),
-            navItems: $this->getNavItems($person->Email),
+            navItems: $this->getNavItems($person->email),
             layoutParams: $this->getAllParams([]),
         );
 
@@ -56,7 +56,7 @@ final class UserGroupsController extends AbstractController
             $this->flight->request()->data->getData()
         ) ?? [];
 
-        $this->personGroupDataHelper->update($person->Id, $groups);
+        $this->personGroupDataHelper->update($person->id, $groups);
         $this->redirect('/user');
     }
 }

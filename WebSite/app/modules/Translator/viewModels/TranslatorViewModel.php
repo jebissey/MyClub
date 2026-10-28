@@ -29,8 +29,8 @@ final readonly class TranslatorViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
-            btn_Parent: '/designer',
+            btnHistoryBack: true,
+            btnParent: '/designer',
         );
     }
 }

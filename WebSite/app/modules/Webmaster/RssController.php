@@ -29,31 +29,31 @@ final class RssController extends AbstractController
 
     public function articlesRssGenerator(): void
     {
-        $base_url         = WebApp::getBaseUrl();
-        $site_title       = "Articles";
-        $site_url         = $base_url;
-        $feed_url         = $base_url . "articles-rss.xml";
-        $feed_description = "Mises à jour de la liste d'articles";
+        $baseUrl         = WebApp::getBaseUrl();
+        $siteTitle       = "Articles";
+        $siteUrl         = $baseUrl;
+        $feedUrl         = $baseUrl . "articles-rss.xml";
+        $feedDescription = "Mises à jour de la liste d'articles";
 
         $articles = $this->articleDataHelper->getArticlesForRss();
 
         $this->sendRssHeaders();
-        echo $this->generateArticlesRSS($articles, $site_title, $site_url, $feed_url, $feed_description);
+        echo $this->generateArticlesRSS($articles, $siteTitle, $siteUrl, $feedUrl, $feedDescription);
     }
 
     public function eventsRssGenerator(): void
     {
-        $base_url         = WebApp::getBaseUrl();
-        $site_title       = "Événements";
-        $site_url         = $base_url;
-        $feed_url         = $base_url . "events-rss.xml";
-        $feed_description = "Calendrier des événements et activités du club";
+        $baseUrl         = WebApp::getBaseUrl();
+        $siteTitle       = "Événements";
+        $siteUrl         = $baseUrl;
+        $feedUrl         = $baseUrl . "events-rss.xml";
+        $feedDescription = "Calendrier des événements et activités du club";
 
         $weeklyEvents = $this->eventDataHelper->getNextWeekEvents();
         $events       = $this->flattenWeeklyEvents($weeklyEvents);
 
         $this->sendRssHeaders();
-        echo $this->generateEventsRSS($events, $site_title, $site_url, $feed_url, $feed_description);
+        echo $this->generateEventsRSS($events, $siteTitle, $siteUrl, $feedUrl, $feedDescription);
     }
 
     private function sendRssHeaders(): void
@@ -88,33 +88,33 @@ final class RssController extends AbstractController
      */
     private function generateArticlesRSS(
         array $articles,
-        string $site_title,
-        string $site_url,
-        string $feed_url,
-        string $feed_description
+        string $siteTitle,
+        string $siteUrl,
+        string $feedUrl,
+        string $feedDescription
     ): string {
         $rss  = '<?xml version="1.0" encoding="UTF-8"?>';
         $rss .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">';
         $rss .= '<channel>';
-        $rss .= '<title>'       . htmlspecialchars($site_title, ENT_XML1, 'UTF-8') . '</title>';
-        $rss .= '<link>'        . htmlspecialchars($site_url, ENT_XML1, 'UTF-8') . '</link>';
-        $rss .= '<description>' . htmlspecialchars($feed_description, ENT_XML1, 'UTF-8') . '</description>';
+        $rss .= '<title>'       . htmlspecialchars($siteTitle, ENT_XML1, 'UTF-8') . '</title>';
+        $rss .= '<link>'        . htmlspecialchars($siteUrl, ENT_XML1, 'UTF-8') . '</link>';
+        $rss .= '<description>' . htmlspecialchars($feedDescription, ENT_XML1, 'UTF-8') . '</description>';
         $rss .= '<language>fr-fr</language>';
         $rss .= '<lastBuildDate>' . date(DATE_RSS) . '</lastBuildDate>';
-        $rss .= '<atom:link href="' . htmlspecialchars($feed_url, ENT_XML1, 'UTF-8') . '" rel="self" type="application/rss+xml" />';
+        $rss .= '<atom:link href="' . htmlspecialchars($feedUrl, ENT_XML1, 'UTF-8') . '" rel="self" type="application/rss+xml" />';
 
         foreach ($articles as $article) {
-            $lastUpdateTimestamp = strtotime($article->LastUpdate);
+            $lastUpdateTimestamp = strtotime($article->lastUpdate);
             if ($lastUpdateTimestamp === false) {
                 $lastUpdateTimestamp = time();
             }
-            $guid        = $site_url . 'article/' . $article->Id . '?v=' . $lastUpdateTimestamp;
-            $description = $this->getFirstElement($article->Content);
+            $guid        = $siteUrl . 'article/' . $article->id . '?v=' . $lastUpdateTimestamp;
+            $description = $this->getFirstElement($article->content);
             $pubDate     = date(DATE_RSS, $lastUpdateTimestamp);
-            $atomUpdated = (new DateTime($article->LastUpdate))->format(DateTime::ATOM);
+            $atomUpdated = (new DateTime($article->lastUpdate))->format(DateTime::ATOM);
 
             $rss .= '<item>';
-            $rss .= '<title>'       . htmlspecialchars($article->Title, ENT_XML1, 'UTF-8') . '</title>';
+            $rss .= '<title>'       . htmlspecialchars($article->title, ENT_XML1, 'UTF-8') . '</title>';
             $rss .= '<link>'        . htmlspecialchars($guid, ENT_XML1, 'UTF-8') . '</link>';
             $rss .= '<guid isPermaLink="false">' . htmlspecialchars($guid, ENT_XML1, 'UTF-8') . '</guid>';
             $rss .= '<pubDate>'     . $pubDate     . '</pubDate>';
@@ -205,23 +205,23 @@ final class RssController extends AbstractController
      */
     private function generateEventsRSS(
         array $events,
-        string $site_title,
-        string $site_url,
-        string $feed_url,
-        string $feed_description
+        string $siteTitle,
+        string $siteUrl,
+        string $feedUrl,
+        string $feedDescription
     ): string {
         $rss  = '<?xml version="1.0" encoding="UTF-8"?>';
         $rss .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:ev="http://purl.org/rss/1.0/modules/event/">';
         $rss .= '<channel>';
-        $rss .= '<title>' . htmlspecialchars($site_title, ENT_XML1, 'UTF-8') . '</title>';
-        $rss .= '<link>' . htmlspecialchars($site_url, ENT_XML1, 'UTF-8') . '</link>';
-        $rss .= '<description>' . htmlspecialchars($feed_description, ENT_XML1, 'UTF-8') . '</description>';
+        $rss .= '<title>' . htmlspecialchars($siteTitle, ENT_XML1, 'UTF-8') . '</title>';
+        $rss .= '<link>' . htmlspecialchars($siteUrl, ENT_XML1, 'UTF-8') . '</link>';
+        $rss .= '<description>' . htmlspecialchars($feedDescription, ENT_XML1, 'UTF-8') . '</description>';
         $rss .= '<language>fr-fr</language>';
         $rss .= '<lastBuildDate>' . date(DATE_RSS) . '</lastBuildDate>';
-        $rss .= '<atom:link href="' . htmlspecialchars($feed_url, ENT_XML1, 'UTF-8') . '" rel="self" type="application/rss+xml" />';
+        $rss .= '<atom:link href="' . htmlspecialchars($feedUrl, ENT_XML1, 'UTF-8') . '" rel="self" type="application/rss+xml" />';
 
         foreach ($events as $event) {
-            $eventUrl = $site_url . 'contact/event/' . $event->id;
+            $eventUrl = $siteUrl . 'contact/event/' . $event->id;
 
             $rss .= '<item>';
             $rss .= '<title>' . htmlspecialchars($event->summary, ENT_XML1, 'UTF-8') . '</title>';

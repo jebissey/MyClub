@@ -68,8 +68,8 @@ final class ArticleStatisticsController extends TableController
 
         foreach ($topPages as $page) {
             $author             = $authors[$page->articleId ?? null] ?? null;
-            $page->AuthorName   = $author?->PersonName;
-            $page->ArticleTitle = $author?->ArticleTitle;
+            $page->AuthorName   = $author?->personName;
+            $page->ArticleTitle = $author?->articleTitle;
         }
 
         $viewModel = new TopItemsByPeriodViewModel(

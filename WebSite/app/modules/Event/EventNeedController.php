@@ -24,12 +24,12 @@ final class EventNeedController extends AbstractController
             return;
         }
         $this->views->render('Event/views/event_needs.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person?->email),
             'needTypes' => $this->dataHelper->gets('NeedType', [], '*', 'Name'),
             'needs' => $this->needDataHelper->getNeedsAndTheirTypes(),
             'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/designer",
+            'btnHistoryBack' => true,
+            'btnParent'      => "/designer",
         ]));
     }
 }

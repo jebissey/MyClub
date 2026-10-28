@@ -23,14 +23,14 @@ final readonly class GroupChatViewModel extends LayoutViewModel
         public mixed $messages,
         public Person $person,
         public array $navItems,
-        public string $btnParent,
+        ?string $btnParent,
         public bool $newMessages,
         array $layoutParams = []
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
-            btn_Parent: $btnParent,
+            btnHistoryBack: true,
+            btnParent: $btnParent,
         );
     }
 }

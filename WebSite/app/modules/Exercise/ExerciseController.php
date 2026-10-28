@@ -28,7 +28,7 @@ final class ExerciseController extends TableController
                 'Title' => '',
                 'Detail' => '',
                 'Content' => '[]',
-                'CreatedBy' => $this->application->getConnectedUser()->person->Id ?? 0,
+                'CreatedBy' => $this->application->getConnectedUser()->person->id ?? 0,
             ]);
             $this->redirect('/exercise/edit/' . $exerciseId);
         }
@@ -48,8 +48,8 @@ final class ExerciseController extends TableController
                 'title'       => $exercise->Title ?? '',
                 'exercises'   => json_decode($exercise->Content ?? '[]', true) ?? [],
                 'i18n' => $this->doTranslations(),
-                'btn_Parent'  => '/exercises',
-                'btn_HistoryBack' => true,
+                'btnParent'  => '/exercises',
+                'btnHistoryBack' => true,
             ]));
         }
     }
@@ -99,10 +99,10 @@ final class ExerciseController extends TableController
             'resetUrl' => '/articles',
             'userConnected' => $connectedUser->person ?? false,
             'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($connectedUser->person?->Email),
+            'navItems' => $this->getNavItems($connectedUser->person?->email),
             'page' => $connectedUser->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/designer",
+            'btnHistoryBack' => true,
+            'btnParent'      => "/designer",
         ]));
     }
 
@@ -136,7 +136,7 @@ final class ExerciseController extends TableController
 
         /** @var object{Content: string, Title: string, CreatedBy: int}|false $exercise */
         $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
-        if (!$exercise || ($this->application->getConnectedUser()->person->Id ?? 0) != $exercise->CreatedBy) {
+        if (!$exercise || ($this->application->getConnectedUser()->person->id ?? 0) != $exercise->CreatedBy) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,
                 'Page not allowed in file ' . __FILE__ . ' at line ' . __LINE__

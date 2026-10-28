@@ -65,11 +65,11 @@ abstract class AbstractShowController extends AbstractController
         return $this->getAllParams([
             'searchFrom'      => $searchFrom,
             'searchMode'      => $searchMode,
-            'navItems'        => $this->getNavItems($connectedUser->person?->Email),
+            'navItems'        => $this->getNavItems($connectedUser->person?->email),
             'person'          => $connectedUser->person,
             'page'            => $connectedUser->getPage(1),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => $parentUrl,
+            'btnHistoryBack' => true,
+            'btnParent'      => $parentUrl,
         ]);
     }
 

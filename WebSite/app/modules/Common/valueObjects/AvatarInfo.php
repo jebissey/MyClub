@@ -14,8 +14,8 @@ use JsonSerializable;
 final readonly class AvatarInfo implements JsonSerializable
 {
     public function __construct(
-        public AvatarKind $Kind,
-        public string $Value,
+        public AvatarKind $kind,
+        public string $value,
     ) {
     }
 
@@ -50,6 +50,6 @@ final readonly class AvatarInfo implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return ['kind' => $this->Kind->value, 'value' => $this->Value];
+        return ['kind' => $this->kind->value, 'value' => $this->value];
     }
 }

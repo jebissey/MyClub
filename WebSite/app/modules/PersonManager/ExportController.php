@@ -43,13 +43,13 @@ final class ExportController extends AbstractController
         $rows = [];
         foreach ($this->personDataHelper->getMembersForExport() as $member) {
             $rows[] = [
-                (int)$member->Id,
-                !(bool)$member->Inactivated,
-                $member->Email,
-                $member->FirstName,
-                $member->LastName,
-                $member->Phone,
-                ...MemberCustomFields::toExportCells($definitions, MemberCustomFields::decodeValues($member->CustomFields)),
+                (int)$member->id,
+                !(bool)$member->inactivated,
+                $member->email,
+                $member->firstName,
+                $member->lastName,
+                $member->phone,
+                ...MemberCustomFields::toExportCells($definitions, MemberCustomFields::decodeValues($member->customFields)),
             ];
         }
 

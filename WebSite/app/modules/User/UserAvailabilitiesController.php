@@ -24,7 +24,7 @@ final class UserAvailabilitiesController extends AbstractController
         }
 
         $person = $this->application->getConnectedUser(true)->person;
-        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Availabilities');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->id], 'Availabilities');
         /** @var object{Availabilities: string|null}|false $row */
         $availabilitiesJson = $row !== false ? ($row->Availabilities ?? '') : '';
 
@@ -32,7 +32,7 @@ final class UserAvailabilitiesController extends AbstractController
         $currentAvailabilities = json_decode($availabilitiesJson, true);
 
         $viewModel = new UserAvailabilitiesViewModel(
-            navItems: $this->getNavItems($person->Email),
+            navItems: $this->getNavItems($person->email),
             currentAvailabilities: is_array($currentAvailabilities) ? $currentAvailabilities : null,
             layoutParams: $this->getAllParams([]),
         );
@@ -53,7 +53,7 @@ final class UserAvailabilitiesController extends AbstractController
         ) ?? '';
         $person = $this->application->getConnectedUser(true)->person;
         if ($availabilities != '') {
-            $this->dataHelper->set('Member', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->Id]);
+            $this->dataHelper->set('Member', ['Availabilities' => json_encode($availabilities)], ['Id' => $person->id]);
         }
         $this->redirect('/user');
     }

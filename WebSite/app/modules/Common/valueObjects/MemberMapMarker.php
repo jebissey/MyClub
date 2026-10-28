@@ -13,13 +13,13 @@ use JsonSerializable;
 final readonly class MemberMapMarker implements JsonSerializable
 {
     public function __construct(
-        public int $Id,
-        public string $Name,
-        public ?string $Nickname,
-        public AvatarInfo $Avatar,
-        public string $Lat,
-        public string $Lng,
-        public ?string $MyPublicData,
+        public int $id,
+        public string $name,
+        public ?string $nickname,
+        public AvatarInfo $avatar,
+        public string $lat,
+        public string $lng,
+        public ?string $myPublicData,
     ) {
     }
 
@@ -37,13 +37,13 @@ final readonly class MemberMapMarker implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->Id,
-            'name' => $this->Name,
-            'nickname' => $this->Nickname,
-            'avatar' => $this->Avatar,
-            'lat' => $this->Lat,
-            'lng' => $this->Lng,
-            'myPublicData' => $this->MyPublicData,
+            'id' => $this->id,
+            'name' => $this->name,
+            'nickname' => $this->nickname,
+            'avatar' => $this->avatar,
+            'lat' => $this->lat,
+            'lng' => $this->lng,
+            'myPublicData' => $this->myPublicData,
         ];
     }
 }

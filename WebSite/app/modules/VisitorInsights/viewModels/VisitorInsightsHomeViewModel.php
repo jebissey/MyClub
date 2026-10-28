@@ -17,8 +17,8 @@ final readonly class VisitorInsightsHomeViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
-            btn_Parent: '/admin',
+            btnHistoryBack: true,
+            btnParent: '/admin',
         );
     }
 }

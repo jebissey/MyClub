@@ -7,10 +7,10 @@ namespace app\modules\Exercise\valueObjects;
 final readonly class ExerciseRow
 {
     public function __construct(
-        public int $Id,
-        public string $Content,
-        public string $Title,
-        public string $LastUpdate,
+        public int $id,
+        public string $content,
+        public string $title,
+        public string $lastUpdate,
     ) {
     }
 
@@ -20,10 +20,10 @@ final readonly class ExerciseRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int)$row->Id,
-            Content: $row->Content,
-            Title: $row->Title,
-            LastUpdate: $row->LastUpdate,
+            id: (int)$row->Id,
+            content: $row->Content,
+            title: $row->Title,
+            lastUpdate: $row->LastUpdate,
         );
     }
 }

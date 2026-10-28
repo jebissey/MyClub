@@ -7,10 +7,10 @@ namespace app\modules\Article\valueObjects;
 final readonly class ArticleSummaryRow
 {
     public function __construct(
-        public int $Id,
-        public string $Title,
-        public string $Timestamp,
-        public string $LastUpdate,
+        public int $id,
+        public string $title,
+        public string $timestamp,
+        public string $lastUpdate,
     ) {
     }
 
@@ -20,10 +20,10 @@ final readonly class ArticleSummaryRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int)$row->Id,
-            Title: $row->Title,
-            Timestamp: $row->Timestamp,
-            LastUpdate: $row->LastUpdate,
+            id: (int)$row->Id,
+            title: $row->Title,
+            timestamp: $row->Timestamp,
+            lastUpdate: $row->LastUpdate,
         );
     }
 }

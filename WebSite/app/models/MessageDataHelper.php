@@ -62,10 +62,10 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
     {
         $bccList = [];
         foreach ($participants as $participant) {
-            $bccList[] = $participant->Email;
+            $bccList[] = $participant->email;
             $this->set('Message', [
                 'EventId'  => $eventId,
-                'PersonId' => $participant->PersonId,
+                'PersonId' => $participant->personId,
                 'Text'     => $text,
                 'From'     => 'Webapp'
             ]);
@@ -171,7 +171,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
                 $row->Avatar ?? null,
                 $gravatarHandler
             );
-
             $result = (array) $row;
             $result['UserImg'] = $userImg;
             unset($result['Avatar'], $result['UseGravatar'], $result['Email']);
@@ -314,7 +313,7 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             ':searchFrom' => $searchFrom,
-            ':personId'   => $connectedUser->person->Id,
+            ':personId'   => $connectedUser->person->id,
         ]);
         $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($messages as $message) {

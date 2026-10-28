@@ -192,21 +192,21 @@ final class EventController extends AbstractController
         $token = is_string($rawToken) ? $rawToken : false;
         $event = $this->eventDataHelper->getEvent($eventId);
 
-        if ($person === false && !$token && $event->Audience !== EventAudience::ForAll) {
+        if ($person === false && !$token && $event->audience !== EventAudience::ForAll) {
             $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
             if ($result && $result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
                 $this->redirect(
                     To::str($_SERVER['REQUEST_URI']),
                     ApplicationError::Ok,
-                    "Auto sign in succeeded for {$result->getUser()?->Email}"
+                    "Auto sign in succeeded for {$result->getUser()?->email}"
                 );
                 return;
             }
             $this->redirect('/user/sign/in?redirect=' . urlencode(To::str($_SERVER['REQUEST_URI'])));
         }
 
-        $userEmail = $person->Email ?? '';
+        $userEmail = $person->email ?? '';
         $participants = $this->participantDataHelper->getEventParticipants($eventId);
         $isRegistered = $this->eventDataHelper->isUserRegistered($eventId, $userEmail);
 
@@ -282,7 +282,7 @@ final class EventController extends AbstractController
             $person = $this->application->getConnectedUser()->person;
             if ($person !== null) {
                 // Membre connecté : inscription/désinscription directe, sans passer par une Invitation.
-                $userId = $person->Id;
+                $userId = $person->id;
                 if ($set) {
                     if ($eventId > 0 && !$this->eventDataHelper->isAlreadyRegistered($userId, $eventId)) {
                         $this->eventDataHelper->addConfirmedParticipant($userId, $eventId);
@@ -347,7 +347,7 @@ final class EventController extends AbstractController
                             'Email' => $invitation->Email,
                             'NickName' => $invitation->NickName,
                         ],
-                        'navItems' => $this->getNavItems($this->application->getConnectedUser(true)->person->Email),
+                        'navItems' => $this->getNavItems($this->application->getConnectedUser(true)->person->email),
                         'page' => $this->application->getConnectedUser()->getPage()
                     ]));
                     return;
@@ -359,7 +359,7 @@ final class EventController extends AbstractController
                 if ($eventData !== false) {
                     /** @var object{Id: int|string, Audience: string} $eventData */
                     $event = EventAudienceRow::fromStdClass($eventData);
-                    if ($event->Audience === EventAudience::ForAll) {
+                    if ($event->audience === EventAudience::ForAll) {
                         $this->redirect('/contact/event/' . $eventId);
                     } else {
                         $this->errors->forbidden(__FILE__, __LINE__);
@@ -421,7 +421,7 @@ final class EventController extends AbstractController
             group: null,
             messages: array_values($this->messageDataHelper->getEventMessages($eventId)),
             person: $person,
-            newMessages: $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
+            newMessages: $this->messageDataHelper->hasNewMessages($person->id, $lastLogId),
             eventId: $eventId,
             layoutParams: $this->getAllParams([]),
         );

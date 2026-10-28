@@ -101,17 +101,17 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             }
             $eventRow = EventFullRow::fromStdClass($event);
 
-            $newStartTime = $this->calculateNewStartTime($eventRow->StartTime, $mode);
+            $newStartTime = $this->calculateNewStartTime($eventRow->startTime, $mode);
             $newEvent = [
-                'Summary'         => $eventRow->Summary,
-                'Description'     => $eventRow->Description,
-                'Location'        => $eventRow->Location,
+                'Summary'         => $eventRow->summary,
+                'Description'     => $eventRow->description,
+                'Location'        => $eventRow->location,
                 'StartTime'       => $newStartTime,
-                'Duration'        => $eventRow->Duration,
-                'IdEventType'     => $eventRow->IdEventType,
+                'Duration'        => $eventRow->duration,
+                'IdEventType'     => $eventRow->idEventType,
                 'CreatedBy'       => $personId,
-                'MaxParticipants' => $eventRow->MaxParticipants,
-                'Audience'        => $eventRow->Audience
+                'MaxParticipants' => $eventRow->maxParticipants,
+                'Audience'        => $eventRow->audience
             ];
             $newEventId = $this->set('Event', $newEvent);
             $attributes = $this->gets('EventAttribute', ['IdEvent' => $id], '*');
@@ -609,7 +609,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':personId'   => $connectedUser->person->Id,
+            ':personId'   => $connectedUser->person->id,
             ':searchFrom' => $searchFrom
         ]);
         $events = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -881,7 +881,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         bool $registeredOnly = false,
         ?int $eventTypeId = null
     ): array {
-        $params = [':personId' => $person->Id ?? 0];
+        $params = [':personId' => $person->id ?? 0];
 
         $sql = "
             SELECT 
@@ -947,7 +947,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         ?int $eventTypeId = null
     ): array {
         $params = [
-            ':idperson' => $person->Id ?? 0,
+            ':idperson' => $person->id ?? 0,
             ':offset'   => $offset,
         ];
 

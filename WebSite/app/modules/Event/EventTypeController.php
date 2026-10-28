@@ -72,8 +72,8 @@ final class EventTypeController extends TableController
             $existingAttributes = $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'IdAttribute');
 
             $this->views->render('Event/views/eventType_edit.latte', $this->getAllParams([
-                'name' => $eventType->Name,
-                'idGroup' => $eventType->IdGroup,
+                'name' => $eventType->name,
+                'idGroup' => $eventType->idGroup,
                 'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'attributes' => $this->dataHelper->gets('Attribute', [], '*', 'Name'),
                 'existingAttributesIds' => array_map(fn($a) => $a->IdAttribute, $existingAttributes),
@@ -106,8 +106,8 @@ final class EventTypeController extends TableController
             'columns' => $columns,
             'resetUrl' => '/eventTypes',
             'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/designer",
+            'btnHistoryBack' => true,
+            'btnParent'      => "/designer",
         ]));
     }
 

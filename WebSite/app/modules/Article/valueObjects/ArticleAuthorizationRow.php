@@ -16,11 +16,11 @@ namespace app\modules\Article\valueObjects;
 final readonly class ArticleAuthorizationRow
 {
     public function __construct(
-        public int $Id,
-        public int $CreatedBy,
-        public ?int $PublishedBy,
-        public ?int $IdGroup,
-        public bool $OnlyForMembers,
+        public int $id,
+        public int $createdBy,
+        public ?int $publishedBy,
+        public ?int $idGroup,
+        public bool $onlyForMembers,
     ) {
     }
 
@@ -30,22 +30,22 @@ final readonly class ArticleAuthorizationRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: isset($row->Id) ? (int) $row->Id : 0,
-            CreatedBy: (int) $row->CreatedBy,
-            PublishedBy: isset($row->PublishedBy) ? (int) $row->PublishedBy : null,
-            IdGroup: isset($row->IdGroup) ? (int) $row->IdGroup : null,
-            OnlyForMembers: (bool) ($row->OnlyForMembers ?? false),
+            id: isset($row->Id) ? (int) $row->Id : 0,
+            createdBy: (int) $row->CreatedBy,
+            publishedBy: isset($row->PublishedBy) ? (int) $row->PublishedBy : null,
+            idGroup: isset($row->IdGroup) ? (int) $row->IdGroup : null,
+            onlyForMembers: (bool) ($row->OnlyForMembers ?? false),
         );
     }
 
     public static function fromArticleRow(ArticleRow $row): self
     {
         return new self(
-            Id: $row->Id,
-            CreatedBy: $row->CreatedBy,
-            PublishedBy: $row->PublishedBy,
-            IdGroup: $row->IdGroup,
-            OnlyForMembers: $row->OnlyForMembers,
+            id: $row->id,
+            createdBy: $row->createdBy,
+            publishedBy: $row->publishedBy,
+            idGroup: $row->idGroup,
+            onlyForMembers: $row->onlyForMembers,
         );
     }
 }

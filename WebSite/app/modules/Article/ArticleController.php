@@ -136,7 +136,7 @@ final class ArticleController extends ArticleAccessController
             return;
         }
 
-        $userId = $this->application->getConnectedUser()->person->Id
+        $userId = $this->application->getConnectedUser()->person->id
             ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
 
         $articleId = $this->articleService->createWithMedia($userId);
@@ -191,7 +191,7 @@ final class ArticleController extends ArticleAccessController
             hasSurvey: $this->dataHelper->get('Survey', ['IdArticle' => $id], 'ClosingDate') ?: null,
             hasOrder: $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate') ?: null,
             userConnected: $connectedUser->person ?? false,
-            navItems: $this->getNavItems($connectedUser->person->Email),
+            navItems: $this->getNavItems($connectedUser->person->email),
             publishedBy: $this->publisherName($article),
             carouselItems: array_values(
                 $this->dataHelper->gets('Carousel', ['IdArticle' => $id], 'Id, IdArticle, Item')
@@ -294,7 +294,7 @@ final class ArticleController extends ArticleAccessController
             }
             $isPublished = ($input['published'] ?? 0) === 1;
             $result = $this->dataHelper->set('Article', [
-                'PublishedBy' => $isPublished ? ($this->application->getConnectedUser()->person->Id ?? null) : null,
+                'PublishedBy' => $isPublished ? ($this->application->getConnectedUser()->person->id ?? null) : null,
                 'LastUpdate'  => date('Y-m-d H:i:s')
             ], ['Id' => $id]);
             if ($result) {
@@ -346,7 +346,7 @@ final class ArticleController extends ArticleAccessController
                 hasSurvey: $survey ?: null,
                 hasOrder: $order ?: null,
                 userConnected: $connectedUser->person !== null,
-                navItems: $this->getNavItems($connectedUser->person?->Email),
+                navItems: $this->getNavItems($connectedUser->person?->email),
                 publishedBy: $this->publisherName($article),
                 canReadPool: $this->authorizationService->canReadSurveyResults(
                     $this->toClosingVisibility($survey),
@@ -390,9 +390,9 @@ final class ArticleController extends ArticleAccessController
         }
 
         $userImg = WebApp::getUserImg(
-            $person->UseGravatar,
-            $person->Email,
-            $person->Avatar,
+            $person->useGravatar,
+            $person->email,
+            $person->avatar,
             new GravatarHandler()
         );
         $lastLogId = isset($_SESSION['last_log_id']) && is_numeric($_SESSION['last_log_id'])
@@ -405,8 +405,8 @@ final class ArticleController extends ArticleAccessController
             group: null,
             messages: array_values($this->messageDataHelper->getArticleMessages($articleId)),
             person: $person,
-            navItems: $this->getNavItems($person->Email),
-            newMessages: $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
+            navItems: $this->getNavItems($person->email),
+            newMessages: $this->messageDataHelper->hasNewMessages($person->id, $lastLogId),
             btnParent: "/article/{$articleId}",
             layoutParams: $this->getAllParams([
                 'page' => $connectedUser->getPage(),
@@ -448,7 +448,7 @@ final class ArticleController extends ArticleAccessController
 
         $publishedBy = null;
         if (($input['published'] ?? 0) === 1) {
-            $publishedBy = $this->application->getConnectedUser()->person->Id
+            $publishedBy = $this->application->getConnectedUser()->person->id
                 ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
         }
 
@@ -476,11 +476,11 @@ final class ArticleController extends ArticleAccessController
     #region Private functions
     private function publisherName(ArticleRow $article): string
     {
-        if ($article->PublishedBy === null || $article->PublishedBy === $article->CreatedBy) {
+        if ($article->publishedBy === null || $article->publishedBy === $article->createdBy) {
             return '';
         }
 
-        return $this->personDataHelper->getPublisher($article->PublishedBy) ?? '';
+        return $this->personDataHelper->getPublisher($article->publishedBy) ?? '';
     }
 
     private function toClosingVisibility(object|false $row): ?ClosingVisibilityRow

@@ -21,11 +21,8 @@ use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Common\valueObjects\ApiResponse;
-use app\modules\Article\valueObjects\ArticleCreatorTitleRow;
 use app\modules\Event\valueObjects\EventCreatorSummaryRow;
-use app\modules\Common\valueObjects\GroupNameRow;
 use app\modules\Common\valueObjects\MessageContext;
-use app\modules\Common\valueObjects\MessageOwnerRow;
 use app\modules\Common\valueObjects\MessageTarget;
 use app\modules\Common\valueObjects\UploadedFileInput;
 
@@ -97,7 +94,7 @@ final class MessageApi extends AbstractApi
                 $articleId,
                 $eventId,
                 $groupId,
-                $this->application->getConnectedUser(true)->person->Id,
+                $this->application->getConnectedUser(true)->person->id,
                 To::str($data['text']),
                 $imagePath !== null ? WebApp::getBaseUrl() . $imagePath : null,
             );
@@ -125,7 +122,7 @@ final class MessageApi extends AbstractApi
 
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->doDeleteMessage(To::int($data['messageId']), $this->application->getConnectedUser(true)->person->Id);
+            $apiResponse = $this->doDeleteMessage(To::int($data['messageId']), $this->application->getConnectedUser(true)->person->id);
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
@@ -190,7 +187,7 @@ final class MessageApi extends AbstractApi
             $data = $this->getJsonInput();
             $apiResponse = $this->doUpdateMessage(
                 To::int($data['messageId']),
-                $this->application->getConnectedUser(true)->person->Id,
+                $this->application->getConnectedUser(true)->person->id,
                 To::str($data['text'])
             );
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
@@ -235,8 +232,7 @@ final class MessageApi extends AbstractApi
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], "Message {$messageId} doesn't exist");
         }
         /** @var object{PersonId: int|string} $row */
-        $message = MessageOwnerRow::fromStdClass($row);
-        if ($message->PersonId !== $personId) {
+        if ((int) $row->PersonId !== $personId) {
             return new ApiResponse(
                 false,
                 ApplicationError::Forbidden->value,
@@ -294,9 +290,10 @@ final class MessageApi extends AbstractApi
                 return;
             }
             /** @var object{CreatedBy: int|string, Title: string} $row */
-            $article = ArticleCreatorTitleRow::fromStdClass($row);
-            $articleAuthorId = $article->CreatedBy;
+            $articleAuthorId = (int) $row->CreatedBy;
+            $articleTitle = $row->Title;
         }
+
         if ($eventId !== null) {
             $row = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary');
             if ($row === false) {
@@ -308,7 +305,7 @@ final class MessageApi extends AbstractApi
             }
             /** @var object{CreatedBy: int|string, Summary: string} $row */
             $event = EventCreatorSummaryRow::fromStdClass($row);
-            $eventCreatorId = $event->CreatedBy;
+            $eventCreatorId = $event->createdBy;
         }
         if ($groupId !== null) {
             $row = $this->dataHelper->get('Group', ['Id' => $groupId], 'Name');
@@ -320,7 +317,7 @@ final class MessageApi extends AbstractApi
                 return;
             }
             /** @var object{Name: string} $row */
-            $group = GroupNameRow::fromStdClass($row);
+            $groupName = $row->Name;
         }
 
         $context = new MessageContext(
@@ -339,15 +336,15 @@ final class MessageApi extends AbstractApi
         if ($articleId !== null) {
             $from = 'article';
             $id = $articleId;
-            $body .= "à l'article {$article->Title} ({$articleId})";
+            $body .= "à l'article {$articleTitle})";
         } elseif ($eventId !== null) {
             $from = 'event';
             $id = $eventId;
-            $body .= "à l'événement {$event->Summary} ({$eventId})";
+            $body .= "à l'événement {$event->summary} ({$eventId})";
         } elseif ($groupId !== null) {
             $from = 'group';
             $id = $groupId;
-            $body .= "au groupe {$group->Name}";
+            $body .= "au groupe {$groupName}";
         }
         $notificationData = [
             'title' => $title,

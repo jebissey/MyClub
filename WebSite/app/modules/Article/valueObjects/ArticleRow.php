@@ -22,17 +22,17 @@ namespace app\modules\Article\valueObjects;
 final readonly class ArticleRow
 {
     public function __construct(
-        public int $Id,
-        public string $Title,
-        public string $Content,
-        public int $CreatedBy,
-        public ?int $PublishedBy,
-        public ?int $IdGroup,
-        public bool $OnlyForMembers,
-        public string $LastUpdate,
-        public string $Timestamp,
-        public ?AuthorInfo $Author = null,
-        public ?GroupInfo $Group = null,
+        public int $id,
+        public string $title,
+        public string $content,
+        public int $createdBy,
+        public ?int $publishedBy,
+        public ?int $idGroup,
+        public bool $onlyForMembers,
+        public string $lastUpdate,
+        public string $timestamp,
+        public ?AuthorInfo $author = null,
+        public ?GroupInfo $group = null,
     ) {
     }
 
@@ -42,17 +42,17 @@ final readonly class ArticleRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int)$row->Id,
-            Title: $row->Title,
-            Content: $row->Content,
-            CreatedBy: (int)$row->CreatedBy,
-            PublishedBy: isset($row->PublishedBy) ? (int)$row->PublishedBy : null,
-            IdGroup: isset($row->IdGroup) ? (int)$row->IdGroup : null,
-            OnlyForMembers: (bool)($row->OnlyForMembers ?? false),
-            LastUpdate: $row->LastUpdate,
-            Timestamp: $row->Timestamp ?? '',
-            Author: AuthorInfo::fromStdClass($row),
-            Group: GroupInfo::fromStdClass($row),
+            id: (int)$row->Id,
+            title: $row->Title,
+            content: $row->Content,
+            createdBy: (int)$row->CreatedBy,
+            publishedBy: isset($row->PublishedBy) ? (int)$row->PublishedBy : null,
+            idGroup: isset($row->IdGroup) ? (int)$row->IdGroup : null,
+            onlyForMembers: (bool)($row->OnlyForMembers ?? false),
+            lastUpdate: $row->LastUpdate,
+            timestamp: $row->Timestamp ?? '',
+            author: AuthorInfo::fromStdClass($row),
+            group: GroupInfo::fromStdClass($row),
         );
     }
 
@@ -64,19 +64,19 @@ final readonly class ArticleRow
     public function toArray(): array
     {
         return [
-            'Id'             => $this->Id,
-            'Title'          => $this->Title,
-            'Content'        => $this->Content,
-            'CreatedBy'      => $this->CreatedBy,
-            'PublishedBy'    => $this->PublishedBy,
-            'IdGroup'        => $this->IdGroup,
-            'OnlyForMembers' => $this->OnlyForMembers,
-            'LastUpdate'     => $this->LastUpdate,
-            'Timestamp'      => $this->Timestamp,
-            'FirstName'      => $this->Author?->FirstName,
-            'LastName'       => $this->Author?->LastName,
-            'NickName'       => $this->Author?->NickName,
-            'GroupName'      => $this->Group?->Name,
+            'Id'             => $this->id,
+            'Title'          => $this->title,
+            'Content'        => $this->content,
+            'CreatedBy'      => $this->createdBy,
+            'PublishedBy'    => $this->publishedBy,
+            'IdGroup'        => $this->idGroup,
+            'OnlyForMembers' => $this->onlyForMembers,
+            'LastUpdate'     => $this->lastUpdate,
+            'Timestamp'      => $this->timestamp,
+            'FirstName'      => $this->author?->firstName,
+            'LastName'       => $this->author?->lastName,
+            'NickName'       => $this->author?->nickName,
+            'GroupName'      => $this->group?->name,
         ];
     }
 }

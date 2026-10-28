@@ -19,8 +19,8 @@ use app\enums\EventAudience;
 final readonly class EventAudienceRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public EventAudience $Audience,
+        public int $id,
+        public EventAudience $audience,
     ) {
     }
 
@@ -28,8 +28,8 @@ final readonly class EventAudienceRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Audience: EventAudience::from($row->Audience),
+            id: (int) $row->Id,
+            audience: EventAudience::from($row->Audience),
         );
     }
 }

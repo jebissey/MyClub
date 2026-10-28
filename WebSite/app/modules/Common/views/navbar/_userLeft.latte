@@ -8,15 +8,15 @@
                             data-bs-placement="bottom">
                     </a>
 
-                    {if isset($btn_Parent)}
+                    {if isset($btnParent)}
                         <a class="btn fs-4 "
-                            href="{$btn_Parent}"
+                            href="{$btnParent}"
                             style="background-color: {$navbarIconColor|noescape}; border-color: {$navbarIconColor|noescape};">
                             <i class="bi bi-arrow-up-circle" style="color: {$navbarInkColor|noescape};"></i>
                         </a>
                     {/if}
 
-                    {if isset($btn_HistoryBack)}
+                    {if isset($btnHistoryBack)}
                         <button class="btn fs-4 ms-2"
                                 onclick="history.back()"
                                 style="background-color: {$navbarIconColor|noescape}; border-color: {$navbarIconColor|noescape};">

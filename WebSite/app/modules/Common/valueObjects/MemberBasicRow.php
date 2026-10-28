@@ -24,15 +24,15 @@ use app\helpers\To;
 final readonly class MemberBasicRow extends IdentityRow
 {
     public function __construct(
-        int $Id,
-        string $Email,
-        string $FirstName,
-        ?string $LastName,
-        ?string $NickName,
-        ?string $Avatar,
-        public bool $UseGravatar,
+        int $id,
+        string $email,
+        string $firstName,
+        ?string $lastName,
+        ?string $nickName,
+        ?string $avatar,
+        public bool $useGravatar,
     ) {
-        parent::__construct($Id, $Email, $FirstName, $LastName, $NickName, $Avatar);
+        parent::__construct($id, $email, $firstName, $lastName, $nickName, $avatar);
     }
 
     /**
@@ -43,13 +43,13 @@ final readonly class MemberBasicRow extends IdentityRow
     public static function fromJoinedRow(object $row): self
     {
         return new self(
-            Id: $row->Id,
-            Email: $row->Email,
-            FirstName: $row->FirstName,
-            LastName: $row->LastName,
-            NickName: $row->NickName,
-            Avatar: $row->Avatar,
-            UseGravatar: To::bool($row->UseGravatar),
+            id: $row->Id,
+            email: $row->Email,
+            firstName: $row->FirstName,
+            lastName: $row->LastName,
+            nickName: $row->NickName,
+            avatar: $row->Avatar,
+            useGravatar: To::bool($row->UseGravatar),
         );
     }
 
@@ -57,13 +57,13 @@ final readonly class MemberBasicRow extends IdentityRow
     public function toPerson(): Person
     {
         return new Person(
-            Id: $this->Id,
-            Email: $this->Email,
-            FirstName: $this->FirstName,
-            LastName: $this->LastName,
-            NickName: $this->NickName,
-            UseGravatar: $this->UseGravatar,
-            Avatar: $this->Avatar,
+            id: $this->id,
+            email: $this->email,
+            firstName: $this->firstName,
+            lastName: $this->lastName,
+            nickName: $this->nickName,
+            useGravatar: $this->useGravatar,
+            avatar: $this->avatar,
         );
     }
 }

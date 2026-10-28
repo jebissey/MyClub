@@ -37,10 +37,10 @@ final class ArticleTableDataHelper extends Data
 
         if ($connectedUser->person !== null) {
             if (!$connectedUser->isEditor()) {
-                $query = $query->where('(CreatedBy = ' . $connectedUser->person->Id . '
+                $query = $query->where('(CreatedBy = ' . $connectedUser->person->id . '
                     OR (PublishedBy IS NOT NULL 
                         AND (IdGroup IS NULL 
-                            OR IdGroup IN (SELECT IdGroup FROM MemberGroup WHERE IdMember = ' . $connectedUser->person->Id . '))
+                            OR IdGroup IN (SELECT IdGroup FROM MemberGroup WHERE IdMember = ' . $connectedUser->person->id . '))
                     ))');
             }
         } else {

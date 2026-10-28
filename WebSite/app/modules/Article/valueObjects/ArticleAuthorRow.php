@@ -7,9 +7,9 @@ namespace app\modules\Article\valueObjects;
 final readonly class ArticleAuthorRow
 {
     public function __construct(
-        public int $Id,
-        public string $PersonName,
-        public string $ArticleTitle,
+        public int $id,
+        public string $personName,
+        public string $articleTitle,
     ) {
     }
 
@@ -19,9 +19,9 @@ final readonly class ArticleAuthorRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int)$row->Id,
-            PersonName: $row->PersonName,
-            ArticleTitle: $row->ArticleTitle,
+            id: (int)$row->Id,
+            personName: $row->PersonName,
+            articleTitle: $row->ArticleTitle,
         );
     }
 }

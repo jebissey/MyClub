@@ -33,8 +33,8 @@ final readonly class RegistrationIndexViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
-            btn_Parent: '/webmaster',
+            btnHistoryBack: true,
+            btnParent: '/webmaster',
         );
     }
 }

@@ -115,11 +115,11 @@ abstract class AbstractController
         $filteredNavItems = [];
         foreach ($navItems as $navItem) {
             if (
-                ($email === null && $navItem->ForAnonymous === 1) ||
-                ($email !== null && $navItem->ForMembers === 1 &&
+                ($email === null && $navItem->forAnonymous === 1) ||
+                ($email !== null && $navItem->forMembers === 1 &&
                     (
-                        $navItem->IdGroup === null ||
-                        (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups, true))
+                        $navItem->idGroup === null ||
+                        (!empty($userGroups) && in_array($navItem->idGroup, $userGroups, true))
                     )
                 ) ||
                 $all
@@ -136,8 +136,8 @@ abstract class AbstractController
 
         return array_map(
             fn(MenuItemRow $navItem): MenuItemRow => $navItem->withGroupName(
-                $navItem->IdGroup !== null && isset($groupsById[$navItem->IdGroup])
-                    ? $groupsById[$navItem->IdGroup]
+                $navItem->idGroup !== null && isset($groupsById[$navItem->idGroup])
+                    ? $groupsById[$navItem->idGroup]
                     : null
             ),
             $filteredNavItems
@@ -237,7 +237,7 @@ abstract class AbstractController
                 $this->redirect(
                     To::str($_SERVER['REQUEST_URI'] ?? ''),
                     ApplicationError::Ok,
-                    "Auto sign in succeeded for {$result->getUser()?->Email}"
+                    "Auto sign in succeeded for {$result->getUser()?->email}"
                 );
                 return true;
             }

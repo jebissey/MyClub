@@ -7,9 +7,9 @@ namespace app\modules\Article\valueObjects;
 final readonly class AuthorInfo
 {
     public function __construct(
-        public ?string $FirstName,
-        public ?string $LastName,
-        public ?string $NickName = null,
+        public ?string $firstName,
+        public ?string $lastName,
+        public ?string $nickName = null,
     ) {
     }
 
@@ -19,17 +19,17 @@ final readonly class AuthorInfo
             return null;
         }
         return new self(
-            FirstName: $row->FirstName ?? null,
-            LastName: $row->LastName ?? null,
-            NickName: $row->NickName ?? null,
+            firstName: $row->FirstName ?? null,
+            lastName: $row->LastName ?? null,
+            nickName: $row->NickName ?? null,
         );
     }
 
     public function displayName(): string
     {
-        $name = trim(($this->FirstName ?? '') . ' ' . ($this->LastName ?? ''));
-        if (!empty($this->NickName)) {
-            $name .= ' (' . $this->NickName . ')';
+        $name = trim(($this->firstName ?? '') . ' ' . ($this->lastName ?? ''));
+        if (!empty($this->nickName)) {
+            $name .= ' (' . $this->nickName . ')';
         }
         return $name;
     }

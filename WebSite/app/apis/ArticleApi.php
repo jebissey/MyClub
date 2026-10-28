@@ -6,17 +6,14 @@ namespace app\apis;
 
 use Exception;
 use Throwable;
-use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\helpers\WebApp;
 use app\models\DesignDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\OrderReplyDataHelper;
 use app\models\PersonDataHelper;
 use app\models\ReplyDataHelper;
-use app\modules\Article\valueObjects\AnswersRow;
 use app\modules\Article\valueObjects\QuestionRow;
 
 final class ArticleApi extends AbstractApi
@@ -63,7 +60,7 @@ final class ArticleApi extends AbstractApi
 
         $this->designDataHelper->insertOrUpdate(
             $data,
-            $this->application->getConnectedUser()->person->Id ?? 0
+            $this->application->getConnectedUser()->person->id ?? 0
         );
         $this->renderJsonOK();
     }
@@ -99,7 +96,7 @@ final class ArticleApi extends AbstractApi
         }
         $person = $this->application->getConnectedUser(true)->person;
         $this->orderReplyDataHelper->insertOrUpdate(
-            To::int($person->Id),
+            To::int($person->id),
             To::int($orderId),
             $orderAnswers
         );
@@ -137,7 +134,7 @@ final class ArticleApi extends AbstractApi
         }
         $person = $this->application->getConnectedUser(true)->person;
         $this->replyDataHelper->insertOrUpdate(
-            $person->Id,
+            $person->id,
             To::int($surveyId),
             $surveyAnswers
         );
@@ -158,21 +155,21 @@ final class ArticleApi extends AbstractApi
         /** @var object{Id: int|string, Question: string, Options: string} $orderData */
         $order = QuestionRow::fromStdClass($orderData);
         try {
-            $options = json_decode($order->Options);
+            $options = json_decode($order->options);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("JSON error: " . json_last_error_msg());
             }
             $person = $this->application->getConnectedUser(true)->person;
-            $previousReplyData = $this->dataHelper->get('OrderReply', ['IdOrder' => $order->Id, 'IdPerson' => $person->Id], 'Answers');
+            $previousReplyData = $this->dataHelper->get('OrderReply', ['IdOrder' => $order->id, 'IdPerson' => $person->id], 'Answers');
             $previousAnswers = null;
-            if ($previousReplyData) {
+            if ($previousReplyData !== false) {
                 /** @var object{Answers: string} $previousReplyData */
-                $previousAnswers = json_decode(AnswersRow::fromStdClass($previousReplyData)->Answers, true);
+                $previousAnswers = json_decode($previousReplyData->Answers, true);
             }
             $this->renderJsonOk([
                 'order' => [
-                    'id' => $order->Id,
-                    'question' => $order->Question,
+                    'id' => $order->id,
+                    'question' => $order->question,
                     'options' => $options,
                     'previousAnswers' => $previousAnswers
                 ]
@@ -196,21 +193,21 @@ final class ArticleApi extends AbstractApi
         /** @var object{Id: int|string, Question: string, Options: string} $surveyData */
         $survey = QuestionRow::fromStdClass($surveyData);
         try {
-            $options = json_decode($survey->Options);
+            $options = json_decode($survey->options);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("JSON error: " . json_last_error_msg());
             }
             $person = $this->application->getConnectedUser(true)->person;
-            $previousReplyData = $this->dataHelper->get('Reply', ['IdSurvey' => $survey->Id, 'IdPerson' => $person->Id], 'Answers');
+            $previousReplyData = $this->dataHelper->get('Reply', ['IdSurvey' => $survey->id, 'IdPerson' => $person->id], 'Answers');
             $previousAnswers = null;
-            if ($previousReplyData) {
+            if ($previousReplyData !== false) {
                 /** @var object{Answers: string} $previousReplyData */
-                $previousAnswers = json_decode(AnswersRow::fromStdClass($previousReplyData)->Answers, true);
+                $previousAnswers = json_decode($previousReplyData->Answers, true);
             }
             $this->renderJsonOk([
                 'survey' => [
-                    'id' => $survey->Id,
-                    'question' => $survey->Question,
+                    'id' => $survey->id,
+                    'question' => $survey->question,
                     'options' => $options,
                     'previousAnswers' => $previousAnswers
                 ]

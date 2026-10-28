@@ -24,13 +24,13 @@ final class UserNotepadController extends AbstractController
         }
 
         $person = $this->application->getConnectedUser(true)->person;
-        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Notepad');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->id], 'Notepad');
         /** @var object{Notepad: string|null}|false $row */
         $notepad = $row !== false ? ($row->Notepad ?? '') : '';
 
         $viewModel = new UserNotepadViewModel(
             notepad: $notepad,
-            navItems: $this->getNavItems($person->Email),
+            navItems: $this->getNavItems($person->email),
             layoutParams: $this->getAllParams([]),
         );
 
@@ -49,7 +49,7 @@ final class UserNotepadController extends AbstractController
         $person = $this->application->getConnectedUser(true)->person;
         $this->dataHelper->set('Member', [
             'Notepad' => $notepad,
-        ], ['Id' => $person->Id]);
+        ], ['Id' => $person->id]);
         $this->redirect('/user');
     }
 }

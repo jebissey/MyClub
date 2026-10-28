@@ -169,7 +169,7 @@ final class LoanApi extends AbstractApi
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoan(), __FILE__, __LINE__)) {
             $user = $this->application->getConnectedUser();
             // A manager sees everything, a regular user only sees their own
-            $userId = $user->isLoanManager() ? 0 : $user->person->Id ?? 0;
+            $userId = $user->isLoanManager() ? 0 : $user->person->id ?? 0;
             $this->renderJsonOk($this->loanDataHelper->getAllReservations($userId));
         }
     }
@@ -201,7 +201,7 @@ final class LoanApi extends AbstractApi
             // Force the current user for a standard reservation
             $user = $this->application->getConnectedUser();
             if (!$user->isLoanManager()) {
-                $data['userId'] = $user->person->Id ?? 0;
+                $data['userId'] = $user->person->id ?? 0;
             }
 
             // Availability check
@@ -230,7 +230,7 @@ final class LoanApi extends AbstractApi
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             $user   = $this->application->getConnectedUser();
-            $userId = $user->isLoanManager() ? 0 : $user->person->Id ?? 0;
+            $userId = $user->isLoanManager() ? 0 : $user->person->id ?? 0;
 
             $ok = $this->loanDataHelper->cancelReservation($id, $userId);
             if (!$ok) {

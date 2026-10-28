@@ -35,7 +35,7 @@ final class GroupController extends AbstractController
             $viewModel = new GroupCreateViewModel(
                 availableAuthorizations: array_values($this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name')),
                 layout: $this->getLayout(),
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 layoutParams: $this->getAllParams([]),
             );
 
@@ -60,7 +60,7 @@ final class GroupController extends AbstractController
                 $viewModel = new GroupCreateViewModel(
                     availableAuthorizations: array_values($availableAuthorizations),
                     layout: $this->getLayout(),
-                    navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                    navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                     error: 'Le nom du groupe est requis',
                     layoutParams: $this->getAllParams([]),
                 );
@@ -171,7 +171,7 @@ final class GroupController extends AbstractController
             $viewModel = new GroupIndexViewModel(
                 groups: $this->groupDataHelper->getGroupsWithAuthorizations($connectedUser),
                 layout: $this->getLayout(),
-                navItems: $this->getNavItems($connectedUser->person?->Email),
+                navItems: $this->getNavItems($connectedUser->person?->email),
                 layoutParams: $this->getAllParams([
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
@@ -193,7 +193,7 @@ final class GroupController extends AbstractController
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
-        if ($connectedUser->person === null || !$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->Id, $groupId)) {
+        if ($connectedUser->person === null || !$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->id, $groupId)) {
             $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
@@ -207,9 +207,9 @@ final class GroupController extends AbstractController
             group: $group,
             messages: $this->messageDataHelper->getGroupMessages($groupId),
             person: $person,
-            navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
             btnParent: "/user/directory?group={$groupId}",
-            newMessages: $this->messageDataHelper->hasNewMessages($person->Id, $lastLogId),
+            newMessages: $this->messageDataHelper->hasNewMessages($person->id, $lastLogId),
             layoutParams: $this->getAllParams([]),
         );
 

@@ -28,7 +28,7 @@ final class KanbanController extends AbstractController
             return;
         }
 
-        $personId = $this->application->getConnectedUser()->person->Id ?? 0;
+        $personId = $this->application->getConnectedUser()->person->id ?? 0;
         $query    = $this->flight->request()->query->getData();
 
         $selectedProjectId = null;

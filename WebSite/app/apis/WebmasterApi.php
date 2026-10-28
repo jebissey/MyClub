@@ -112,7 +112,7 @@ final class WebmasterApi extends AbstractApi
         $endpoint = is_string($endpointRaw) ? trim($endpointRaw) : '';
         $p256dh   = is_string($p256dhRaw)   ? trim($p256dhRaw)   : '';
         $auth     = is_string($authRaw)     ? trim($authRaw)     : '';
-        $idPerson = $this->connectedUser->person?->Id;
+        $idPerson = $this->connectedUser->person?->id;
 
         if ($endpoint === '' || $p256dh === '' || $auth === '') {
             $this->renderJsonBadRequest('Requête incomplète.', __FILE__, __LINE__);

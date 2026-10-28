@@ -84,12 +84,12 @@ final class WebApp
 
     public static function sanitizeHtml(string $html): string
     {
-        $allowed_tags = '<div><span><p><br><strong><em><ul><ol><li><a><img>'
+        $allowedTags = '<div><span><p><br><strong><em><ul><ol><li><a><img>'
             . '<hr><h1><h2><h3><h4><h5><h6><blockquote><pre><code>'
             . '<table><thead><tbody><tr><th><td>'
             . '<section><i>';
 
-        $html = strip_tags($html, $allowed_tags);
+        $html = strip_tags($html, $allowedTags);
 
         $html = preg_replace('/<(.*?)[\s|>]on[a-z]+=[\'"].*?[\'"]>(.*?)<\/\\1>/i', '<$1>$2</$1>', $html);
         $html = preg_replace('/javascript:.*?[\'"]/i', '', $html ?? '');

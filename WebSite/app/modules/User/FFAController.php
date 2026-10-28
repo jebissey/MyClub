@@ -37,9 +37,9 @@ final class FFAController extends AbstractController
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
 
         /** @var string $firstName */
-        $firstName = $input['firstName'] ?? $person->FirstName ?? '???';
+        $firstName = $input['firstName'] ?? $person->firstName ?? '???';
         /** @var string $lastName */
-        $lastName = $input['lastName'] ?? $person->LastName ?? '???';
+        $lastName = $input['lastName'] ?? $person->lastName ?? '???';
         $question = $input['question'] ?? 'rank';
         /** @var string $year */
         $year = $input['year'] ?? date('Y');
@@ -55,7 +55,7 @@ final class FFAController extends AbstractController
             'lastName'  => $lastName,
             'question'  => $question,
             'results'   => $results,
-            'navItems'  => $this->getNavItems($person?->Email),
+            'navItems'  => $this->getNavItems($person?->email),
             'year'      => $year,
             'club'      => $club,
             'page'      => $connectedUser->getPage(),

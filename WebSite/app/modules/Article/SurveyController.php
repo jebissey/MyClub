@@ -51,23 +51,23 @@ final class SurveyController extends ClosableFormController
             return null;
         }
 
-        $replies = $this->surveyDataHelper->getRepliesForActivePersons($survey->Id);
+        $replies = $this->surveyDataHelper->getRepliesForActivePersons($survey->id);
         $participants = [];
         /** @var array<string, int> $results */
         $results = [];
 
         /** @var array<string> $options */
-        $options = json_decode($survey->Options) ?? [];
+        $options = json_decode($survey->options) ?? [];
         foreach ($options as $option) {
             $results[$option] = 0;
         }
 
         foreach ($replies as $reply) {
             /** @var array<string> $answers */
-            $answers = json_decode($reply->Answers) ?? [];
+            $answers = json_decode($reply->answers) ?? [];
 
             $participants[] = [
-                'name'    => $this->participantName($reply->IdPerson),
+                'name'    => $this->participantName($reply->idPerson),
                 'answers' => $answers,
             ];
 

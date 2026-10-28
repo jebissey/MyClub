@@ -61,7 +61,7 @@ final class RegistrationController extends TableController
                 columns: $columns,
                 resetUrl: '/registration',
                 layout: $this->getLayout(),
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 i18n: [
                     'errorLoadGroups' => ($this->t)('person_manager.registration.error.load_groups'),
                     'errorGeneric'    => ($this->t)('person_manager.registration.error.generic'),

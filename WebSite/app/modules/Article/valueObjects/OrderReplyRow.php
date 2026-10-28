@@ -18,11 +18,11 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 final readonly class OrderReplyRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public int $IdPerson,
-        public int $IdOrder,
-        public string $Answers,
-        public string $LastUpdate,
+        public int $id,
+        public int $idPerson,
+        public int $idOrder,
+        public string $answers,
+        public string $lastUpdate,
     ) {
     }
 
@@ -30,11 +30,11 @@ final readonly class OrderReplyRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            IdPerson: (int) $row->IdPerson,
-            IdOrder: (int) $row->IdOrder,
-            Answers: $row->Answers,
-            LastUpdate: $row->LastUpdate,
+            id: (int) $row->Id,
+            idPerson: (int) $row->IdPerson,
+            idOrder: (int) $row->IdOrder,
+            answers: $row->Answers,
+            lastUpdate: $row->LastUpdate,
         );
     }
 }

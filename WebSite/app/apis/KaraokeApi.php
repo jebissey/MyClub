@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\apis;
 
-use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\enums\Karaoke;
 use app\helpers\Application;
@@ -121,7 +120,7 @@ final class KaraokeApi extends AbstractApi
             return;
         }
 
-        $sessionDbId = (int)$session->Id;
+        $sessionDbId = (int)$session->id;
         $isHost = $this->karaokeDataHelper->isClientHost($clientId, $sessionDbId);
         $clientsCount = $this->karaokeDataHelper->countActiveClients($sessionDbId);
 
@@ -130,9 +129,9 @@ final class KaraokeApi extends AbstractApi
             'isHost' => $isHost,
             'clientsCount' => $clientsCount,
             'hasActiveSession' => $clientsCount > 0,
-            'status' => $session->Status,
-            'countdownStart' => $session->CountdownStart,
-            'playStartTime' => $session->PlayStartTime
+            'status' => $session->status,
+            'countdownStart' => $session->countdownStart,
+            'playStartTime' => $session->playStartTime
         ]);
     }
 
@@ -144,7 +143,7 @@ final class KaraokeApi extends AbstractApi
             return;
         }
 
-        $sessionDbId = (int)$session->Id;
+        $sessionDbId = (int)$session->id;
         if (!$this->karaokeDataHelper->isClientHost($clientId, $sessionDbId)) {
             $this->renderJsonForbidden(__FILE__, __LINE__);
             return;
@@ -155,8 +154,8 @@ final class KaraokeApi extends AbstractApi
 
         $this->renderJsonOk([
             'serverTime' => time(),
-            'countdownStart' => $updatedSession?->CountdownStart,
-            'playStartTime' => $updatedSession?->PlayStartTime
+            'countdownStart' => $updatedSession?->countdownStart,
+            'playStartTime' => $updatedSession?->playStartTime
         ]);
     }
 
@@ -166,7 +165,7 @@ final class KaraokeApi extends AbstractApi
         $session = $this->karaokeDataHelper->getSessionBySessionId($this->sessionId);
 
         if ($session) {
-            $sessionDbId = (int)$session->Id;
+            $sessionDbId = (int)$session->id;
             $this->karaokeDataHelper->deleteSessionIfEmpty($sessionDbId);
         }
 

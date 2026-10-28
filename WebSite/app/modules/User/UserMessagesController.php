@@ -34,10 +34,10 @@ final class UserMessagesController extends AbstractShowController
         $viewModel = new UserMessagesViewModel(
             searchFrom: $searchFrom,
             searchMode: $searchMode,
-            navItems: $this->getNavItems($connectedUser->person?->Email),
+            navItems: $this->getNavItems($connectedUser->person?->email),
             person: $connectedUser->person,
             messages: $this->messageDataHelper->getGroupedMessages(
-                $connectedUser->person->Id ?? 0,
+                $connectedUser->person->id ?? 0,
                 $searchFrom,
                 new GravatarHandler()
             ),

@@ -42,8 +42,8 @@ final class EventGuestController extends AbstractController
             'message' => $message,
             'messageType' => $type,
             'page' => $connectedUser->getPage(1),
-            'navItems' => $this->getNavItems($connectedUser->person?->Email),
-            'btn_HistoryBack' => true,
+            'navItems' => $this->getNavItems($connectedUser->person?->email),
+            'btnHistoryBack' => true,
         ]));
     }
 
@@ -88,25 +88,25 @@ final class EventGuestController extends AbstractController
                     $nickname,
                     $eventId,
                     $token,
-                    $this->application->getConnectedUser()->person->Id ?? 0,
+                    $this->application->getConnectedUser()->person->id ?? 0,
                     (new DateTime())->format('Y-m-d H:i:s')
                 );
 
                 $root = Application::$root;
                 $invitationLink = $root . "/event/$eventId?t=$token";
-                $subject = "Invitation à l'événement : " . $event->Summary;
+                $subject = "Invitation à l'événement : " . $event->summary;
                 $body = "Bonjour" . (!empty($nickname) ? " {$nickname}" : "") . ",\n\n";
                 $body .= "Vous êtes invité(e) à participer à l'événement suivant :\n\n";
-                $body .= "Titre : {$event->Summary}\n";
-                $body .= "Description : {$event->Description}\n";
-                $body .= "Lieu : {$event->Location}\n";
-                $body .= "Date : " . (new DateTime($event->StartTime))->format('d/m/Y à H:i') . "\n\n";
+                $body .= "Titre : {$event->summary}\n";
+                $body .= "Description : {$event->description}\n";
+                $body .= "Lieu : {$event->location}\n";
+                $body .= "Date : " . (new DateTime($event->startTime))->format('d/m/Y à H:i') . "\n\n";
                 $body .= "Pour confirmer votre participation, cliquez sur le lien suivant :\n";
                 $body .= $invitationLink . "\n\n";
                 $body .= "Cordialement,\nL'équipe des animateurs";
 
                 $emailMessage = new EmailMessage(
-                    from: $this->application->getConnectedUser()->person->Email ?? '',
+                    from: $this->application->getConnectedUser()->person->email ?? '',
                     to: $email,
                     subject: $subject,
                     body: $body,

@@ -28,8 +28,8 @@ final readonly class EventChatViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
-            btn_Parent: "/event/{$eventId}",
+            btnHistoryBack: true,
+            btnParent: "/event/{$eventId}",
         );
     }
 }

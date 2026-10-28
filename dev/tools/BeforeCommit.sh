@@ -11,25 +11,28 @@ echo -e "\033[1m  $1\033[0m" >&2
 echo "=============================================================================" >&2
 }
 
-print_step "1/7 : phpcbf"
+print_step "1/8 : phpcbf"
 vendor/bin/phpcbf --standard=../dev/phpcs.xml --runtime-set ignore_non_auto_fixable_on_exit 1 app || true
 
-print_step "2/7 : phpcs"
+print_step "2/8 : phpcs"
 vendor/bin/phpcs --standard=../dev/phpcs.xml app
 
-print_step "3/7 : phpstan"
+print_step "3/8 : naming conventions"
+php ../dev/test/CheckNaming.php --level=2
+
+print_step "4/8 : phpstan"
 vendor/bin/phpstan analyse -c ../dev/phpstan.neon
 
-print_step "4/7 : checking unit tests"
+print_step "5/8 : checking unit tests"
 php ../dev/test/CheckMissingTests.php
 
-print_step "5/7 : phpunit"
+print_step "6/8 : phpunit"
 vendor/bin/phpunit -c ../dev/phpunit.xml
 
-print_step "6/7 : coding standards check"
+print_step "7/8 : coding standards check"
 php ../dev/test/CheckCodingStandards.php
 
-print_step "7/7 : js cache busting check (|version)"
+print_step "8/8 : js cache busting check (|version)"
 php ../dev/test/CheckJs.php
 
 echo >&2

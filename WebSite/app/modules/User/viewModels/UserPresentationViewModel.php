@@ -18,14 +18,14 @@ final readonly class UserPresentationViewModel extends LayoutViewModel
         public object $person,
         public Person $loggedPerson,
         public array $navItems,
-        public string $userImg_,
+        public string $personImg,
         public int $maxZoom,
         array $layoutParams = []
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
-            btn_Parent: '/user/directory',
+            btnHistoryBack: true,
+            btnParent: '/user/directory',
         );
     }
 }

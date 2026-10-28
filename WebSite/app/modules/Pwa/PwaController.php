@@ -82,7 +82,7 @@ final class PwaController extends AbstractController
         );
         $user = $this->application->getConnectedUser();
         $articleId = $this->articleService->createWithMedia(
-            $user->person->Id ?? 0,
+            $user->person->id ?? 0,
             $files,
             $title,
             $text

@@ -9,10 +9,10 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 final readonly class SharedFileRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public ?int $IdGroup,
-        public int $OnlyForMembers,
-        public string $Item,
+        public int $id,
+        public ?int $idGroup,
+        public int $onlyForMembers,
+        public string $item,
     ) {
     }
 
@@ -22,10 +22,10 @@ final readonly class SharedFileRow extends AbstractValueObject
     public static function fromStdClass(object $o): self
     {
         return new self(
-            Id: (int)$o->Id,
-            IdGroup: $o->IdGroup !== null ? (int)$o->IdGroup : null,
-            OnlyForMembers: (int)$o->OnlyForMembers,
-            Item: (string)$o->Item,
+            id: (int)$o->Id,
+            idGroup: $o->IdGroup !== null ? (int)$o->IdGroup : null,
+            onlyForMembers: (int)$o->OnlyForMembers,
+            item: (string)$o->Item,
         );
     }
 }

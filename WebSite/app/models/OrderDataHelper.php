@@ -171,7 +171,7 @@ final class OrderDataHelper extends Data implements NewsProviderInterface
         );
 
         foreach ($orders as $order) {
-            $articleRow = $this->articleDataHelper->getWithAuthor($order->IdArticle);
+            $articleRow = $this->articleDataHelper->getWithAuthor($order->idArticle);
             if ($articleRow === false) {
                 continue;
             }
@@ -184,7 +184,7 @@ final class OrderDataHelper extends Data implements NewsProviderInterface
 
             // 2nd gate: the visibility chosen by the creator of the order
             /** @var ClosingVisibilityRowShape|false $closingRow */
-            $closingRow = $this->get('Order', ['IdArticle' => $order->IdArticle], 'Id, ClosingDate, Visibility');
+            $closingRow = $this->get('Order', ['IdArticle' => $order->idArticle], 'Id, ClosingDate, Visibility');
             if (
                 $closingRow === false
                 || !$this->authorizationService->canReadOrderResults(
@@ -198,12 +198,12 @@ final class OrderDataHelper extends Data implements NewsProviderInterface
 
             $news[] = [
                 'type'   => 'order',
-                'id'     => $order->IdArticle,
-                'title'  => $order->Question,
-                'detail' => 'Commandes : ' . $order->Orderers,
-                'from'   => $order->FirstName . ' ' . $order->LastName,
-                'date'   => $order->LastActivity,
-                'url'    => '/order/results/' . $order->IdArticle
+                'id'     => $order->idArticle,
+                'title'  => $order->question,
+                'detail' => 'Commandes : ' . $order->orderers,
+                'from'   => $order->firstName . ' ' . $order->lastName,
+                'date'   => $order->lastActivity,
+                'url'    => '/order/results/' . $order->idArticle
             ];
         }
         return $news;

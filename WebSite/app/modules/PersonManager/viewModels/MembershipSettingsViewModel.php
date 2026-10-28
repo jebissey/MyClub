@@ -24,8 +24,8 @@ final readonly class MembershipSettingsViewModel extends LayoutViewModel
 
         parent::__construct(
             ...$baseArgs,
-            btn_HistoryBack: true,
-            btn_Parent: '/personManager',
+            btnHistoryBack: true,
+            btnParent: '/personManager',
         );
     }
 }

@@ -7,8 +7,8 @@ namespace app\modules\Article\valueObjects;
 final readonly class GroupInfo
 {
     public function __construct(
-        public int $Id,
-        public string $Name,
+        public int $id,
+        public string $name,
     ) {
     }
 
@@ -18,8 +18,8 @@ final readonly class GroupInfo
             return null;
         }
         return new self(
-            Id: (int)$row->IdGroup,
-            Name: $row->GroupName,
+            id: (int)$row->IdGroup,
+            name: $row->GroupName,
         );
     }
 }

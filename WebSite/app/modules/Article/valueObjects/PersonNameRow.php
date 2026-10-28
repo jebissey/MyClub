@@ -17,8 +17,8 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 final readonly class PersonNameRow extends AbstractValueObject
 {
     public function __construct(
-        public string $FirstName,
-        public string $LastName,
+        public string $firstName,
+        public string $lastName,
     ) {
     }
 
@@ -26,8 +26,8 @@ final readonly class PersonNameRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            FirstName: $row->FirstName,
-            LastName: $row->LastName,
+            firstName: $row->FirstName,
+            lastName: $row->LastName,
         );
     }
 }

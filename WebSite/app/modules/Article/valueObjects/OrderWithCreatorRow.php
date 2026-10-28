@@ -8,8 +8,8 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 use app\enums\OrderVisibility;
 
 /**
- * Ligne Order enrichie du créateur de l'article associé,
- * telle que retournée par OrderDataHelper::getWithCreator().
+ * Order row enriched with the creator of the associated article,
+ * as returned by OrderDataHelper::getWithCreator().
  *
  * @phpstan-type OrderWithCreatorRowShape object{
  *     Id: int|string,
@@ -24,13 +24,13 @@ use app\enums\OrderVisibility;
 final readonly class OrderWithCreatorRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public string $Question,
-        public string $Options,
-        public int $IdArticle,
-        public string $ClosingDate,
-        public OrderVisibility $Visibility,
-        public int $CreatedBy,
+        public int $id,
+        public string $question,
+        public string $options,
+        public int $idArticle,
+        public string $closingDate,
+        public OrderVisibility $visibility,
+        public int $createdBy,
     ) {
     }
 
@@ -38,13 +38,13 @@ final readonly class OrderWithCreatorRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Question: $row->Question,
-            Options: $row->Options,
-            IdArticle: (int) $row->IdArticle,
-            ClosingDate: $row->ClosingDate,
-            Visibility: OrderVisibility::from($row->Visibility),
-            CreatedBy: (int) $row->CreatedBy,
+            id: (int) $row->Id,
+            question: $row->Question,
+            options: $row->Options,
+            idArticle: (int) $row->IdArticle,
+            closingDate: $row->ClosingDate,
+            visibility: OrderVisibility::from($row->Visibility),
+            createdBy: (int) $row->CreatedBy,
         );
     }
 }

@@ -35,7 +35,7 @@ final readonly class AuthenticationService
         }
 
         $token = bin2hex(random_bytes(32));
-        $this->memberDataHelper->setResetToken($row->Id, $token);
+        $this->memberDataHelper->setResetToken($row->id, $token);
 
         $resetLink = $this->baseUrl . '/user/setPassword/' . $token;
 
@@ -62,9 +62,9 @@ final readonly class AuthenticationService
 
         $person = $row->toPerson();
 
-        $this->memberDataHelper->recordSignIn($person->Id);
+        $this->memberDataHelper->recordSignIn($person->id);
 
-        $_SESSION['user']   = $person->Email;
+        $_SESSION['user']   = $person->email;
         $_SESSION['navbar'] = '';
 
         return AuthResult::success($person);
@@ -102,11 +102,11 @@ final readonly class AuthenticationService
             return false;
         }
 
-        if ($member->TokenCreatedAt === null || (new DateTime($member->TokenCreatedAt))->diff(new DateTime())->h >= 1) {
+        if ($member->tokenCreatedAt === null || (new DateTime($member->tokenCreatedAt))->diff(new DateTime())->h >= 1) {
             return false;
         }
 
-        $this->memberDataHelper->finalizeReset($member->Id, Password::signPassword($newPassword));
+        $this->memberDataHelper->finalizeReset($member->id, Password::signPassword($newPassword));
 
         return true;
     }
@@ -134,11 +134,11 @@ final readonly class AuthenticationService
                 return AuthResult::error("Sign in failed: unknown email {$email}");
             }
 
-            if ($row->Inactivated) {
+            if ($row->inactivated) {
                 return AuthResult::error("Sign in failed: inactivated user {$email}");
             }
 
-            if (!Password::verifyPassword($password, $row->Password ?? '')) {
+            if (!Password::verifyPassword($password, $row->password ?? '')) {
                 return AuthResult::error("Sign in failed: wrong password for {$email}");
             }
 
@@ -162,13 +162,13 @@ final readonly class AuthenticationService
 
     private function loginUser(Person $person, bool $rememberMe): AuthResult
     {
-        $this->memberDataHelper->recordSignIn($person->Id);
+        $this->memberDataHelper->recordSignIn($person->id);
 
         if ($rememberMe) {
-            $this->setRememberMeToken($person->Id);
+            $this->setRememberMeToken($person->id);
         }
 
-        $_SESSION['user']   = $person->Email;
+        $_SESSION['user']   = $person->email;
         $_SESSION['navbar'] = '';
 
         return AuthResult::success($person);

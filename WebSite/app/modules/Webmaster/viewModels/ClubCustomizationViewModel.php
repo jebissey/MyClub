@@ -24,8 +24,8 @@ final readonly class ClubCustomizationViewModel extends LayoutViewModel
 
         parent::__construct(
             ...$baseArgs,
-            btn_HistoryBack: true,
-            btn_Parent: '/webmaster',
+            btnHistoryBack: true,
+            btnParent: '/webmaster',
         );
     }
 }

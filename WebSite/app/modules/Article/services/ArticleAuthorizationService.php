@@ -29,7 +29,7 @@ final readonly class ArticleAuthorizationService
 
     public function isOwner(ArticleRow|ArticleAuthorizationRow $article, ConnectedUser $user): bool
     {
-        return $user->person !== null && $article->CreatedBy === $user->person->Id;
+        return $user->person !== null && $article->createdBy === $user->person->id;
     }
 
     public function canEdit(ArticleRow $article, ConnectedUser $user): bool
@@ -76,12 +76,12 @@ final readonly class ArticleAuthorizationService
         if ($survey === null || $person === null) {
             return false;
         }
-        $personId = $person->Id;
+        $personId = $person->id;
 
         return $this->canReadClosableResults(
             $survey,
             $this->isOwner($article, $user),
-            fn(): bool => $this->authorizationDataHelper->hasRepliedToSurvey($survey->Id, $personId),
+            fn(): bool => $this->authorizationDataHelper->hasRepliedToSurvey($survey->id, $personId),
             participantsOnly: 'voters',
             participantsOnlyAfterClosing: 'votersAfterClosing',
         );
@@ -96,12 +96,12 @@ final readonly class ArticleAuthorizationService
         if ($order === null || $person === null) {
             return false;
         }
-        $personId = $person->Id;
+        $personId = $person->id;
 
         return $this->canReadClosableResults(
             $order,
             $this->isOwner($article, $user),
-            fn(): bool => $this->authorizationDataHelper->hasRepliedToOrder($order->Id, $personId),
+            fn(): bool => $this->authorizationDataHelper->hasRepliedToOrder($order->id, $personId),
             participantsOnly: 'orderers',
             participantsOnlyAfterClosing: 'orderersAfterClosing',
         );
@@ -120,25 +120,25 @@ final readonly class ArticleAuthorizationService
     {
         $person = $user->person;
 
-        if ($person !== null && ($article->CreatedBy === $person->Id || $user->isEditor())) {
+        if ($person !== null && ($article->createdBy === $person->id || $user->isEditor())) {
             return null;
         }
-        if ($article->PublishedBy === null) {
+        if ($article->publishedBy === null) {
             return $person === null ? ArticleAccess::LoginRequired : ArticleAccess::Forbidden;
         }
-        if (!$article->OnlyForMembers && $article->IdGroup === null) {
+        if (!$article->onlyForMembers && $article->idGroup === null) {
             return null;
         }
         if ($person === null) {
             return ArticleAccess::LoginRequired;
         }
-        if ($article->IdGroup === null) {
+        if ($article->idGroup === null) {
             return null;
         }
 
-        $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
+        $userGroups = $this->authorizationDataHelper->getUserGroups($person->email);
 
-        return in_array((int) $article->IdGroup, $userGroups, true) ? null : ArticleAccess::Forbidden;
+        return in_array((int) $article->idGroup, $userGroups, true) ? null : ArticleAccess::Forbidden;
     }
 
     /**
@@ -153,18 +153,18 @@ final readonly class ArticleAuthorizationService
         string $participantsOnly,
         string $participantsOnlyAfterClosing,
     ): bool {
-        if ($isOwner || $item->Visibility === 'all') {
+        if ($isOwner || $item->visibility === 'all') {
             return true;
         }
 
-        $isClosed = $item->ClosingDate < (new DateTimeImmutable())->format('Y-m-d');
-        if ($item->Visibility === 'allAfterClosing') {
+        $isClosed = $item->closingDate < (new DateTimeImmutable())->format('Y-m-d');
+        if ($item->visibility === 'allAfterClosing') {
             return $isClosed;
         }
-        if ($item->Visibility === $participantsOnly) {
+        if ($item->visibility === $participantsOnly) {
             return $hasParticipated();
         }
-        if ($item->Visibility === $participantsOnlyAfterClosing) {
+        if ($item->visibility === $participantsOnlyAfterClosing) {
             return $isClosed && $hasParticipated();
         }
 

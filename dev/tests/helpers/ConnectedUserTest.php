@@ -496,7 +496,7 @@ final class ConnectedUserTest extends DataHelperTestCase
         $this->assertTrue($user->isEditor());
         $this->assertFalse($user->isRedactor());
         $this->assertInstanceOf(Person::class, $user->person);
-        $this->assertSame('known@example.com', $user->person->Email);
+        $this->assertSame('known@example.com', $user->person->email);
     }
 
     // -------------------------------------------------------------------------

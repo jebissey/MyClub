@@ -10,8 +10,8 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 final readonly class NeedTypeRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public string $Name,
+        public int $id,
+        public string $name,
     ) {
     }
 
@@ -21,8 +21,8 @@ final readonly class NeedTypeRow extends AbstractValueObject
     public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Name: (string) $row->Name,
+            id: (int) $row->Id,
+            name: (string) $row->Name,
         );
     }
 }

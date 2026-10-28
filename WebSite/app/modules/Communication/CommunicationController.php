@@ -22,13 +22,13 @@ final class CommunicationController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isCommunicationManager(), __FILE__, __LINE__)) {
             $connectedUser = $this->application->getConnectedUser();
-            $userEmail = $connectedUser->person->Email ?? '';
+            $userEmail = $connectedUser->person->email ?? '';
 
             $contactEmail = $this->dataHelper->getSetting('contactEmail', '');
 
             $viewModel = new CommunicationEditViewModel(
                 groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
-                navItems: $this->getNavItems($connectedUser->person?->Email),
+                navItems: $this->getNavItems($connectedUser->person?->email),
                 smtpFrom: $this->emailService->getSmtpConfig()?->getSenderAddress($userEmail),
                 i18n: [
                     'subjectRequired'     => ($this->t)('communication.email.subject_required'),
@@ -41,7 +41,7 @@ final class CommunicationController extends AbstractController
                     'quotaMonthlyReached' => ($this->t)('communication.quota.monthly_reached'),
                     'quotaAlmost'         => ($this->t)('communication.quota.almost_exceeded'),
                 ],
-                connectedPersonId: $connectedUser->person->Id ?? null,
+                connectedPersonId: $connectedUser->person->id ?? null,
                 contactEmail: $contactEmail,
                 layoutParams: $this->getAllParams([
                     'page' => $connectedUser->getPage(),

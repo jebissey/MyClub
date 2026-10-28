@@ -32,7 +32,7 @@ final readonly class ContactViewModel extends LayoutViewModel
 
         parent::__construct(
             ...$baseArgs,
-            btn_HistoryBack: true,
+            btnHistoryBack: true,
         );
     }
 }

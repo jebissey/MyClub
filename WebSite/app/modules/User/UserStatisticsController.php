@@ -47,7 +47,7 @@ final class UserStatisticsController extends AbstractController
             stats: $this->personalStatisticsDataHelper->getStats($person, $season['start'], $season['end']),
             seasons: $this->personalStatisticsDataHelper->getAvailableSeasons(),
             currentSeason: $season,
-            navItems: $this->getNavItems($person->Email),
+            navItems: $this->getNavItems($person->email),
             chartData: $this->buildChartData($this->getVisitCounts($season), $person),
             participationChartData: $this->buildChartData($this->getParticipationCounts($season), $person),
             messageChartData: $this->buildChartData($this->getMessageCounts($season), $person),
@@ -145,7 +145,7 @@ final class UserStatisticsController extends AbstractController
         $currentUserSlice = $this->distributionCalculator->findUserSlice(
             $dist['tranches'],
             $dist['memberCounts'],
-            $person->Email
+            $person->email
         );
 
         return array_map(

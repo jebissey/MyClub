@@ -150,11 +150,11 @@ final class ArticleListController extends TableController
             columns: $columns,
             resetUrl: '/articles',
             userConnected: $connectedUser->person ?? false,
-            navItems: $this->getNavItems($connectedUser->person?->Email),
+            navItems: $this->getNavItems($connectedUser->person?->email),
             layoutParams: $this->getAllParams([
                 'page' => $connectedUser->getPage(),
-                'btn_HistoryBack' => true,
-                'btn_Parent' => '/',
+                'btnHistoryBack' => true,
+                'btnParent' => '/',
             ]),
         );
         $this->views->render($template, $viewModel->toArray());

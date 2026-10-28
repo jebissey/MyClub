@@ -7,8 +7,8 @@ namespace app\modules\Common\valueObjects;
 final readonly class ResetTokenRow
 {
     public function __construct(
-        public int $Id,
-        public ?string $TokenCreatedAt,
+        public int $id,
+        public ?string $tokenCreatedAt,
     ) {
     }
 

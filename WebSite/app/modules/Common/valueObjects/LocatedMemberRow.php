@@ -23,19 +23,19 @@ namespace app\modules\Common\valueObjects;
 final readonly class LocatedMemberRow
 {
     public function __construct(
-        public int $Id,
-        public string $FirstName,
-        public string $LastName,
-        public ?string $NickName,
-        public ?string $Avatar,
-        public string $UseGravatar,
-        public string $Email,
-        public ?string $Location,
-        public ?string $MyPublicDataInPresentationDirectory,
-        public int $InPresentationDirectory,
-        public int $ShowPhoneInPresentationDirectory,
-        public int $ShowEmailInPresentationDirectory,
-        public string $UserImg = '',
+        public int $id,
+        public string $firstName,
+        public string $lastName,
+        public ?string $nickName,
+        public ?string $avatar,
+        public string $useGravatar,
+        public string $email,
+        public ?string $location,
+        public ?string $myPublicDataInPresentationDirectory,
+        public int $inPresentationDirectory,
+        public int $showPhoneInPresentationDirectory,
+        public int $showEmailInPresentationDirectory,
+        public string $userImg = '',
     ) {
     }
 
@@ -45,18 +45,18 @@ final readonly class LocatedMemberRow
     public function withUserImg(string $userImg): self
     {
         return new self(
-            $this->Id,
-            $this->FirstName,
-            $this->LastName,
-            $this->NickName,
-            $this->Avatar,
-            $this->UseGravatar,
-            $this->Email,
-            $this->Location,
-            $this->MyPublicDataInPresentationDirectory,
-            $this->InPresentationDirectory,
-            $this->ShowPhoneInPresentationDirectory,
-            $this->ShowEmailInPresentationDirectory,
+            $this->id,
+            $this->firstName,
+            $this->lastName,
+            $this->nickName,
+            $this->avatar,
+            $this->useGravatar,
+            $this->email,
+            $this->location,
+            $this->myPublicDataInPresentationDirectory,
+            $this->inPresentationDirectory,
+            $this->showPhoneInPresentationDirectory,
+            $this->showEmailInPresentationDirectory,
             $userImg,
         );
     }
@@ -67,20 +67,20 @@ final readonly class LocatedMemberRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            FirstName: (string) $row->FirstName,
-            LastName: (string) $row->LastName,
-            NickName: $row->NickName !== null ? (string) $row->NickName : null,
-            Avatar: $row->Avatar !== null ? (string) $row->Avatar : null,
-            UseGravatar: (string) $row->UseGravatar,
-            Email: (string) $row->Email,
-            Location: $row->Location !== null ? (string) $row->Location : null,
-            MyPublicDataInPresentationDirectory: $row->MyPublicDataInPresentationDirectory !== null
+            id: (int) $row->Id,
+            firstName: (string) $row->FirstName,
+            lastName: (string) $row->LastName,
+            nickName: $row->NickName !== null ? (string) $row->NickName : null,
+            avatar: $row->Avatar !== null ? (string) $row->Avatar : null,
+            useGravatar: (string) $row->UseGravatar,
+            email: (string) $row->Email,
+            location: $row->Location !== null ? (string) $row->Location : null,
+            myPublicDataInPresentationDirectory: $row->MyPublicDataInPresentationDirectory !== null
                 ? (string) $row->MyPublicDataInPresentationDirectory
                 : null,
-            InPresentationDirectory: (int) $row->InPresentationDirectory,
-            ShowPhoneInPresentationDirectory: (int) $row->ShowPhoneInPresentationDirectory,
-            ShowEmailInPresentationDirectory: (int) $row->ShowEmailInPresentationDirectory,
+            inPresentationDirectory: (int) $row->InPresentationDirectory,
+            showPhoneInPresentationDirectory: (int) $row->ShowPhoneInPresentationDirectory,
+            showEmailInPresentationDirectory: (int) $row->ShowEmailInPresentationDirectory,
         );
     }
 }

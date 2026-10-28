@@ -37,7 +37,7 @@ final readonly class EventNextEventsViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
+            btnHistoryBack: true,
         );
     }
 }

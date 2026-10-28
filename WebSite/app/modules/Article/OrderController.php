@@ -56,7 +56,7 @@ final class OrderController extends ClosableFormController
         }
 
         /** @var array<int, OrderReplyRowShape> $repliesData */
-        $repliesData = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->Id], '*');
+        $repliesData = $this->dataHelper->gets('OrderReply', ['IdOrder' => $order->id], '*');
 
         $replies = array_map(
             static fn(object $row): OrderReplyRow => OrderReplyRow::fromStdClass($row),
@@ -68,17 +68,17 @@ final class OrderController extends ClosableFormController
         $results = [];
 
         /** @var array<string> $options */
-        $options = json_decode($order->Options) ?? [];
+        $options = json_decode($order->options) ?? [];
         foreach ($options as $option) {
             $results[$option] = 0;
         }
 
         foreach ($replies as $reply) {
             /** @var array<string, float|int> $answers */
-            $answers = json_decode($reply->Answers) ?? [];
+            $answers = json_decode($reply->answers) ?? [];
 
             $participants[] = [
-                'name'    => $this->participantName($reply->IdPerson),
+                'name'    => $this->participantName($reply->idPerson),
                 'answers' => $answers,
             ];
 

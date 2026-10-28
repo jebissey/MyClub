@@ -47,7 +47,7 @@ final class UserDirectoryController extends AbstractController
 
         $loggedPersonRow = $this->dataHelper->get(
             'Member',
-            ['Id' => $person->Id],
+            ['Id' => $person->id],
             'InPresentationDirectory'
         );
         /** @var object{InPresentationDirectory: bool|int|string|null}|false $loggedPersonRow */
@@ -68,7 +68,7 @@ final class UserDirectoryController extends AbstractController
                 '/user/directory?' . http_build_query($queryFilters + ['group' => $group->id])
             ),
             $this->groupDataHelper->getGroupsForDirectory(
-                personId: $person->Id,
+                personId: $person->id,
                 onlyMyGroups: $filterMyGroups,
                 onlySelfEnrollable: $filterSelfEnroll,
                 onlyWithAuthorization: $filterWithAuth
@@ -77,7 +77,7 @@ final class UserDirectoryController extends AbstractController
 
         $viewModel = new UserDirectoryViewModel(
             persons: $persons,
-            navItems: $this->getNavItems($person->Email),
+            navItems: $this->getNavItems($person->email),
             loggedPersonInPresentationDirectory: $loggedPersonInPresentationDirectory,
             groups: $groups,
             groupCounts: $this->groupDataHelper->getGroupCount(),
@@ -86,7 +86,7 @@ final class UserDirectoryController extends AbstractController
                 '"From"' => 'User',
                 'GroupId' => $selectedGroup
             ], '*')),
-            userIsInGroup: $this->personGroupDataHelper->isPersonInGroup($person->Id, $selectedGroup ?? 0),
+            userIsInGroup: $this->personGroupDataHelper->isPersonInGroup($person->id, $selectedGroup ?? 0),
             countOfLocatedMembers: count($persons),
             numberOfPublicMembers: count($this->dataHelper->gets('Member', [
                 'InPresentationDirectory' => 1,
@@ -123,7 +123,7 @@ final class UserDirectoryController extends AbstractController
         $viewModel = new UsersMapViewModel(
             locationData: $locationData,
             membersCount: count($locationData),
-            navItems: $this->getNavItems($person?->Email),
+            navItems: $this->getNavItems($person?->email),
             title: 'Carte des membres',
             isPublic: false,
             maxZoom: 12,
@@ -145,7 +145,7 @@ final class UserDirectoryController extends AbstractController
         $viewModel = new UsersMapViewModel(
             locationData: $locationData,
             membersCount: count($locationData),
-            navItems: $this->getNavItems($this->application->getConnectedUser(true)->person->Email),
+            navItems: $this->getNavItems($this->application->getConnectedUser(true)->person->email),
             title: 'Carte des membres publics',
             isPublic: true,
             maxZoom: 11,

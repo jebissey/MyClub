@@ -44,7 +44,7 @@ final class HelloAssoApi extends AbstractApi
         $season = $this->membershipDataHelper->currentSeason();
 
         // Guard: already paid this season
-        $existing = $this->membershipDataHelper->getForPersonAndSeason((int)$person?->Id, $season);
+        $existing = $this->membershipDataHelper->getForPersonAndSeason((int)$person?->id, $season);
         if ($existing && $existing->Status === 'paid') {
             $this->renderJsonBadRequest('Membership already paid for this season.', __FILE__, __LINE__);
             return;
@@ -57,7 +57,7 @@ final class HelloAssoApi extends AbstractApi
 
         $amountCents  = $this->membershipDataHelper->getAmountCents();
         $membershipId = $this->membershipDataHelper->createPending(
-            (int)$person?->Id,
+            (int)$person?->id,
             $season,
             $amountCents
         );
@@ -72,9 +72,9 @@ final class HelloAssoApi extends AbstractApi
                     returnUrl: "{$root}/membership/return?mid={$membershipId}&status=success",
                     errorUrl: "{$root}/membership/return?mid={$membershipId}&status=error",
                     payer: [
-                        'firstName' => $person->FirstName ?? '',
-                        'lastName'  => $person->LastName  ?? '',
-                        'email'     => $person->Email     ?? '',
+                        'firstName' => $person->firstName ?? '',
+                        'lastName'  => $person->lastName  ?? '',
+                        'email'     => $person->email     ?? '',
                     ],
                 );
 

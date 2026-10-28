@@ -22,13 +22,13 @@ final class MenuItemController extends AbstractController
 
     public function index(): void
     {
-        $menuItems = $this->getNavItems($this->application->getConnectedUser()->person?->Email, true);
+        $menuItems = $this->getNavItems($this->application->getConnectedUser()->person?->email, true);
         $tab = MenuItemTab::tryFrom($this->flight->request()->query->tab ?? '') ?? MenuItemTab::Navbar;
 
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
             $this->views->render('Designer/views/menuItem.latte', $this->getAllParams([
-                'navbarItems'  => array_filter($menuItems, fn($i) => $i->What === 'navbar'),
-                'sidebarItems' => array_filter($menuItems, fn($i) => $i->What === 'sidebar'),
+                'navbarItems'  => array_filter($menuItems, fn($i) => $i->what === 'navbar'),
+                'sidebarItems' => array_filter($menuItems, fn($i) => $i->what === 'sidebar'),
                 'groups'       => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'page'         => $this->application->getConnectedUser()->getPage(),
                 'activeTab'    => $tab,
@@ -81,8 +81,8 @@ final class MenuItemController extends AbstractController
                     'col_label'               => ($this->t)('menu.col_label'),
                     'col_parent'              => ($this->t)('menu.col_parent'),
                 ],
-                'btn_HistoryBack' => true,
-                'btn_Parent'      => "/designer",
+                'btnHistoryBack' => true,
+                'btnParent'      => "/designer",
             ]));
         }
     }
@@ -98,7 +98,7 @@ final class MenuItemController extends AbstractController
                 'data'         => $arwardsDataHelper->getData($counterNames),
                 'groups'       => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
                 'layout'       => $this->getLayout(),
-                'navItems'     => $this->getNavItems($person->Email),
+                'navItems'     => $this->getNavItems($person->email),
                 'page'         => $this->application->getConnectedUser()->getPage(),
             ]));
         } else {
@@ -126,7 +126,7 @@ final class MenuItemController extends AbstractController
             $viewModel = new MenuArticleViewModel(
                 chosenArticle: $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
                 carouselItems: $this->carouselDataHelper->getCarouselItems($id),
-                navItems: $this->getNavItems($person?->Email),
+                navItems: $this->getNavItems($person?->email),
                 hasAuthorization: $connectedUser->hasAutorization(),
                 layoutParams: $this->getAllParams([]),
             );

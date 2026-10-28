@@ -94,7 +94,7 @@ final class HomeController extends AbstractController
                 $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl())
                     ? $prodSiteUrl
                     : null,
-                $connectedUser->person?->Alert
+                $connectedUser->person?->alert
             );
         }
         $latestArticlesCount = (int) $this->dataHelper->getSetting('Home_LatestArticlesCount', '10');
@@ -131,7 +131,7 @@ final class HomeController extends AbstractController
 
         if ($latestArticle === null && isset($articles['latestArticle'])) {
             $latestArticle = $this->articleDataHelper->getWithAuthor(
-                $articles['latestArticle']->Id
+                $articles['latestArticle']->id
             ) ?: null;
         }
 
@@ -145,21 +145,21 @@ final class HomeController extends AbstractController
 
         if (
             $latestArticle !== null
-            && $latestArticle->PublishedBy !== $latestArticle->CreatedBy
+            && $latestArticle->publishedBy !== $latestArticle->createdBy
         ) {
             $publishedBy = $this->personDataHelper->getPublisher(
-                $latestArticle->PublishedBy
+                $latestArticle->publishedBy
             ) ?? '';
         }
 
         $latestArticleHasSurvey = $latestArticle !== null
-            && (bool) $this->surveyDataHelper->articleHasSurveyNotClosed($latestArticle->Id);
+            && (bool) $this->surveyDataHelper->articleHasSurveyNotClosed($latestArticle->id);
 
         $carouselItems = $latestArticle !== null
             ? array_values(
                 $this->dataHelper->gets(
                     'Carousel',
-                    ['IdArticle' => $latestArticle->Id],
+                    ['IdArticle' => $latestArticle->id],
                     'Item'
                 )
             )
@@ -171,7 +171,7 @@ final class HomeController extends AbstractController
             latestArticlesCount: $latestArticlesCount,
             homeHeader: $homeHeader,
             homeFooter: $homeFooter,
-            navItems: $this->getNavItems($connectedUser->person?->Email),
+            navItems: $this->getNavItems($connectedUser->person?->email),
             sidebarMenu: $this->getSidebarMenuItems($connectedUser->person),
             publishedBy: $publishedBy,
             latestArticleHasSurvey: $latestArticleHasSurvey,
@@ -204,11 +204,11 @@ final class HomeController extends AbstractController
         $user = $this->application->getConnectedUser();
 
         $this->views->render('Common/views/signpost.latte', $this->getAllParams([
-            'navItems'        => $this->getNavItems($user->person?->Email),
+            'navItems'        => $this->getNavItems($user->person?->email),
             'title'           => ($this->t)('home.signpost.title'),
             'page'            => $user->getPage(),
             'user'            => $user,
-            'btn_HistoryBack' => true,
+            'btnHistoryBack' => true,
         ]));
     }
 
@@ -221,7 +221,7 @@ final class HomeController extends AbstractController
     {
         $userGroups = [];
         if ($person !== null) {
-            $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
+            $userGroups = $this->authorizationDataHelper->getUserGroups($person->email);
         }
 
         $navItems = $this->dataHelper->gets(

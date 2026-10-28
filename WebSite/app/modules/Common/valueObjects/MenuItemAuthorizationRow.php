@@ -7,9 +7,9 @@ namespace app\modules\Common\valueObjects;
 final readonly class MenuItemAuthorizationRow
 {
     public function __construct(
-        public ?int $IdGroup,
-        public int $ForMembers,
-        public int $ForAnonymous,
+        public ?int $idGroup,
+        public int $forMembers,
+        public int $forAnonymous,
         public ?int $groupId,
     ) {
     }
@@ -20,9 +20,9 @@ final readonly class MenuItemAuthorizationRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            IdGroup: $row->IdGroup !== null ? (int)$row->IdGroup : null,
-            ForMembers: (int)$row->ForMembers,
-            ForAnonymous: (int)$row->ForAnonymous,
+            idGroup: $row->IdGroup !== null ? (int)$row->IdGroup : null,
+            forMembers: (int)$row->ForMembers,
+            forAnonymous: (int)$row->ForAnonymous,
             groupId: $row->groupId !== null ? (int)$row->groupId : null,
         );
     }

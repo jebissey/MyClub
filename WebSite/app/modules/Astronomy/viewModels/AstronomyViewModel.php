@@ -25,8 +25,8 @@ final readonly class AstronomyViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
-            btn_Parent: "/games",
+            btnHistoryBack: true,
+            btnParent: "/games",
         );
     }
 }

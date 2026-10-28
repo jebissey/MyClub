@@ -148,8 +148,8 @@ final class CommunicationApi extends AbstractApi
                     return;
                 }
 
-                $from    = $config->getSenderAddress($this->connectedUser->person->Email ?? '');
-                $replyTo = $this->resolveReplyTo($replyToMode, $config->from, $this->connectedUser->person->Email ?? '');
+                $from    = $config->getSenderAddress($this->connectedUser->person->email ?? '');
+                $replyTo = $this->resolveReplyTo($replyToMode, $config->from, $this->connectedUser->person->email ?? '');
 
                 $emailMessage = new EmailMessage(
                     from: $from,

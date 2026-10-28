@@ -123,21 +123,21 @@ final class ArticleAuthorizationServiceTest extends TestCase
         bool $onlyForMembers = false,
     ): ArticleRow {
         return new ArticleRow(
-            Id: 1,
-            Title: 'Title',
-            Content: 'Content',
-            CreatedBy: $createdBy,
-            PublishedBy: $publishedBy,
-            IdGroup: $idGroup,
-            OnlyForMembers: $onlyForMembers,
-            LastUpdate: '2026-01-01 00:00:00',
-            Timestamp: '',
+            id: 1,
+            title: 'Title',
+            content: 'Content',
+            createdBy: $createdBy,
+            publishedBy: $publishedBy,
+            idGroup: $idGroup,
+            onlyForMembers: $onlyForMembers,
+            lastUpdate: '2026-01-01 00:00:00',
+            timestamp: '',
         );
     }
 
     private function makeClosing(string $visibility, string $closingDate): ClosingVisibilityRow
     {
-        return new ClosingVisibilityRow(Id: 1, ClosingDate: $closingDate, Visibility: $visibility);
+        return new ClosingVisibilityRow(id: 1, closingDate: $closingDate, visibility: $visibility);
     }
 
     /**
@@ -165,7 +165,7 @@ final class ArticleAuthorizationServiceTest extends TestCase
 
     private function makePerson(int $id): Person
     {
-        return new Person(Id: $id, Email: "person{$id}@example.test");
+        return new Person(id: $id, email: "person{$id}@example.test");
     }
 
     /**
@@ -201,11 +201,11 @@ final class ArticleAuthorizationServiceTest extends TestCase
     public function testIsOwnerWorksWithAnArticleAuthorizationRow(): void
     {
         $row = new ArticleAuthorizationRow(
-            Id: 1,
-            CreatedBy: 42,
-            PublishedBy: null,
-            IdGroup: null,
-            OnlyForMembers: false,
+            id: 1,
+            createdBy: 42,
+            publishedBy: null,
+            idGroup: null,
+            onlyForMembers: false,
         );
 
         $this->assertTrue($this->makeService()->isOwner($row, $this->makeConnectedUser($this->makePerson(42))));
@@ -342,8 +342,8 @@ final class ArticleAuthorizationServiceTest extends TestCase
     public function testCanReadMatchesTheDenialOfAuthorizeRead(): void
     {
         $service = $this->makeService();
-        $public = new ArticleAuthorizationRow(Id: 1, CreatedBy: 10, PublishedBy: 1, IdGroup: null, OnlyForMembers: false);
-        $membersOnly = new ArticleAuthorizationRow(Id: 1, CreatedBy: 10, PublishedBy: 1, IdGroup: null, OnlyForMembers: true);
+        $public = new ArticleAuthorizationRow(id: 1, createdBy: 10, publishedBy: 1, idGroup: null, onlyForMembers: false);
+        $membersOnly = new ArticleAuthorizationRow(id: 1, createdBy: 10, publishedBy: 1, idGroup: null, onlyForMembers: true);
         $anonymous = $this->makeConnectedUser(person: null);
 
         $this->assertTrue($service->canRead($public, $anonymous));

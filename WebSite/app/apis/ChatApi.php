@@ -56,10 +56,10 @@ final class ChatApi extends AbstractApi
             }
 
             $visitPerson = new Person(
-                Id: (int) $visit->PersonId,
-                Email: $visit->Email ?? '',
-                UseGravatar: To::bool($visit->UseGravatar ?? null),
-                Avatar: $visit->Avatar ?? null,
+                id: (int) $visit->PersonId,
+                email: $visit->Email ?? '',
+                useGravatar: To::bool($visit->UseGravatar ?? null),
+                avatar: $visit->Avatar ?? null,
             );
 
             $result[] = [
@@ -70,16 +70,16 @@ final class ChatApi extends AbstractApi
                 'formattedDate' => $visit->FormattedDate,
                 'useGravatar'   => $visit->UseGravatar,
                 'userImg'       => WebApp::getUserImg(
-                    $visitPerson->UseGravatar,
-                    $visitPerson->Email,
-                    $visitPerson->Avatar,
+                    $visitPerson->useGravatar,
+                    $visitPerson->email,
+                    $visitPerson->avatar,
                     $this->gravatarHandler
                 ),
                 'os'            => $visit->Os,
                 'browser'       => $visit->Browser,
             ];
         }
-        $hasNew = $this->messageDataHelper->hasNewMessages($this->connectedUser->person->Id ?? 0, $previousLogId);
+        $hasNew = $this->messageDataHelper->hasNewMessages($this->connectedUser->person->id ?? 0, $previousLogId);
         $this->renderJsonOk([
             'users'          => $result,
             'hasNewMessages' => $hasNew,

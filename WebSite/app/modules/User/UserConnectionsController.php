@@ -31,7 +31,7 @@ final class UserConnectionsController extends AbstractController
             $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
-        $this->showConnections($person->Id);
+        $this->showConnections($person->id);
     }
 
     public function showConnections(int $idPerson): void
@@ -73,8 +73,8 @@ final class UserConnectionsController extends AbstractController
             connections: $data['connections'],
             maxEvents: $data['maxEvents'],
             layout: $this->getLayout(),
-            navItems: $this->getNavItems($person->Email),
-            user: $person->FirstName . ' ' . $person->LastName . ($person->NickName != '' ? ' (' . $person->NickName . ')' : ''),
+            navItems: $this->getNavItems($person->email),
+            user: $person->firstName . ' ' . $person->lastName . ($person->nickName != '' ? ' (' . $person->nickName . ')' : ''),
             layoutParams: $this->getAllParams([]),
         );
 

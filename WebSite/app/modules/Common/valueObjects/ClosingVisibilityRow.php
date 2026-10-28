@@ -14,9 +14,9 @@ namespace app\modules\Common\valueObjects;
 final readonly class ClosingVisibilityRow
 {
     public function __construct(
-        public int $Id,
-        public string $ClosingDate,
-        public string $Visibility,
+        public int $id,
+        public string $closingDate,
+        public string $visibility,
     ) {
     }
 
@@ -26,9 +26,9 @@ final readonly class ClosingVisibilityRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            ClosingDate: (string) $row->ClosingDate,
-            Visibility: (string) $row->Visibility,
+            id: (int) $row->Id,
+            closingDate: (string) $row->ClosingDate,
+            visibility: (string) $row->Visibility,
         );
     }
 }

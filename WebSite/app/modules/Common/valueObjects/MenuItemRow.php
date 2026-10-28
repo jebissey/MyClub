@@ -9,55 +9,55 @@ use stdClass;
 final readonly class MenuItemRow
 {
     public function __construct(
-        public int $Id,
-        public string $Name,
-        public string $Route,
-        public ?int $IdGroup,
-        public int $ForMembers,
-        public int $ForContacts,
-        public int $ForAnonymous,
-        public string $What,
-        public string $Type,
-        public string $Label,
-        public ?string $Icon,
-        public string $Url,
-        public ?string $GroupName = null,
+        public int $id,
+        public string $name,
+        public string $route,
+        public ?int $idGroup,
+        public int $forMembers,
+        public int $forContacts,
+        public int $forAnonymous,
+        public string $what,
+        public string $type,
+        public string $label,
+        public ?string $icon,
+        public string $url,
+        public ?string $groupName = null,
     ) {
     }
 
     public static function fromStdClass(stdClass $o): self
     {
         return new self(
-            Id: (int) $o->Id,
-            Name: (string) $o->Name,
-            Route: (string) $o->Route,
-            IdGroup: $o->IdGroup !== null ? (int) $o->IdGroup : null,
-            ForMembers: (int) $o->ForMembers,
-            ForContacts: (int) $o->ForContacts,
-            ForAnonymous: (int) $o->ForAnonymous,
-            What: (string) $o->What,
-            Type: (string) $o->Type,
-            Label: (string) $o->Label,
-            Icon: $o->Icon !== null ? (string) $o->Icon : null,
-            Url: (string) $o->Url,
+            id: (int) $o->Id,
+            name: (string) $o->Name,
+            route: (string) $o->Route,
+            idGroup: $o->IdGroup !== null ? (int) $o->IdGroup : null,
+            forMembers: (int) $o->ForMembers,
+            forContacts: (int) $o->ForContacts,
+            forAnonymous: (int) $o->ForAnonymous,
+            what: (string) $o->What,
+            type: (string) $o->Type,
+            label: (string) $o->Label,
+            icon: $o->Icon !== null ? (string) $o->Icon : null,
+            url: (string) $o->Url,
         );
     }
 
     public function withGroupName(?string $groupName): self
     {
         return new self(
-            $this->Id,
-            $this->Name,
-            $this->Route,
-            $this->IdGroup,
-            $this->ForMembers,
-            $this->ForContacts,
-            $this->ForAnonymous,
-            $this->What,
-            $this->Type,
-            $this->Label,
-            $this->Icon,
-            $this->Url,
+            $this->id,
+            $this->name,
+            $this->route,
+            $this->idGroup,
+            $this->forMembers,
+            $this->forContacts,
+            $this->forAnonymous,
+            $this->what,
+            $this->type,
+            $this->label,
+            $this->icon,
+            $this->url,
             $groupName,
         );
     }

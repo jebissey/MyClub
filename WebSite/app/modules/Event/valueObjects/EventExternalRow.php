@@ -22,12 +22,12 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 final readonly class EventExternalRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public string $Summary,
-        public ?string $Description,
-        public ?string $Location,
-        public string $StartTime,
-        public ?string $Audience,
+        public int $id,
+        public string $summary,
+        public ?string $description,
+        public ?string $location,
+        public string $startTime,
+        public ?string $audience,
     ) {
     }
 
@@ -35,12 +35,12 @@ final readonly class EventExternalRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Summary: $row->Summary,
-            Description: $row->Description ?? null,
-            Location: $row->Location ?? null,
-            StartTime: $row->StartTime,
-            Audience: $row->Audience ?? null,
+            id: (int) $row->Id,
+            summary: $row->Summary,
+            description: $row->Description ?? null,
+            location: $row->Location ?? null,
+            startTime: $row->StartTime,
+            audience: $row->Audience ?? null,
         );
     }
 }

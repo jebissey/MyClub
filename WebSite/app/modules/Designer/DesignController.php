@@ -26,15 +26,15 @@ final class DesignController extends AbstractController
             $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
-        [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($this->application->getConnectedUser()->person->Id ?? 0);
+        [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($this->application->getConnectedUser()->person->id ?? 0);
 
         $this->views->render('Article/views/designs_index.latte', $this->getAllParams([
             'designs' => $designs,
             'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
             'userVotes' => $userVotes,
             'page' => $this->application->getConnectedUser()->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/designer",
+            'btnHistoryBack' => true,
+            'btnParent'      => "/designer",
         ]));
     }
 
@@ -66,7 +66,7 @@ final class DesignController extends AbstractController
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->data->getData());
         $values = [
-            'IdPerson' => $this->application->getConnectedUser()->person->Id ?? 0,
+            'IdPerson' => $this->application->getConnectedUser()->person->id ?? 0,
             'Name' => $filterValues['name'] ?? '',
             'Detail' => $filterValues['detail'] ?? '',
             'NavBar' => $filterValues['navbar'] ?? '',

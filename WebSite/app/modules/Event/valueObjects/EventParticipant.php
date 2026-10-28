@@ -12,8 +12,8 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 final readonly class EventParticipant extends AbstractValueObject
 {
     public function __construct(
-        public int $PersonId,
-        public string $Email,
+        public int $personId,
+        public string $email,
     ) {
     }
 
@@ -24,8 +24,8 @@ final readonly class EventParticipant extends AbstractValueObject
             return null;
         }
         return new self(
-            PersonId: (int) $row->PersonId,
-            Email: $row->Email,
+            personId: (int) $row->PersonId,
+            email: $row->Email,
         );
     }
 }

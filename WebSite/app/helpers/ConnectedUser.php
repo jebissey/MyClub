@@ -81,13 +81,13 @@ final class ConnectedUser
         $personRow = array_merge((array) $individual, (array) $member);
         $person = Person::fromArray($personRow);
 
-        $authorizations = $this->authorizationDataHelper->getsFor($person->Id);
+        $authorizations = $this->authorizationDataHelper->getsFor($person->id);
 
         $this->person = $person;
         $this->user   = new ConnectedUserVO($person, $authorizations);
 
-        if ($this->person->Alert !== null) {
-            Params::setMemberAlert($this->person->Alert);
+        if ($this->person->alert !== null) {
+            Params::setMemberAlert($this->person->alert);
         }
 
         $lang = TranslationManager::getCurrentLanguage();
@@ -97,14 +97,14 @@ final class ConnectedUser
 
         Params::setParams(
             [
-                'href' => $this->getHref($this->person->Email),
+                'href' => $this->getHref($this->person->email),
                 'userImg' => WebApp::computeUserImg(
-                    $this->person->UseGravatar,
-                    $this->person->Email,
-                    $this->person->Avatar,
+                    $this->person->useGravatar,
+                    $this->person->email,
+                    $this->person->avatar,
                     $this->gravatarHandler
                 ),
-                'userEmail' => $this->person->Email,
+                'userEmail' => $this->person->email,
                 'isAdmin' => $this->isAdministrator(),
                 'isBackupManager' => $this->isBackupManager(),
                 'isCommunicationManager' => $this->isCommunicationManager(),
@@ -138,7 +138,7 @@ final class ConnectedUser
                 && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl())
                 ? $prodSiteUrl
                 : null,
-            $this->person->Alert
+            $this->person->alert
         );
     }
 
@@ -153,7 +153,7 @@ final class ConnectedUser
             return null;
         }
 
-        $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignIn');
+        $row = $this->dataHelper->get('Member', ['Id' => $this->person->id], 'LastSignIn');
         return $row !== false ? ($row->LastSignIn ?? null) : null;
     }
 
@@ -163,7 +163,7 @@ final class ConnectedUser
             return null;
         }
 
-        $row = $this->dataHelper->get('Member', ['Id' => $this->person->Id], 'LastSignOut');
+        $row = $this->dataHelper->get('Member', ['Id' => $this->person->id], 'LastSignOut');
         return $row !== false ? ($row->LastSignOut ?? null) : null;
     }
 
@@ -179,7 +179,7 @@ final class ConnectedUser
 
     public function getUserId(): int
     {
-        return $this->person->Id ?? 0;
+        return $this->person->id ?? 0;
     }
 
     public function hasAutorization(): bool

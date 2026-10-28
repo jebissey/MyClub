@@ -24,8 +24,8 @@ abstract readonly class LayoutViewModel
         public ?string $productionSiteUrl = null,
         public ?string $memberAlert = null,
         // Navigation buttons
-        public bool $btn_HistoryBack = true,
-        public ?string $btn_Parent = '/',
+        public bool $btnHistoryBack = true,
+        public ?string $btnParent = '/',
         // Session / connected-user context
         public string $href = '/user/sign/in',
         public string $userImg = '👻',

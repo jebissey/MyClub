@@ -160,7 +160,7 @@ final class AuthenticationServiceTest extends TestCase
         ]);
 
         $this->assertTrue($result->isSuccess());
-        $this->assertSame('user@example.com', $result->getUser()?->Email);
+        $this->assertSame('user@example.com', $result->getUser()?->email);
         $this->assertSame('user@example.com', $_SESSION['user']);
         $this->assertNotNull($this->memberColumn(42, 'LastSignIn'));
     }

@@ -30,19 +30,19 @@ use app\enums\EventAudience;
 final readonly class EventDetailRow extends AbstractValueObject
 {
     public function __construct(
-        public int $Id,
-        public string $Summary,
-        public string $Description,
-        public string $Location,
-        public string $StartTime,
-        public int $Duration,
-        public int $IdEventType,
-        public int $CreatedBy,
-        public int $MaxParticipants,
-        public EventAudience $Audience,
-        public string $LastUpdate,
-        public int $Canceled,
-        public string $EventTypeName,
+        public int $id,
+        public string $summary,
+        public string $description,
+        public string $location,
+        public string $startTime,
+        public int $duration,
+        public int $idEventType,
+        public int $createdBy,
+        public int $maxParticipants,
+        public EventAudience $audience,
+        public string $lastUpdate,
+        public int $canceled,
+        public string $eventTypeName,
     ) {
     }
 
@@ -50,19 +50,19 @@ final readonly class EventDetailRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Summary: $row->Summary,
-            Description: $row->Description,
-            Location: $row->Location,
-            StartTime: $row->StartTime,
-            Duration: (int) $row->Duration,
-            IdEventType: (int) $row->IdEventType,
-            CreatedBy: (int) $row->CreatedBy,
-            MaxParticipants: (int) $row->MaxParticipants,
-            Audience: EventAudience::from($row->Audience),
-            LastUpdate: $row->LastUpdate,
-            Canceled: (int) $row->Canceled,
-            EventTypeName: $row->EventTypeName,
+            id: (int) $row->Id,
+            summary: $row->Summary,
+            description: $row->Description,
+            location: $row->Location,
+            startTime: $row->StartTime,
+            duration: (int) $row->Duration,
+            idEventType: (int) $row->IdEventType,
+            createdBy: (int) $row->CreatedBy,
+            maxParticipants: (int) $row->MaxParticipants,
+            audience: EventAudience::from($row->Audience),
+            lastUpdate: $row->LastUpdate,
+            canceled: (int) $row->Canceled,
+            eventTypeName: $row->EventTypeName,
         );
     }
 }

@@ -34,8 +34,8 @@ final class ExerciseApi extends AbstractApi
         }
         /** @var object{Id: int|string, Content: string, Title: string, LastUpdate: string} $row */
         $exercise = ExerciseRow::fromStdClass($row);
-        $exercises = json_decode($exercise->Content, true) ?? [];
-        $this->renderJsonOk(['exercises' => $exercises, 'title' => $exercise->Title]);
+        $exercises = json_decode($exercise->content, true) ?? [];
+        $this->renderJsonOk(['exercises' => $exercises, 'title' => $exercise->title]);
     }
 
     public function save(int $id): void
@@ -73,7 +73,7 @@ final class ExerciseApi extends AbstractApi
         $exercise = ExerciseRow::fromStdClass($row);
 
         /** @var array<mixed> $exercises */
-        $exercises = json_decode($exercise->Content, true) ?? [];
+        $exercises = json_decode($exercise->content, true) ?? [];
         if ($index < 0 || $index >= count($exercises)) {
             $this->renderJsonBadRequest("Index {$index} out of range", __FILE__, __LINE__);
             return;

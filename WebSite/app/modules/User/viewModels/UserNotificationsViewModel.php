@@ -29,8 +29,8 @@ final readonly class UserNotificationsViewModel extends LayoutViewModel
 
         parent::__construct(
             ...$baseArgs,
-            btn_HistoryBack: true,
-            btn_Parent: '/user',
+            btnHistoryBack: true,
+            btnParent: '/user',
         );
     }
 }

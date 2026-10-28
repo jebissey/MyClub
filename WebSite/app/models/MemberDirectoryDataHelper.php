@@ -163,7 +163,7 @@ final class MemberDirectoryDataHelper extends Data
         WHERE m.InPresentationDirectory = 1
           AND m.Inactivated = 0
         ORDER BY i.FirstName, i.LastName
-    ';
+        ';
         $stmt = $this->pdo->query($sql);
         if ($stmt === false) {
             return [];

@@ -30,8 +30,8 @@ final readonly class DbBrowserTableViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
-            btn_Parent: '/dbbrowser',
+            btnHistoryBack: true,
+            btnParent: '/dbbrowser',
         );
     }
 }

@@ -34,27 +34,27 @@ final class UserNotificationsController extends AbstractController
         $notification = '';
         if (isset($_GET['test'])) {
             $this->notificationSender->sendToRecipients(
-                [$person->Id],
+                [$person->id],
                 [
                     'title' => 'Notification de test',
                     'body'  => 'Ceci est une notification push de test.',
                     'url'   => '/',
                 ]
             );
-            $notification = "🚀 Notification de test envoyée à l'utilisateur #{$person->Id}.";
+            $notification = "🚀 Notification de test envoyée à l'utilisateur #{$person->id}.";
         }
 
-        $row = $this->dataHelper->get('Member', ['Id' => $person->Id], 'Notifications');
+        $row = $this->dataHelper->get('Member', ['Id' => $person->id], 'Notifications');
         /** @var object{Notifications: string|null}|false $row */
         $notificationsJson = $row !== false ? ($row->Notifications ?? '{}') : '{}';
 
         /** @var array<string, mixed>|null $decodedNotifications */
         $decodedNotifications = json_decode($notificationsJson, true);
 
-        $groupsWithType = $this->groupDataHelper->getGroupsWithType($person->Id);
+        $groupsWithType = $this->groupDataHelper->getGroupsWithType($person->id);
 
         $viewModel = new UserNotificationsViewModel(
-            navItems: $this->getNavItems($person->Email),
+            navItems: $this->getNavItems($person->email),
             currentNotifications: is_array($decodedNotifications) ? $decodedNotifications : [],
             groups: array_values($groupsWithType),
             vapidPubliKey: $this->credentials->get('vapid', 'publicKey') ?? '',
@@ -84,7 +84,7 @@ final class UserNotificationsController extends AbstractController
             $notifications['messageOnGroupJoined']
         );
         $person = $this->application->getConnectedUser(true)->person;
-        $this->dataHelper->set('Member', ['Notifications' => json_encode($notifications)], ['Id' => $person->Id]);
+        $this->dataHelper->set('Member', ['Notifications' => json_encode($notifications)], ['Id' => $person->id]);
         $this->redirect('/user');
     }
 }

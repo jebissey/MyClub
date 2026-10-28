@@ -156,7 +156,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         $indexed = [];
         foreach ($results as $row) {
             $authorRow = ArticleAuthorRow::fromStdClass($row);
-            $indexed[$authorRow->Id] = $authorRow;
+            $indexed[$authorRow->id] = $authorRow;
         }
 
         return $indexed;
@@ -253,11 +253,11 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         $news = [];
         foreach ($articles as $article) {
             $authorization = new ArticleAuthorizationRow(
-                Id: (int) $article->Id,
-                CreatedBy: (int) $article->CreatedBy,
-                PublishedBy: $article->PublishedBy === null ? null : (int) $article->PublishedBy,
-                IdGroup: $article->IdGroup === null ? null : (int) $article->IdGroup,
-                OnlyForMembers: (bool) $article->OnlyForMembers,
+                id: (int) $article->Id,
+                createdBy: (int) $article->CreatedBy,
+                publishedBy: $article->PublishedBy === null ? null : (int) $article->PublishedBy,
+                idGroup: $article->IdGroup === null ? null : (int) $article->IdGroup,
+                onlyForMembers: (bool) $article->OnlyForMembers,
             );
             if ($this->authorizationService->canRead($authorization, $connectedUser)) {
                 $news[] = [

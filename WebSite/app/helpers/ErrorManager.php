@@ -76,7 +76,7 @@ final readonly class ErrorManager implements ErrorManagerInterface
         $this->application->getFlight()->response()->status($code->value);
         $this->emptyController->render('Common/views/info.latte', [
             'content' => $result,
-            'btn_HistoryBack' => true,
+            'btnHistoryBack' => true,
             'previousPage' => true,
             'timer' => $timeout,
             'navbarBgColor'   => $navbarColors->bgColor,

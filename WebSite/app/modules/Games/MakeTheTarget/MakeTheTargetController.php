@@ -57,7 +57,7 @@ final class MakeTheTargetController extends TableController
         ];
 
         $viewModel = new MakeTheTargetViewModel(
-            navItems: $this->getNavItems($connectedUser->person->Email),
+            navItems: $this->getNavItems($connectedUser->person->email),
             i18n: $i18n,
             sessionId: session_id() . '_' . $gameId,
             layoutParams: $this->getAllParams([

@@ -83,7 +83,7 @@ final class PersonController extends TableController
             );
 
             $viewModel = new UserAccountViewModel(
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 readOnly: (bool)($member->Imported ?? false),
                 email: $individual->Email,
                 firstName: $individual->FirstName ?? '',
@@ -347,7 +347,7 @@ final class PersonController extends TableController
             $season      = MyClubDateTime::getSeasonRange($seasonStart, $seasonEnd);
 
             $viewModel = new MembershipSettingsViewModel(
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 settings: [
                     'amount'      => (int)$this->dataHelper->getSetting('Membership_Amount', '0') / 100,
                     'seasonStart' => $season['start'],

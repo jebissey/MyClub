@@ -65,7 +65,7 @@ final class ContactController extends AbstractController
 
         // A connected user cannot change identity: prefill and lock the fields.
         $viewModel = new ContactViewModel(
-            navItems: $this->getNavItems($connectedUser->person?->Email),
+            navItems: $this->getNavItems($connectedUser->person?->email),
             event: $event,
             turnstileSiteKey: (string)($this->credentials->get('turnstile', 'site_key') ?? ''),
             name: $identity['name'] ?? '',
@@ -93,10 +93,10 @@ final class ContactController extends AbstractController
         }
         return [
             'name'  => trim(
-                WebApp::sanitizeInput($person->LastName ?? '') . ' ' .
-                    WebApp::sanitizeInput($person->FirstName ?? '')
+                WebApp::sanitizeInput($person->lastName ?? '') . ' ' .
+                    WebApp::sanitizeInput($person->firstName ?? '')
             ),
-            'email' => filter_var($person->Email, FILTER_VALIDATE_EMAIL) ?: '',
+            'email' => filter_var($person->email, FILTER_VALIDATE_EMAIL) ?: '',
         ];
     }
 

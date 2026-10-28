@@ -169,16 +169,16 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
             $survey = SurveyNewsRow::fromStdClass($row);
 
             $article = new ArticleAuthorizationRow(
-                Id: $survey->IdArticle,
-                CreatedBy: $survey->CreatedBy,
-                PublishedBy: $survey->PublishedBy,
-                IdGroup: $survey->IdGroup,
-                OnlyForMembers: $survey->OnlyForMembers,
+                id: $survey->idArticle,
+                createdBy: $survey->createdBy,
+                publishedBy: $survey->publishedBy,
+                idGroup: $survey->idGroup,
+                onlyForMembers: $survey->onlyForMembers,
             );
             $closing = new ClosingVisibilityRow(
-                Id: $survey->SurveyId,
-                ClosingDate: $survey->ClosingDate,
-                Visibility: $survey->Visibility->value, // ou adapte selon le constructeur de ClosingVisibilityRow
+                id: $survey->surveyId,
+                closingDate: $survey->closingDate,
+                visibility: $survey->visibility->value, // ou adapte selon le constructeur de ClosingVisibilityRow
             );
 
             // Same two gates as the results page: read the article, then the visibility chosen by its creator
@@ -188,12 +188,12 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
             ) {
                 $news[] = [
                 'type'   => 'survey',
-                'id'     => $survey->IdArticle,
-                'title'  => $survey->Question,
-                'detail' => 'Votes : ' . $survey->Voters,
-                'from'   => $survey->FirstName . ' ' . $survey->LastName,
-                'date'   => $survey->LastActivity,
-                'url'    => '/survey/results/' . $survey->IdArticle
+                'id'     => $survey->idArticle,
+                'title'  => $survey->question,
+                'detail' => 'Votes : ' . $survey->voters,
+                'from'   => $survey->firstName . ' ' . $survey->lastName,
+                'date'   => $survey->lastActivity,
+                'url'    => '/survey/results/' . $survey->idArticle
                 ];
             }
         }

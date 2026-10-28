@@ -9,16 +9,16 @@ use stdClass;
 final readonly class EventRegistrationRow
 {
     public function __construct(
-        public int $Id,
-        public string $Summary,
+        public int $id,
+        public string $summary,
     ) {
     }
 
     public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Summary: (string) $row->Summary,
+            id: (int) $row->Id,
+            summary: (string) $row->Summary,
         );
     }
 }

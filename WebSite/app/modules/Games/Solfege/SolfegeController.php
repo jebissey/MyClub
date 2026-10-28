@@ -22,7 +22,7 @@ final class SolfegeController extends AbstractController
         }
 
         $this->views->render('Event/views/solfege_learn.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+            'navItems' => $this->getNavItems($this->application->getConnectedUser()->person?->email),
             'title' => 'Apprentissage du Solfège',
             'page' => $this->application->getConnectedUser()->getPage(),
         ]));

@@ -19,14 +19,14 @@ namespace app\modules\Article\valueObjects;
 final readonly class OrderNewsRow
 {
     public function __construct(
-        public string $FirstName,
-        public string $LastName,
-        public string $Question,
-        public string $ClosingDate,
-        public string $Visibility,
-        public int $IdArticle,
-        public string $LastActivity,
-        public string $Orderers,
+        public string $firstName,
+        public string $lastName,
+        public string $question,
+        public string $closingDate,
+        public string $visibility,
+        public int $idArticle,
+        public string $lastActivity,
+        public string $orderers,
     ) {
     }
 
@@ -36,14 +36,14 @@ final readonly class OrderNewsRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            FirstName: (string) $row->FirstName,
-            LastName: (string) $row->LastName,
-            Question: (string) $row->Question,
-            ClosingDate: (string) $row->ClosingDate,
-            Visibility: (string) $row->Visibility,
-            IdArticle: (int) $row->IdArticle,
-            LastActivity: (string) $row->LastActivity,
-            Orderers: (string) $row->Orderers,
+            firstName: (string) $row->FirstName,
+            lastName: (string) $row->LastName,
+            question: (string) $row->Question,
+            closingDate: (string) $row->ClosingDate,
+            visibility: (string) $row->Visibility,
+            idArticle: (int) $row->IdArticle,
+            lastActivity: (string) $row->LastActivity,
+            orderers: (string) $row->Orderers,
         );
     }
 }

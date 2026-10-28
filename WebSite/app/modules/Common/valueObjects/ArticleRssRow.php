@@ -18,11 +18,11 @@ namespace app\modules\Common\valueObjects;
 final readonly class ArticleRssRow
 {
     public function __construct(
-        public int $Id,
-        public string $Title,
-        public string $Content,
-        public string $LastUpdate,
-        public string $CreationDate,
+        public int $id,
+        public string $title,
+        public string $content,
+        public string $lastUpdate,
+        public string $creationDate,
     ) {
     }
 
@@ -32,11 +32,11 @@ final readonly class ArticleRssRow
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Id: (int) $row->Id,
-            Title: $row->Title,
-            Content: $row->Content,
-            LastUpdate: $row->LastUpdate,
-            CreationDate: $row->CreationDate,
+            id: (int) $row->Id,
+            title: $row->Title,
+            content: $row->Content,
+            lastUpdate: $row->LastUpdate,
+            creationDate: $row->CreationDate,
         );
     }
 }

@@ -94,7 +94,7 @@ final class AuthorizationDataHelper extends Data
             if ($this->canReadArticle($article, $connectedUser)) {
                 return true;
             }
-            if (in_array($article->Id, $menuArticleIds, true)) {
+            if (in_array($article->id, $menuArticleIds, true)) {
                 return true;
             }
         }
@@ -206,7 +206,7 @@ final class AuthorizationDataHelper extends Data
             ");
             $stmt->execute([
                 ':id'       => $eventId,
-                ':personId' => $connectedUser->person->Id,
+                ':personId' => $connectedUser->person->id,
             ]);
         }
         return (bool) $stmt->fetch(PDO::FETCH_OBJ);
@@ -232,7 +232,7 @@ final class AuthorizationDataHelper extends Data
             if (!($connectedUser->person ?? false)) {
                 return false;
             }
-            return in_array((int) $message->GroupId, $this->getUserGroups($connectedUser->person->Email), true);
+            return in_array((int) $message->GroupId, $this->getUserGroups($connectedUser->person->email), true);
         }
 
         return false;

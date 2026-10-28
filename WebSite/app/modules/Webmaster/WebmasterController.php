@@ -42,7 +42,7 @@ final class WebmasterController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $viewModel = new ClubCustomizationViewModel(
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 settings: [
                     'clubName'      => $this->dataHelper->getSetting('PWA_Name', 'MyClub'),
                     'clubShortName' => $this->dataHelper->getSetting('PWA_ShortName', 'MyClub'),
@@ -180,7 +180,7 @@ final class WebmasterController extends TableController
                     'gmp'      => extension_loaded('gmp'),
                     'mbstring' => extension_loaded('mbstring'),
                 ],
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 layoutParams: $this->getAllParams([
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
@@ -194,7 +194,7 @@ final class WebmasterController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $viewModel = new EmailCredentialsViewModel(
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 sendMethod: $this->credentials->get('email', 'method'),
                 smtpAccount: $this->credentials->get('smtp', 'username'),
                 smtpFrom: $this->credentials->get('smtp', 'from'),
@@ -345,7 +345,7 @@ final class WebmasterController extends TableController
             filters: $filterConfig,
             columns: $columns,
             resetUrl: '/installations',
-            navItems: $this->getNavItems($connectedUser->person?->Email),
+            navItems: $this->getNavItems($connectedUser->person?->email),
             layoutParams: $this->getAllParams([
                 'page' => $connectedUser->getPage(),
             ]),
@@ -369,7 +369,7 @@ final class WebmasterController extends TableController
         $articles = $this->articleDataHelper->getArticlesForAll();
 
         $homepageLastmod = !empty($articles)
-            ? (new DateTime($articles[0]->LastUpdate))->format(DateTime::ATOM)
+            ? (new DateTime($articles[0]->lastUpdate))->format(DateTime::ATOM)
             : (new DateTime())->format(DateTime::ATOM);
 
         $urls = [
@@ -378,13 +378,13 @@ final class WebmasterController extends TableController
 
         foreach ($articles as $article) {
             try {
-                $lastmod = (new DateTime($article->LastUpdate))->format(DateTime::ATOM);
+                $lastmod = (new DateTime($article->lastUpdate))->format(DateTime::ATOM);
             } catch (Exception $e) {
                 $lastmod = (new DateTime())->format(DateTime::ATOM);
             }
 
             $urls[] = [
-                'loc'     => $baseUrl . '/article/' . (int) $article->Id,
+                'loc'     => $baseUrl . '/article/' . (int) $article->id,
                 'lastmod' => $lastmod,
             ];
         }
@@ -397,7 +397,7 @@ final class WebmasterController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $viewModel = new TurnstileCredentialsViewModel(
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 turnstileSiteKey: $this->credentials->get('turnstile', 'site_key'),
                 turnstileConfigured: !empty($this->credentials->get('turnstile', 'secret_key')),
                 layoutParams: $this->getAllParams([
@@ -431,7 +431,7 @@ final class WebmasterController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $viewModel = new HelloAssoCredentialsViewModel(
-                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->Email),
+                navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 helloassoClientId: $this->credentials->get('helloasso', 'client_id'),
                 helloassoConfigured: !empty($this->credentials->get('helloasso', 'client_secret')),
                 helloassoOrgSlug: $this->credentials->get('helloasso', 'org_slug'),

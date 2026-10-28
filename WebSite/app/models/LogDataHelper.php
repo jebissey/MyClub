@@ -151,7 +151,7 @@ final class LogDataHelper extends Data
         foreach ($activePersons as $i => $person) {
             $key            = ':e' . $i;
             $placeholders[] = $key;
-            $params[$key]   = strtolower($person->Email);
+            $params[$key]   = strtolower($person->email);
         }
 
         $in = implode(', ', $placeholders);
@@ -182,15 +182,15 @@ final class LogDataHelper extends Data
         $result = [];
 
         foreach ($activePersons as $person) {
-            $email = strtolower($person->Email);
+            $email = strtolower($person->email);
 
             if (isset($logByEmail[$email])) {
                 $log = $logByEmail[$email];
 
                 $result[] = (object) [
-                    'PersonId'     => $person->Id,
-                    'FullName'     => $person->FirstName . ' ' . $person->LastName,
-                    'Email'        => $person->Email,
+                    'PersonId'     => $person->id,
+                    'FullName'     => $person->firstName . ' ' . $person->lastName,
+                    'Email'        => $person->email,
                     'LastActivity' => $log->CreatedAt,
                     'Os'           => $log->Os,
                     'Browser'      => $log->Browser,

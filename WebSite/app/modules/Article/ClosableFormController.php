@@ -88,7 +88,7 @@ abstract class ClosableFormController extends AbstractController
             'article' => $article,
             $name     => $this->dataHelper->get(
                 ucfirst($name),
-                ['IdArticle' => $article->Id],
+                ['IdArticle' => $article->id],
                 'Question, Options, ClosingDate, Visibility'
             ),
             'page' => $this->application->getConnectedUser()->getPage(),
@@ -149,10 +149,9 @@ abstract class ClosableFormController extends AbstractController
 
         $table = ucfirst($this->formName());
         $existing = $this->dataHelper->get($table, ['IdArticle' => $articleId], 'Id');
-        if ($existing) {
+        if ($existing !== false) {
             /** @var object{Id: int|string} $existing */
-            $form = IdRow::fromStdClass($existing);
-            $this->dataHelper->set($table, $fields, ['Id' => $form->Id]);
+            $this->dataHelper->set($table, $fields, ['Id' => $existing->Id]);
         } else {
             $this->dataHelper->set($table, $fields);
         }
@@ -207,8 +206,8 @@ abstract class ClosableFormController extends AbstractController
             'articleId'       => $articleId,
             'currentVersion'  => Application::VERSION,
             'page'            => $connectedUser->getPage(),
-            'btn_HistoryBack' => true,
-            'btn_Parent'      => "/article/{$articleId}",
+            'btnHistoryBack' => true,
+            'btnParent'      => "/article/{$articleId}",
         ])));
     }
 
@@ -224,7 +223,7 @@ abstract class ClosableFormController extends AbstractController
         /** @var object{FirstName: string, LastName: string} $personData */
         $person = PersonNameRow::fromStdClass($personData);
 
-        return $person->FirstName . ' ' . $person->LastName;
+        return $person->firstName . ' ' . $person->lastName;
     }
 
     private function raiseFormNotFound(int $articleId): void

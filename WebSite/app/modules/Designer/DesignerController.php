@@ -28,8 +28,8 @@ final class DesignerController extends AbstractController
             $this->views->render('Designer/views/designer.latte', $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
                 'content' => '',
-                'btn_HistoryBack' => true,
-                'btn_Parent'      => "/admin",
+                'btnHistoryBack' => true,
+                'btnParent'      => "/admin",
             ]));
         }
     }

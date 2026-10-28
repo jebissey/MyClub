@@ -17,7 +17,7 @@ final readonly class UserSignInViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btn_HistoryBack: true,
+            btnHistoryBack: true,
         );
     }
 }

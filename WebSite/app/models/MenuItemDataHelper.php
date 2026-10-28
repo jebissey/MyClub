@@ -8,7 +8,6 @@ use InvalidArgumentException;
 use PDO;
 use Throwable;
 use app\helpers\Application;
-use app\modules\Common\valueObjects\MaxPositionRow;
 use app\modules\Common\valueObjects\MenuItemAuthorizationRow;
 use app\modules\Common\valueObjects\Person;
 
@@ -47,10 +46,10 @@ final class MenuItemDataHelper extends Data
         }
         $pageData = MenuItemAuthorizationRow::fromStdClass($raw);
 
-        if (!$pageData->IdGroup) {
+        if (!$pageData->idGroup) {
             if (
-                ($person === null && $pageData->ForAnonymous) ||
-                ($person !== null && $pageData->ForMembers)
+                ($person === null && $pageData->forAnonymous) ||
+                ($person !== null && $pageData->forMembers)
             ) {
                 return true;
             }
@@ -59,8 +58,8 @@ final class MenuItemDataHelper extends Data
         if ($person === null) {
             return false;
         }
-        $userGroups = $this->authorizationDataHelper->getUserGroups($person->Email);
-        return in_array($pageData->IdGroup, $userGroups);
+        $userGroups = $this->authorizationDataHelper->getUserGroups($person->email);
+        return in_array($pageData->idGroup, $userGroups);
     }
 
     public function del(int $id): int
@@ -130,21 +129,10 @@ final class MenuItemDataHelper extends Data
 
         if (empty($data['id'])) {
             if (isset($parent)) {
-                /** @var object{MaxPos: int|string|null}|false $maxPosRaw */
-                $maxPosRaw = $this->fluent
-                    ->from('MenuItem')
-                    ->where('ParentId = ?', $menuItem['ParentId'])
-                    ->select('MAX(Position) AS MaxPos')
-                    ->fetch();
-                $maxPos = $maxPosRaw !== false ? MaxPositionRow::fromStdClass($maxPosRaw) : null;
-                $menuItem['Position'] = max($parent->Position + 1, ($maxPos->MaxPos ?? 0) + 1);
+                $menuItem['Position'] = max($parent->Position + 1, $this->getMaxPosition($menuItem['ParentId']) + 1);
             } else {
-                /** @var object{MaxPos: int|string|null}|false $maxPosRaw */
-                $maxPosRaw = $this->fluent->from('MenuItem')->select('MAX(Position) AS MaxPos')->fetch();
-                $maxPos = $maxPosRaw !== false ? MaxPositionRow::fromStdClass($maxPosRaw) : null;
-                $menuItem['Position'] = $maxPos?->MaxPos !== null ? $maxPos->MaxPos + 1 : 1;
+                $menuItem['Position'] = $this->getMaxPosition() + 1;
             }
-
             $this->set('MenuItem', $menuItem);
         } else {
             if (!array_key_exists('position', $data)) {
@@ -191,5 +179,25 @@ final class MenuItemDataHelper extends Data
         $stmt->execute(['id' => $id]);
 
         return $count + $stmt->rowCount();
+    }
+
+    /**
+     * Highest position among the menu items, optionally restricted to the children of a parent.
+     * Returns 0 when there is no item.
+     */
+    private function getMaxPosition(?int $parentId = null): int
+    {
+        $sql = 'SELECT MAX(Position) FROM MenuItem';
+        $params = [];
+        if ($parentId !== null) {
+            $sql .= ' WHERE ParentId = :parentId';
+            $params[':parentId'] = $parentId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $max = $stmt->fetchColumn();
+
+        return is_numeric($max) ? (int) $max : 0;
     }
 }

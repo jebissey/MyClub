@@ -18,8 +18,8 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 final readonly class EventTypeNameGroupRow extends AbstractValueObject
 {
     public function __construct(
-        public string $Name,
-        public ?int $IdGroup,
+        public string $name,
+        public ?int $idGroup,
     ) {
     }
 
@@ -27,8 +27,8 @@ final readonly class EventTypeNameGroupRow extends AbstractValueObject
     public static function fromStdClass(object $row): self
     {
         return new self(
-            Name: $row->Name,
-            IdGroup: $row->IdGroup !== null ? (int) $row->IdGroup : null,
+            name: $row->Name,
+            idGroup: $row->IdGroup !== null ? (int) $row->IdGroup : null,
         );
     }
 }

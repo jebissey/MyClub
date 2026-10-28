@@ -31,28 +31,28 @@ final readonly class MemberMapService
     {
         $markers = [];
         foreach ($members as $member) {
-            if (empty($member->Location) || preg_match(self::LOCATION_PATTERN, $member->Location) !== 1) {
+            if (empty($member->location) || preg_match(self::LOCATION_PATTERN, $member->location) !== 1) {
                 continue;
             }
-            [$lat, $lng] = explode(',', $member->Location);
+            [$lat, $lng] = explode(',', $member->location);
             $markers[] = new MemberMapMarker(
-                Id: $member->Id,
-                Name: $member->FirstName . ' ' . $member->LastName,
-                Nickname: $member->NickName,
-                Avatar: AvatarInfo::fromMember(
-                    useGravatar: $member->UseGravatar,
-                    email: $member->Email,
-                    avatar: $member->Avatar,
+                id: $member->id,
+                name: $member->firstName . ' ' . $member->lastName,
+                nickname: $member->nickName,
+                avatar: AvatarInfo::fromMember(
+                    useGravatar: $member->useGravatar,
+                    email: $member->email,
+                    avatar: $member->avatar,
                     userImg: WebApp::getUserImg(
-                        To::bool($member->UseGravatar),
-                        $member->Email,
-                        $member->Avatar,
+                        To::bool($member->useGravatar),
+                        $member->email,
+                        $member->avatar,
                         $this->gravatarHandler
                     ),
                 ),
-                Lat: trim($lat),
-                Lng: trim($lng),
-                MyPublicData: $member->MyPublicDataInPresentationDirectory,
+                lat: trim($lat),
+                lng: trim($lng),
+                myPublicData: $member->myPublicDataInPresentationDirectory,
             );
         }
 
