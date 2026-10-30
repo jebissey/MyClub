@@ -58,7 +58,7 @@ final class MemberDirectoryDataHelper extends Data
     public function getLocatedMember(int $memberId): LocatedMemberRow
     {
         $sql = 'SELECT i.Id, i.FirstName, i.LastName, i.NickName, i.Avatar, '
-            . 'm.UseGravatar, i.Email, m.Location, '
+            . 'm.UseGravatar, i.Email, i.Phone, m.Location, '
             . 'm.MyPublicDataInPresentationDirectory, '
             . 'm.InPresentationDirectory, '
             . 'm.ShowPhoneInPresentationDirectory, '

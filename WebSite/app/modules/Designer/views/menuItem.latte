@@ -117,13 +117,13 @@
                                     </thead>
                                     <tbody id="navList">
                                         {foreach $navbarItems as $item}
-                                        <tr data-id="{$item->Id}">
-                                            <td>{$item->Label}</td>
-                                            <td>{$item->Url}</td>
-                                            <td>{$item->GroupName ?? ''}</td>
-                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForMembers}checked{/if} disabled></td>
-                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForContacts}checked{/if} disabled></td>
-                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForAnonymous}checked{/if} disabled></td>
+                                        <tr data-id="{$item->id}">
+                                            <td>{$item->label}</td>
+                                            <td>{$item->url}</td>
+                                            <td>{$item->groupName ?? ''}</td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->forMembers}checked{/if} disabled></td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->forContacts}checked{/if} disabled></td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->forAnonymous}checked{/if} disabled></td>
                                             <td class="text-end">
                                                 <button class="btn btn-sm btn-primary edit-btn"><i class="bi bi-pencil"></i></button>
                                                 <button class="btn btn-sm btn-danger delete-btn"><i class="bi bi-trash"></i></button>
@@ -153,16 +153,16 @@
                                     </thead>
                                     <tbody id="sidebarList">
                                         {foreach $sidebarItems as $item}
-                                        <tr data-id="{$item->Id}" data-parent="{$item->ParentId ?? ''}">
-                                            <td><span class="badge bg-secondary">{$item->Type}</span></td>
-                                            <td>{if $item->Icon}<i class="bi {$item->Icon}"></i>{/if}</td>
-                                            <td>{$item->Label ?? '<em class="text-muted">—</em>'|noescape}</td>
-                                            <td>{$item->Url ?? ''}</td>
-                                            <td>{$item->ParentLabel ?? ''}</td>
-                                            <td>{$item->GroupName ?? ''}</td>
-                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForMembers}checked{/if} disabled></td>
-                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForContacts}checked{/if} disabled></td>
-                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->ForAnonymous}checked{/if} disabled></td>
+                                        <tr data-id="{$item->id}" data-parent="{$item->parentId ?? ''}">
+                                            <td><span class="badge bg-secondary">{$item->type}</span></td>
+                                            <td>{if $item->icon}<i class="bi {$item->icon}"></i>{/if}</td>
+                                            <td>{$item->label ?? '<em class="text-muted">—</em>'|noescape}</td>
+                                            <td>{$item->url ?? ''}</td>
+                                            <td>{$item->parentLabel ?? ''}</td>
+                                            <td>{$item->groupName ?? ''}</td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->forMembers}checked{/if} disabled></td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->forContacts}checked{/if} disabled></td>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->forAnonymous}checked{/if} disabled></td>
                                             <td class="text-end">
                                                 <button class="btn btn-sm btn-primary edit-btn"><i class="bi bi-pencil"></i></button>
                                                 <button class="btn btn-sm btn-danger delete-btn"><i class="bi bi-trash"></i></button>

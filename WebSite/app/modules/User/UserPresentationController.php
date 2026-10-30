@@ -31,22 +31,16 @@ final class UserPresentationController extends AbstractController
             return;
         }
 
-        $person = $this->application->getConnectedUser(true)->person;
+        $connectedPerson = $this->application->getConnectedUser(true)->person;
+        $member = $this->memberDirectoryDataHelper->getLocatedMember($connectedPerson->id);
 
-        $row = $this->dataHelper->get(
-            'Member',
-            ['Id' => $person->id],
-            'Presentation, Location, InPresentationDirectory, ShowPhoneInPresentationDirectory,' .
-                'showEmailInPresentationDirectory, myPublicDataInPresentationDirectory'
-        );
-        if ($row === false) {
-            $this->errors->badRequest("Unknown person {$person->id}", __FILE__, __LINE__);
-            return;
-        }
+        // Presentation can be large (embedded images): loaded here only, never in LocatedMemberRow
+        $row = $this->dataHelper->get('Member', ['Id' => $connectedPerson->id], 'Presentation');
 
         $viewModel = new UserEditPresentationViewModel(
-            person: $row,
-            navItems: $this->getNavItems($person->email),
+            person: $member,
+            presentation: $row === false ? '' : (string) ($row->Presentation ?? ''),
+            navItems: $this->getNavItems($connectedPerson->email),
             validationMsg: ($this->t)('presentation.edit.validation.noContent'),
             maxZoom: 18,
             layoutParams: $this->getAllParams([]),
@@ -96,7 +90,7 @@ final class UserPresentationController extends AbstractController
             'Id' => $personId,
             'Inactivated' => 0,
             'InPresentationDirectory' => 1,
-        ], 'Id');
+        ], 'Id, Presentation');
         if ($row === false) {
             $this->errors->badRequest("Unknown person {$personId}", __FILE__, __LINE__);
             return;
@@ -106,6 +100,7 @@ final class UserPresentationController extends AbstractController
 
         $viewModel = new UserPresentationViewModel(
             person: $person,
+            presentation: (string) ($row->Presentation ?? ''),
             loggedPerson: $this->application->getConnectedUser(true)->person,
             navItems: $this->getNavItems($person->email),
             personImg: WebApp::getUserImg(

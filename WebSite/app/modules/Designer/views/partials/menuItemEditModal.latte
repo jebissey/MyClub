@@ -72,7 +72,7 @@
                     <select class="form-select" id="itemParent">
                         <option value="">{$i18n['field_none']}</option>
                         {foreach $sidebarItems as $parent}
-                            {if $parent->Type === 'submenu'}
+                            {if $parent->type === 'submenu'}
                         <option value="{$parent->Id}">{$parent->Label}</option>
                             {/if}
                         {/foreach}

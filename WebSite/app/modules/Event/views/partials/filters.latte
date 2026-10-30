@@ -1,0 +1,88 @@
+{* Dedicated filter form for the next events page. *}
+<form method="GET" action="/nextEvents" class="accordion mb-3" id="filtersAccordion">
+    <div class="accordion-item border">
+
+        <h2 class="accordion-header" id="filtersHeading">
+            <button class="accordion-button {if !$hasActiveFilters}collapsed{/if} gap-2"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#filtersCollapse"
+                    aria-expanded="{if $hasActiveFilters}true{else}false{/if}"
+                    aria-controls="filtersCollapse">
+                <i class="bi bi-search flex-shrink-0"></i>
+                {='filters'|translate}
+                {if $hasActiveFilters}
+                    <span class="badge text-bg-primary ms-1">{$activeFilterCount}</span>
+                {/if}
+            </button>
+        </h2>
+
+        <div id="filtersCollapse"
+             class="accordion-collapse collapse {if $hasActiveFilters}show{/if}"
+             aria-labelledby="filtersHeading">
+            <div class="accordion-body">
+
+                {* Preserve pagination / mode across filter submissions *}
+                <input type="hidden" name="mode" value="{$mode}">
+                <input type="hidden" name="offset" value="0">
+
+                {* Filter 1: preferences *}
+                <div class="form-check mb-2">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="filterByPreferences"
+                           name="filterByPreferences"
+                           value="1"
+                           {if $filterByPreferences}checked{/if}>
+                    <label class="form-check-label" for="filterByPreferences">
+                        <i class="bi bi-funnel"></i>
+                        {='events.filter.by_preferences'|translate}
+                    </label>
+                </div>
+
+                {* Filter 2: registered only *}
+                <div class="form-check mb-3">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="registeredOnly"
+                           name="registeredOnly"
+                           value="1"
+                           {if $registeredOnly}checked{/if}>
+                    <label class="form-check-label" for="registeredOnly">
+                        <i class="bi bi-person-check"></i>
+                        {='events.filter.registered_only'|translate}
+                    </label>
+                </div>
+
+                {* Filter 3: event type, label + combobox on the same line *}
+                <div class="row align-items-center mb-3">
+                    <label for="eventTypeId" class="col-auto col-form-label fw-semibold">
+                        <i class="bi bi-tag"></i>
+                        {='type'|translate}
+                    </label>
+                    <div class="col-md-4">
+                        <select class="form-select" id="eventTypeId" name="eventTypeId">
+                            <option value="">{='events.filter.all_types'|translate}</option>
+                            {foreach $eventTypes as $eventType}
+                                <option value="{$eventType->id}"
+                                        {if $selectedEventTypeId == $eventType->id}selected{/if}>
+                                    {$eventType->name}
+                                </option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary" title="{='filter'|translate}">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    <a href="/nextEvents?mode={$mode}" class="btn btn-secondary" title="{='reset'|translate}">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>

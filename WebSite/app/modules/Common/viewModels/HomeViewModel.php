@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Common\viewModels;
 
+use app\modules\Common\valueObjects\ArticleRow;
+
 final readonly class HomeViewModel extends LayoutViewModel
 {
     /**
@@ -16,7 +18,7 @@ final readonly class HomeViewModel extends LayoutViewModel
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(
-        public ?object $latestArticle,
+        public ?ArticleRow $latestArticle,
         public array $latestArticles,
         public int $latestArticlesCount,
         public string $homeHeader,

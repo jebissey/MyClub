@@ -741,50 +741,71 @@ final class EventDataHelper extends Data implements NewsProviderInterface
 
     public function updateUserSupply(int $eventId, string $userEmail, int $needId, int $supply): bool
     {
-        try {
-            $participant = $this->fluent->from('Participant part')
-                ->select('part.Id')
-                ->innerJoin('Individual i ON part.IdIndividual = i.Id')
-                ->where('part.IdEvent', $eventId)
-                ->where('i.Email COLLATE NOCASE', $userEmail)
-                ->fetch();
-            if (!$participant) {
-                return false;
-            }
-            /** @var object{Id: int|string} $participant */
-
-            /** @var object{Id: int|string}|false $existing */
-            $existing = $this->fluent->from('ParticipantSupply')
-                ->select('Id')
-                ->where('IdParticipant', $participant->Id)
-                ->where('IdNeed', $needId)
-                ->fetch();
-            if ($existing) {
-                if ($supply > 0) {
-                    $this->fluent->update('ParticipantSupply')
-                        ->set(['Supply' => $supply])
-                        ->where('Id', $existing->Id)
-                        ->execute();
-                } else {
-                    $this->fluent->deleteFrom('ParticipantSupply')
-                        ->where('Id', $existing->Id)
-                        ->execute();
-                }
-            } elseif ($supply > 0) {
-                $this->fluent->insertInto('ParticipantSupply')
-                    ->values([
-                        'IdParticipant' => $participant->Id,
-                        'IdNeed'        => $needId,
-                        'Supply'        => $supply
-                    ])
-                    ->execute();
-            }
-            return true;
-        } catch (Throwable $e) {
-            throw $e;
+        // Find the participant for this event, matching the email case-insensitively
+        $stmt = $this->pdo->prepare(
+            'SELECT part.Id
+         FROM Participant part
+         INNER JOIN Individual i ON part.IdIndividual = i.Id
+         WHERE part.IdEvent = :eventId
+           AND i.Email COLLATE NOCASE = :email
+         LIMIT 1'
+        );
+        $stmt->execute([
+            'eventId' => $eventId,
+            'email'   => $userEmail,
+        ]);
+        $participantId = $stmt->fetchColumn();
+        if ($participantId === false) {
+            return false;
         }
-    }
+        $participantId = (int) $participantId;
 
+        // Look for an existing supply row for this participant and need
+        $stmt = $this->pdo->prepare(
+            'SELECT Id
+         FROM ParticipantSupply
+         WHERE IdParticipant = :participantId
+           AND IdNeed = :needId
+         LIMIT 1'
+        );
+        $stmt->execute([
+            'participantId' => $participantId,
+            'needId'        => $needId,
+        ]);
+        $existingId = $stmt->fetchColumn();
+
+        if ($existingId !== false) {
+            if ($supply > 0) {
+                // Update the existing supply
+                $stmt = $this->pdo->prepare(
+                    'UPDATE ParticipantSupply SET Supply = :supply WHERE Id = :id'
+                );
+                $stmt->execute([
+                    'supply' => $supply,
+                    'id'     => (int) $existingId,
+                ]);
+            } else {
+                // A supply of zero means the row is no longer needed
+                $stmt = $this->pdo->prepare(
+                    'DELETE FROM ParticipantSupply WHERE Id = :id'
+                );
+                $stmt->execute(['id' => (int) $existingId]);
+            }
+        } elseif ($supply > 0) {
+            // Create a new supply row
+            $stmt = $this->pdo->prepare(
+                'INSERT INTO ParticipantSupply (IdParticipant, IdNeed, Supply)
+             VALUES (:participantId, :needId, :supply)'
+            );
+            $stmt->execute([
+                'participantId' => $participantId,
+                'needId'        => $needId,
+                'supply'        => $supply,
+            ]);
+        }
+
+        return true;
+    }
 
     #region Private functions
     private function calculateNewStartTime(string|DateTimeImmutable $originalStartTime, Period $mode): string

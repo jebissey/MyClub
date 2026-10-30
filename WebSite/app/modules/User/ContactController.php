@@ -205,7 +205,7 @@ final class ContactController extends AbstractController
 
     private function silentFail(string $message): void
     {
-        $url = '/contact' . $this->buildUrl([]);
+        $url = '/contact' . WebApp::buildUrl([]);
         $this->redirect($url, ApplicationError::Ok, $message);
     }
 
@@ -269,7 +269,7 @@ final class ContactController extends AbstractController
         }
 
         if ($emailSent) {
-            $url = '/contact' . $this->buildUrl([
+            $url = '/contact' . WebApp::buildUrl([
                 'success' => ($this->t)('contact.success.sent'),
                 'who'     => $email,
             ]);
@@ -297,16 +297,6 @@ final class ContactController extends AbstractController
             'old_message' => $message,
         ];
         $this->redirect('/contact?' . http_build_query($params));
-    }
-
-    /**
-     * @param array<string, scalar|null> $newParams
-     */
-    private function buildUrl(array $newParams): string
-    {
-        /** @var array<string, scalar|null> $params */
-        $params = array_merge($_GET, $newParams);
-        return '?' . http_build_query($params);
     }
     #endregion
 }

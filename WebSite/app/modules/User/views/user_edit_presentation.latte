@@ -44,18 +44,18 @@
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" id="inPresentationDirectory"
                                         name="inPresentationDirectory"
-                                        {if $person->InPresentationDirectory}checked{/if}>
+                                        {if $person->inPresentationDirectory}checked{/if}>
                                     <label class="form-check-label" for="inPresentationDirectory">
                                         {='presentation.edit.inDirectory'|translate}
                                     </label>
                                     <div class="form-text">{='presentation.edit.inDirectory.hint'|translate}</div>
                                 </div>
 
-                                <div id="directoryOptions" class="ms-4 mt-2 {if !$person->InPresentationDirectory}d-none{/if}">
+                                <div id="directoryOptions" class="ms-4 mt-2 {if !$person->inPresentationDirectory}d-none{/if}">
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="checkbox" id="showPhoneInPresentationDirectory"
                                             name="showPhoneInPresentationDirectory"
-                                            {if $person->ShowPhoneInPresentationDirectory}checked{/if}>
+                                            {if $person->showPhoneInPresentationDirectory}checked{/if}>
                                         <label class="form-check-label" for="showPhoneInPresentationDirectory">
                                             {='presentation.edit.showPhone'|translate}
                                         </label>
@@ -63,7 +63,7 @@
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="checkbox" id="showEmailInPresentationDirectory"
                                             name="showEmailInPresentationDirectory"
-                                            {if $person->ShowEmailInPresentationDirectory}checked{/if}>
+                                            {if $person->showEmailInPresentationDirectory}checked{/if}>
                                         <label class="form-check-label" for="showEmailInPresentationDirectory">
                                             {='presentation.edit.showEmail'|translate}
                                         </label>
@@ -71,13 +71,13 @@
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="checkbox" id="showLocationInDirectory"
                                             name="showLocationInDirectory"
-                                            {if $person->MyPublicDataInPresentationDirectory}checked{/if}>
+                                            {if $person->myPublicDataInPresentationDirectory}checked{/if}>
                                         <label class="form-check-label" for="showLocationInDirectory">
                                             {='presentation.edit.showLocation'|translate}
                                         </label>
                                     </div>
 
-                                    <div id="publicLocationZone" class="mt-2 {if !$person->MyPublicDataInPresentationDirectory}d-none{/if}">
+                                    <div id="publicLocationZone" class="mt-2 {if !$person->myPublicDataInPresentationDirectory}d-none{/if}">
                                         <label class="form-label" for="myPublicDataInPresentationDirectory">
                                             {='presentation.edit.publicLocation.label'|translate}
                                         </label>
@@ -86,7 +86,7 @@
                                                   name="myPublicDataInPresentationDirectory"
                                                   rows="3"
                                                   placeholder="{='presentation.edit.publicLocation.placeholder'|translate}"
-                                        >{$person->MyPublicDataInPresentationDirectory}</textarea>
+                                        >{$person->myPublicDataInPresentationDirectory}</textarea>
                                         <div class="form-text">{='presentation.edit.publicLocation.hint'|translate}</div>
                                     </div>
                                 </div>
@@ -103,7 +103,7 @@
                         <div class="mb-4">
                             <label class="form-label">{='presentation.edit.location.label'|translate}</label>
                             <div id="map" style="height: 300px;"></div>
-                            <input type="hidden" id="location" name="location" value="{$person->Location}">
+                            <input type="hidden" id="location" name="location" value="{$person->location}">
                             <div class="form-text">{='presentation.edit.location.hint'|translate}</div>
                         </div>
 

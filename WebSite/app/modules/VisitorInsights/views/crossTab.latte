@@ -21,15 +21,15 @@
         <div class="card-body">
             <form method="get" class="row">
                 <div class="col-md-3 mb-3">
-                    <label for="period" class="mr-2">{='visitor_insights.cross_tab.period'|translate}:</label>
+                    <label for="period" class="mr-2">{='cross_tab.period'|translate}:</label>
                     <select class="form-select" id="period" name="period" onchange="this.form.submit()">
-                        <option value="today"          {if $period == 'today'}selected{/if}>{='visitor_insights.cross_tab.period.today'|translate}</option>
-                        <option value="yesterday"      {if $period == 'yesterday'}selected{/if}>{='visitor_insights.cross_tab.period.yesterday'|translate}</option>
-                        <option value="beforeYesterday"{if $period == 'beforeYesterday'}selected{/if}>{='visitor_insights.cross_tab.period.before_yesterday'|translate}</option>
-                        <option value="week"           {if $period == 'week'}selected{/if}>{='visitor_insights.cross_tab.period.week'|translate}</option>
-                        <option value="month"          {if $period == 'month'}selected{/if}>{='visitor_insights.cross_tab.period.month'|translate}</option>
-                        <option value="quarter"        {if $period == 'quarter'}selected{/if}>{='visitor_insights.cross_tab.period.quarter'|translate}</option>
-                        <option value="year"           {if $period == 'year'}selected{/if}>{='visitor_insights.cross_tab.period.year'|translate}</option>
+                        <option value="today"          {if $period == 'today'}selected{/if}>{='cross_tab.period.today'|translate}</option>
+                        <option value="yesterday"      {if $period == 'yesterday'}selected{/if}>{='cross_tab.period.yesterday'|translate}</option>
+                        <option value="beforeYesterday"{if $period == 'beforeYesterday'}selected{/if}>{='cross_tab.period.before_yesterday'|translate}</option>
+                        <option value="week"           {if $period == 'week'}selected{/if}>{='cross_tab.period.week'|translate}</option>
+                        <option value="month"          {if $period == 'month'}selected{/if}>{='cross_tab.period.month'|translate}</option>
+                        <option value="quarter"        {if $period == 'quarter'}selected{/if}>{='cross_tab.period.quarter'|translate}</option>
+                        <option value="year"           {if $period == 'year'}selected{/if}>{='cross_tab.period.year'|translate}</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">

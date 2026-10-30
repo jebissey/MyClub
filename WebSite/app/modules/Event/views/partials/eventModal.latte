@@ -33,7 +33,7 @@
                             <div class="col">
                                 <select class="form-select" id="eventTypeInput" name="eventType" required>
                                     {foreach $eventTypes as $eventType}
-                                        <option value="{$eventType->Id}">{$eventType->Name}</option>
+                                        <option value="{$eventType->id}">{$eventType->name}</option>
                                     {/foreach}
                                 </select>
                             </div>
@@ -93,7 +93,7 @@
                                     <select class="form-select" id="needTypeInput" name="needType" required>
                                         <option value="0">{='events.form.need_type_placeholder'|translate}</option>
                                         {foreach $needTypes as $needType}
-                                            <option value="{$needType->Id}">{$needType->Name}</option>
+                                            <option value="{$needType->id}">{$needType->name}</option>
                                         {/foreach}
                                     </select>
                                 </div>

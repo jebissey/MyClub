@@ -14,10 +14,9 @@ use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
-use app\modules\Article\valueObjects\ArticleRow;
-use app\modules\Article\valueObjects\IdRow;
 use app\modules\Article\valueObjects\PersonNameRow;
 use app\modules\Common\AbstractController;
+use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 /**

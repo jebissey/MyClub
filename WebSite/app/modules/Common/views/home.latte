@@ -31,7 +31,7 @@
     {if file_exists('app/images/header-banner.jpg')}
         <img src="/app/images/header-banner.jpg"
              class="home-banner w-100 d-block"
-             alt="Bannière">
+             alt="{='home.banner_alt'|translate}">
     {/if}
 {/block}
 
@@ -89,7 +89,7 @@
 {/block}
 
 {block content}
-    <div class="container-fluid"{if file_exists('app/images/header-banner.jpg')}style="margin-top: calc(-1 * var(--navbar-height));"{/if}>
+    <div class="container-fluid"{if file_exists('app/images/header-banner.jpg')} style="margin-top: calc(-1 * var(--navbar-height));"{/if}>
         {if $homeHeader !== ''}
             {$homeHeader|noescape}
         {/if}
@@ -97,7 +97,7 @@
         {if isset($message) && $message !== ''}
         <div class="alert alert-success alert-dismissible">
             {$message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{='home.close'|translate}"></button>
         </div>
         {/if}
 
@@ -105,14 +105,15 @@
             {foreach $pendingSurveys as $survey}
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                 <div class="toast-header">
-                    <strong class="me-auto">Sondage en attente : {$survey->ArticleTitle}</strong>
-                    <small>Fermeture : {$survey->ClosingDate|shortDate}</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <strong class="me-auto">{='home.pending_survey'|translate} {$survey->articleTitle}</strong>
+                    <small>{='home.survey_closing'|translate} {$survey->closingDate|shortDate}</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="{='home.close'|translate}"></button>
+
                 </div>
                 <div class="toast-body">
-                    {$survey->SurveyQuestion}
+                    {$survey->surveyQuestion}
                     <div class="mt-2 pt-2 border-top">
-                        <a href="/article/{$survey->ArticleId}" class="btn btn-primary btn-sm">Répondre au sondage</a>
+                        <a href="/article/{$survey->articleId}" class="btn btn-primary btn-sm">{='home.answer_survey'|translate}</a>
                     </div>
                 </div>
             </div>
@@ -122,14 +123,14 @@
             {foreach $pendingDesigns as $design}
                 <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                     <div class="toast-header">
-                        <strong class="me-auto">Design en attente : {$design->DesignName}</strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        <strong class="me-auto">{='home.pending_design'|translate} {$design->designName}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="{='home.close'|translate}"></button>
                     </div>
                     <div class="toast-body">
-                        {$design->DesignDetail}
-                        <small>Cliquer sur la ligne pour donner votre avis</small>
+                        {$design->designDetail}
+                        <small>{='home.design_hint'|translate}</small>
                         <div class="mt-2 pt-2 border-top">
-                            <a href="/designs/" class="btn btn-primary btn-sm">Donner votre avis</a>
+                            <a href="/designs/" class="btn btn-primary btn-sm">{='home.give_opinion'|translate}</a>
                         </div>
                     </div>
                 </div>
@@ -139,7 +140,7 @@
 
         {if $news}
         <div class="alert alert-info" role="alert">
-            <a href="/user/news" class="btn btn-primary btn-sm">Voir les nouveautés</a>
+            <a href="/user/news" class="btn btn-primary btn-sm">{='home.see_news'|translate}</a>
         </div>
         {/if}
 
@@ -147,16 +148,16 @@
         <div class="card mb-4">
             {if $homeParagraphsCount !== 0}
             <div class="card-header">
-                <h2 class="card-title">{$latestArticle->Title}</h2>
+                <h2 class="card-title">{$latestArticle->title}</h2>
                 <small class="text-muted">
-                    {='created_by'|translate} {$latestArticle->Author?->displayName() ?? ''}
-                    {='on'|translate} {=$latestArticle->Timestamp|shortDate}
+                    {='created_by'|translate} {$latestArticle->author?->displayName ?? ''}
+                    {='on'|translate} {=$latestArticle->timestamp|shortDate}
                     {$publishedBy}
-                    {if date('Y-m-d', strtotime($latestArticle->Timestamp)) !== date('Y-m-d', strtotime($latestArticle->LastUpdate))}
-                        {='modified_on'|translate} {=$latestArticle->LastUpdate|shortDate}
+                    {if date('Y-m-d', strtotime($latestArticle->timestamp)) !== date('Y-m-d', strtotime($latestArticle->lastUpdate))}
+                        {='modified_on'|translate} {=$latestArticle->lastUpdate|shortDate}
                     {/if}
                     {if $latestArticleHasSurvey}
-                        <a href="/article/{$latestArticle->Id}" class="btn btn-success ms-2">
+                        <a href="/article/{$latestArticle->id}" class="btn btn-success ms-2">
                             {='vote'|translate}{if $userEmail === ''} {='connection_required'|translate}{/if}
                         </a>
                     {/if}
@@ -165,9 +166,9 @@
             {/if}
             <div class="card-body">
                 {if $homeParagraphsCount === 0}
-                    {$latestArticle->Content|noescape}
+                    {$latestArticle->content|noescape}
                     {if $carouselItems && count($carouselItems) > 0}
-                        <div id="homeCarousel-{$latestArticle->Id}" class="carousel slide mt-3" data-bs-ride="carousel">
+                        <div id="homeCarousel-{$latestArticle->id}" class="carousel slide mt-3" data-bs-ride="carousel">
                             <div class="carousel-inner">
                                 {foreach $carouselItems as $key => $item}
                                     <div class="carousel-item {if $key === 0}active{/if}">
@@ -177,12 +178,12 @@
                             </div>
                             {if count($carouselItems) > 1}
                                 <button class="carousel-control-prev" type="button"
-                                        data-bs-target="#homeCarousel-{$latestArticle->Id}" data-bs-slide="prev">
+                                        data-bs-target="#homeCarousel-{$latestArticle->id}" data-bs-slide="prev">
                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                     <span class="visually-hidden">{='previous'|translate}</span>
                                 </button>
                                 <button class="carousel-control-next" type="button"
-                                        data-bs-target="#homeCarousel-{$latestArticle->Id}" data-bs-slide="next">
+                                        data-bs-target="#homeCarousel-{$latestArticle->id}" data-bs-slide="next">
                                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                     <span class="visually-hidden">{='next'|translate}</span>
                                 </button>
@@ -190,11 +191,11 @@
                         </div>
                     {/if}
                 {else}
-                    {$latestArticle->Content|extractFirstElement|noescape}
+                    {$latestArticle->content|extractFirstElement|noescape}
                 {/if}
                 {if $homeParagraphsCount !== 0}
                 <div class="mt-3">
-                    <a href="/article/{$latestArticle->Id}" class="btn btn-primary btn-sm">Lire l'article</a>
+                    <a href="/article/{$latestArticle->id}" class="btn btn-primary btn-sm">{='home.read_article'|translate}</a>
                 </div>
                 {/if}
             </div>
@@ -203,14 +204,14 @@
 
         {if $latestArticlesCount > 0 && count($latestArticles) > 0}
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 class="mb-0">Articles récents</h3>
-            <a href="/articles" class="btn btn-secondary">Liste de tous les articles</a>
+            <h3 class="mb-0">{='home.recent_articles'|translate}</h3>
+            <a href="/articles" class="btn btn-secondary">{='home.all_articles'|translate}</a>
         </div>
         <ul class="list-group mb-4">
             {foreach $latestArticles as $article}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <a href="/article/{$article->Id}">{$article->Title}</a>
-                    <span class="badge bg-secondary rounded-pill">{$article->LastUpdate|shortDate}</span>
+                    <a href="/article/{$article->id}">{$article->title}</a>
+                    <span class="badge bg-secondary rounded-pill">{$article->lastUpdate|shortDate}</span>
                 </li>
             {/foreach}
         </ul>

@@ -18,7 +18,6 @@ use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAlertService;
 use app\modules\Article\services\ArticleAuthorizationService;
-use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Article\viewModels\ArticleCarouselViewModel;
 use app\modules\Article\viewModels\ArticleEditViewModel;
 use app\modules\Article\viewModels\ArticleShowViewModel;
@@ -29,6 +28,7 @@ use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
+use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 use app\modules\Common\viewModels\ChatViewModel;
 

@@ -9,8 +9,8 @@ use app\enums\ArticleAccess;
 use app\helpers\ConnectedUser;
 use app\models\AuthorizationDataHelper;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
-use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Article\valueObjects\Result;
+use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 /**

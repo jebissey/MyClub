@@ -13,6 +13,7 @@ namespace app\modules\Common\valueObjects;
  *     Avatar: string|null,
  *     UseGravatar: bool|int|string|null,
  *     Email: string,
+ *     Phone: string|null,
  *     Location: string|null,
  *     MyPublicDataInPresentationDirectory: string|null,
  *     InPresentationDirectory: int|string,
@@ -30,6 +31,7 @@ final readonly class LocatedMemberRow
         public ?string $avatar,
         public string $useGravatar,
         public string $email,
+        public ?string $phone,
         public ?string $location,
         public ?string $myPublicDataInPresentationDirectory,
         public int $inPresentationDirectory,
@@ -52,6 +54,7 @@ final readonly class LocatedMemberRow
             $this->avatar,
             $this->useGravatar,
             $this->email,
+            $this->phone,
             $this->location,
             $this->myPublicDataInPresentationDirectory,
             $this->inPresentationDirectory,
@@ -74,6 +77,7 @@ final readonly class LocatedMemberRow
             avatar: $row->Avatar !== null ? (string) $row->Avatar : null,
             useGravatar: (string) $row->UseGravatar,
             email: (string) $row->Email,
+            phone: $row->Phone !== null ? (string) $row->Phone : null,
             location: $row->Location !== null ? (string) $row->Location : null,
             myPublicDataInPresentationDirectory: $row->MyPublicDataInPresentationDirectory !== null
                 ? (string) $row->MyPublicDataInPresentationDirectory

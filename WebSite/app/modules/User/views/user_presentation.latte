@@ -26,13 +26,13 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">                    
-                    {if $person->UseGravatar && $person->Email}
+                    {if $person->useGravatar && $person->email}
                     <img src="{$personImg}" class="rounded-circle"
-                        alt="User gravatar" 
+                        alt="{='user.presentation.avatar_alt'|translate}"
                         data-bs-toggle="tooltip" 
                         data-bs-placement="bottom" 
                         title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}">
-                    {elseif $person->Avatar}
+                    {elseif $person->avatar}
                     <span data-bs-toggle="tooltip" 
                           data-bs-placement="bottom" 
                           title="{if $userEmail != ''}{='my_data'|translate}{else}{='login'|translate}{/if}"
@@ -45,23 +45,23 @@
                     </div>
                     {/if}
                     
-                    <h3>{$person->FirstName} {$person->LastName}</h3>
-                    {if $person->NickName}
-                        <p class="text-muted">{$person->NickName}</p>
+                    <h3>{$person->firstName} {$person->lastName}</h3>
+                    {if $person->nickName}
+                        <p class="text-muted">{$person->nickName}</p>
                     {/if}
                     
-                    {if $loggedPerson && $loggedPerson->Id == $person->Id}
+                    {if $loggedPerson && $loggedPerson->id == $person->id}
                         <a href="/user/presentation/edit" class="btn btn-sm btn-primary mt-2">
-                            <i class="bi bi-pencil"></i> Modifier ma présentation
+                            <i class="bi bi-pencil"></i> {='user.presentation.edit_mine'|translate}
                         </a>
                     {/if}
                 </div>
             </div>
             
-            {if $person->Location !== null && $person->Location !== '' }
+            {if $person->location !== null && $person->location !== '' }
                 <div class="card mt-3">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Quartier</h5>
+                        <h5 class="card-title mb-0">{='user.presentation.neighborhood'|translate}</h5>
                     </div>
                     <div class="card-body p-0">
                         <div id="map" style="height: 200px;"></div>
@@ -69,20 +69,20 @@
                 </div>
             {/if}
             
-            {if $person->Phone || $person->Email}
+            {if $person->phone || $person->email}
                 <div class="card mt-3">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Contact</h5>
+                        <h5 class="card-title mb-0">{='user.presentation.contact'|translate}</h5>
                     </div>
                     <div class="card-body">
-                    {if $person->ShowPhoneInPresentationDirectory && $person->Phone}
-                        <p><i class="bi bi-telephone"></i> {$person->Phone}</p>
+                    {if $person->showPhoneInPresentationDirectory && $person->phone}
+                        <p><i class="bi bi-telephone"></i> {$person->phone}</p>
                     {/if}
-                    {if $person->ShowEmailInPresentationDirectory && $person->Email}
-                        <p><i class="bi bi-envelope"></i> {$person->Email}</p>
+                    {if $person->showEmailInPresentationDirectory && $person->email}
+                        <p><i class="bi bi-envelope"></i> {$person->email}</p>
                     {/if}
-                    {if !$person->ShowPhoneInPresentationDirectory && !$person->ShowEmailInPresentationDirectory}
-                        <p class="text-muted"><i class="bi bi-lock"></i> Coordonnées non partagées</p>
+                    {if !$person->showPhoneInPresentationDirectory && !$person->showEmailInPresentationDirectory}
+                        <p class="text-muted"><i class="bi bi-lock"></i> {='user.presentation.contact_not_shared'|translate}</p>
                     {/if}
                     </div>
                 </div>
@@ -92,16 +92,16 @@
         <div class="col-md-9">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Présentation</h5>
+                    <h5 class="card-title mb-0">{='user.presentation.title'|translate}</h5>
                 </div>
                 <div class="card-body">
-                    {if $person->Presentation !== null && $person->Presentation !== ''}
-                        <div class="presentation-content">
-                            {$person->Presentation|noescape}
-                        </div>
-                    {else}
-                        <p class="text-muted">Aucune présentation disponible</p>
-                    {/if}
+                {if $presentation !== ''}
+                <div class="presentation-content">
+                    {$presentation|noescape}
+                </div>
+                {else}
+                <p class="text-muted">{='user.presentation.none_available'|translate}</p>
+                {/if}
                 </div>
             </div>
         </div>
@@ -110,11 +110,11 @@
 {/block}
 
 {block scripts}
-{if $person->Location}
+{if $person->location}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script>
-            const locationStr = {$person->Location};
+            const locationStr = {$person->location};
             const mapMaxZoom = {$maxZoom};
     </script>
     <script src="{='/app/modules/User/js/presentation.js'|version}"></script>

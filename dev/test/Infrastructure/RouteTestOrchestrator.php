@@ -95,18 +95,6 @@ final class RouteTestOrchestrator
         return $results;
     }
 
-    /** @param list<mixed> $results */
-    private function resultsHaveFailure(array $results): bool
-    {
-        foreach ($results as $result) {
-            if ($result instanceof TestResult && $result->isFailure()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     /**
      * @return bool true when the run produced at least one failure
      *              (status failures, parameter, response, data, or auth errors).
@@ -127,6 +115,18 @@ final class RouteTestOrchestrator
     // -------------------------------------------------------------------------
     // Private
     // -------------------------------------------------------------------------
+
+    /** @param list<mixed> $results */
+    private function resultsHaveFailure(array $results): bool
+    {
+        foreach ($results as $result) {
+            if ($result instanceof TestResult && $result->isFailure()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /** @param list<mixed> $results */
     private function summaryGenerator(array $results): TestSummary

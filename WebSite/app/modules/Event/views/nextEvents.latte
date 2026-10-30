@@ -22,14 +22,34 @@
 {/block}
 
 {block navbar}
+{* Filters to carry over on every navigation link (falsy values are dropped) *}
+{var $filterParams = array_filter([
+    'filterByPreferences' => $filterByPreferences ? 1 : null,
+    'registeredOnly'      => $registeredOnly ? 1 : null,
+    'eventTypeId'         => $selectedEventTypeId,
+])}
+
 <div class="container-fluid d-flex align-items-center">
     <div class="d-flex align-items-center">
         {include '../../Common/views/navbar/_userLeft.latte'}
     </div>
+    <div class="ms-auto d-flex gap-2 mt-2">
+        <a href="?{http_build_query(['mode' => 'past', 'offset' => max(0, $offset + 10)] + $filterParams)}"
+           class="btn btn-light border border-2 border-white shadow fw-bold fs-5">&lsaquo;</a>
+        <a href="?{http_build_query(['mode' => 'past', 'offset' => $offset - 10] + $filterParams)}"
+           class="btn btn-light border border-2 border-white shadow fw-bold fs-5">&rsaquo;</a>
+        <a href="?{http_build_query(['mode' => 'next', 'offset' => 0] + $filterParams)}"
+           class="btn btn-warning border border-2 border-white shadow fw-bold fs-5">&raquo;</a>
+        {if $isEventManager}
+            <button type="button" class="btn btn-primary border border-2 border-white shadow fs-5" id="createEventBtn">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        {/if}
+    </div>
     <div class="d-flex align-items-center gap-3 ms-auto">
         <a href="/nextEvents/help"
-            data-bs-toggle="tooltip"
-            title="{='contextual_help'|translate}">
+           data-bs-toggle="tooltip"
+           title="{='contextual_help'|translate}">
             <i class="bi bi-question-circle-fill fs-2" style="color: {$navbarIconColor|noescape};"></i>
         </a>
     </div>
@@ -47,29 +67,20 @@
             {='eventsAvailableForAll'|translate}
         {/if}
         </h1>
-        <div class="ms-auto d-flex gap-2 mt-2">
-            <a href="?mode=past&offset={max(0, $offset+10)}" class="btn btn-outline-secondary">&lsaquo;</a>
-            <a href="?mode=past&offset={$offset-10}" class="btn btn-outline-secondary">&rsaquo;</a>
-            <a href="?mode=next&offset=0" class="btn btn-secondary">&raquo;</a>
-        {if $isEventManager}
-            <button type="button" class="btn btn-primary" id="createEventBtn">
-                <i class="bi bi-plus-lg"></i>
-            </button>
-        {/if}
-        </div>
     </div>
 
-    {if $person != false && $mode == 'next'}
-    <div class="preferences-filter">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="filterByPreferences" {if $filterByPreferences}checked{/if} />
-            <label class="form-check-label" for="filterByPreferences">
-                <i class="bi bi-funnel"></i> {='events.filter.by_preferences'|translate}
-            </label>
-        </div>
-    </div>
-    <h4 class="text-center bg-light py-2">{='events.click_to_detail'|translate}</h4>
+    {if $person != false}
+        {include 'partials/filters.latte',
+            filterByPreferences: $filterByPreferences,
+            registeredOnly:      $registeredOnly,
+            selectedEventTypeId: $selectedEventTypeId,
+            eventTypes:          $eventTypes,
+            mode:                $mode,
+            hasActiveFilters:    $filterByPreferences || $registeredOnly || $selectedEventTypeId,
+            activeFilterCount:   ($filterByPreferences ? 1 : 0) + ($registeredOnly ? 1 : 0) + ($selectedEventTypeId ? 1 : 0),
+        }
     {/if}
+    <h4 class="text-center bg-light py-2">{='events.click_to_detail'|translate}</h4>
 
     <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y;">
         <table class="table table-striped">

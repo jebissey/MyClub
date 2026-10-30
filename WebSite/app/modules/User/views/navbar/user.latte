@@ -1,50 +1,25 @@
-  <div class="container-fluid">
-    
+<div class="container-fluid">
     {include '../../../Common/views/navbar/_userLeft.latte'}
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="d-flex align-items-center gap-3 ms-auto">
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'account'}active{/if}" href="/user/account" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='account'|translate}"><h2>👤</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'availabilities'}active{/if}" href="/user/availabilities" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='availabilities'|translate}"><h2>🕒</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'groups'}active{/if}" href="/user/groups" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='groups'|translate}"><h2>🔐</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'preferences'}active{/if}" href="/user/preferences" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='preferences'|translate}"><h2>⭐</h2></a>
-                </li>
-                <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Notifications">
-                    <a class="nav-link {if $page == 'notifications'}active{/if}" href="/user/notifications"><h2>🔔</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'statistics'}active{/if}" href="/user/statistics" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='statistics'|translate}"><h2>📊</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'directory'}active{/if}" href="/user/presentation/edit" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='directory'|translate}"><h2>🎭</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'news'}active{/if}" href="/user/news" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='news'|translate}"><h2>📰</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'messages'}active{/if}" href="/user/messages" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='messages'|translate}"><h2>💬</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'notepad'}active{/if}" href="/user/notepad" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='notepad'|translate}"><h2>🗒️</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'connections'}active{/if}" href="/user/connections" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='connections'|translate}"><h2>🕸️</h2></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {if $page == 'membership'}active{/if}" href="/user/membership" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{='membership'|translate}"><h2>🤝</h2></a>
-                </li>
+                {foreach $items as $item}
+                    <li class="nav-item">
+                        <a class="nav-link {if $page == $item['page']}active{/if}"
+                           href="{$item['href']}"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="bottom"
+                           title="{= $item['label']|translate}">
+                            <h2>{$item['icon']}</h2>
+                        </a>
+                    </li>
+                {/foreach}
             </ul>
         </div>
     </div>

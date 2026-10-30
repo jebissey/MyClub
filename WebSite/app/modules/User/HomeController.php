@@ -15,6 +15,7 @@ use app\models\MetadataDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\Person;
 use app\modules\Common\viewModels\HomeViewModel;
 use app\modules\User\valueObjects\SidebarMenuChild;
@@ -58,7 +59,7 @@ final class HomeController extends AbstractController
             $pendingSurveyResponses = $this->surveyDataHelper->getPendingSurveyResponses();
             $userPendingSurveys = array_values(array_filter(
                 $pendingSurveyResponses,
-                static fn($item) => strcasecmp($item->Email, $userEmail) === 0
+                static fn($item) => strcasecmp($item->email, $userEmail) === 0
             ));
 
             $pendingDesignResponses = $this->designDataHelper->getPendingDesignResponses();
@@ -204,10 +205,10 @@ final class HomeController extends AbstractController
         $user = $this->application->getConnectedUser();
 
         $this->views->render('Common/views/signpost.latte', $this->getAllParams([
-            'navItems'        => $this->getNavItems($user->person?->email),
-            'title'           => ($this->t)('home.signpost.title'),
-            'page'            => $user->getPage(),
-            'user'            => $user,
+            'navItems'       => $this->getNavItems($user->person?->email),
+            'title'          => ($this->t)('home.signpost.title'),
+            'page'           => $user->getPage(),
+            'user'           => $user,
             'btnHistoryBack' => true,
         ]));
     }

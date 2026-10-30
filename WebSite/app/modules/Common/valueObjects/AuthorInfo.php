@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Article\valueObjects;
+namespace app\modules\Common\valueObjects;
 
 final readonly class AuthorInfo
 {
     public function __construct(
         public ?string $firstName,
         public ?string $lastName,
+        public ?string $displayName,
         public ?string $nickName = null,
     ) {
     }
@@ -22,14 +23,15 @@ final readonly class AuthorInfo
             firstName: $row->FirstName ?? null,
             lastName: $row->LastName ?? null,
             nickName: $row->NickName ?? null,
+            displayName: self::getDisplayName($row),
         );
     }
 
-    public function displayName(): string
+    private static function getDisplayName(object $row): string
     {
-        $name = trim(($this->firstName ?? '') . ' ' . ($this->lastName ?? ''));
-        if (!empty($this->nickName)) {
-            $name .= ' (' . $this->nickName . ')';
+        $name = trim(($row->firstName ?? '') . ' ' . ($row->lastName ?? ''));
+        if (!empty($row->nickName)) {
+            $name .= ' (' . $row->nickName . ')';
         }
         return $name;
     }

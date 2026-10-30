@@ -1,9 +1,25 @@
 {layout '../../Common/views/layout.latte'}
 
+{* Single source of truth for the user menu entries *}
+{var $userMenuItems = [
+    ['page' => 'account',        'href' => '/user/account',          'icon' => '👤', 'label' => 'navbar.user.account'],
+    ['page' => 'availabilities', 'href' => '/user/availabilities',   'icon' => '🕒', 'label' => 'navbar.user.availabilities'],
+    ['page' => 'groups',         'href' => '/user/groups',           'icon' => '🔐', 'label' => 'navbar.user.groups'],
+    ['page' => 'preferences',    'href' => '/user/preferences',      'icon' => '⭐', 'label' => 'navbar.user.preferences'],
+    ['page' => 'notifications',  'href' => '/user/notifications',    'icon' => '🔔', 'label' => 'navbar.user.notifications'],
+    ['page' => 'statistics',     'href' => '/user/statistics',       'icon' => '📊', 'label' => 'navbar.user.statistics'],
+    ['page' => 'directory',      'href' => '/user/presentation/edit','icon' => '🎭', 'label' => 'navbar.user.directory'],
+    ['page' => 'news',           'href' => '/user/news',             'icon' => '📰', 'label' => 'navbar.user.news'],
+    ['page' => 'messages',       'href' => '/user/messages',         'icon' => '💬', 'label' => 'navbar.user.messages'],
+    ['page' => 'notepad',        'href' => '/user/notepad',          'icon' => '🗒️', 'label' => 'navbar.user.notepad'],
+    ['page' => 'connections',    'href' => '/user/connections',      'icon' => '🕸️', 'label' => 'navbar.user.connections'],
+    ['page' => 'membership',     'href' => '/user/membership',       'icon' => '🤝', 'label' => 'navbar.user.membership'],
+]}
+
 {block navbar}
-    {include 'navbar/user.latte'}
+    {include 'navbar/user.latte', items: $userMenuItems}
 {/block}
 
 {block content}
-{$content|noescape}
+    {include '../../Common/views/navbar/_menuList.latte', items: $userMenuItems}
 {/block}

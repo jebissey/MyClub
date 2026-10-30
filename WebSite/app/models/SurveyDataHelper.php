@@ -12,6 +12,7 @@ use app\helpers\ConnectedUser;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
+use app\modules\Article\valueObjects\PendingSurveyRow;
 use app\modules\Article\valueObjects\ReplyRow;
 use app\modules\Article\valueObjects\SurveyNewsRow;
 use app\modules\Article\valueObjects\SurveyWithCreatorRow;
@@ -87,7 +88,7 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
-     * @return array<int, stdClass>
+     * @return array<int, PendingSurveyRow>
      */
     public function getPendingSurveyResponses(): array
     {
@@ -121,7 +122,7 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
         if ($stmt === false) {
             throw new QueryException('getPendingSurveyResponses query failed');
         }
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return array_map(PendingSurveyRow::fromStdClass(...), $stmt->fetchAll(PDO::FETCH_OBJ));
     }
 
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array

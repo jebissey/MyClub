@@ -7,13 +7,12 @@ namespace app\models;
 use PDO;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\helpers\To;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\ArticleAuthorRow;
-use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Article\valueObjects\ArticleSitemapRow;
 use app\modules\Article\valueObjects\ArticleSummaryRow;
+use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ArticleRssRow;
 use app\modules\Common\interfaces\NewsProviderInterface;
 

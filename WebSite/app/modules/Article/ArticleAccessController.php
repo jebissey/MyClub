@@ -12,8 +12,8 @@ use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
-use app\modules\Article\valueObjects\ArticleRow;
 use app\modules\Article\valueObjects\Result;
+use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\TableController;
 use app\modules\Common\services\AnonymousAccessService;
 

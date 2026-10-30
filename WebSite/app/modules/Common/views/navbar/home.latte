@@ -9,7 +9,7 @@
                     <ul class="navbar-nav d-flex justify-content-center flex-wrap w-100">
                     {foreach $navItems as $navItem}
                     <li class="nav-item">
-                        <a class="nav-link {if $currentPath === $navItem->Route}active{/if}" href="{$navItem->Route}">{$navItem->Name|noescape}</a>
+                        <a class="nav-link {if $currentPath === $navItem->route}active{/if}" href="{$navItem->route}">{$navItem->name|noescape}</a>
                     </li>
                     {/foreach}
                     </ul>

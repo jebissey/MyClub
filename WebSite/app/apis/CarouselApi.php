@@ -17,6 +17,7 @@ use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
+use app\modules\Common\valueObjects\ArticleRow;
 
 final class CarouselApi extends AbstractApi
 {

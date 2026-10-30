@@ -10,7 +10,7 @@ use app\helpers\ConnectedUser;
 use app\models\ArticleDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
-use app\modules\Article\valueObjects\ArticleRow;
+use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 final class SurveyController extends ClosableFormController

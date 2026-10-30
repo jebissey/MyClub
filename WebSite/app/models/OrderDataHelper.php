@@ -13,6 +13,7 @@ use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\OrderWithCreatorRow;
 use app\modules\Article\valueObjects\OrderNewsRow;
+use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 /**

@@ -78,7 +78,7 @@ final class EventSupplyApi extends AbstractApi
                 To::int($input['needId'] ?? null),
                 To::int($input['supply'] ?? null)
             );
-            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
+            $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, To::str($apiResponse->message));
         } catch (QueryException $e) {
             $this->renderJsonBadRequest($e->getMessage(), $e->getFile(), $e->getLine());
         } catch (UnauthorizedAccessException $e) {
@@ -93,12 +93,12 @@ final class EventSupplyApi extends AbstractApi
     private function doUpdateSupply(int $eventId, string $userEmail, int $needId, int $supply): ApiResponse
     {
         if (!$this->eventDataHelper->isUserRegistered($eventId, $userEmail)) {
-            return new ApiResponse(false, ApplicationError::BadRequest->value);
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'User not registered');
         }
 
         $success = $this->eventDataHelper->updateUserSupply($eventId, $userEmail, $needId, $supply);
         if (!$success) {
-            return new ApiResponse(false, ApplicationError::BadRequest->value);
+            return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Update error');
         }
 
         $eventNeeds = $this->eventDataHelper->getEventNeeds($eventId);

@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Article\valueObjects;
+namespace app\modules\Common\valueObjects;
+
+use app\modules\Common\valueObjects\AuthorInfo;
+use app\modules\Common\valueObjects\GroupInfo;
 
 /**
  * @phpstan-type ArticleRowShape object{
@@ -54,29 +57,5 @@ final readonly class ArticleRow
             author: AuthorInfo::fromStdClass($row),
             group: GroupInfo::fromStdClass($row),
         );
-    }
-
-    /**
-     * Compatibilité Latte / code legacy attendant un tableau associatif.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(): array
-    {
-        return [
-            'Id'             => $this->id,
-            'Title'          => $this->title,
-            'Content'        => $this->content,
-            'CreatedBy'      => $this->createdBy,
-            'PublishedBy'    => $this->publishedBy,
-            'IdGroup'        => $this->idGroup,
-            'OnlyForMembers' => $this->onlyForMembers,
-            'LastUpdate'     => $this->lastUpdate,
-            'Timestamp'      => $this->timestamp,
-            'FirstName'      => $this->author?->firstName,
-            'LastName'       => $this->author?->lastName,
-            'NickName'       => $this->author?->nickName,
-            'GroupName'      => $this->group?->name,
-        ];
     }
 }
