@@ -1,9 +1,21 @@
+includes:
+    - ../WebSite/vendor/efabrica/phpstan-latte/rules.neon
+
 parameters:
-    level: 9
+    level: max
     paths:
         - ../WebSite/app
         - test        
         - tests        
         - tools
+    latte:
+        collectedPaths:
+            - ../WebSite/app/modules
+        # Active la résolution large des {include}/{layout} /
+        # {template path} dans les contextes non standard
+        resolveAllPossiblePaths: true
+
+        reportUnanalysedTemplates: false
+
     excludePaths:
     ignoreErrors:

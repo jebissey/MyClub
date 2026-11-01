@@ -7,7 +7,6 @@ namespace app\modules\Common\services;
 use app\enums\ApplicationError;
 use app\helpers\ConnectedUser;
 use app\modules\Common\valueObjects\RedirectInfo;
-use app\modules\Common\services\AuthenticationService;
 
 /**
  * Anonymous visitor on a protected page: try the "remember me" cookie,
@@ -23,9 +22,9 @@ final readonly class AnonymousAccessService
     ) {
     }
 
-    public function resolve(string $requestUri): RedirectInfo
+    public function resolve(string $requestUri, ?string $rememberToken): RedirectInfo
     {
-        $result = $this->authenticationService->handleRememberMeLogin();
+        $result = $this->authenticationService->handleRememberMeLogin($rememberToken);
 
         if ($result && $result->isSuccess()) {
             // The cookie login has just changed who is signed in: reload the connected user

@@ -20,24 +20,15 @@ final class AuthenticationServiceTest extends TestCase
      */
     private array $session;
 
-    /**
-     * @var array<string, mixed>
-     */
-    private array $cookie;
-
     private PDO $pdo;
 
     protected function setUp(): void
     {
         /** @var array<string, mixed> $session */
         $session = $_SESSION;
-        /** @var array<string, mixed> $cookie */
-        $cookie = $_COOKIE;
         $this->session = $session;
-        $this->cookie = $cookie;
 
         $_SESSION = [];
-        $_COOKIE = [];
 
         $this->pdo = new PDO('sqlite::memory:');
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -67,7 +58,6 @@ final class AuthenticationServiceTest extends TestCase
     protected function tearDown(): void
     {
         $_SESSION = $this->session;
-        $_COOKIE = $this->cookie;
     }
 
     // -------------------------------------------------------------------------
@@ -84,6 +74,16 @@ final class AuthenticationServiceTest extends TestCase
             DataHelperFactory::create(MemberDataHelper::class, $this->pdo),
             'https://myclub.test'
         );
+    }
+
+    /**
+     * A translator that returns the key itself, so tests can assert on translation keys.
+     *
+     * @return callable(string): string
+     */
+    private function keyTranslator(): callable
+    {
+        return static fn(string $key): string => $key;
     }
 
     private function givenMember(
@@ -207,17 +207,24 @@ final class AuthenticationServiceTest extends TestCase
     // handleRememberMeLogin
     // -------------------------------------------------------------------------
 
-    public function testHandleRememberMeLoginReturnsNullWhenNoCookie(): void
+    public function testHandleRememberMeLoginReturnsNullWhenNoToken(): void
     {
-        $this->assertNull($this->makeService()->handleRememberMeLogin());
+        $this->assertNull($this->makeService()->handleRememberMeLogin(null));
+    }
+
+    public function testHandleRememberMeLoginReturnsNullWhenTokenEmpty(): void
+    {
+        $this->givenMember(id: 42, token: '');
+
+        $this->assertNull($this->makeService()->handleRememberMeLogin(''));
+        $this->assertArrayNotHasKey('user', $_SESSION);
     }
 
     public function testHandleRememberMeLoginSuccess(): void
     {
-        $_COOKIE['rememberMe'] = 'valid-token';
         $this->givenMember(id: 42, token: 'valid-token');
 
-        $result = $this->makeService()->handleRememberMeLogin();
+        $result = $this->makeService()->handleRememberMeLogin('valid-token');
 
         $this->assertNotNull($result);
         $this->assertTrue($result->isSuccess());
@@ -225,21 +232,19 @@ final class AuthenticationServiceTest extends TestCase
         $this->assertNotNull($this->memberColumn(42, 'LastSignIn'));
     }
 
-    public function testHandleRememberMeLoginClearsCookieWhenTokenInvalid(): void
+    public function testHandleRememberMeLoginReturnsNullWhenTokenInvalid(): void
     {
-        $_COOKIE['rememberMe'] = 'invalid-token';
         $this->givenMember(id: 42, token: 'another-token');
 
-        $this->assertNull($this->makeService()->handleRememberMeLogin());
+        $this->assertNull($this->makeService()->handleRememberMeLogin('invalid-token'));
         $this->assertNull($this->memberColumn(42, 'LastSignIn'));
     }
 
     public function testHandleRememberMeLoginReturnsNullWhenMemberInactivated(): void
     {
-        $_COOKIE['rememberMe'] = 'valid-token';
         $this->givenMember(id: 42, inactivated: true, token: 'valid-token');
 
-        $this->assertNull($this->makeService()->handleRememberMeLogin());
+        $this->assertNull($this->makeService()->handleRememberMeLogin('valid-token'));
         $this->assertArrayNotHasKey('user', $_SESSION);
     }
 
@@ -314,7 +319,7 @@ final class AuthenticationServiceTest extends TestCase
     {
         $this->expectException(EmailException::class);
 
-        $this->makeService()->prepareForgotPasswordEmail('unknown@example.com');
+        $this->makeService()->prepareForgotPasswordEmail('unknown@example.com', $this->keyTranslator());
     }
 
     public function testPrepareForgotPasswordEmailThrowsWhenIndividualIsNotAMember(): void
@@ -323,20 +328,19 @@ final class AuthenticationServiceTest extends TestCase
 
         $this->expectException(EmailException::class);
 
-        $this->makeService()->prepareForgotPasswordEmail('contact@example.com');
+        $this->makeService()->prepareForgotPasswordEmail('contact@example.com', $this->keyTranslator());
     }
 
     public function testPrepareForgotPasswordEmailStoresTokenAndBuildsMessage(): void
     {
         $this->givenMember(id: 42);
 
-        $message = $this->makeService()->prepareForgotPasswordEmail('user@example.com');
+        $message = $this->makeService()->prepareForgotPasswordEmail('user@example.com', $this->keyTranslator());
 
         $this->assertSame('user@example.com', $message->to);
-        $this->assertStringContainsString(
-            '/user/setPassword/',
-            $message->body
-        );
+        $this->assertSame('auth.forgot_password.email.subject', $message->subject);
+        $this->assertStringContainsString('auth.forgot_password.email.body', $message->body);
+        $this->assertStringContainsString('/user/setPassword/', $message->body);
 
         $token = $this->memberColumn(42, 'Token');
         $this->assertIsString($token);

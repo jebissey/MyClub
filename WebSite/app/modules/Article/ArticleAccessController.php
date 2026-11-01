@@ -156,7 +156,7 @@ abstract class ArticleAccessController extends TableController
     protected function handleAnonymousAccess(): void
     {
         $requestUri = is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '/';
-        $target = $this->anonymousAccessService->resolve($requestUri);
+        $target = $this->anonymousAccessService->resolve($requestUri, $this->getRememberMeToken());
 
         $this->redirect($target->url, $target->status, $target->message);
     }

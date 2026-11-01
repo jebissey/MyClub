@@ -25,7 +25,7 @@ final class DbBrowserController extends TableController
     public function createRecord(string $table): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $this->dbBrowserDataHelper->createRecord($table);
+            $this->dbBrowserDataHelper->createRecord($table, $this->input->form());
             $this->redirect('/dbbrowser/' . urlencode($table));
         }
     }
@@ -124,7 +124,7 @@ final class DbBrowserController extends TableController
     public function updateRecord(string $table, int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $this->dbBrowserDataHelper->updateRecord($table, $id);
+            $this->dbBrowserDataHelper->updateRecord($table, $id, $this->input->form());
             $this->redirect('/dbbrowser/' . urlencode($table));
         }
     }

@@ -6,7 +6,6 @@ namespace app\helpers;
 
 use app\enums\FilterInputRule;
 use app\helpers\interfaces\GravatarHandlerInterface;
-use app\modules\Common\valueObjects\Person;
 
 final class WebApp
 {

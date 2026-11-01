@@ -18,6 +18,8 @@ use app\modules\Common\valueObjects\Person;
 
 final readonly class AuthenticationService
 {
+    public const REMEMBER_ME_COOKIE = 'rememberMe';
+
     public function __construct(
         private MemberDataHelper $memberDataHelper,
         private string $baseUrl
@@ -25,9 +27,10 @@ final readonly class AuthenticationService
     }
 
     /**
+     * @param callable(string): string $t translator
      * @throws EmailException if the email address is unknown
      */
-    public function prepareForgotPasswordEmail(string $email): EmailMessage
+    public function prepareForgotPasswordEmail(string $email, callable $t): EmailMessage
     {
         $row = $this->memberDataHelper->findBasicByEmail($email);
         if ($row === false) {
@@ -40,21 +43,21 @@ final readonly class AuthenticationService
         $resetLink = $this->baseUrl . '/user/setPassword/' . $token;
 
         return new EmailMessage(
-            from:    null,
-            to:      $email,
-            subject: 'Initialisation du mot de passe',
-            body:    "Cliquez sur ce lien pour initialiser votre mot de passe : $resetLink",
-            isHtml:  true
+            from: null,
+            to: $email,
+            subject: $t('auth.forgot_password.email.subject'),
+            body: $t('auth.forgot_password.email.body') . ' ' . $resetLink,
+            isHtml: true
         );
     }
 
-    public function handleRememberMeLogin(): ?AuthResult
+    public function handleRememberMeLogin(?string $rememberToken): ?AuthResult
     {
-        if (!isset($_COOKIE['rememberMe'])) {
+        if ($rememberToken === null || $rememberToken === '') {
             return null;
         }
 
-        $row = $this->memberDataHelper->findByRememberToken(To::str($_COOKIE['rememberMe']));
+        $row = $this->memberDataHelper->findByRememberToken($rememberToken);
         if ($row === false) {
             $this->clearRememberMeCookie();
             return null;
@@ -152,7 +155,7 @@ final readonly class AuthenticationService
 
     private function clearRememberMeCookie(): void
     {
-        setcookie('rememberMe', '', time() - 3600, '/');
+        setcookie(self::REMEMBER_ME_COOKIE, '', time() - 3600, '/');
     }
 
     private function generateRememberMeToken(): string
@@ -180,6 +183,6 @@ final readonly class AuthenticationService
 
         $this->memberDataHelper->setRememberToken($personId, $token);
 
-        setcookie('rememberMe', $token, time() + (30 * 24 * 60 * 60), '/');
+        setcookie(self::REMEMBER_ME_COOKIE, $token, time() + (30 * 24 * 60 * 60), '/');
     }
 }

@@ -201,8 +201,19 @@ WHERE Name = 'membership';
 
 -- Remove the obsolete translation entry
 DELETE FROM Languages
-WHERE rowid = 1283
-  AND Name = 'User';
+WHERE Name = 'User';
+
+-- Forgot password e-mail: texts previously hard-coded in AuthenticationService
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('auth.forgot_password.email.subject',
+ 'Password reset',
+ 'Initialisation du mot de passe',
+ 'Resetowanie hasła'),
+
+('auth.forgot_password.email.body',
+ 'Click on this link to reset your password:',
+ 'Cliquez sur ce lien pour initialiser votre mot de passe :',
+ 'Kliknij ten link, aby zresetować hasło:');
 SQL);
 
         return 101;

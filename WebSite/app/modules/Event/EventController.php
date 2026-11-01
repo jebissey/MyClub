@@ -194,7 +194,7 @@ final class EventController extends AbstractController
         $event = $this->eventDataHelper->getEvent($eventId);
 
         if ($person === false && !$token && $event->audience !== EventAudience::ForAll) {
-            $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
+            $result = $this->application->getAuthenticationService()->handleRememberMeLogin($this->getRememberMeToken());
             if ($result && $result->isSuccess()) {
                 $this->application->getConnectedUser()->get();
                 $this->redirect(

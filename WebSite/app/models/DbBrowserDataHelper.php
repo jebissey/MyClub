@@ -25,14 +25,15 @@ final class DbBrowserDataHelper extends Data
         );
     }
 
-    public function createRecord(string $table): void
+    /** @param array<string, mixed> $input Form data of the request */
+    public function createRecord(string $table, array $input): void
     {
         $this->validateTableName($table);
         $columns = $this->getTableColumns($table);
         $data = [];
         foreach ($columns as $column) {
-            if (isset($_POST[$column])) {
-                $data[$column] = $_POST[$column];
+            if (isset($input[$column]) && is_scalar($input[$column])) {
+                $data[$column] = $input[$column];
             }
         }
         $columnsList = implode(', ', array_map([$this, 'quoteName'], array_keys($data)));
@@ -220,7 +221,8 @@ final class DbBrowserDataHelper extends Data
         return [$rows, $this->getTableColumns($table), $dbbPage, $totalPages, $filters];
     }
 
-    public function updateRecord(string $table, int $id): void
+    /** @param array<string, mixed> $input Form data of the request */
+    public function updateRecord(string $table, int $id, array $input): void
     {
         $this->validateTableName($table);
         $columnsDetails = $this->getTableColumnsDetails($table);
@@ -228,8 +230,8 @@ final class DbBrowserDataHelper extends Data
         $data = [];
         foreach ($columnsDetails as $columnsDetail) {
             $column = $columnsDetail['name'];
-            if (isset($_POST[$column]) && $column != $primaryKey) {
-                $value = $_POST[$column];
+            if (isset($input[$column]) && is_scalar($input[$column]) && $column != $primaryKey) {
+                $value = $input[$column];
                 if ($value === '' && $columnsDetail['notnull'] == 0) {
                     $value = null;
                 }

@@ -22,6 +22,7 @@ use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MetadataDataHelper;
+use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\DownloadResponder;
 use app\modules\Common\services\ErrorRaiser;
 use app\modules\Common\services\ViewRenderer;
@@ -235,7 +236,7 @@ abstract class AbstractController
 
         // Anonymous visitor: try the "remember me" auto sign-in first
         if ($connectedUser->person === null) {
-            $result = $this->application->getAuthenticationService()->handleRememberMeLogin();
+            $result = $this->application->getAuthenticationService()->handleRememberMeLogin($this->getRememberMeToken());
             if ($result && $result->isSuccess()) {
                 $this->redirect(
                     To::str($_SERVER['REQUEST_URI'] ?? ''),
@@ -310,5 +311,10 @@ abstract class AbstractController
             layoutParams: $this->getAllParams([]),
         );
         $this->views->render('Common/views/info.latte', $viewModel->toArray());
+    }
+
+    protected function getRememberMeToken(): ?string
+    {
+        return $this->input->cookie(AuthenticationService::REMEMBER_ME_COOKIE);
     }
 }

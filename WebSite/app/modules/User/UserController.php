@@ -38,7 +38,7 @@ final class UserController extends AbstractController
 
         try {
             $success = $this->emailService->send(
-                $this->authService->prepareForgotPasswordEmail($email)
+                $this->authService->prepareForgotPasswordEmail($email, $this->t)
             );
         } catch (EmailException $e) {
             Flight::set('message', "Error {$e->getMessage()} with email {$email}");
@@ -96,7 +96,7 @@ final class UserController extends AbstractController
                 $this->errors->badRequest($result->getError(), __FILE__, __LINE__);
             }
         } elseif (WebApp::getRequestMethod() === 'GET') {
-            $rememberMeResult = $this->authService->handleRememberMeLogin();
+            $rememberMeResult = $this->authService->handleRememberMeLogin($this->getRememberMeToken());
             if ($rememberMeResult && $rememberMeResult->isSuccess()) {
                 $this->redirect($redirect, ApplicationError::Ok, "Auto sign in succeeded for {$rememberMeResult->getUser()?->email}");
                 return;

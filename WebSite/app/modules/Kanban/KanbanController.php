@@ -6,11 +6,9 @@ namespace app\modules\Kanban;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
-use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\KanbanDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Kanban\viewModels\KanbanBoardViewModel;
 
 final class KanbanController extends AbstractController

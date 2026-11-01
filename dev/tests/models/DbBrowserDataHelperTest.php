@@ -14,18 +14,12 @@ use app\models\DbBrowserDataHelper;
 
 class DbBrowserDataHelperTest extends DataHelperTestCase
 {
-    protected function tearDown(): void
-    {
-        unset($_POST);
-        parent::tearDown();
-    }
-
     private function makeDbBrowserHelper(PDO $pdo): DbBrowserDataHelper
     {
         /** @var DbBrowserDataHelper $helper */
         $helper = $this->makeHelper(DbBrowserDataHelper::class, $pdo);
-        // makeHelper() ne câble que pdo/tables (communs à Data) ;
-        // getQuery() a en plus besoin de $fluent, propre à Data.
+        // makeHelper() only wires pdo/tables (common to Data);
+        // getQuery() also needs $fluent, which is specific to Data.
         $this->setProperty($helper, 'fluent', new Query($pdo));
 
         return $helper;
@@ -166,21 +160,20 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
     }
 
     // -------------------------------------------------------------------------
-    // createRecord / updateRecord / deleteRecord (lisent $_POST)
+    // createRecord / updateRecord / deleteRecord (form data is passed as an argument)
     // -------------------------------------------------------------------------
 
-    public function testCreateRecordInsertsRowFromPostData(): void
+    public function testCreateRecordInsertsRowFromFormData(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $_POST = [
+        $helper->createRecord('Individual', [
             'Type' => 'Member',
             'FirstName' => 'Alice',
             'LastName' => 'Martin',
             'Email' => 'alice.martin@test.local',
-        ];
-        $helper->createRecord('Individual');
+        ]);
 
         $stmt = $pdo->query(
             "SELECT FirstName FROM Individual WHERE LastName = 'Martin'",
@@ -189,34 +182,55 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $this->assertSame('Alice', $stmt->fetchColumn());
     }
 
-    public function testUpdateRecordUpdatesRowFromPostData(): void
+    public function testCreateRecordIgnoresNonScalarValues(): void
+    {
+        $pdo = $this->openDatabaseCopyOrSkip();
+        $helper = $this->makeDbBrowserHelper($pdo);
+
+        $helper->createRecord('Individual', [
+            'Type' => 'Member',
+            'FirstName' => 'Scalar',
+            'LastName' => 'Checked',
+            'Email' => 'scalar.checked@test.local',
+            'NickName' => ['injected'],
+        ]);
+
+        $stmt = $pdo->query("SELECT NickName FROM Individual WHERE LastName = 'Checked'");
+        $this->assertInstanceOf(PDOStatement::class, $stmt);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->assertIsArray($row);
+        $this->assertNotSame('Array', $row['NickName']);
+    }
+
+    public function testUpdateRecordUpdatesRowFromFormData(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Paul', 'Durand', 'paul.durand@test.local')");
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $_POST = ['FirstName' => 'Paul-Updated', 'LastName' => 'Durand'];
-        $helper->updateRecord('Individual', $id);
+        $helper->updateRecord('Individual', $id, [
+            'FirstName' => 'Paul-Updated',
+            'LastName' => 'Durand',
+        ]);
 
         $stmt = $pdo->prepare('SELECT FirstName FROM Individual WHERE Id = :id');
         $stmt->execute([':id' => $id]);
         $this->assertSame('Paul-Updated', $stmt->fetchColumn());
     }
 
-    public function testUpdateRecordIgnoresPrimaryKeyFieldFromPostData(): void
+    public function testUpdateRecordIgnoresPrimaryKeyFieldFromFormData(): void
     {
         $pdo = $this->openDatabaseCopyOrSkip();
         $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Marc', 'Petit', 'marc.petit@test.local')");
         $id = (int) $pdo->lastInsertId();
         $helper = $this->makeDbBrowserHelper($pdo);
 
-        $_POST = [
+        $helper->updateRecord('Individual', $id, [
             'Id' => $id + 1000,
             'FirstName' => 'Marc-Updated',
             'LastName' => 'Petit',
-        ];
-        $helper->updateRecord('Individual', $id);
+        ]);
 
         $stmt = $pdo->prepare('SELECT FirstName FROM Individual WHERE Id = :id');
         $stmt->execute([':id' => $id]);
