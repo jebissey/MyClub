@@ -150,6 +150,7 @@ final class WebmasterController extends TableController
             $privateKey = $this->credentials->get('vapid', 'privateKey');
 
             if (!$publicKey || !$privateKey) {
+                /** @var array{publicKey: string, privateKey: string} $newKeys */
                 $newKeys = VAPID::createVapidKeys();
                 $this->credentials->set('vapid', 'publicKey', $newKeys['publicKey']);
                 $this->credentials->set('vapid', 'privateKey', $newKeys['privateKey']);
@@ -160,7 +161,7 @@ final class WebmasterController extends TableController
             }
 
             $notification = '';
-            if (isset($_GET['test'])) {
+            if ($this->input->hasQuery('test')) {
                 $this->notificationSender->sendToRecipients(
                     [1],
                     [
@@ -330,9 +331,6 @@ final class WebmasterController extends TableController
             ['field' => 'checkCount',     'label' => ($this->t)('webmaster.installations.label.check_count')],
             ['field' => 'status',         'label' => ($this->t)('webmaster.installations.label.status')],
         ];
-
-        $query = $this->logDataHelper->getInstallations();
-        $data  = $this->prepareTableData($query, $filterValues, true);
 
         /** @var array<int, stdClass> $items */
         $items = $data['items'];

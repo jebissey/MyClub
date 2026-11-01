@@ -11,7 +11,9 @@ use Latte\Engine as LatteEngine;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
 use app\helpers\Params;
+use app\helpers\RequestInput;
 use app\helpers\To;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
@@ -26,7 +28,6 @@ use app\modules\Common\services\ViewRenderer;
 use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Common\valueObjects\NavbarColors;
-use app\modules\Common\valueObjects\Person;
 
 abstract class AbstractController
 {
@@ -41,10 +42,15 @@ abstract class AbstractController
     private readonly MetadataDataHelper $metadataDataHelper;
     private readonly ?string $prodSiteUrl;
     private readonly NavbarColors $navbarColors;
-    protected Closure $t;
     protected readonly ErrorRaiser $errors;
     protected readonly ViewRenderer $views;
     protected readonly DownloadResponder $downloads;
+
+    /** @var Closure(string): string */
+    protected Closure $t;
+
+    protected readonly RequestInput $input;
+
 
     public function __construct(protected Application $application)
     {
@@ -61,6 +67,7 @@ abstract class AbstractController
         $this->errors = new ErrorRaiser($application->getErrorManager());
         $this->views = new ViewRenderer($this->latte);
         $this->downloads = new DownloadResponder();
+        $this->input = $application->getRequestInput();
     }
 
     #region Protected fucntions
@@ -131,7 +138,7 @@ abstract class AbstractController
         $groups = $this->dataHelper->gets('Group', ['Inactivated' => 0], '*');
         $groupsById = [];
         foreach ($groups as $group) {
-            $groupsById[$group->Id] = (string) $group->Name;
+            $groupsById[To::int($group->Id)] = To::str($group->Name);
         }
 
         return array_map(
@@ -154,8 +161,7 @@ abstract class AbstractController
      */
     protected function getQueryBool(string $key, ?bool $default = null): ?bool
     {
-        $value = $this->getQueryParam($key, FilterInputRule::Bool->value);
-        return is_int($value) ? $value === 1 : $default;
+        return $this->input->queryBool($key, $default);
     }
 
     /**
@@ -163,8 +169,7 @@ abstract class AbstractController
      */
     protected function getQueryInt(string $key, ?int $default = null): ?int
     {
-        $value = $this->getQueryParam($key, FilterInputRule::Int->value, $default);
-        return is_int($value) ? $value : $default;
+        return $this->input->queryInt($key, $default);
     }
 
     /**
@@ -178,13 +183,8 @@ abstract class AbstractController
      */
     protected function getQueryString(string $key, array $allowed = [], ?string $default = null): ?string
     {
-        $rule = $allowed !== [] ? $allowed : FilterInputRule::Text->value;
-        $value = $this->getQueryParam($key, $rule);
-
-        return is_string($value) && $value !== '' ? $value : $default;
+        return $this->input->queryString($key, $allowed, $default);
     }
-
-
 
     protected function redirect(string $url, ?ApplicationError $applicationError = null, ?string $message = null): void
     {
@@ -218,6 +218,9 @@ abstract class AbstractController
         return $trans;
     }
 
+    /**
+     * @param callable(ConnectedUser): bool $permissionCheck
+     */
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck, string $file, int $line): bool
     {
         if (WebApp::getRequestMethod() !== $method) {
@@ -267,6 +270,7 @@ abstract class AbstractController
     }
 
     /**
+     * @param callable(ConnectedUser): bool $isAllowed
      * @param array<string,mixed> $viewModelOptions Extra named arguments forwarded to InfoViewModel
      */
     protected function renderHelp(
@@ -282,8 +286,9 @@ abstract class AbstractController
 
         $lang = TranslationManager::getCurrentLanguage();
         $helpRow = $this->dataHelper->get('Languages', ['Name' => $helpName], $lang);
-        $content = ($helpRow !== false && isset($helpRow->$lang))
-            ? $helpRow->$lang
+        $value = $helpRow !== false ? ($helpRow->$lang ?? null) : null;
+        $content = is_string($value)
+            ? $value
             : $this->languagesDataHelper->translate('help_missing');
 
         $viewModel = new InfoViewModel(
@@ -305,30 +310,5 @@ abstract class AbstractController
             layoutParams: $this->getAllParams([]),
         );
         $this->views->render('Common/views/info.latte', $viewModel->toArray());
-    }
-
-    #region Private funcions
-
-    /**
-     * Retrieve and filter a query-string parameter.
-     *
-     * Uses WebApp::filterInput / FilterInputRule.
-     * Returns $default when the parameter is missing, empty or invalid.
-     *
-     * Examples:
-     *   $groupId = $this->getQueryParam('group', FilterInputRule::Int);          // int|null
-     *   $page    = $this->getQueryParam('page',  FilterInputRule::Int, 1);       // int (default 1)
-     *   $search  = $this->getQueryParam('q',     FilterInputRule::Text);         // string|null
-     *   $ids     = $this->getQueryParam('ids',   FilterInputRule::ArrayInt);     // list<int>|null
-     *
-     * @param string|list<string> $rule  A FilterInputRule value or a list of allowed values
-     */
-    private function getQueryParam(string $key, string|array $rule, mixed $default = null): mixed
-    {
-        $source = $this->flight->request()->query->getData();
-        $filtered = WebApp::getFiltered($key, $rule, $source);
-
-        // getFiltered returns false when the value is missing / empty / invalid
-        return ($filtered !== false && $filtered !== null) ? $filtered : $default;
     }
 }

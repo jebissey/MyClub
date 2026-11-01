@@ -74,7 +74,7 @@ final class EventApi extends AbstractApi
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             try {
                 $modeString = To::str(
-                    WebApp::getFiltered('mode', array_column(Period::cases(), 'value'), $_GET),
+                    WebApp::getFiltered('mode', array_column(Period::cases(), 'value'), $this->input->query()),
                     Period::Today->value
                 );
                 $apiResponse = $this->eventService->duplicateEvent(

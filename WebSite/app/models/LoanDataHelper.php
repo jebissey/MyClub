@@ -523,40 +523,56 @@ final class LoanDataHelper extends Data
         // Prêts
         $stmt = $this->pdo->prepare(
             "SELECT lr.Id, lr.LoanDate, lr.DueDate, lr.ReturnDate, lr.Status,
-			        li.Name AS ItemName,
-			        b.FirstName || ' ' || b.LastName AS BorrowerName
-			 FROM   LoanRecord lr
-			 JOIN   LoanItem li ON li.Id = lr.ItemId
-			 JOIN   Individual b  ON b.Id  = lr.BorrowerId
-			 WHERE  lr.Status IN ('active','returned','overdue')
-			   AND  lr.LoanDate <= :end
-			   AND  lr.DueDate  >= :start"
+                li.Name AS ItemName,
+                b.FirstName || ' ' || b.LastName AS BorrowerName
+            FROM   LoanRecord lr
+            JOIN   LoanItem li ON li.Id = lr.ItemId
+            JOIN   Individual b  ON b.Id  = lr.BorrowerId
+            WHERE  lr.Status IN ('active','returned','overdue')
+                AND  lr.LoanDate <= :end
+                AND  lr.DueDate  >= :start"
         );
         $stmt->execute([':start' => $start, ':end' => $end]);
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $color = match ($row['Status']) {
+
+        /** @var list<array<string, mixed>> $loanRows */
+        $loanRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($loanRows as $row) {
+            $status = is_string($row['Status'] ?? null) ? $row['Status'] : 'active';
+            $color = match ($status) {
                 'returned' => '#198754',
                 'overdue'  => '#dc3545',
                 default    => '#0d6efd',
             };
-            $endDate = $row['ReturnDate'] ?? $row['DueDate'];
+
+            $returnDate = is_string($row['ReturnDate'] ?? null) ? $row['ReturnDate'] : null;
+            $dueDate    = is_string($row['DueDate'] ?? null) ? $row['DueDate'] : '';
+            $endDate    = $returnDate ?? $dueDate;
+
             // FullCalendar : end est exclusif, on ajoute 1 jour pour les all-day events
             $endTimestamp = strtotime($endDate . ' +1 day');
+            $rowId = is_scalar($row['Id'] ?? null) ? (string) $row['Id'] : '0';
+
             if ($endTimestamp === false) {
-                throw new RuntimeException("Date invalide pour le prêt #{$row['Id']} : {$endDate}");
+                throw new RuntimeException("Date invalide pour le prêt #{$rowId} : {$endDate}");
             }
+
             $endDateExclusive = date('Y-m-d', $endTimestamp);
+            $itemName     = is_string($row['ItemName'] ?? null) ? $row['ItemName'] : '';
+            $borrowerName = is_string($row['BorrowerName'] ?? null) ? $row['BorrowerName'] : '';
+            $loanDate     = is_string($row['LoanDate'] ?? null) ? $row['LoanDate'] : '';
+
             $events[] = [
-                'id'              => 'loan-' . $row['Id'],
-                'title'           => $row['ItemName'] . ' → ' . $row['BorrowerName'],
-                'start'           => $row['LoanDate'],
+                'id'              => 'loan-' . $rowId,
+                'title'           => $itemName . ' → ' . $borrowerName,
+                'start'           => $loanDate,
                 'end'             => $endDateExclusive,
                 'backgroundColor' => $color,
                 'borderColor'     => $color,
                 'extendedProps'   => [
                     'type'   => 'loan',
-                    'id'     => $row['Id'],
-                    'status' => $row['Status'],
+                    'id'     => is_numeric($row['Id'] ?? null) ? (int) $row['Id'] : 0,
+                    'status' => $status,
                 ],
             ];
         }
@@ -564,26 +580,37 @@ final class LoanDataHelper extends Data
         // Réservations
         $stmt2 = $this->pdo->prepare(
             "SELECT res.Id, res.ReservationDate, res.StartTime, res.EndTime,
-			        li.Name AS ItemName,
-			        p.FirstName || ' ' || p.LastName AS UserName
-			 FROM   LoanReservation res
-			 JOIN   LoanItem li ON li.Id = res.ItemId
-			 JOIN   Individual p  ON p.Id  = res.UserId
-			 WHERE  res.Status = 'active'
-			   AND  res.ReservationDate BETWEEN :start AND :end"
+                li.Name AS ItemName,
+                p.FirstName || ' ' || p.LastName AS UserName
+            FROM   LoanReservation res
+            JOIN   LoanItem li ON li.Id = res.ItemId
+            JOIN   Individual p  ON p.Id  = res.UserId
+            WHERE  res.Status = 'active'
+                AND  res.ReservationDate BETWEEN :start AND :end"
         );
         $stmt2->execute([':start' => $start, ':end' => $end]);
-        foreach ($stmt2->fetchAll(PDO::FETCH_ASSOC) as $row) {
+
+        /** @var list<array<string, mixed>> $reservationRows */
+        $reservationRows = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($reservationRows as $row) {
+            $rowId            = is_scalar($row['Id'] ?? null) ? (string) $row['Id'] : '0';
+            $itemName         = is_string($row['ItemName'] ?? null) ? $row['ItemName'] : '';
+            $userName         = is_string($row['UserName'] ?? null) ? $row['UserName'] : '';
+            $reservationDate  = is_string($row['ReservationDate'] ?? null) ? $row['ReservationDate'] : '';
+            $startTime        = is_string($row['StartTime'] ?? null) ? $row['StartTime'] : '';
+            $endTime          = is_string($row['EndTime'] ?? null) ? $row['EndTime'] : '';
+
             $events[] = [
-                'id'              => 'res-' . $row['Id'],
-                'title'           => $row['ItemName'] . ' – ' . $row['UserName'],
-                'start'           => $row['ReservationDate'] . 'T' . $row['StartTime'],
-                'end'             => $row['ReservationDate'] . 'T' . $row['EndTime'],
+                'id'              => 'res-' . $rowId,
+                'title'           => $itemName . ' – ' . $userName,
+                'start'           => $reservationDate . 'T' . $startTime,
+                'end'             => $reservationDate . 'T' . $endTime,
                 'backgroundColor' => '#fd7e14',
                 'borderColor'     => '#fd7e14',
                 'extendedProps'   => [
                     'type' => 'reservation',
-                    'id'   => $row['Id'],
+                    'id'   => is_numeric($row['Id'] ?? null) ? (int) $row['Id'] : 0,
                 ],
             ];
         }

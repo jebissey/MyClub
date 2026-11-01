@@ -6,6 +6,7 @@ namespace app\modules\Article;
 
 use app\enums\Period;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\TranslationManager;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
@@ -33,9 +34,13 @@ final class ArticleStatisticsController extends TableController
             return;
         }
 
-        $period = Period::from($this->flight->request()->query->period ?? 'month');
+        $period = Period::tryFrom(To::str($this->flight->request()->query->period ?? 'month')) ?? Period::Month;
         $dateRange = $period->dateRange();
-        $crosstabData = $this->articleCrosstabDataHelper->getItems($dateRange);
+        $crosstabData = array_filter(
+            $this->articleCrosstabDataHelper->getItems($dateRange),
+            static fn(mixed $key): bool => is_string($key),
+            ARRAY_FILTER_USE_KEY
+        );
 
         $viewModel = new CrosstabViewModel(
             crosstabData: $crosstabData,
@@ -61,13 +66,18 @@ final class ArticleStatisticsController extends TableController
         $dateCondition = $period->dateConditions('CreatedAt');
         $topPages      = $this->logDataHelper->getTopArticles($dateCondition, self::TOP);
 
-        $articleIds = array_values(array_filter(
-            array_map(fn($p) => $p->articleId ?? null, $topPages)
-        ));
+        $articleIds = [];
+        foreach ($topPages as $page) {
+            $id = To::int($page->articleId ?? null);
+            if ($id > 0) {
+                $articleIds[] = $id;
+            }
+        }
         $authors = $this->articleDataHelper->getAuthorsByArticleIds($articleIds);
 
         foreach ($topPages as $page) {
-            $author             = $authors[$page->articleId ?? null] ?? null;
+            $articleId          = To::int($page->articleId ?? null);
+            $author             = $articleId > 0 ? ($authors[$articleId] ?? null) : null;
             $page->AuthorName   = $author?->personName;
             $page->ArticleTitle = $author?->articleTitle;
         }

@@ -17,6 +17,7 @@ use app\modules\Common\services\EmailService;
 use app\modules\Common\services\RegistrationLinkService;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\viewModels\ContactViewModel;
+use app\modules\Common\valueObjects\ContactFeedbackInfo;
 use app\modules\Common\valueObjects\EventRegistrationRow;
 
 final class ContactController extends AbstractController
@@ -71,6 +72,7 @@ final class ContactController extends AbstractController
             name: $identity['name'] ?? '',
             email: $identity['email'] ?? '',
             identityReadOnly: $identity !== null,
+            feedback: ContactFeedbackInfo::fromQuery($this->input->query()),
             layout: $this->getLayout(),
             page: $connectedUser->getPage(),
             layoutParams: $this->getAllParams([]),
@@ -102,7 +104,7 @@ final class ContactController extends AbstractController
 
     private function handleContactForm(): void
     {
-        $honeypot = To::str($_POST['website'] ?? '');
+        $honeypot = $this->input->formString('website');
         if ($honeypot !== '') {
             $this->silentFail("honey pot field filling with {$honeypot}");
             return;
@@ -110,7 +112,7 @@ final class ContactController extends AbstractController
 
         $formLoadedAt = To::int($_SESSION['contact_form_loaded'] ?? 0);
         $duration = time() - $formLoadedAt;
-        if ($duration <= self::MIN_FILL_SECONDS) {
+        if ($formLoadedAt === 0 || $duration <= self::MIN_FILL_SECONDS) {
             $this->silentFail("too fast for a human ({$duration}s)");
             return;
         }
@@ -122,7 +124,7 @@ final class ContactController extends AbstractController
             return;
         }
 
-        $turnstileToken = To::str($_POST['cf-turnstile-response'] ?? '');
+        $turnstileToken = $this->input->formString('cf-turnstile-response');
         if (!$this->verifyTurnstile($turnstileToken, $ip)) {
             $this->silentFail('turnstile challenge failed');
             return;
@@ -135,7 +137,7 @@ final class ContactController extends AbstractController
             'eventId' => FilterInputRule::Int->value,
         ];
 
-        $input   = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+        $input   = WebApp::filterInput($schema, $this->input->form());
         $name    = To::str($input['name']    ?? '');
         $email   = To::str($input['email']   ?? '');
         $message = To::str($input['message'] ?? '');

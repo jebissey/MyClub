@@ -264,14 +264,12 @@ final class HelloAssoService
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
         if (!is_string($response)) {
             throw new RuntimeException("HelloAsso cURL error for {$url}");
         }
 
         $decoded = json_decode($response, true);
-
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if ($httpCode >= 400) {
             $msg = $response;
             if (is_array($decoded) && isset($decoded['message']) && is_scalar($decoded['message'])) {
@@ -280,6 +278,13 @@ final class HelloAssoService
             throw new RuntimeException("HelloAsso API error {$httpCode}: {$msg}");
         }
 
-        return is_array($decoded) ? $decoded : [];
+        if (!is_array($decoded)) {
+            return [];
+        }
+        return array_filter(
+            $decoded,
+            static fn($key) => is_string($key),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 }

@@ -172,9 +172,9 @@ final readonly class MediaManager implements MediaManagerInterface
         }
         return new ShareStatus(
             shared: true,
-            idGroup: $sharedFile->idGroup,
+            idGroup: To::nullableInt($sharedFile->idGroup),
             membersOnly: $sharedFile->membersOnly === 1,
-            link: WebApp::getBaseUrl() . 'media/sharedFile/' . $sharedFile->Token
+            link: WebApp::getBaseUrl() . 'media/sharedFile/' . To::requireStr($sharedFile->Token)
         );
     }
 

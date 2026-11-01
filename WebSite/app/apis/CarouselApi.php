@@ -129,7 +129,7 @@ final class CarouselApi extends AbstractApi
         if (isset($data['id'])) {
             /** @var object{IdArticle: int|string}|false $existing */
             $existing = $this->dataHelper->get('Carousel', ['Id' => To::int($data['id'])], 'IdArticle');
-            if ($existing !== false && (int)$existing->IdArticle !== $idArticle) {
+            if ($existing !== false && To::int($existing->IdArticle !== $idArticle)) {
                 $this->renderJsonForbidden(__FILE__, __LINE__);
                 return;
             }

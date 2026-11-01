@@ -101,7 +101,10 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
+
+        /** @var list<stdClass> $messages */
         $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
@@ -126,7 +129,10 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
+
+        /** @var list<stdClass> $messages */
         $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
@@ -155,7 +161,10 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':groupId' => $groupId]);
+
+        /** @var list<stdClass> $messages */
         $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         $this->addAvatarAndTimeAgoToMessages($messages);
         return $messages;
     }
@@ -164,19 +173,25 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
     public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
     {
         $rows = $this->doGetGroupedMessages($personId, $searchFrom);
-        return array_map(function (stdClass $row) use ($gravatarHandler): array {
+
+        /** @var list<array<string, mixed>> $result */
+        $result = array_map(function (stdClass $row) use ($gravatarHandler): array {
             $userImg = WebApp::computeUserImg(
-                (bool)($row->UseGravatar ?? false),
-                $row->Email ?? null,
-                $row->Avatar ?? null,
+                (bool) ($row->UseGravatar ?? false),
+                is_string($row->Email ?? null) ? $row->Email : null,
+                is_string($row->Avatar ?? null) ? $row->Avatar : null,
                 $gravatarHandler
             );
-            $result = (array) $row;
-            $result['UserImg'] = $userImg;
-            unset($result['Avatar'], $result['UseGravatar'], $result['Email']);
 
-            return $result;
+            /** @var array<string, mixed> $item */
+            $item = (array) $row;
+            $item['UserImg'] = $userImg;
+            unset($item['Avatar'], $item['UseGravatar'], $item['Email']);
+
+            return $item;
         }, $rows);
+
+        return $result;
     }
 
     /** @return array{0: int, 1: int, 2: string} */
@@ -193,8 +208,11 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
                 $this->languagesDataHelper->translate('message.image_not_attached')
             );
         }
-        $path = parse_url($message->ImagePath, PHP_URL_PATH);
-        if (!$path) {
+        $path = is_string($message->ImagePath)
+            ? parse_url($message->ImagePath, PHP_URL_PATH)
+            : false;
+
+        if (!is_string($path) || $path === '') {
             throw new RuntimeException(
                 $this->languagesDataHelper->translate('message.image_invalid_path')
             );
@@ -228,7 +246,11 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
             ':start' => $season['start'],
             ':end'   => $season['end'],
         ]);
-        return $query->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        /** @var array<string, int> $result */
+        $result = $query->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        return $result;
     }
 
     /**
@@ -272,10 +294,19 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         ");
         $groups->execute([':path' => $like]);
 
+        /** @var list<stdClass> $eventsResult */
+        $eventsResult = $events->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<stdClass> $articlesResult */
+        $articlesResult = $articles->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<stdClass> $groupsResult */
+        $groupsResult = $groups->fetchAll(PDO::FETCH_OBJ);
+
         return [
-            'events'   => $events->fetchAll(PDO::FETCH_OBJ),
-            'articles' => $articles->fetchAll(PDO::FETCH_OBJ),
-            'groups'   => $groups->fetchAll(PDO::FETCH_OBJ),
+            'events'   => $eventsResult,
+            'articles' => $articlesResult,
+            'groups'   => $groupsResult,
         ];
     }
 
@@ -315,15 +346,25 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
             ':searchFrom' => $searchFrom,
             ':personId'   => $connectedUser->person->id,
         ]);
+        /** @var list<stdClass> $messages */
         $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         foreach ($messages as $message) {
+            $eventId    = is_numeric($message->EventId ?? null) ? (int) $message->EventId : 0;
+            $summary    = is_string($message->Summary ?? null) ? $message->Summary : '';
+            $startTime  = is_string($message->StartTime ?? null) ? $message->StartTime : '';
+            $text       = is_string($message->Text ?? null) ? $message->Text : '';
+            $firstName  = is_string($message->FirstName ?? null) ? $message->FirstName : '';
+            $lastName   = is_string($message->LastName ?? null) ? $message->LastName : '';
+            $lastUpdate = is_string($message->LastUpdate ?? null) ? $message->LastUpdate : '';
+
             $news[] = [
                 'type'  => 'message',
-                'id'    => $message->EventId,
-                'title' => $message->Summary . '(' . TranslationManager::getShortDate($message->StartTime) . ')' . ' => ' . $message->Text,
-                'from'  => $message->FirstName . ' ' . $message->LastName,
-                'date'  => $message->LastUpdate,
-                'url'   => '/event/chat/' . $message->EventId
+                'id'    => $eventId,
+                'title' => $summary . '(' . TranslationManager::getShortDate($startTime) . ')' . ' => ' . $text,
+                'from'  => $firstName . ' ' . $lastName,
+                'date'  => $lastUpdate,
+                'url'   => '/event/chat/' . $eventId,
             ];
         }
         return $news;
@@ -348,7 +389,7 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         $used = [];
         foreach ($paths as $path) {
             foreach ($imagePaths as $imagePath) {
-                if ($imagePath !== null && str_contains($imagePath, $path)) {
+                if (is_string($imagePath) && str_contains($imagePath, $path)) {
                     $used[$path] = true;
                     break;
                 }
@@ -396,17 +437,24 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
      */
     private function addAvatarAndTimeAgoToMessages(array $messages): array
     {
-        static $gravatarHandler = new GravatarHandler();
+        static $gravatarHandler = null;
+
+        if (!$gravatarHandler instanceof GravatarHandler) {
+            $gravatarHandler = new GravatarHandler();
+        }
 
         foreach ($messages as $message) {
             $message->UserImg = WebApp::computeUserImg(
-                (bool)($message->UseGravatar ?? false),
-                $message->Email ?? null,
-                $message->Avatar ?? null,
+                (bool) ($message->UseGravatar ?? false),
+                is_string($message->Email ?? null) ? $message->Email : null,
+                is_string($message->Avatar ?? null) ? $message->Avatar : null,
                 $gravatarHandler
             );
-            $message->TimeAgo = MyClubDateTime::calculateTimeAgo($message->LastUpdate);
+
+            $lastUpdate = is_string($message->LastUpdate ?? null) ? $message->LastUpdate : '';
+            $message->TimeAgo = MyClubDateTime::calculateTimeAgo($lastUpdate);
         }
+
         return $messages;
     }
 
@@ -553,7 +601,11 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
 
         $stmt = $this->pdo->prepare($query);
         $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     private function getLastCreatedAt(int $lastLogId): ?string

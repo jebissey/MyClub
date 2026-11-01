@@ -92,20 +92,24 @@ final class KanbanDataHelper extends Data
     }
 
     /**
-     * @return array<int, object{Id: int, Title: string, Detail: string}>
+     * @return list<object{Id: int, Title: string, Detail: string}>
      */
     public function getKanbanProjects(): array
     {
         $sql = "
-            SELECT 
-                Id, 
-                Title, 
-                Detail
-            FROM KanbanProject
-            ORDER BY Title";
+        SELECT
+            Id,
+            Title,
+            Detail
+        FROM KanbanProject
+        ORDER BY Title";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<object{Id: int, Title: string, Detail: string}> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     public function moveKanbanCard(int $id, string $what, string $remark = ''): bool
@@ -171,7 +175,7 @@ final class KanbanDataHelper extends Data
     }
 
     /**
-     * @return array<int, object{Id: int, Status: string, Remark: string, LastUpdate: string}>
+     * @return list<object{Id: int, Status: string, Remark: string, LastUpdate: string}>
      */
     public function getKanbanHistory(int $idKanbanCard): array
     {
@@ -194,7 +198,11 @@ final class KanbanDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':idKanbanCard' => $idKanbanCard]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<object{Id: int, Status: string, Remark: string, LastUpdate: string}> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     #region Project
@@ -224,7 +232,7 @@ final class KanbanDataHelper extends Data
     }
 
     /**
-     * @return array<int, object{Id: int, Title: string, Detail: string, IdKanbanCardType: int, Label: string, CurrentStatus: string}>
+     * @return list<object{Id: int, Title: string, Detail: string, IdKanbanCardType: int, Label: string, CurrentStatus: string}>
      */
     public function getProjectCards(int $idProject, ?int $filterCT, ?string $filterTitle, ?string $filterDetail): array
     {
@@ -274,7 +282,11 @@ final class KanbanDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<object{Id: int, Title: string, Detail: string, IdKanbanCardType: int, Label: string, CurrentStatus: string}> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     public function updateKanbanProject(int $id, string $title, string $detail, int $idPerson): bool
@@ -337,7 +349,7 @@ final class KanbanDataHelper extends Data
     }
 
     /**
-     * @return array<int, object{Id: int, Label: string, Detail: string, Color: string}>
+     * @return list<object{Id: int, Label: string, Detail: string, Color: string}>
      */
     public function getProjectCardTypes(?int $idProject): array
     {
@@ -356,7 +368,11 @@ final class KanbanDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':idProject' => $idProject]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<object{Id: int, Label: string, Detail: string, Color: string}> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     public function updateKanbanCardType(int $idKanbanCardType, string $label, string $detail, string $color): int

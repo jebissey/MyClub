@@ -10,6 +10,7 @@ use RuntimeException;
 use stdClass;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\To;
 
 final class DbBrowserDataHelper extends Data
 {
@@ -165,15 +166,15 @@ final class DbBrowserDataHelper extends Data
         $query = "SELECT * FROM " . $this->quoteName($table);
         $params = [];
 
-        if (!empty($filters)) {
-            $whereConditions = [];
-            foreach ($filters as $column => $value) {
-                if ($value === '') {
-                    continue;
-                }
-                $whereConditions[] = $this->quoteName($column) . " LIKE :filter_" . $column;
-                $params["filter_" . $column] = '%' . $value . '%';
+        $whereConditions = [];
+        foreach ($filters as $column => $value) {
+            if ($value === '') {
+                continue;
             }
+            $whereConditions[] = $this->quoteName($column) . " LIKE :filter_" . $column;
+            $params["filter_" . $column] = '%' . $value . '%';
+        }
+        if ($whereConditions !== []) {
             $query .= " WHERE " . implode(' AND ', $whereConditions);
         }
 
@@ -195,9 +196,12 @@ final class DbBrowserDataHelper extends Data
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
 
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-        foreach ($rows as &$row) {
-            foreach ($row as $col => $val) {
+        $rows = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $row) {
+            if (!$row instanceof stdClass) {
+                continue;
+            }
+            foreach (get_object_vars($row) as $col => $val) {
                 if (!is_string($val)) {
                     continue;
                 }
@@ -210,8 +214,9 @@ final class DbBrowserDataHelper extends Data
                 }
                 $row->$col = $val;
             }
+            $rows[] = $row;
         }
-        unset($row);
+
         return [$rows, $this->getTableColumns($table), $dbbPage, $totalPages, $filters];
     }
 
@@ -257,10 +262,19 @@ final class DbBrowserDataHelper extends Data
             throw new RuntimeException('Query failed in file ' . __FILE__ . ' at line ' . __LINE__);
         }
 
-        return array_map(
-            fn($col) => ['name' => $col->name, 'label' => $col->name],
-            $stmt->fetchAll(PDO::FETCH_OBJ)
-        );
+        $config = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $col) {
+            if (!$col instanceof stdClass) {
+                continue;
+            }
+            $name = To::str($col->name ?? null);
+            if ($name === '') {
+                continue;
+            }
+            $config[] = ['name' => $name, 'label' => $name];
+        }
+
+        return $config;
     }
 
     /** @return array<string, mixed> */
@@ -277,16 +291,22 @@ final class DbBrowserDataHelper extends Data
 
         $schema = [];
         foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $col) {
-            $name = $col->name;
+            if (!$col instanceof stdClass) {
+                continue;
+            }
+            $name = To::str($col->name ?? null);
+            if ($name === '') {
+                continue;
+            }
 
             if (isset($checkConstraints[$name])) {
                 $schema[$name] = $checkConstraints[$name];
                 continue;
             }
 
-            $schema[$name] = match (strtolower(trim($col->type))) {
+            $schema[$name] = match (strtolower(trim(To::str($col->type ?? null)))) {
                 'integer'  => FilterInputRule::Int->value,
-                default    => FilterInputRule::Content->value, // TEXT, DATE, datetime, vide…
+                default    => FilterInputRule::Content->value, // TEXT, DATE, datetime, empty...
             };
         }
 

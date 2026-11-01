@@ -37,6 +37,7 @@ final class ExerciseController extends TableController
     public function edit(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner(), __FILE__, __LINE__)) {
+            /** @var object{Content: string|null, Title: string|null, CreatedBy: int}|false $exercise */
             $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
             if (!$exercise) {
                 $this->errors->forbidden(__FILE__, __LINE__);
@@ -44,11 +45,11 @@ final class ExerciseController extends TableController
             }
 
             $this->views->render('Exercise/views/editor.latte', $this->getAllParams([
-                'articleId'   => $id,
-                'title'       => $exercise->Title ?? '',
-                'exercises'   => json_decode($exercise->Content ?? '[]', true) ?? [],
-                'i18n' => $this->doTranslations(),
-                'btnParent'  => '/exercises',
+                'articleId'      => $id,
+                'title'          => $exercise->Title ?? '',
+                'exercises'      => $this->decodeExerciseContent($exercise->Content),
+                'i18n'           => $this->doTranslations(),
+                'btnParent'      => '/exercises',
                 'btnHistoryBack' => true,
             ]));
         }
@@ -112,13 +113,14 @@ final class ExerciseController extends TableController
             return;
         }
 
+        /** @var object{Content: string|null, Title: string|null, CreatedBy: int}|false $exercise */
         $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
         if (!$exercise) {
             $this->errors->badRequest("Exercise ({$id}) not found", __FILE__, __LINE__);
             return;
         }
 
-        $exercises = json_decode($exercise->Content ?? '[]', true) ?? [];
+        $exercises = $this->decodeExerciseContent($exercise->Content);
 
         $this->views->render('Exercise/views/player.latte', $this->getAllParams([
             'articleId' => $id,
@@ -189,5 +191,15 @@ final class ExerciseController extends TableController
             'msg.error',
         ];
         return $this->translations($keys, 'exercise.');
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function decodeExerciseContent(mixed $content): array
+    {
+        $decoded = json_decode(To::str($content), true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 }

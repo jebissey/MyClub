@@ -8,6 +8,7 @@ use Throwable;
 use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\models\MessageDataHelper;
@@ -106,10 +107,7 @@ final class GroupController extends AbstractController
                 $viewModel = new GroupEditViewModel(
                     group: $group,
                     availableAuthorizations: array_values($this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name')),
-                    currentAuthorizations: array_column(
-                        $this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'),
-                        'IdAuthorization'
-                    ),
+                    currentAuthorizations: $this->getGroupAuthorizationIds($id),
                     layout: $this->getLayout(),
                     layoutParams: $this->getAllParams([]),
                 );
@@ -146,10 +144,7 @@ final class GroupController extends AbstractController
                 $viewModel = new GroupEditViewModel(
                     group: $group,
                     availableAuthorizations: array_values($availableAuthorizations),
-                    currentAuthorizations: array_column(
-                        $this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $id], 'IdAuthorization'),
-                        'IdAuthorization'
-                    ),
+                    currentAuthorizations: $this->getGroupAuthorizationIds($id),
                     layout: $this->getLayout(),
                     error: 'Le nom du groupe est requis',
                     layoutParams: $this->getAllParams([]),
@@ -214,5 +209,17 @@ final class GroupController extends AbstractController
         );
 
         $this->views->render('Common/views/chat.latte', $viewModel->toArray());
+    }
+
+    #region Privates functions
+    /**
+     * @return list<int>
+     */
+    private function getGroupAuthorizationIds(int $groupId): array
+    {
+        return array_values(array_map(
+            static fn($row) => To::int($row->IdAuthorization),
+            $this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $groupId], 'IdAuthorization')
+        ));
     }
 }

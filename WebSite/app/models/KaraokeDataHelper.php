@@ -8,6 +8,7 @@ use PDO;
 use stdClass;
 use Throwable;
 use app\helpers\Application;
+use app\helpers\To;
 use app\modules\Games\Karaoke\valueObjects\KaraokeSession;
 
 final class KaraokeDataHelper extends Data
@@ -66,7 +67,7 @@ final class KaraokeDataHelper extends Data
         $stmt->execute([$sessionId]);
         $session = $stmt->fetch(PDO::FETCH_OBJ);
         if ($session instanceof stdClass) {
-            return (int)$session->Id;
+            return To::int($session->Id);
         }
 
         $stmt = $this->pdo->prepare('

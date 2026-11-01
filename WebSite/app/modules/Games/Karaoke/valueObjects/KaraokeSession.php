@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Games\Karaoke\valueObjects;
 
 use stdClass;
+use app\helpers\To;
 
 final readonly class KaraokeSession
 {
@@ -19,10 +20,10 @@ final readonly class KaraokeSession
     public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            id: (int)$row->Id,
-            status: (string)$row->Status,
-            countdownStart: $row->CountdownStart !== null ? (string)$row->CountdownStart : null,
-            playStartTime: $row->PlayStartTime !== null ? (string)$row->PlayStartTime : null,
+            id: To::int($row->Id),
+            status: To::str($row->Status),
+            countdownStart: $row->CountdownStart !== null ? To::str($row->CountdownStart) : null,
+            playStartTime: $row->PlayStartTime !== null ? To::str($row->PlayStartTime) : null,
         );
     }
 }

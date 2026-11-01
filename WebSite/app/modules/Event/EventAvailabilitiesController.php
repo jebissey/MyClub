@@ -68,13 +68,13 @@ final class EventAvailabilitiesController extends AbstractController
 
         // --- Participation effective ---
 
-        $rangeParam = $_GET['range'] ?? null;
+        $rangeParam = $this->input->query()['range'] ?? null;
         $rangeKey   = is_string($rangeParam) ? $rangeParam : '6m';
         if (!isset(self::RANGE_MODIFIERS[$rangeKey])) {
             $rangeKey = '6m';
         }
 
-        $startParam    = $_GET['startDate'] ?? null;
+        $startParam    = $this->input->query()['startDate'] ?? null;
         $startParamStr = is_string($startParam) ? $startParam : null;
         try {
             $start = ($startParamStr !== null && $startParamStr !== '')

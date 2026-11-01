@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
+use DateTimeInterface;
 use flight\Engine;
 use Latte\Engine as LatteEngine;
 use Latte\Loaders\FileLoader;
@@ -59,7 +60,9 @@ final class Application
     private readonly PDO $pdoForLog;
     private readonly ErrorManager $errorManager;
     private readonly ConnectedUser $connectedUser;
+
     private AuthenticationService $authenticationService;
+    private ?RequestInput $requestInput = null;
 
     private function __construct()
     {
@@ -170,6 +173,11 @@ final class Application
         return Database::getInstance()->getPdoForCredential();
     }
 
+    public function getRequestInput(): RequestInput
+    {
+        return $this->requestInput ??= new RequestInput($this->getFlight()->request());
+    }
+
     public function getErrorManager(): ErrorManager
     {
         return $this->errorManager;
@@ -236,15 +244,18 @@ final class Application
     }
 
     #region Private functions
+
     private function setupLatteFilters(): void
     {
         self::$latte->addExtension(new TracyExtension());
 
-        self::$latte->addFilter('json', function ($value) {
+        self::$latte->addFilter('json', function (mixed $value): string|false {
             return json_encode($value, JSON_HEX_APOS | JSON_HEX_QUOT);
         });
 
-        self::$latte->addFilter('extractFirstElement', function ($html) {
+        self::$latte->addFilter('extractFirstElement', function (mixed $html): string {
+            $html = To::str($html);
+
             if (preg_match('/<p[^>]*>(.*?)<\/p>/s', $html, $matches)) {
                 return $matches[0];
             }
@@ -262,17 +273,18 @@ final class Application
             return strlen($text) > 150 ? substr($text, 0, 150) . '...' : $text;
         });
 
-        self::$latte->addFilter('nl2br', function ($string) {
+        self::$latte->addFilter('nl2br', function (mixed $string): string {
             return nl2br(
-                htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+                htmlspecialchars(To::str($string), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
             );
         });
 
-        self::$latte->addFilter('urlencode', function ($s) {
-            return urlencode($s);
+        self::$latte->addFilter('urlencode', function (mixed $s): string {
+            return urlencode(To::str($s));
         });
 
-        self::$latte->addFilter('translate', function ($key) {
+        self::$latte->addFilter('translate', function (mixed $key): string {
+            /** @var LanguagesDataHelper|null $languagesDataHelper */
             static $languagesDataHelper = null;
 
             $languagesDataHelper ??= new LanguagesDataHelper(
@@ -280,48 +292,50 @@ final class Application
                 $this->getErrorManager()
             );
 
-            return $languagesDataHelper->translate($key);
+            return $languagesDataHelper->translate(To::str($key));
         });
 
         self::$latte->addFilter(
             'shortDate',
-            fn($date) => TranslationManager::getShortDate($date)
+            fn(DateTimeInterface|string $date) => TranslationManager::getShortDate($date)
         );
 
         self::$latte->addFilter(
             'longDate',
-            fn($date) => TranslationManager::getLongDate($date)
+            fn(DateTimeInterface|string $date) => TranslationManager::getLongDate($date)
         );
 
         self::$latte->addFilter(
             'longDateTime',
-            fn($date) => TranslationManager::getLongDateTime($date)
+            fn(DateTimeInterface|string $date) => TranslationManager::getLongDateTime($date)
         );
 
         self::$latte->addFilter(
             'shortDateTime',
-            fn($date) => TranslationManager::getShortDateTime($date)
+            fn(DateTimeInterface|string $date) => TranslationManager::getShortDateTime($date)
         );
 
         self::$latte->addFilter(
             'dayName',
-            fn($date) => TranslationManager::getDayName($date)
+            fn(DateTimeInterface $date) => TranslationManager::getDayName($date)
         );
 
-        self::$latte->addFilter('formatFileSize', function ($bytes) {
-            if ($bytes >= 1073741824) {
-                return number_format($bytes / 1073741824, 2) . ' GB';
+        self::$latte->addFilter('formatFileSize', function (mixed $bytes): string {
+            $size = To::int($bytes);
+
+            if ($size >= 1073741824) {
+                return number_format($size / 1073741824, 2) . ' GB';
             }
 
-            if ($bytes >= 1048576) {
-                return number_format($bytes / 1048576, 2) . ' MB';
+            if ($size >= 1048576) {
+                return number_format($size / 1048576, 2) . ' MB';
             }
 
-            if ($bytes >= 1024) {
-                return number_format($bytes / 1024, 2) . ' KB';
+            if ($size >= 1024) {
+                return number_format($size / 1024, 2) . ' KB';
             }
 
-            return $bytes . ' bytes';
+            return $size . ' bytes';
         });
 
         self::$latte->addFilter('version', function (string $path): string {
@@ -346,7 +360,7 @@ final class Application
 
         self::$latte->addFilter(
             'readableDuration',
-            fn($duration) => TranslationManager::getReadableDuration($duration)
+            fn(mixed $duration) => TranslationManager::getReadableDuration(To::int($duration))
         );
     }
 }

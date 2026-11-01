@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Loan;
 
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\TranslationManager;
 use app\models\LoanDataHelper;
 use app\modules\Common\AbstractController;
@@ -67,7 +68,7 @@ final class LoanController extends AbstractController
         $content = ($helpRow !== false && isset($helpRow->$lang)) ? $helpRow->$lang : '';
 
         $viewModel = new InfoViewModel(
-            content: $content,
+            content: To::str($content),
             timer: 0,
             hasAuthorization: $this->application->getConnectedUser()->isRedactor(),
             previousPage: true,

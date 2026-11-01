@@ -6,6 +6,7 @@ namespace app\models;
 
 use PDO;
 use app\helpers\Application;
+use app\helpers\To;
 
 /**
  * @phpstan-type EventParticipantRow object{
@@ -55,6 +56,7 @@ final class ParticipantDataHelper extends Data
 
         /** @var list<EventParticipantRow> $rows */
         $rows = array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+
         return $rows;
     }
 
@@ -77,10 +79,13 @@ final class ParticipantDataHelper extends Data
 
         $query->execute([
             ':start' => $season['start'],
-            ':end'   => $season['end']
+            ':end'   => $season['end'],
         ]);
 
-        return $query->fetchAll(PDO::FETCH_KEY_PAIR);
+        /** @var array<string, int> $result */
+        $result = $query->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        return $result;
     }
 
     /** @return array{connections: array<int, array<string, mixed>>, maxEvents: int} */
@@ -115,24 +120,29 @@ final class ParticipantDataHelper extends Data
         ");
 
         $stmt->execute(['idPerson' => $idPerson]);
+
+        /** @var list<array<string, mixed>> $connections */
         $connections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($connections as &$connection) {
-            if (!empty($connection['EventList'])) {
-                $events = explode(' • ', $connection['EventList']);
+            $eventList = $connection['EventList'] ?? null;
 
-                usort($events, function ($a, $b) {
+            if (is_string($eventList) && $eventList !== '') {
+                $events = explode(' • ', $eventList);
+
+                usort($events, function (string $a, string $b): int {
                     $partsA = explode('|', $a);
                     $partsB = explode('|', $b);
 
-                    return strcmp($partsB[1], $partsA[1]);
+                    return strcmp($partsB[1] ?? '', $partsA[1] ?? '');
                 });
 
                 $connection['EventList'] = implode(' • ', $events);
             }
         }
+        unset($connection);
 
-        if (!$connections) {
+        if ($connections === []) {
             return ['connections' => [], 'maxEvents' => 0];
         }
 
@@ -149,19 +159,39 @@ final class ParticipantDataHelper extends Data
         ");
 
         if ($personsStmt === false) {
+            $commonEvents = array_column($connections, 'CommonEvents');
+            $maxEvents = $commonEvents !== []
+                ? To::int(max(array_map(static fn(mixed $v): int => To::int($v), $commonEvents)))
+                : 0;
+
             return [
                 'connections' => $connections,
-                'maxEvents' => (int) max(array_column($connections, 'CommonEvents')),
+                'maxEvents'   => $maxEvents,
             ];
         }
 
+        /** @var array<int|string, string> $persons */
         $persons = $personsStmt->fetchAll(PDO::FETCH_KEY_PAIR);
-        $maxEvents = (int) max(array_column($connections, 'CommonEvents'));
+
+        $commonEvents = array_column($connections, 'CommonEvents');
+        $maxEvents = $commonEvents !== []
+            ? To::int(max(array_map(static fn(mixed $v): int => To::int($v), $commonEvents)))
+            : 0;
 
         foreach ($connections as &$c) {
-            $c['Name'] = $persons[$c['OtherPerson']] ?? 'Inconnu';
-            $c['Percent'] = $maxEvents
-                ? round(($c['CommonEvents'] / $maxEvents) * 100)
+            $otherPerson = $c['OtherPerson'] ?? null;
+            $otherPersonKey = (is_int($otherPerson) || is_string($otherPerson))
+                ? $otherPerson
+                : null;
+
+            $c['Name'] = ($otherPersonKey !== null && isset($persons[$otherPersonKey]))
+                ? $persons[$otherPersonKey]
+                : 'Inconnu';
+
+            $common = is_numeric($c['CommonEvents'] ?? null) ? (int) $c['CommonEvents'] : 0;
+
+            $c['Percent'] = $maxEvents > 0
+                ? (int) round(($common / $maxEvents) * 100)
                 : 0;
 
             if ($c['Percent'] >= 70) {
@@ -178,7 +208,7 @@ final class ParticipantDataHelper extends Data
 
         return [
             'connections' => $connections,
-            'maxEvents' => $maxEvents
+            'maxEvents'   => $maxEvents,
         ];
     }
 }

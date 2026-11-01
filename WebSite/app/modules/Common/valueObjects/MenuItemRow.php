@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Common\valueObjects;
 
 use stdClass;
+use app\helpers\To;
 
 final readonly class MenuItemRow
 {
@@ -28,18 +29,18 @@ final readonly class MenuItemRow
     public static function fromStdClass(stdClass $o): self
     {
         return new self(
-            id: (int) $o->Id,
-            name: (string) $o->Name,
-            route: (string) $o->Route,
-            idGroup: $o->IdGroup !== null ? (int) $o->IdGroup : null,
-            forMembers: (int) $o->ForMembers,
-            forContacts: (int) $o->ForContacts,
-            forAnonymous: (int) $o->ForAnonymous,
-            what: (string) $o->What,
-            type: (string) $o->Type,
-            label: (string) $o->Label,
-            icon: $o->Icon !== null ? (string) $o->Icon : null,
-            url: (string) $o->Url,
+            id: To::int($o->Id),
+            name: To::str($o->Name),
+            route: To::str($o->Route),
+            idGroup: $o->IdGroup !== null ? To::int($o->IdGroup) : null,
+            forMembers: To::int($o->ForMembers),
+            forContacts: To::int($o->ForContacts),
+            forAnonymous: To::int($o->ForAnonymous),
+            what: To::str($o->What),
+            type: To::str($o->Type),
+            label: To::str($o->Label),
+            icon: $o->Icon !== null ? To::str($o->Icon) : null,
+            url: To::str($o->Url),
         );
     }
 

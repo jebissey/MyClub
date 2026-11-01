@@ -38,8 +38,7 @@ final class KaraokeController extends AbstractController
                 'sessionId' => session_id()
             ]));
         } catch (LyricsParserException $e) {
-            $content = ($this->t)($e->getMessage())
-                ?? ($this->t)('Error500');
+            $content = ($this->t)($e->getMessage());
 
             $this->views->render('Common/views/info.latte', $this->getAllParams([
                 'content' => $content,

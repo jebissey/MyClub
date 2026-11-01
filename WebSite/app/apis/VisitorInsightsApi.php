@@ -32,9 +32,10 @@ final class VisitorInsightsApi extends AbstractApi
             return;
         }
 
-        $uri  = trim(To::str($_GET['uri']  ?? ''));
-        $from = trim(To::str($_GET['from'] ?? ''));
-        $to   = trim(To::str($_GET['to']   ?? ''));
+        $query = $this->input->query();
+        $uri  = trim(To::str($query['uri'] ?? ''));
+        $from = trim(To::str($query['from'] ?? ''));
+        $to   = trim(To::str($query['to'] ?? ''));
 
         if ($uri === '' || $from === '' || $to === '') {
             $this->renderJsonBadRequest('Missing required parameters: uri, from, to', __FILE__, __LINE__);
@@ -60,9 +61,10 @@ final class VisitorInsightsApi extends AbstractApi
             return;
         }
 
-        $uri  = trim(To::str($_GET['uri']  ?? ''));
-        $from = trim(To::str($_GET['from'] ?? ''));
-        $to   = trim(To::str($_GET['to']   ?? ''));
+        $query = $this->input->query();
+        $uri  = trim(To::str($query['uri'] ?? ''));
+        $from = trim(To::str($query['from'] ?? ''));
+        $to   = trim(To::str($query['to'] ?? ''));
 
         if ($uri === '' || $from === '' || $to === '') {
             $this->renderJsonBadRequest('Missing required parameters: uri, from, to', __FILE__, __LINE__);

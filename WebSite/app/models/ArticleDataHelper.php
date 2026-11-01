@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use PDOStatement;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
+use app\helpers\To;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\ArticleAuthorRow;
@@ -89,10 +91,10 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
             return [];
         }
 
-        return array_values(array_map(
-            ArticleSitemapRow::fromStdClass(...),
-            $stmt->fetchAll(PDO::FETCH_OBJ)
-        ));
+        /** @var list<object{Id: int|string, LastUpdate: string, Title: string, ReferenceSource: string}> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(ArticleSitemapRow::fromStdClass(...), $rows);
     }
 
     /**
@@ -115,10 +117,10 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
 
-        return array_values(array_map(
-            ArticleRssRow::fromStdClass(...),
-            $stmt->fetchAll(PDO::FETCH_OBJ)
-        ));
+        /** @var list<object{Id: int|string, Title: string, Content: string, LastUpdate: string, CreationDate: string}> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(ArticleRssRow::fromStdClass(...), $rows);
     }
 
     /**
@@ -150,6 +152,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($articleIds);
 
+        /** @var list<object{Id: int|string, PersonName: string, ArticleTitle: string}> $results */
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $indexed = [];
@@ -292,7 +295,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         $used = [];
         foreach ($paths as $path) {
             foreach ($contents as $content) {
-                if ($content !== null && str_contains($content, $path)) {
+                if (is_string($content) && str_contains($content, $path)) {
                     $used[$path] = true;
                     break;
                 }
@@ -359,7 +362,10 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':path' => '%' . $path . '%']);
 
-        return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+        /** @var list<object> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     public function isUserAllowedToReadArticle(string $userEmail, int $id): bool
@@ -424,7 +430,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         ");
         $query->execute($groupIds);
 
-        return array_values($query->fetchAll(PDO::FETCH_COLUMN));
+        return $this->fetchIntColumn($query);
     }
 
     /**
@@ -441,7 +447,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         ");
         $query->execute();
 
-        return array_values($query->fetchAll(PDO::FETCH_COLUMN));
+        return $this->fetchIntColumn($query);
     }
 
     /**
@@ -473,9 +479,11 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ) ?: [];
 
-        return array_values(array_map(ArticleSummaryRow::fromStdClass(...), $rows));
+        /** @var list<object{Id: int|string, Title: string, Timestamp: string, LastUpdate: string}> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(ArticleSummaryRow::fromStdClass(...), $rows);
     }
 
     /**
@@ -492,7 +500,20 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         ");
         $query->execute();
 
-        return array_values($query->fetchAll(PDO::FETCH_COLUMN));
+        return $this->fetchIntColumn($query);
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function fetchIntColumn(PDOStatement $stmt): array
+    {
+        $values = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $value) {
+            $values[] = To::int($value);
+        }
+
+        return $values;
     }
 
     #endregion

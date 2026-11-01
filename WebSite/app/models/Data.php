@@ -11,6 +11,7 @@ use PDOException;
 use PDOStatement;
 use RuntimeException;
 use stdClass;
+use UnexpectedValueException;
 use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
 use app\helpers\interfaces\ErrorManagerInterface;
@@ -23,7 +24,7 @@ abstract class Data
     protected Query $fluent;
     protected Query $fluentForLog;
 
-    /** @var array<int, string> */
+    /** @var list<string> */
     private readonly array $tables;
 
     public function __construct(
@@ -40,7 +41,64 @@ abstract class Data
 
     #region Protected methods
 
-    /** @return array<int, string> */
+    /**
+     * Fetches the first column of all rows as strings. The type is asserted here once for all helpers.
+     *
+     * @return list<string>
+     */
+    protected function fetchColumnStrings(PDOStatement $stmt): array
+    {
+        /** @var list<string> $values */
+        $values = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        return $values;
+    }
+
+    /**
+     * Fetches all rows as objects. The type is asserted here once for all helpers.
+     *
+     * @return list<stdClass>
+     */
+    protected function fetchObjects(PDOStatement $stmt): array
+    {
+        /** @var list<stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
+    }
+
+    /**
+     * Fetches all rows of a PDOStatement, throwing if the query failed
+     * (PDO::query() is typed PDOStatement|false).
+     *
+     * @return list<array<string, mixed>>
+     */
+    protected function fetchAllOrFail(PDOStatement|false $stmt): array
+    {
+        if ($stmt === false) {
+            throw new RuntimeException('SQL query failed.');
+        }
+
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $rows;
+    }
+
+    /**
+     * Fetches the first column of the first row of a PDOStatement,
+     * throwing if the query failed.
+     */
+    protected function fetchColumnOrFail(PDOStatement|false $stmt, int $column = 0): mixed
+    {
+        if ($stmt === false) {
+            throw new RuntimeException('SQL query failed.');
+        }
+
+        return $stmt->fetchColumn($column);
+    }
+
+    /** @return list<string> */
     protected function getCheckValues(string $table, string $column): array
     {
         $sql = "SELECT sql FROM sqlite_master WHERE type='table' AND name=?";
@@ -59,11 +117,13 @@ abstract class Data
         }
         if (preg_match("/\"$column\"[^\n]*CHECK\s*\(\s*\"$column\"\s+IN\s*\(([^)]+)\)\)/i", $sqlText, $matches)) {
             $values = explode(',', $matches[1]);
-            $values = array_map(function ($v) {
-                return trim($v, " '\"");
-            }, $values);
-            return $values;
+
+            return array_map(
+                static fn(string $v): string => trim($v, " '\""),
+                $values
+            );
         }
+
         return [];
     }
 
@@ -79,7 +139,7 @@ abstract class Data
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
             throw new SqliteTableException("Invalid table name in file $file at line $line");
         }
-        if (!in_array($table, $this->tables)) {
+        if (!in_array($table, $this->tables, true)) {
             throw new SqliteTableException("Table '$table' not found in file $file at line $line");
         }
     }
@@ -135,8 +195,8 @@ abstract class Data
                     $params[":{$field}"] = $value;
                 }
                 $sql .= ' WHERE ' . implode(' AND ', $conditions);
-                $sql .= ' LIMIT 1';
             }
+            $sql .= ' LIMIT 1';
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
             $result = $stmt->fetch(PDO::FETCH_OBJ);
@@ -150,20 +210,21 @@ abstract class Data
         }
     }
 
+    /**
+     * Returns the translated text for a given language key, or an empty string if not found.
+     */
+    public function getLanguageText(string $name, string $lang): string
+    {
+        return $this->getString('Languages', ['Name' => $name], $lang);
+    }
+
     public function getNavbarColors(): NavbarColors
     {
         return new NavbarColors(
-            bgColor: $this->get('Settings', ['Name' => 'Navbar_BgColor'], 'Value')->Value ?? '#212529',
-            inkColor: $this->get('Settings', ['Name' => 'Navbar_InkColor'], 'Value')->Value ?? '#ffffff',
-            iconColor: $this->get('Settings', ['Name' => 'Navbar_IconColor'], 'Value')->Value ?? '#ffc107',
+            bgColor: $this->getString('Settings', ['Name' => 'Navbar_BgColor'], 'Value', '#212529'),
+            inkColor: $this->getString('Settings', ['Name' => 'Navbar_InkColor'], 'Value', '#ffffff'),
+            iconColor: $this->getString('Settings', ['Name' => 'Navbar_IconColor'], 'Value', '#ffc107'),
         );
-    }
-
-    public function getSetting(string $name, string $default): string
-    {
-        /** @var object{Value?: string}|false $row */
-        $row = $this->get('Settings', ['Name' => $name], 'Value');
-        return $row !== false ? ($row->Value ?? $default) : $default;
     }
 
     /**
@@ -205,16 +266,24 @@ abstract class Data
             }
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-            if ($keyPair) {
-                $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-                $keyPairArray = [];
-                foreach ($results as $result) {
-                    $key = $result->{$firstField};
-                    $keyPairArray[$key] = $result;
-                }
-                return $keyPairArray;
+
+            $rows = $this->fetchObjects($stmt);
+
+            // $firstField is only set when $keyPair is true
+            if ($firstField === null) {
+                return $rows;
             }
-            return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            $keyPairArray = [];
+            foreach ($rows as $row) {
+                $key = $row->{$firstField};
+                if (!is_int($key) && !is_string($key)) {
+                    throw new UnexpectedValueException("Invalid key-pair value in column '{$firstField}'");
+                }
+                $keyPairArray[$key] = $row;
+            }
+
+            return $keyPairArray;
         } catch (PDOException $e) {
             $this->errorManager->raise(
                 ApplicationError::Error,
@@ -224,14 +293,51 @@ abstract class Data
         }
     }
 
-    /** @return array<int, string> */
+    public function getSetting(string $name, string $default): string
+    {
+        return $this->getString('Settings', ['Name' => $name], 'Value', $default);
+    }
+
+    /**
+     * Same as getValue(), cast to string. Returns $default when there is no row,
+     * the column is NULL, or the value is not scalar.
+     *
+     * @param array<string, mixed> $where
+     */
+    public function getString(string $table, array $where, string $field, string $default = ''): string
+    {
+        $value = $this->getValue($table, $where, $field);
+
+        return is_scalar($value) ? (string) $value : $default;
+    }
+
+    /** @return list<string> */
     public function getTables(): array
     {
         $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
         if ($stmt === false) {
-            throw new RuntimeException('La requête SQL a échoué.');
+            throw new RuntimeException('SQL query failed.');
         }
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        return $this->fetchColumnStrings($stmt);
+    }
+
+    /**
+     * Returns the value of a single column from the first matching row,
+     * or null if no row matches or the column is NULL.
+     *
+     * $field must be a plain column name (no alias, no table prefix).
+     *
+     * @param array<string, mixed> $where
+     */
+    public function getValue(string $table, array $where, string $field): mixed
+    {
+        $row = $this->get($table, $where, $field);
+        if ($row === false) {
+            return null;
+        }
+
+        return get_object_vars($row)[$field] ?? null;
     }
 
     /**
@@ -290,7 +396,7 @@ abstract class Data
             $queryType = strtoupper(substr(trim($sql), 0, 6));
             switch ($queryType) {
                 case 'SELECT':
-                    return $stmt->fetchAll(PDO::FETCH_OBJ);
+                    return $this->fetchObjects($stmt);
                 case 'INSERT':
                     return $pdo->lastInsertId();
                 case 'UPDATE':
@@ -391,31 +497,6 @@ abstract class Data
             }
         }
         return true;
-    }
-
-    /**
-     * Récupère toutes les lignes d'un PDOStatement, en levant une exception
-     * si la requête a échoué (PDO::query() est typé PDOStatement|false).
-     * @return array<int, array<string, mixed>>
-     */
-    protected function fetchAllOrFail(PDOStatement|false $stmt): array
-    {
-        if ($stmt === false) {
-            throw new RuntimeException('La requête SQL a échoué.');
-        }
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Récupère la première colonne de la première ligne d'un PDOStatement,
-     * en levant une exception si la requête a échoué.
-     */
-    protected function fetchColumnOrFail(PDOStatement|false $stmt, int $column = 0): mixed
-    {
-        if ($stmt === false) {
-            throw new RuntimeException('La requête SQL a échoué.');
-        }
-        return $stmt->fetchColumn($column);
     }
 
     /**

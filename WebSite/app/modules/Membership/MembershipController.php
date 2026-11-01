@@ -49,7 +49,7 @@ final class MembershipController extends AbstractController
         $current  = $this->membershipDataHelper->getForPersonAndSeason($personId, $season);
         $history  = $this->membershipDataHelper->getAllForPerson($personId);
 
-        $paymentFeedbackRaw = $_GET['payment'] ?? null;
+        $paymentFeedbackRaw = $this->input->query()['payment'] ?? null;
         $paymentFeedback = is_string($paymentFeedbackRaw) ? $paymentFeedbackRaw : null;
 
         // ── HelloAsso widget URL ──────────────────────────────────────────────

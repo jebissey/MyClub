@@ -6,8 +6,10 @@ namespace app\models;
 
 use DateTime;
 use PDO;
+use stdClass;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
+use app\helpers\To;
 
 final class LogStatisticsDataHelper extends Data
 {
@@ -36,15 +38,20 @@ final class LogStatisticsDataHelper extends Data
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute([
             ':startDate' => $startDate->format('Y-m-d H:i:s'),
-            ':endDate' => $endDate->format('Y-m-d H:i:s')
+            ':endDate'   => $endDate->format('Y-m-d H:i:s'),
         ]);
+
+        /** @var list<stdClass> $results */
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         $labels = [];
         $data = [];
         foreach ($results as $row) {
-            $labels[] = $row->Os ?: 'Inconnu';
-            $data[] = (int)$row->count;
+            $os = is_string($row->Os ?? null) ? $row->Os : null;
+            $labels[] = ($os !== null && $os !== '') ? $os : 'Inconnu';
+            $data[] = To::int($row->count ?? 0);
         }
+
         return ['labels' => $labels, 'data' => $data];
     }
 
@@ -88,19 +95,25 @@ final class LogStatisticsDataHelper extends Data
             WHERE rest = ''
             OR SUBSTR(rest, 0, INSTR(rest, ' ')) GLOB '[0-9]*'
             GROUP BY word
-            ORDER BY count DESC";
+            ORDER BY count DESC
+        ";
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute([
             ':startDate' => $startDate->format('Y-m-d H:i:s'),
-            ':endDate' => $endDate->format('Y-m-d H:i:s')
+            ':endDate'   => $endDate->format('Y-m-d H:i:s'),
         ]);
+
+        /** @var list<stdClass> $results */
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         $labels = [];
         $data = [];
         foreach ($results as $row) {
-            $labels[] = $row->Browser ?? 'Inconnu';
-            $data[] = $row->count;
+            $browser = is_string($row->Browser ?? null) ? $row->Browser : null;
+            $labels[] = $browser ?? 'Inconnu';
+            $data[] = To::int($row->count ?? 0);
         }
+
         return ['labels' => $labels, 'data' => $data];
     }
 
@@ -120,16 +133,23 @@ final class LogStatisticsDataHelper extends Data
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute([
             ':startDate' => $startDate->format('Y-m-d H:i:s'),
-            ':endDate' => $endDate->format('Y-m-d H:i:s')
+            ':endDate'   => $endDate->format('Y-m-d H:i:s'),
         ]);
+
+        /** @var list<stdClass> $results */
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
+        /** @var array<string, int> $typeGroups */
         $typeGroups = [];
+        /** @var array<string, list<string>> $typeResolutions */
         $typeResolutions = [];
 
         foreach ($results as $row) {
-            $orientation = $this->getScreenOrientation($row->ScreenResolution);
-            $type = $this->getResolutionType($row->ScreenResolution);
+            $resolution = is_string($row->ScreenResolution ?? null) ? $row->ScreenResolution : null;
+            $count = To::int($row->count ?? 0);
+
+            $orientation = $this->getScreenOrientation($resolution);
+            $type = $this->getResolutionType($resolution);
             $emoji = $this->getDeviceEmoji($orientation, $type);
 
             $typeKey = "$type $emoji";
@@ -137,18 +157,20 @@ final class LogStatisticsDataHelper extends Data
                 $typeGroups[$typeKey] = 0;
                 $typeResolutions[$typeKey] = [];
             }
-            $typeGroups[$typeKey] += $row->count;
-            if ($row->ScreenResolution && $row->ScreenResolution !== 'Inconnu') {
-                $typeResolutions[$typeKey][] = $row->ScreenResolution;
+            $typeGroups[$typeKey] += $count;
+
+            if ($resolution !== null && $resolution !== '' && $resolution !== 'Inconnu') {
+                $typeResolutions[$typeKey][] = $resolution;
             }
         }
 
         arsort($typeGroups);
+
         $labels = [];
         $data = [];
         foreach ($typeGroups as $typeKey => $count) {
             $label = $typeKey;
-            if (!empty($typeResolutions[$typeKey])) {
+            if ($typeResolutions[$typeKey] !== []) {
                 $resolutionRange = $this->getResolutionRange($typeResolutions[$typeKey]);
                 $label .= " $resolutionRange";
             }
@@ -175,19 +197,25 @@ final class LogStatisticsDataHelper extends Data
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute([
             ':startDate' => $startDate->format('Y-m-d H:i:s'),
-            ':endDate' => $endDate->format('Y-m-d H:i:s')
+            ':endDate'   => $endDate->format('Y-m-d H:i:s'),
         ]);
+
+        /** @var list<stdClass> $results */
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         $labels = [];
         $data = [];
         foreach ($results as $row) {
-            $labels[] = $row->Type ?: 'Inconnu';
-            $data[] = $row->count;
+            $type = is_string($row->Type ?? null) ? $row->Type : null;
+            $labels[] = ($type !== null && $type !== '') ? $type : 'Inconnu';
+            $data[] = To::int($row->count ?? 0);
         }
+
         return ['labels' => $labels, 'data' => $data];
     }
 
     #region Private helper methods
+
     /** @param array<int, string> $resolutions */
     private function getResolutionRange(array $resolutions): string
     {
@@ -197,12 +225,12 @@ final class LogStatisticsDataHelper extends Data
         foreach ($resolutions as $resolution) {
             if (strpos($resolution, 'x') !== false) {
                 [$width, $height] = explode('x', $resolution);
-                $widths[] = (int)$width;
-                $heights[] = (int)$height;
+                $widths[] = To::int($width);
+                $heights[] = To::int($height);
             }
         }
 
-        if (empty($widths) || empty($heights)) {
+        if ($widths === [] || $heights === []) {
             return 'Résolutions variées';
         }
 
@@ -238,30 +266,33 @@ final class LogStatisticsDataHelper extends Data
 
     private function getScreenOrientation(?string $resolution): string
     {
-        if (!$resolution || strpos($resolution, 'x') === false) {
+        if ($resolution === null || $resolution === '' || strpos($resolution, 'x') === false) {
             return 'Inconnu';
         }
         [$width, $height] = explode('x', $resolution);
-        return ((int)$width < (int)$height) ? 'Portrait' : 'Paysage';
+
+        return (To::int($width) < To::int($height)) ? 'Portrait' : 'Paysage';
     }
 
     private function getResolutionType(?string $resolution): string
     {
-        if (!$resolution) {
+        if ($resolution === null || $resolution === '') {
             return 'Inconnu';
         }
         [$width, $height] = explode('x', $resolution) + [0, 0];
-        $maxDimension = max((int)$width, (int)$height);
+        $w = To::int($width);
+        $h = To::int($height);
+        $maxDimension = max($w, $h);
 
         return match (true) {
             $maxDimension >= 3840 => '4K',
             $maxDimension >= 2560 => '2K/1440p',
             $maxDimension >= 1920 => 'Full HD',
             $maxDimension >= 1280 => 'HD',
-            $height > $width && $height >= 900 => 'Mobile Premium',
-            $height > $width && $height >= 800 => 'Mobile Standard',
-            $height > $width && $height >= 700 => 'Mobile Compact',
-            $height > $width => 'Mobile Basique',
+            $h > $w && $h >= 900 => 'Mobile Premium',
+            $h > $w && $h >= 800 => 'Mobile Standard',
+            $h > $w && $h >= 700 => 'Mobile Compact',
+            $h > $w => 'Mobile Basique',
             $maxDimension >= 1024 => 'Tablette',
             default => 'Petit écran',
         };

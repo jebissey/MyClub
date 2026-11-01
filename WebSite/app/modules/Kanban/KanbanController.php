@@ -50,7 +50,7 @@ final class KanbanController extends AbstractController
 
         $viewModel = new KanbanBoardViewModel(
             personId: $personId,
-            projects: array_values($this->kanbanDataHelper->getKanbanProjects()),
+            projects: $this->kanbanDataHelper->getKanbanProjects(),
             columns: [
                 ['icon' => '💡', 'label' => 'Backlog'],
                 ['icon' => '☑️', 'label' => 'Selected'],
@@ -58,7 +58,7 @@ final class KanbanController extends AbstractController
                 ['icon' => '🏁', 'label' => 'Done'],
             ],
             selectedProjectId: $selectedProjectId,
-            cardTypes: array_values($this->kanbanDataHelper->getProjectCardTypes($selectedProjectId)),
+            cardTypes: $this->kanbanDataHelper->getProjectCardTypes($selectedProjectId),
             filters: $filters,
             isOwner: $isOwner,
             layoutParams: $this->getAllParams([

@@ -60,9 +60,9 @@ final class SimulationExtractor
             } catch (Throwable $e) {
                 throw new RuntimeException(
                     'error: ' . $e->getMessage()
-                    . ' on dbId ' . $row['Id']
-                    . ' (Step ' . $row['Step'] . ') '
-                    . $row['Method'] . ' ' . $row['Uri']
+                        . ' on dbId ' . $row['Id']
+                        . ' (Step ' . $row['Step'] . ') '
+                        . $row['Method'] . ' ' . $row['Uri']
                 );
             }
         }
@@ -75,12 +75,7 @@ final class SimulationExtractor
      */
     private function decodeArray(?string $json): array
     {
-        if ($json === null || $json === '') {
-            return [];
-        }
-        $decoded = json_decode($json, true);
-
-        return is_array($decoded) ? $decoded : [];
+        return $this->decodeNullableArray($json) ?? [];
     }
 
     /**

@@ -154,7 +154,7 @@ final class ConnectedUser
         }
 
         $row = $this->dataHelper->get('Member', ['Id' => $this->person->id], 'LastSignIn');
-        return $row !== false ? ($row->LastSignIn ?? null) : null;
+        return $row !== false ? To::nullableStr($row->LastSignIn ?? null) : null;
     }
 
     public function getLastSignOut(): ?string
@@ -164,7 +164,7 @@ final class ConnectedUser
         }
 
         $row = $this->dataHelper->get('Member', ['Id' => $this->person->id], 'LastSignOut');
-        return $row !== false ? ($row->LastSignOut ?? null) : null;
+        return $row !== false ? To::nullableStr($row->LastSignOut ?? null) : null;
     }
 
     public function getPage(int $segment = 0): ?string

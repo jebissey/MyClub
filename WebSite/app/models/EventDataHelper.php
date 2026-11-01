@@ -303,7 +303,9 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ':startOfWeek' => $startOfCurrentWeek->format('Y-m-d H:i:s'),
             ':endOfWeek'   => $endOfThirdWeek->format('Y-m-d H:i:s'),
         ]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var array<int, stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $rows;
     }
 
 
@@ -334,7 +336,9 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ':date'      => $date,
             ':userEmail' => $userEmail,
         ]);
-        return $query->fetchAll(PDO::FETCH_OBJ);
+        /** @var array<int, stdClass> $rows */
+        $rows = $query->fetchAll(PDO::FETCH_OBJ);
+        return $rows;
     }
 
     public function getEvent(int $eventId): EventDetailRow
@@ -380,6 +384,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['eventId' => $eventId]);
+            /** @var array<int, stdClass> $result */
             $result = $stmt->fetchAll(PDO::FETCH_OBJ);
             return $result;
         }
@@ -433,7 +438,9 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':today' => (new DateTime())->format('Y-m-d\TH:i:s')]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var array<int, stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $rows;
     }
 
 
@@ -489,7 +496,9 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$eventId, $eventId, $eventId]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var array<int, stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $rows;
     }
 
 
@@ -550,6 +559,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ':start' => $startOfCurrentWeek->format('Y-m-d H:i:s'),
             ':end'   => $endOfThirdWeek->format('Y-m-d H:i:s'),
         ]);
+        /** @var array<int, stdClass> $events */
         $events = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $weeklyEvents = [];
@@ -569,8 +579,8 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         }
 
         foreach ($events as $event) {
-            $startTime  = new DateTime($event->StartTime);
-            $dayOfWeek  = (int)$startTime->format('N');
+            $startTime  = new DateTime(To::str($event->StartTime));
+            $dayOfWeek  = (int) $startTime->format('N');
             $weekKey = $startTime->format('o-W');
             if (!isset($weeklyEvents[$weekKey])) {
                 continue;
@@ -612,14 +622,15 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ':personId'   => $connectedUser->person->id,
             ':searchFrom' => $searchFrom
         ]);
+        /** @var array<int, stdClass> $events */
         $events = $stmt->fetchAll(PDO::FETCH_OBJ);
         foreach ($events as $event) {
             $news[] = [
                 'type'  => 'event',
-                'id'    => $event->Id,
-                'title' => $event->Summary,
-                'date'  => $event->LastUpdate,
-                'url'   => '/event/' . $event->Id
+                'id'    => To::int($event->Id),
+                'title' => To::str($event->Summary),
+                'date'  => To::str($event->LastUpdate),
+                'url'   => '/event/' . To::int($event->Id),
             ];
         }
         return $news;
@@ -647,7 +658,9 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var array<int, stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $rows;
     }
 
 
@@ -668,7 +681,9 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ':eventId'   => $eventId,
             ':userEmail' => $userEmail,
         ]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var array<int, stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $rows;
     }
 
 
@@ -844,20 +859,23 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($eventIds);
 
+            /** @var array<int, stdClass> $rows */
             $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
             foreach ($rows as $row) {
-                $attributes[$row->IdEvent][] = [
-                    'id'     => $row->Id,
-                    'name'   => $row->Name,
-                    'detail' => $row->Detail,
-                    'color'  => $row->Color
+                $eventIdKey = To::int($row->IdEvent);
+                $attributes[$eventIdKey][] = [
+                    'id'     => To::int($row->Id),
+                    'name'   => To::str($row->Name),
+                    'detail' => To::str($row->Detail),
+                    'color'  => To::str($row->Color),
                 ];
             }
         }
-        return array_map(function ($event) use ($attributes) {
+        return array_map(function (stdClass $event) use ($attributes): array {
+            $eventId = To::int($event->Id);
             return [
-                'id'              => $event->Id,
+                'id'              => $eventId,
                 'idEventType'     => $event->IdEventType,
                 'eventTypeName'   => $event->EventTypeName,
                 'groupName'       => $event->EventTypeIdGroup ? $this->fluent->from("'Group'")->where(
@@ -867,15 +885,15 @@ final class EventDataHelper extends Data implements NewsProviderInterface
                 'summary'         => $event->Summary,
                 'location'        => $event->Location,
                 'startTime'       => $event->StartTime,
-                'duration'        => TranslationManager::getReadableDuration($event->Duration),
-                'attributes'      => $attributes[$event->Id] ?? [],
-                'participants'    => $this->fluent->from('Participant')->where('IdEvent', $event->Id)->count(),
+                'duration'        => TranslationManager::getReadableDuration(To::int($event->Duration)),
+                'attributes'      => $attributes[$eventId] ?? [],
+                'participants'    => $this->fluent->from('Participant')->where('IdEvent', $eventId)->count(),
                 'maxParticipants' => $event->MaxParticipants,
                 'booked'          => $event->Booked,
                 'audience'        => $event->Audience,
                 'createdBy'       => $event->CreatedBy,
                 'messages'        => $event->MessageCount,
-                'webappMessages'  => $this->getEventMessagesCount($event->Id, 'Webapp'),
+                'webappMessages'  => $this->getEventMessagesCount($eventId, 'Webapp'),
                 'canceled'        => $event->Canceled,
             ];
         }, $events);
@@ -949,6 +967,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+        /** @var array<int, stdClass> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
         $events = $this->events($rows);
 
@@ -1016,7 +1035,9 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
-        return $this->events($stmt->fetchAll(PDO::FETCH_OBJ));
+        /** @var array<int, stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $this->events($rows);
     }
 
     /** @return array{0: DateTime, 1: DateTime} */
@@ -1104,17 +1125,17 @@ final class EventDataHelper extends Data implements NewsProviderInterface
     private function buildEventArray(stdClass $event, DateTime $startTime): array
     {
         return [
-            'id'           => $event->Id,
-            'summary'      => $event->Summary,
-            'description'  => $event->Description,
-            'location'     => $event->Location,
+            'id'           => is_int($event->Id) || is_string($event->Id) ? $event->Id : To::int($event->Id),
+            'summary'      => To::str($event->Summary),
+            'description'  => $event->Description !== null ? To::str($event->Description) : null,
+            'location'     => $event->Location !== null ? To::str($event->Location) : null,
             'startTime'    => $startTime->format('H:i'),
-            'duration'     => $this->formatDuration((int)($event->Duration ?? 0)),
-            'eventType'    => $event->EventTypeName,
-            'audience'     => $event->Audience,
+            'duration'     => $this->formatDuration(To::int(($event->Duration) ?? 0)),
+            'eventType'    => $event->EventTypeName !== null ? To::str($event->EventTypeName) : null,
+            'audience'     => $event->Audience !== null ? To::str($event->Audience) : null,
             'attributes'   => $this->parseAttributes($event),
-            'fullDateTime' => $event->StartTime,
-            'groupName'    => $event->GroupName,
+            'fullDateTime' => To::str($event->StartTime),
+            'groupName'    => $event->GroupName !== null ? To::str($event->GroupName) : null,
             'date'         => $startTime->format('Y-m-d'),
         ];
     }
@@ -1150,10 +1171,10 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         }
 
         $sep     = chr(31);
-        $ids     = explode($sep, $event->AttributeIds);
-        $names   = explode($sep, $event->AttributeNames   ?? '');
-        $details = explode($sep, $event->AttributeDetails ?? '');
-        $colors  = explode($sep, $event->AttributeColors  ?? '');
+        $ids     = explode($sep, To::str($event->AttributeIds));
+        $names   = explode($sep, To::str(($event->AttributeNames)   ?? ''));
+        $details = explode($sep, To::str(($event->AttributeDetails) ?? ''));
+        $colors  = explode($sep, To::str(($event->AttributeColors)  ?? ''));
         $count   = count($ids);
 
         $attributes = [];

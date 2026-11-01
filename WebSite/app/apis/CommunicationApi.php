@@ -6,12 +6,10 @@ namespace app\apis;
 
 use JsonException;
 use Throwable;
-use app\enums\ApplicationError;
 use app\exceptions\EmailException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\helpers\WebApp;
 use app\modules\Common\interfaces\EmailQuotaTrackerInterface;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
@@ -66,8 +64,8 @@ final class CommunicationApi extends AbstractApi
             $this->renderJsonOk([
                 'members' => array_values(array_map(fn($m) => [
                     'id'    => $m->Id,
-                    'name'  => trim(($m->FirstName ?? '') . ' ' . ($m->LastName ?? '')),
-                    'email' => $m->Email ?? '',
+                    'name'  => trim(To::str($m->FirstName ?? null) . ' ' . To::str($m->LastName ?? null)),
+                    'email' => To::str($m->Email ?? null),
                 ], $members)),
             ]);
         } catch (Throwable $e) {

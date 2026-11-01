@@ -44,7 +44,7 @@ final class HelloAssoApi extends AbstractApi
         $season = $this->membershipDataHelper->currentSeason();
 
         // Guard: already paid this season
-        $existing = $this->membershipDataHelper->getForPersonAndSeason((int)$person?->id, $season);
+        $existing = $this->membershipDataHelper->getForPersonAndSeason(To::int($person?->id), $season);
         if ($existing && $existing->Status === 'paid') {
             $this->renderJsonBadRequest('Membership already paid for this season.', __FILE__, __LINE__);
             return;
@@ -52,12 +52,12 @@ final class HelloAssoApi extends AbstractApi
 
         // Cancel any stale pending row before creating a fresh one
         if ($existing && $existing->Status === 'pending') {
-            $this->membershipDataHelper->cancel((int)$existing->Id);
+            $this->membershipDataHelper->cancel(To::int($existing->Id));
         }
 
         $amountCents  = $this->membershipDataHelper->getAmountCents();
         $membershipId = $this->membershipDataHelper->createPending(
-            (int)$person?->id,
+            To::int($person?->id),
             $season,
             $amountCents
         );
@@ -141,7 +141,7 @@ final class HelloAssoApi extends AbstractApi
      */
     public function paymentReturn(): void
     {
-        $status = $_GET['status'] ?? 'error';
+        $status = $this->input->query()['status'] ?? 'error';
 
         if ($status === 'success') {
             $this->application->getFlight()->redirect('/membership?payment=success');

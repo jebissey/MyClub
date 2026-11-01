@@ -39,7 +39,7 @@ final class KanbanApi extends AbstractApi
             return;
         }
 
-        $kanbanCardId = (int)trim(To::str($data['cardType'] ?? ''));
+        $kanbanCardId = To::int(trim(To::str($data['cardType'] ?? '')));
         $title = trim(To::str($data['title'] ?? ''));
         $detail = trim(To::str($data['detail'] ?? ''));
         if (empty($kanbanCardId)) {

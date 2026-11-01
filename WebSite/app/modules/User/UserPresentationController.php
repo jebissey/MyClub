@@ -39,7 +39,7 @@ final class UserPresentationController extends AbstractController
 
         $viewModel = new UserEditPresentationViewModel(
             person: $member,
-            presentation: $row === false ? '' : (string) ($row->Presentation ?? ''),
+            presentation: $row === false ? '' : To::str($row->Presentation ?? ''),
             navItems: $this->getNavItems($connectedPerson->email),
             validationMsg: ($this->t)('presentation.edit.validation.noContent'),
             maxZoom: 18,
@@ -100,7 +100,7 @@ final class UserPresentationController extends AbstractController
 
         $viewModel = new UserPresentationViewModel(
             person: $person,
-            presentation: (string) ($row->Presentation ?? ''),
+            presentation: To::str($row->Presentation ?? ''),
             loggedPerson: $this->application->getConnectedUser(true)->person,
             navItems: $this->getNavItems($person->email),
             personImg: WebApp::getUserImg(

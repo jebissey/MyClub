@@ -72,7 +72,7 @@ final class AlertRecipientDataHelper extends Data
      * Returns the emails of the members who want to be alerted about the article
      * and records one Message per recipient.
      *
-     * @return string[]
+     * @return list<string>
      */
     public function getPersonWantedToBeAlerted(int $idArticle): array
     {

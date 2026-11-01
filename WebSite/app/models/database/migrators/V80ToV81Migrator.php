@@ -771,6 +771,9 @@ final class V80ToV81Migrator implements DatabaseMigratorInterface
             throw new RuntimeException("Query failed: $sql");
         }
 
-        return array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+        /** @var list<object> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 }

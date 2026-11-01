@@ -9,13 +9,13 @@ use app\helpers\Client;
 
 final class ClientTest extends TestCase
 {
-    /** @var array<string, mixed> */
+    /** @var array<mixed> */
     private array $server;
 
-    /** @var array<string, mixed> */
+    /** @var array<mixed> */
     private array $cookie;
 
-    /** @var array<string, mixed> */
+    /** @var array<mixed> */
     private array $session;
 
     protected function setUp(): void

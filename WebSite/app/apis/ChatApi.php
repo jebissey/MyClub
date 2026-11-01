@@ -20,8 +20,6 @@ use app\modules\Common\valueObjects\Person;
 
 final class ChatApi extends AbstractApi
 {
-    private const ACTIVE_WINDOW_MINUTES = 15;
-
     public function __construct(
         Application $application,
         protected ConnectedUser $connectedUser,
@@ -42,24 +40,16 @@ final class ChatApi extends AbstractApi
         }
 
         $previousLogId = To::int($_SESSION['last_log_id'] ?? null);
-        $minutes = To::int($_GET['m'] ?? null, self::ACTIVE_WINDOW_MINUTES);
-
         $activePersons = $this->memberDataHelper->getActiveMembersBasicInfo();
         $visits = $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons);
 
-        $cutoff = new DateTime("-{$minutes} minutes", new DateTimeZone('UTC'));
         $result = [];
         foreach ($visits as $visit) {
-            $visitDate = new DateTime($visit->LastActivity, new DateTimeZone('UTC'));
-            if ($visitDate < $cutoff) {
-                continue;
-            }
-
             $visitPerson = new Person(
-                id: (int) $visit->PersonId,
-                email: $visit->Email ?? '',
+                id: To::int($visit->PersonId),
+                email: To::str($visit->Email ?? ''),
                 useGravatar: To::bool($visit->UseGravatar ?? null),
-                avatar: $visit->Avatar ?? null,
+                avatar: To::nullableStr($visit->Avatar ?? null),
             );
 
             $result[] = [

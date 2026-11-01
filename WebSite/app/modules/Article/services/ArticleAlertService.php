@@ -37,7 +37,7 @@ final readonly class ArticleAlertService
     /**
      * Pure composition: no database access.
      *
-     * @param string[] $recipients
+     * @param list<string> $recipients
      * @param callable(string): string $t translator
      */
     public function compose(int $articleId, string $authorEmail, array $recipients, callable $t): ArticleAlertInfo

@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use RuntimeException;
 use app\enums\TimeOfDay;
 use app\helpers\Application;
+use app\helpers\To;
 
 final class AvailabilityDataHelper extends Data
 {
@@ -112,8 +113,12 @@ final class AvailabilityDataHelper extends Data
 
         $events = [];
         foreach ($rows as $row) {
-            $startTime = new DateTimeImmutable((string) $row['StartTime']);
-            $rowDay    = ((int) $startTime->format('N')) - 1; // 1=lundi..7=dimanche -> 0..6
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $startTime = new DateTimeImmutable(To::str($row['StartTime'] ?? null));
+            $rowDay    = ((int) $startTime->format('N')) - 1; // 1=Monday..7=Sunday -> 0..6
 
             if ($rowDay !== $day) {
                 continue;
@@ -130,12 +135,12 @@ final class AvailabilityDataHelper extends Data
             }
 
             $events[] = [
-                'id'                => (int) $row['Id'],
-                'date'              => $startTime->format('Y-m-d'),
-                'startTime'         => $startTime->format('H:i'),
-                'durationMinutes'   => (int) ($row['Duration'] / 60),
-                'summary'           => (string) ($row['Summary'] ?? ''),
-                'participantCount'  => (int) $row['ParticipantCount'],
+                'id'               => To::int($row['Id'] ?? null),
+                'date'             => $startTime->format('Y-m-d'),
+                'startTime'        => $startTime->format('H:i'),
+                'durationMinutes'  => intdiv(To::int($row['Duration'] ?? null), 60),
+                'summary'          => To::str($row['Summary'] ?? null),
+                'participantCount' => To::int($row['ParticipantCount'] ?? null),
             ];
         }
 
@@ -176,8 +181,12 @@ final class AvailabilityDataHelper extends Data
         }
 
         foreach ($rows as $row) {
-            $startTime = new DateTimeImmutable((string) $row['StartTime']);
-            $day       = ((int) $startTime->format('N')) - 1; // 1=lundi..7=dimanche -> 0..6
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $startTime = new DateTimeImmutable(To::str($row['StartTime'] ?? null));
+            $day       = ((int) $startTime->format('N')) - 1; // 1=Monday..7=Sunday -> 0..6
 
             $slot = match (TimeOfDay::fromDateTime($startTime)) {
                 TimeOfDay::Morning   => 'morning',
@@ -185,7 +194,8 @@ final class AvailabilityDataHelper extends Data
                 TimeOfDay::Evening   => 'evening',
             };
 
-            $count = (int) $row['ParticipantCount'];
+            $count = To::int($row['ParticipantCount'] ?? null);
+
 
             $current = $sums[$day][$slot];
             $current['total']      += $count;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Common\services;
 
+use app\helpers\To;
 use app\modules\Common\interfaces\RecipientResolverInterface;
 use app\models\Data;
 use app\modules\Notifications\services\ArticleRecipientResolver;
@@ -26,7 +27,7 @@ final readonly class MessageRecipientService
     }
 
     /**
-     * @return array<int, int>
+     * @return list<int>
      */
     public function getRecipientsForContext(MessageContext $context): array
     {
@@ -38,26 +39,26 @@ final readonly class MessageRecipientService
 
         $recipients = [];
         foreach ($members as $member) {
-            /** @var array<string, mixed> $preferences */
-            $preferences = json_decode(
-                $member->Notifications ?? '{}',
-                true
-            ) ?? [];
+            $memberId = To::int($member->Id);
+            $notifications = $member->Notifications;
 
-            if ($preferences === []) {
+            $decoded = is_string($notifications) && $notifications !== ''
+                ? json_decode($notifications, true)
+                : null;
+
+            if (!is_array($decoded) || $decoded === []) {
                 continue;
             }
+
+            /** @var array<string, mixed> $preferences */
+            $preferences = $decoded;
 
             foreach ($this->resolvers as $resolver) {
                 if (
                     $resolver->supports($context)
-                    && $resolver->shouldNotify(
-                        $context,
-                        $member->Id,
-                        $preferences
-                    )
+                    && $resolver->shouldNotify($context, $memberId, $preferences)
                 ) {
-                    $recipients[] = $member->Id;
+                    $recipients[] = $memberId;
                     break;
                 }
             }

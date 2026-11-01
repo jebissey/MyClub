@@ -37,20 +37,20 @@
             <h2>{$event->Summary}</h2>
         {/if}
 
-        {if isset($_GET['success'])}
-            <div class="alert alert-success" role="alert">{$_GET['success']}</div>
+        {if $feedback->success !== null}
+            <div class="alert alert-success" role="alert">{$feedback->success}</div>
         {/if}
 
-        {if isset($_GET['error'])}
-            <div class="alert alert-danger" role="alert">{$_GET['error']}</div>
+        {if $feedback->error !== null}
+            <div class="alert alert-danger" role="alert">{$feedback->error}</div>
         {/if}
 
-        {if isset($_GET['errors'])}
+        {if $feedback->errors !== []}
             <div class="alert alert-danger" role="alert">
                 <ul class="mb-0">
-                    {foreach explode('|', $_GET['errors']) as $error}
-                        <li>{$error}</li>
-                    {/foreach}
+                {foreach $feedback->errors as $error}
+                    <li>{$error}</li>
+                {/foreach}
                 </ul>
             </div>
         {/if}

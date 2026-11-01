@@ -32,7 +32,7 @@ final class UserNotificationsController extends AbstractController
 
         $person = $this->application->getConnectedUser(true)->person;
         $notification = '';
-        if (isset($_GET['test'])) {
+        if ($this->input->hasQuery('test')) {
             $this->notificationSender->sendToRecipients(
                 [$person->id],
                 [
@@ -51,12 +51,10 @@ final class UserNotificationsController extends AbstractController
         /** @var array<string, mixed>|null $decodedNotifications */
         $decodedNotifications = json_decode($notificationsJson, true);
 
-        $groupsWithType = $this->groupDataHelper->getGroupsWithType($person->id);
-
         $viewModel = new UserNotificationsViewModel(
             navItems: $this->getNavItems($person->email),
             currentNotifications: is_array($decodedNotifications) ? $decodedNotifications : [],
-            groups: array_values($groupsWithType),
+            groups: $this->groupDataHelper->getGroupsWithType($person->id),
             vapidPubliKey: $this->credentials->get('vapid', 'publicKey') ?? '',
             notification: $notification,
             layoutParams: $this->getAllParams([]),

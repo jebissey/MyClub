@@ -60,7 +60,7 @@ final class LanguagesDataHelper extends Data
     }
 
     /**
-     * @return array<int, object{Id: int, Name: string, ref_value: string|null, target_value: string|null}>
+     * @return list<object{Id: int, Name: string, ref_value: string|null, target_value: string|null}>
      */
     public function getTranslations(
         string $referenceLang,
@@ -85,13 +85,15 @@ final class LanguagesDataHelper extends Data
         }
 
         $sql .= " ORDER BY Name";
-
         $stmt = $this->pdo->query($sql);
         if ($stmt === false) {
             throw new RuntimeException('Failed to query Languages table');
         }
 
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<object{Id: int, Name: string, ref_value: string|null, target_value: string|null}> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     public function countMissingTranslations(string $targetLang): int

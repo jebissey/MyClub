@@ -17,6 +17,7 @@ use app\exceptions\DatabaseException;
 use app\helpers\Application;
 use app\helpers\File;
 use app\helpers\LogMessage;
+use app\helpers\To;
 use app\modules\Common\interfaces\DatabaseMigratorInterface;
 
 final class Database
@@ -214,26 +215,45 @@ final class Database
         }
         $tables = $stmtTables->fetchAll(PDO::FETCH_COLUMN);
 
-        foreach ($tables as $table) {
-            $stmtFk = $pdo->query("PRAGMA foreign_key_list(" . $pdo->quote((string)$table) . ")");
+        foreach ($tables as $tableName) {
+            $table = To::str($tableName);
+            if ($table === '') {
+                continue;
+            }
+
+            $stmtFk = $pdo->query("PRAGMA foreign_key_list(" . $pdo->quote($table) . ")");
             if (!$stmtFk instanceof PDOStatement) {
                 continue;
             }
             $foreignKeys = $stmtFk->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($foreignKeys as $fk) {
+                if (!is_array($fk)) {
+                    continue;
+                }
+
+                $from = To::str($fk['from'] ?? null);
+                $to = To::str($fk['to'] ?? null);
+                $parentTable = To::str($fk['table'] ?? null);
+
+                // 'to' is NULL in SQLite when the foreign key implicitly references the parent
+                // primary key. An empty identifier would make the DELETE below wrong, so skip it.
+                if ($from === '' || $to === '' || $parentTable === '') {
+                    continue;
+                }
+
                 $sql = sprintf(
                     'DELETE FROM "%s" WHERE "%s" IS NOT NULL AND "%s" NOT IN (SELECT "%s" FROM "%s")',
                     $table,
-                    $fk['from'],
-                    $fk['from'],
-                    $fk['to'],
-                    $fk['table']
+                    $from,
+                    $from,
+                    $to,
+                    $parentTable
                 );
                 $deleted = $pdo->exec($sql);
                 if ($deleted !== false && $deleted > 0) {
                     $logMessage->setMessage(
-                        "Orphans deleted in {$table}.{$fk['from']} referencing {$fk['table']}.{$fk['to']}: {$deleted} row(s)"
+                        "Orphans deleted in {$table}.{$from} referencing {$parentTable}.{$to}: {$deleted} row(s)"
                     );
                 }
             }
@@ -250,7 +270,15 @@ final class Database
 
         if (!empty($violations)) {
             $details = implode('; ', array_map(
-                fn(array $v) => "table={$v['table']} rowid={$v['rowid']} parent={$v['parent']} fkid={$v['fkid']}",
+                static function (mixed $v): string {
+                    if (!is_array($v)) {
+                        return 'unknown violation';
+                    }
+                    return 'table=' . To::str($v['table'] ?? null)
+                        . ' rowid=' . To::str($v['rowid'] ?? null)
+                        . ' parent=' . To::str($v['parent'] ?? null)
+                        . ' fkid=' . To::str($v['fkid'] ?? null);
+                },
                 $violations
             ));
             Application::unreachable("Orphaned records found after migration: {$details}");

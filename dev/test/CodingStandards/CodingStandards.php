@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/bootstrap.php';
-
 use test\CodingStandards\CodingStandardsChecker;
 
 function main(): int

@@ -193,7 +193,7 @@ final class VisitorInsightsController extends TableController
 
         $periodType = $this->flight->request()->query->periodType ?? self::DEFAULT_PERIOD_TYPE;
         $periodType = in_array($periodType, self::PERIOD_TYPES, true) ? $periodType : self::DEFAULT_PERIOD_TYPE;
-        $offset     = (int)($this->flight->request()->query->offset ?? 0);
+        $offset     = To::int(($this->flight->request()->query->offset ?? 0));
         $data       = $this->logDataAnalyticsHelper->getStatisticsData($periodType, $offset);
 
         $viewModel = new VisitorsGrafViewModel(

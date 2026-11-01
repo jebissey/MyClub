@@ -158,7 +158,8 @@ final class EventController extends AbstractController
             return;
         }
 
-        $period = Period::from($this->flight->request()->query->period ?? 'month');
+        $periodValue = To::str($this->flight->request()->query->period ?? 'month');
+        $period = Period::tryFrom($periodValue) ?? Period::from('month');
         [$dateRange, $crosstabData] = $this->crosstabDataHelper->getevents($period);
 
         $viewModel = new CrosstabViewModel(
@@ -228,10 +229,10 @@ final class EventController extends AbstractController
             event: $event,
             attributes: array_map(
                 static fn(stdClass $row): EventAttributeRow => new EventAttributeRow(
-                    id: (string) $row->AttributeId,
-                    name: $row->Name,
-                    detail: $row->Detail,
-                    color: $row->Color,
+                    id: To::str($row->AttributeId),
+                    name: To::str($row->Name),
+                    detail: To::str($row->Detail),
+                    color: To::str($row->Color),
                 ),
                 array_values($this->eventDataHelper->getEventAttributes($eventId))
             ),

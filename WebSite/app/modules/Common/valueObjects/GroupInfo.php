@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Common\valueObjects;
 
+use app\helpers\To;
+
 final readonly class GroupInfo
 {
     public function __construct(
@@ -18,8 +20,8 @@ final readonly class GroupInfo
             return null;
         }
         return new self(
-            id: (int)$row->IdGroup,
-            name: $row->GroupName,
+            id: To::int($row->IdGroup),
+            name: To::str($row->GroupName),
         );
     }
 }

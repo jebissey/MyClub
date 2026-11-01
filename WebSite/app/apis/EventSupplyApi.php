@@ -47,7 +47,7 @@ final class EventSupplyApi extends AbstractApi
             $this->renderJsonBadRequest("Invalid parameters", __FILE__, __LINE__);
             return;
         }
-        $eventId = (int)$eventId;
+        $eventId = To::int($eventId);
         $userEmail = $this->application->getConnectedUser(true)->person->email;
         try {
             $this->render(
@@ -113,17 +113,22 @@ final class EventSupplyApi extends AbstractApi
     private function findUpdatedNeed(array $eventNeeds, int $needId): ?array
     {
         foreach ($eventNeeds as $need) {
-            if ($need->Id == $needId) {
-                return [
-                    'id' => $need->Id,
-                    'providedQuantity' => $need->ProvidedQuantity,
-                    'requiredQuantity' => $need->RequiredQuantity,
-                    'percentage' => $need->RequiredQuantity > 0
-                        ? min(100, ($need->ProvidedQuantity / $need->RequiredQuantity) * 100)
-                        : 0
-                ];
+            $id = To::requireInt($need->Id);
+            if ($id !== $needId) {
+                continue;
             }
+
+            $provided = To::number($need->ProvidedQuantity);
+            $required = To::number($need->RequiredQuantity);
+
+            return [
+                'id' => $id,
+                'providedQuantity' => $provided,
+                'requiredQuantity' => $required,
+                'percentage' => $required > 0 ? min(100, ($provided / $required) * 100) : 0,
+            ];
         }
+
         return null;
     }
 

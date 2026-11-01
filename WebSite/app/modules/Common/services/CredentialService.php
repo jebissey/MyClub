@@ -31,7 +31,7 @@ final class CredentialService
      */
     public function get(string $service, string $name): ?string
     {
-        return $this->data->getValue($service, $name);
+        return $this->data->getCredentialValue($service, $name);
     }
 
     /**
@@ -41,6 +41,6 @@ final class CredentialService
      */
     public function set(string $service, string $name, string $value): bool
     {
-        return $this->data->setValue($service, $name, $value);
+        return $this->data->setCredentialValue($service, $name, $value);
     }
 }

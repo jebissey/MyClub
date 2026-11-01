@@ -53,4 +53,54 @@ final class To
     {
         return is_scalar($value) ? (string) $value : $default;
     }
+
+    /**
+     * SUM() returns an int or a float depending on the stored values.
+     * Keeping the original type avoids turning counters into floats.
+     */
+    public static function number(mixed $value): int|float
+    {
+        if (is_int($value) || is_float($value)) {
+            return $value;
+        }
+
+        return is_string($value) && is_numeric($value) ? $value + 0 : 0;
+    }
+
+
+    /**
+     * Strict variants: throw instead of returning a default, for data
+     * that must be valid (database rows, identifiers, dates).
+     */
+    public static function requireInt(mixed $value): int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && is_numeric($value)) {
+            return (int) $value;
+        }
+
+        throw new RuntimeException('Expected int, got ' . get_debug_type($value));
+    }
+
+    public static function requireStr(mixed $value): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        throw new RuntimeException('Expected string, got ' . get_debug_type($value));
+    }
+
+    public static function nullableInt(mixed $value): ?int
+    {
+        return $value === null ? null : self::requireInt($value);
+    }
+
+    public static function nullableStr(mixed $value): ?string
+    {
+        return $value === null ? null : self::requireStr($value);
+    }
 }

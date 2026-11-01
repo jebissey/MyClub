@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Common\valueObjects;
 
 use stdClass;
+use app\helpers\To;
 
 final readonly class EventAttributeRow
 {
@@ -37,10 +38,10 @@ final readonly class EventAttributeRow
     public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            id: (string) $row->Id,
-            name: (string) $row->Name,
-            detail: (string) $row->Detail,
-            color: (string) $row->Color,
+            id: To::str($row->Id),
+            name: To::str($row->Name),
+            detail: To::str($row->Detail),
+            color: To::str($row->Color),
         );
     }
 }

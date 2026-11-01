@@ -8,6 +8,7 @@ use app\enums\ApplicationError;
 use app\enums\MenuItemTab;
 use app\exceptions\QueryException;
 use app\helpers\Application;
+use app\helpers\To;
 use app\models\ArwardsDataHelper;
 use app\models\CarouselDataHelper;
 use app\modules\Common\AbstractController;
@@ -23,7 +24,7 @@ final class MenuItemController extends AbstractController
     public function index(): void
     {
         $menuItems = $this->getNavItems($this->application->getConnectedUser()->person?->email, true);
-        $tab = MenuItemTab::tryFrom($this->flight->request()->query->tab ?? '') ?? MenuItemTab::Navbar;
+        $tab = MenuItemTab::tryFrom(To::str($this->flight->request()->query->tab ?? '')) ?? MenuItemTab::Navbar;
 
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
             $this->views->render('Designer/views/menuItem.latte', $this->getAllParams([

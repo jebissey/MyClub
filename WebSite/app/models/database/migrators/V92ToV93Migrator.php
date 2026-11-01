@@ -23,6 +23,7 @@ SQL);
         if ($statement === false) {
             throw new RuntimeException('Failed to check for duplicate language names.');
         }
+        /** @var list<array{Name: string, Total: int|string}> $duplicates */
         $duplicates = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         if ($duplicates !== []) {

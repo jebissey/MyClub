@@ -38,7 +38,7 @@ final class NeedDataHelper extends Data
             throw new RuntimeException('Unable to execute query.');
         }
 
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $this->fetchObjects($stmt);
     }
 
     /**
@@ -56,7 +56,7 @@ final class NeedDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':needTypeId' => $needTypeId]);
 
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $this->fetchObjects($stmt);
     }
 
     public function countForNeedType(int $needTypeid): int

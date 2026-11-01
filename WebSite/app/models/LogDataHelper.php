@@ -7,7 +7,6 @@ namespace app\models;
 use DateTimeImmutable;
 use Envms\FluentPDO\Queries\Select;
 use PDO;
-use RuntimeException;
 use stdClass;
 use app\enums\Period;
 use app\helpers\Application;
@@ -99,9 +98,11 @@ final class LogDataHelper extends Data
         $visits = $this->getLastVisitPerActivePerson($activePersons);
 
         foreach ($visits as &$visit) {
-            $visit->TimeAgo       = MyClubDateTime::calculateTimeAgo($visit->LastActivity);
-            $visit->MinutesAgo    = MyClubDateTime::calculateMinutesAgo($visit->LastActivity);
-            $visit->FormattedDate = MyClubDateTime::formatDateFromUTC($visit->LastActivity);
+            $lastActivity = is_string($visit->LastActivity ?? null) ? $visit->LastActivity : '';
+
+            $visit->TimeAgo       = MyClubDateTime::calculateTimeAgo($lastActivity);
+            $visit->MinutesAgo    = MyClubDateTime::calculateMinutesAgo($lastActivity);
+            $visit->FormattedDate = MyClubDateTime::formatDateFromUTC($lastActivity);
 
             /** @var object{Id: int, Email: string, Avatar: string|null}|false $individual */
             $individual = $this->dataHelper->get(
@@ -131,6 +132,7 @@ final class LogDataHelper extends Data
                 $visit->Avatar      = '';
             }
         }
+        unset($visit);
 
         return $visits;
     }
@@ -141,7 +143,7 @@ final class LogDataHelper extends Data
      */
     private function getLastVisitPerActivePerson(array $activePersons): array
     {
-        if (empty($activePersons)) {
+        if ($activePersons === []) {
             return [];
         }
 
@@ -171,12 +173,16 @@ final class LogDataHelper extends Data
 
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute($params);
+
+        /** @var list<stdClass> $logs */
         $logs = $stmt->fetchAll(PDO::FETCH_OBJ);
 
+        /** @var array<string, stdClass> $logByEmail */
         $logByEmail = [];
 
         foreach ($logs as $log) {
-            $logByEmail[strtolower($log->Who)] = $log;
+            $who = is_string($log->Who ?? null) ? $log->Who : '';
+            $logByEmail[strtolower($who)] = $log;
         }
 
         $result = [];
@@ -191,16 +197,21 @@ final class LogDataHelper extends Data
                     'PersonId'     => $person->id,
                     'FullName'     => $person->firstName . ' ' . $person->lastName,
                     'Email'        => $person->email,
-                    'LastActivity' => $log->CreatedAt,
-                    'Os'           => $log->Os,
-                    'Browser'      => $log->Browser,
+                    'LastActivity' => is_string($log->CreatedAt ?? null) ? $log->CreatedAt : '',
+                    'Os'           => is_string($log->Os ?? null) ? $log->Os : '',
+                    'Browser'      => is_string($log->Browser ?? null) ? $log->Browser : '',
                 ];
             }
         }
 
         usort(
             $result,
-            fn($a, $b) => strcmp($b->LastActivity, $a->LastActivity)
+            static function (stdClass $a, stdClass $b): int {
+                $aVal = is_string($a->LastActivity ?? null) ? $a->LastActivity : '';
+                $bVal = is_string($b->LastActivity ?? null) ? $b->LastActivity : '';
+
+                return strcmp($bVal, $aVal);
+            }
         );
 
         return $result;
@@ -225,11 +236,11 @@ final class LogDataHelper extends Data
         );
 
         $sql = "SELECT LOWER(i.Email) AS Email, i.FirstName, i.LastName
-                FROM Individual i
-                INNER JOIN Member m ON m.Id = i.Id";
+            FROM Individual i
+            INNER JOIN Member m ON m.Id = i.Id";
         $params = [];
 
-        if (!empty($emails)) {
+        if ($emails !== []) {
             $placeholders = implode(
                 ',',
                 array_fill(0, count($emails), '?')
@@ -242,7 +253,10 @@ final class LogDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     /**
@@ -286,7 +300,10 @@ final class LogDataHelper extends Data
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute([':top' => $top]);
 
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     /**
@@ -320,7 +337,10 @@ final class LogDataHelper extends Data
         $stmt->bindValue(':limit', $top, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return $rows;
     }
 
     /**
@@ -341,7 +361,10 @@ final class LogDataHelper extends Data
             ':end'   => $season['end'],
         ]);
 
-        return $query->fetchAll(PDO::FETCH_KEY_PAIR);
+        /** @var array<string, int> $result */
+        $result = $query->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        return $result;
     }
 
     #region Installations
@@ -419,16 +442,21 @@ final class LogDataHelper extends Data
             ':to'          => $to->format('Y-m-d 23:59:59'),
         ]);
 
-        $durations = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        /** @var list<mixed> $rawDurations */
+        $rawDurations = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        if (empty($durations)) {
+        if ($rawDurations === []) {
             return [];
         }
 
-        $min      = (int) $durations[0];
-        $max      = (int) $durations[count($durations) - 1];
+        /** @var list<int> $durations */
+        $durations = array_map(static fn(mixed $v): int => To::int($v), $rawDurations);
+
+        $min      = $durations[0];
+        $max      = $durations[count($durations) - 1];
         $stepSize = $this->computeStepSize($min, $max);
 
+        /** @var array<int, int> $buckets */
         $buckets = [];
 
         foreach ($durations as $d) {
@@ -439,15 +467,15 @@ final class LogDataHelper extends Data
         ksort($buckets);
 
         $medianIndex  = (int) floor(count($durations) / 2);
-        $medianValue  = (int) $durations[$medianIndex];
+        $medianValue  = $durations[$medianIndex];
         $medianBucket = (int) floor($medianValue / $stepSize);
 
         $result = [];
 
         foreach ($buckets as $index => $count) {
-            $from    = $index * $stepSize;
-            $to      = $from + $stepSize - 1;
-            $tranche = $from . '–' . $to . ' ms';
+            $fromMs  = $index * $stepSize;
+            $toMs    = $fromMs + $stepSize - 1;
+            $tranche = $fromMs . '–' . $toMs . ' ms';
 
             $result[] = [
                 'tranche'       => $tranche,
@@ -488,9 +516,10 @@ final class LogDataHelper extends Data
             ':to'   => $to->format('Y-m-d 23:59:59'),
         ]);
 
+        /** @var list<stdClass> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        if (empty($rows)) {
+        if ($rows === []) {
             return [];
         }
 
@@ -511,7 +540,11 @@ final class LogDataHelper extends Data
         }
 
         foreach ($rows as $row) {
-            $ts = strtotime($row->CreatedAt);
+            $createdAt = To::str($row->CreatedAt);
+            $ts = strtotime($createdAt);
+            if ($ts === false) {
+                continue;
+            }
 
             $index = min(
                 self::CREATION_TIME_TREND_STEP_SIZE - 1,
@@ -521,7 +554,7 @@ final class LogDataHelper extends Data
             /** @var array{total: int, count: int} $bucket */
             $bucket = $buckets[$index];
 
-            $bucket['total'] += (int) $row->duration;
+            $bucket['total'] += To::int($row->duration ?? 0);
             $bucket['count']++;
 
             $buckets[$index] = $bucket;
@@ -593,11 +626,14 @@ final class LogDataHelper extends Data
         $unknownVersion = $t('webmaster.installations.unknown_version');
 
         foreach ($rows as $installation) {
-            $host = (string) $installation->Host;
+            $host = To::str($installation->Host);
 
             if (strpos($host, '%') !== false) {
                 $decoded = urldecode($host);
-                $installation->Host = parse_url($decoded, PHP_URL_HOST) ?: $decoded;
+                $parsedHost = parse_url($decoded, PHP_URL_HOST);
+                $installation->Host = is_string($parsedHost) && $parsedHost !== ''
+                    ? $parsedHost
+                    : $decoded;
             } elseif (filter_var($host, FILTER_VALIDATE_IP)) {
                 $dnsCache[$host] ??= @gethostbyaddr($host);
                 $hostname = $dnsCache[$host];
@@ -610,10 +646,11 @@ final class LogDataHelper extends Data
             $installation->webappVersions ??= $unknownVersion;
             $installation->phpVersions    ??= $unknownVersion;
 
-            $lastCheck = (string) $installation->lastCheck;
+            $lastCheck = To::str($installation->lastCheck);
             $installation->timeAgo = $this->getTimeAgo($lastCheck);
 
-            $installation->status = $t('webmaster.installations.status.' . $installation->status);
+            $status = To::str($installation->status);
+            $installation->status = $t('webmaster.installations.status.' . $status);
 
             $daysSinceLastCheck = (time() - strtotime($lastCheck)) / 86400;
             $installation->status = $t(match (true) {
@@ -648,14 +685,15 @@ final class LogDataHelper extends Data
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
+        /** @var list<stdClass> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $result = [];
 
         foreach ($rows as $row) {
             $result[] = [
-                'date'  => (string) $row->CreatedAt,
-                'email' => (string) ($row->Who ?? ''),
+                'date'  => To::str($row->CreatedAt),
+                'email' => To::str($row->Who ?? null),
             ];
         }
 

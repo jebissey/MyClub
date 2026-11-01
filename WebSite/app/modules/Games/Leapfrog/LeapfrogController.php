@@ -48,7 +48,7 @@ final class LeapfrogController extends TableController
 
     public function statistics(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdmin(), __FILE__, __LINE__)) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAdministrator(), __FILE__, __LINE__)) {
             return;
         }
         $schema = [

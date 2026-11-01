@@ -52,7 +52,7 @@ final class CarouselDataHelper extends Data
     }
 
     /**
-     * @param array<int, string> $paths
+     * @param list<string> $paths
      * @return array<string, bool>
      */
     public function getPathsUsedInGalery(array $paths): array
@@ -63,19 +63,20 @@ final class CarouselDataHelper extends Data
 
         $stmt = $this->pdo->query("SELECT Item FROM Carousel");
         if ($stmt === false) {
-            throw new RuntimeException('Échec de la requête SELECT Item FROM Carousel');
+            throw new RuntimeException('Query failed: SELECT Item FROM Carousel');
         }
         $items = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         $used = [];
         foreach ($paths as $path) {
             foreach ($items as $item) {
-                if (str_contains($item, $path)) {
+                if (is_string($item) && str_contains($item, $path)) {
                     $used[$path] = true;
                     break;
                 }
             }
         }
+
         return $used;
     }
 }

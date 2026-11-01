@@ -31,10 +31,10 @@ use tests\support\DataHelperFactory;
  */
 final class ConnectedUserTest extends DataHelperTestCase
 {
-    /** @var array<string, mixed> */
+    /** @var array<mixed> */
     private array $server;
 
-    /** @var array<string, mixed> */
+    /** @var array<mixed> */
     private array $session;
 
     protected function setUp(): void

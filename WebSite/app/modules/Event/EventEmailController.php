@@ -51,8 +51,12 @@ final class EventEmailController extends AbstractController
         $dayOfWeek = $input['dayOfWeek'] ?? null;
         $timeOfDay = $input['timeOfDay'] ?? '';
         $filteredEmails = $this->alertRecipientDataHelper->getEmailsOfInterestedPeople($idGroup, $idEventType, $dayOfWeek, $timeOfDay);
-        $groupName = $idGroup != null ? $this->dataHelper->get('Group', ['Id' => $idGroup], 'Name')->Name ?? '' : '';
-        $eventTypeName = $idEventType !== null ? $this->dataHelper->get('EventType', ['Id' => $idEventType], 'Name')->Name ?? '' : '';
+        $groupName = $idGroup !== null && $idGroup > 0
+            ? $this->dataHelper->getString('Group', ['Id' => $idGroup], 'Name')
+            : '';
+        $eventTypeName = $idEventType !== null && $idEventType > 0
+            ? $this->dataHelper->getString('EventType', ['Id' => $idEventType], 'Name')
+            : '';
         $dayOfWeekName = $dayOfWeek !== null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
         $translatedTimeOfDay = ($this->t)($timeOfDay);
 

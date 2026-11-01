@@ -63,7 +63,7 @@ final class TranslatorController extends AbstractController
         $viewModel = new TranslatorViewModel(
             navItems: $this->getNavItems($user->person?->email),
             title: 'Translations',
-            i18n: array_values($translations),
+            i18n: $translations,
             referenceLang: $referenceLang,
             targetLang: $targetLang,
             missingOnly: $missingOnly,

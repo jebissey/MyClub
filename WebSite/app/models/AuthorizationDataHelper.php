@@ -106,7 +106,7 @@ final class AuthorizationDataHelper extends Data
             WHERE ImagePath LIKE :pattern"
         );
         $stmt->execute([':pattern' => '%' . $path . '%']);
-        $messages = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $messages = $this->fetchObjects($stmt);
 
         foreach ($messages as $message) {
             if ($this->canReadMessageParent($message, $connectedUser)) {
@@ -225,14 +225,14 @@ final class AuthorizationDataHelper extends Data
         }
 
         if (!empty($message->EventId)) {
-            return $this->canReadEventById((int) $message->EventId, $connectedUser);
+            return $this->canReadEventById(To::int($message->EventId), $connectedUser);
         }
 
         if (!empty($message->GroupId)) {
             if (!($connectedUser->person ?? false)) {
                 return false;
             }
-            return in_array((int) $message->GroupId, $this->getUserGroups($connectedUser->person->email), true);
+            return in_array(To::int($message->GroupId), $this->getUserGroups($connectedUser->person->email), true);
         }
 
         return false;

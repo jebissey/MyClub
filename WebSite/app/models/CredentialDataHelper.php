@@ -32,7 +32,7 @@ final class CredentialDataHelper extends Data
     /**
      * @return string|null The stored value, or null if not found.
      */
-    public function getValue(string $service, string $name): ?string
+    public function getCredentialValue(string $service, string $name): ?string
     {
         $stmt = $this->getCredentialPdo()->prepare(
             'SELECT Value FROM "' . self::CREDENTIAL_TABLE . '"
@@ -51,7 +51,7 @@ final class CredentialDataHelper extends Data
      *
      * @return bool True on success, false on failure.
      */
-    public function setValue(string $service, string $name, string $value): bool
+    public function setCredentialValue(string $service, string $name, string $value): bool
     {
         $stmt = $this->getCredentialPdo()->prepare(
             'INSERT INTO "' . self::CREDENTIAL_TABLE . '" (Service, Name, Value, UpdatedAt)

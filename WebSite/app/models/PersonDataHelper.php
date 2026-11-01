@@ -145,7 +145,7 @@ final class PersonDataHelper extends Data
               AND m.Inactivated = 0
             ORDER BY clubMember
         ";
-        return $this->queryOrFail($sql)->fetchAll(PDO::FETCH_OBJ);
+        return $this->fetchObjects($this->queryOrFail($sql));
     }
 
     /**
@@ -229,7 +229,7 @@ final class PersonDataHelper extends Data
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $this->fetchObjects($stmt);
     }
 
     /**
@@ -297,7 +297,7 @@ final class PersonDataHelper extends Data
             GROUP BY i.Id
             ORDER BY i.FirstName, i.LastName
         ";
-        return $this->queryOrFail($sql)->fetchAll(PDO::FETCH_OBJ);
+        return $this->fetchObjects($this->queryOrFail($sql));
     }
 
     public function getWebmasterEmail(): string

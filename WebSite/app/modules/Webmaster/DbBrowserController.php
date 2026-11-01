@@ -42,7 +42,7 @@ final class DbBrowserController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $viewModel = new DbBrowserIndexViewModel(
-                tables: array_values($this->dbBrowserDataHelper->getTables()),
+                tables: $this->dbBrowserDataHelper->getTables(),
                 layoutParams: $this->getAllParams([
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),

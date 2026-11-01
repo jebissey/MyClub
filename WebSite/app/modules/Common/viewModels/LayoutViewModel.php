@@ -154,9 +154,12 @@ abstract readonly class LayoutViewModel
      */
     public function toArray(): array
     {
-        return array_merge(
+        $properties = array_filter(
             get_object_vars($this),
-            $this->allParams
+            static fn(mixed $key): bool => is_string($key),
+            ARRAY_FILTER_USE_KEY
         );
+
+        return $this->allParams + $properties;
     }
 }

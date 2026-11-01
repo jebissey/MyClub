@@ -28,7 +28,7 @@ final class ArwardsController extends AbstractController
         $counterNames = $arwardsDataHelper->getCounterNames();
 
         $viewModel = new ArwardsViewModel(
-            counterNames: array_values($counterNames),
+            counterNames: $counterNames,
             data: $arwardsDataHelper->getData($counterNames),
             groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
             layout: $this->getLayout(),

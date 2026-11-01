@@ -118,7 +118,7 @@ final class MediaApi extends AbstractApi
     public function isShared(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $filePath = trim(To::str($_GET['path'] ?? ''));
+            $filePath = trim(To::str($this->input->query()['path'] ?? ''));
             if (!$filePath) {
                 $this->renderJsonBadRequest('Fichier manquant', __FILE__, __LINE__);
                 return;

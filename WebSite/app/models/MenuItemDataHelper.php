@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use PDO;
 use Throwable;
 use app\helpers\Application;
+use app\helpers\To;
 use app\modules\Common\valueObjects\MenuItemAuthorizationRow;
 use app\modules\Common\valueObjects\Person;
 
@@ -169,10 +170,10 @@ final class MenuItemDataHelper extends Data
 
         $stmt = $this->pdo->prepare("SELECT Id FROM MenuItem WHERE ParentId = :parentId");
         $stmt->execute(['parentId' => $id]);
-        $children = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        $children = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         foreach ($children as $childId) {
-            $count += $this->deleteRecursive((int)$childId);
+            $count += $this->deleteRecursive(To::requireInt($childId));
         }
 
         $stmt = $this->pdo->prepare("DELETE FROM MenuItem WHERE Id = :id");

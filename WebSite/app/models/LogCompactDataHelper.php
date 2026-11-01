@@ -25,13 +25,13 @@ final class LogCompactDataHelper extends Data
     public function compactLog(int $removeOlderThanXmonths, int $compactOlderThanXmonths): void
     {
         $metadata = $this->get('Metadata', ['Id' => 1], 'Compact_lastDate, Compact_everyXdays, Compact_maxRecords');
-        $maxRecords = isset($metadata->Compact_maxRecords) ? (int)$metadata->Compact_maxRecords : 0;
+        $maxRecords = To::int($metadata->Compact_maxRecords ?? null);
         if (!empty($metadata->Compact_everyXdays) && !empty($metadata->Compact_lastDate)) {
-            $last = new DateTime($metadata->Compact_lastDate);
+            $last = new DateTime(To::str($metadata->Compact_lastDate));
             $now  = new DateTime();
             $daysSinceLast = (int)$last->diff($now)->format('%a');
             $countBefore = To::int($this->fetchColumnOrFail($this->pdoForLog->query("SELECT COUNT(*) FROM Log")));
-            if ($daysSinceLast >= (int)$metadata->Compact_everyXdays) {
+            if ($daysSinceLast >= To::int($metadata->Compact_everyXdays)) {
                 $this->compactRows($removeOlderThanXmonths, $compactOlderThanXmonths);
                 $this->set('Metadata', ['Compact_lastDate' => (new DateTime())->format('Y-m-d H:i:s')], ['Id' => 1]);
             } else {

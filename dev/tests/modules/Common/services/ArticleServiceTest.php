@@ -81,9 +81,12 @@ final class ArticleServiceTest extends TestCase
         $statement = $this->carouselPdo->query('SELECT IdArticle, Item FROM Carousel ORDER BY Id');
         $this->assertNotFalse($statement);
 
+        /** @var list<array{IdArticle: numeric-string|int, Item: string}> $fetched */
+        $fetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
         $rows = [];
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $rows[] = ['IdArticle' => (int)$row['IdArticle'], 'Item' => (string)$row['Item']];
+        foreach ($fetched as $row) {
+            $rows[] = ['IdArticle' => (int)$row['IdArticle'], 'Item' => $row['Item']];
         }
 
         return $rows;

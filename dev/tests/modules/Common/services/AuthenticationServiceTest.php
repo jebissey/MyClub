@@ -29,8 +29,12 @@ final class AuthenticationServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->session = $_SESSION;
-        $this->cookie = $_COOKIE;
+        /** @var array<string, mixed> $session */
+        $session = $_SESSION;
+        /** @var array<string, mixed> $cookie */
+        $cookie = $_COOKIE;
+        $this->session = $session;
+        $this->cookie = $cookie;
 
         $_SESSION = [];
         $_COOKIE = [];

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace test\Infrastructure;
 
+use CurlHandle;
 use RuntimeException;
 
 use test\Core\ValueObjects\HttpResponse;
@@ -49,7 +50,7 @@ final class CurlHttpClient implements HttpClientInterface
 
         $curlOptions[CURLOPT_FAILONERROR] = false;
         $receivedData = '';
-        $curlOptions[CURLOPT_WRITEFUNCTION] = function ($ch, $data) use (&$receivedData) {
+        $curlOptions[CURLOPT_WRITEFUNCTION] = function (CurlHandle $ch, string $data) use (&$receivedData): int {
             $receivedData .= $data;
             return strlen($data);
         };
@@ -145,7 +146,7 @@ final class CurlHttpClient implements HttpClientInterface
         }
         if (!empty($cookiesToSend)) {
             $curlOptions[CURLOPT_COOKIE] = implode('; ', array_map(
-                fn (string $name, string $value): string => "$name=$value",
+                fn(string $name, string $value): string => "$name=$value",
                 array_keys($cookiesToSend),
                 $cookiesToSend
             ));

@@ -29,10 +29,9 @@ final class UserGroupsController extends AbstractController
         }
 
         $person = $this->application->getConnectedUser(true)->person;
-        $currentGroups = $this->groupDataHelper->getCurrentGroups($person->id);
 
         $viewModel = new UserGroupsViewModel(
-            groups: array_values($currentGroups),
+            groups: $this->groupDataHelper->getCurrentGroups($person->id),
             layout: $this->getLayout(),
             navItems: $this->getNavItems($person->email),
             layoutParams: $this->getAllParams([]),

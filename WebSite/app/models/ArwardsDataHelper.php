@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use PDO;
 use PDOException;
-use stdClass;
 use app\helpers\Application;
+use app\helpers\To;
 
 final class ArwardsDataHelper extends Data
 {
@@ -21,19 +20,19 @@ final class ArwardsDataHelper extends Data
     }
 
     /**
-     * @param array<int, string> $counterNames
+     * @param list<string> $counterNames
      * @return array<int, array{name: string, counters: array<string, int|float>, total: int|float}>
      */
     public function getData(array $counterNames): array
     {
         $query = $this->pdo->query('
-            SELECT 
-                p.Id, 
-                p.FirstName, 
-                p.LastName, 
-                p.NickName, 
-                c.Name as CounterName, 
-                SUM(c.Value) as CounterValue, 
+            SELECT
+                p.Id,
+                p.FirstName,
+                p.LastName,
+                p.NickName,
+                c.Name as CounterName,
+                SUM(c.Value) as CounterValue,
                 (SELECT SUM(Value) FROM Counter WHERE IdPerson = p.Id) as Total
             FROM Individual p
             LEFT JOIN Counter c ON p.Id = c.IdPerson
@@ -44,32 +43,37 @@ final class ArwardsDataHelper extends Data
             throw new PDOException('getData query failed');
         }
 
-        /** @var array<int, stdClass> $results */
-        $results = $query->fetchAll(PDO::FETCH_OBJ);
+        /** @var array<int, array{name: string, counters: array<string, int|float>, total: int|float}> $data */
         $data = [];
-        foreach ($results as $row) {
-            $personId = $row->Id;
+        foreach ($this->fetchObjects($query) as $row) {
+            $personId = To::int($row->Id);
+
             if (!isset($data[$personId])) {
+                $nickName = To::str($row->NickName);
+
                 $data[$personId] = [
                     'name' => trim(sprintf(
                         '%s %s %s',
-                        $row->FirstName,
-                        $row->LastName,
-                        $row->NickName ? "({$row->NickName})" : ''
+                        To::str($row->FirstName),
+                        To::str($row->LastName),
+                        $nickName !== '' ? "({$nickName})" : ''
                     )),
                     'counters' => array_fill_keys($counterNames, 0),
-                    'total' => $row->Total
+                    'total' => To::number($row->Total),
                 ];
             }
-            if ($row->CounterName) {
-                $data[$personId]['counters'][$row->CounterName] = $row->CounterValue;
+
+            $counterName = To::str($row->CounterName);
+            if ($counterName !== '') {
+                $data[$personId]['counters'][$counterName] = To::number($row->CounterValue);
             }
         }
+
         return $data;
     }
 
     /**
-     * @return array<int, string>
+     * @return list<string>
      */
     public function getCounterNames(): array
     {
@@ -78,7 +82,6 @@ final class ArwardsDataHelper extends Data
             throw new PDOException('getCounterNames query failed');
         }
 
-        /** @var array<int, string> */
-        return array_column($query->fetchAll(PDO::FETCH_ASSOC), 'Name');
+        return $this->fetchColumnStrings($query);
     }
 }

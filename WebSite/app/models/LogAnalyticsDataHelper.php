@@ -6,10 +6,12 @@ namespace app\models;
 
 use DateTime;
 use PDO;
+use PDOStatement;
 use RuntimeException;
 use stdClass;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
+use app\helpers\To;
 
 final class LogAnalyticsDataHelper extends Data
 {
@@ -172,7 +174,7 @@ final class LogAnalyticsDataHelper extends Data
             ':host'       => $this->getHost(),
         ]);
 
-        return $query->fetchAll(PDO::FETCH_OBJ);
+        return $this->fetchAllObjects($query);
     }
 
     /** @return array<int, stdClass> */
@@ -198,7 +200,7 @@ final class LogAnalyticsDataHelper extends Data
             ':host'       => $this->getHost(),
         ]);
 
-        return $query->fetchAll(PDO::FETCH_OBJ);
+        return $this->fetchAllObjects($query);
     }
 
     #region Private helper methods
@@ -229,8 +231,8 @@ final class LogAnalyticsDataHelper extends Data
         $rows = $query->fetchAll(PDO::FETCH_OBJ);
 
         return array_map(
-            static fn($row): int => (int) $row->uniqueVisitors,
-            $rows
+            static fn(stdClass $row): int => To::int($row->uniqueVisitors ?? null),
+            $this->fetchAllObjects($query)
         );
     }
 
@@ -340,6 +342,17 @@ final class LogAnalyticsDataHelper extends Data
     private function getHost(): string
     {
         return Application::$root . '%';
+    }
+
+    /**
+     * @return list<stdClass>
+     */
+    private function fetchAllObjects(PDOStatement $stmt): array
+    {
+        return array_values(array_filter(
+            $stmt->fetchAll(PDO::FETCH_OBJ),
+            static fn(mixed $row): bool => $row instanceof stdClass
+        ));
     }
 
     #endregion

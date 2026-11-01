@@ -98,19 +98,29 @@ final class MediaController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
             $query = $this->flight->request()->query;
-            $year          = isset($query->year) && $query->year !== '' ? (int)$query->year : (int)date('Y');
-            $month         = $query->month         ?? '';
-            $fileExtension = $query->fileExtension ?? '';
-            $search        = trim($query->search ?? '');
-            $unusedOnly    = isset($query->unusedOnly) && $query->unusedOnly === '1';
 
+            $year = isset($query->year) && is_numeric($query->year)
+                ? (int) $query->year
+                : (int) date('Y');
+
+            $month = isset($query->month) && is_string($query->month)
+                ? $query->month
+                : '';
+
+            $fileExtension = isset($query->fileExtension) && is_string($query->fileExtension)
+                ? $query->fileExtension
+                : '';
+
+            $search = isset($query->search) && is_string($query->search)
+                ? trim($query->search)
+                : '';
+
+            $unusedOnly = isset($query->unusedOnly) && $query->unusedOnly === '1';
             $years = $this->getAvailableYears();
-            if (!in_array($year, $years)) {
-                $year = (int)date('Y');
-            }
-            if ($month !== '' && !in_array($month, $this->getMonths($year))) {
+            if ($month !== '' && !in_array($month, $this->getMonths($year), true)) {
                 $month = '';
             }
+
             $filteredFiles = $this->getFiles($year, $month, $fileExtension, $search, $unusedOnly);
             $totalFiles    = $this->getFiles($year, $month, '', '', false);
             $connectedUser = $this->application->getConnectedUser();
@@ -119,7 +129,7 @@ final class MediaController extends AbstractController
                 files: array_values($filteredFiles),
                 filteredCount: count($filteredFiles),
                 totalCount: count($totalFiles),
-                years: array_values($years),
+                years: $years,
                 currentYear: $year,
                 months: array_values($this->getMonths($year)),
                 currentMonth: $month,
@@ -195,7 +205,9 @@ final class MediaController extends AbstractController
     public function showUsesInArticles(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $path = $this->flight->request()->query->path ?? '';
+            $rawPath = $this->flight->request()->query->path ?? null;
+            $path = is_string($rawPath) ? $rawPath : '';
+
             $viewModel = new MediaUsesInArticlesViewModel(
                 path: $path,
                 articles: $path !== '' ? $this->articleDataHelper->inArticles($path) : [],
@@ -210,8 +222,13 @@ final class MediaController extends AbstractController
     public function showUsesInMessages(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $path = $this->flight->request()->query->path ?? '';
-            $uses = $path !== '' ? $this->messageDataHelper->getMessageUses($path) : ['events' => [], 'articles' => [], 'groups' => []];
+            $rawPath = $this->flight->request()->query->path ?? null;
+            $path = is_string($rawPath) ? $rawPath : '';
+
+            $uses = $path !== ''
+                ? $this->messageDataHelper->getMessageUses($path)
+                : ['events' => [], 'articles' => [], 'groups' => []];
+
             $viewModel = new MediaUsesInMessagesViewModel(
                 path: $path,
                 events: array_values($uses['events']),
@@ -255,20 +272,27 @@ final class MediaController extends AbstractController
     }
 
     /**
-     * @return array<int, string>
+     * @return list<string>
      */
     private function getAvailableYears(): array
     {
         $years = [];
-        if (file_exists(MediaManager::getMediaPath()) && is_dir(MediaManager::getMediaPath())) {
-            $dirs = scandir(MediaManager::getMediaPath());
+        $basePath = MediaManager::getMediaPath();
+
+        if (file_exists($basePath) && is_dir($basePath)) {
+            $dirs = scandir($basePath);
+            if ($dirs === false) {
+                return [];
+            }
+
             foreach ($dirs as $dir) {
-                if ($dir !== '.' && $dir !== '..' && is_dir(MediaManager::getMediaPath() . $dir) && is_numeric($dir)) {
+                if ($dir !== '.' && $dir !== '..' && is_dir($basePath . $dir) && is_numeric($dir)) {
                     $years[] = $dir;
                 }
             }
             rsort($years);
         }
+
         return $years;
     }
 

@@ -19,11 +19,11 @@ final class OdsReader
     private const MAX_COLUMNS = 200;
 
     /**
-     * Lit la première feuille d'un fichier .ods.
-     * Seules les cellules non vides sont retournées ; les dates sont en AAAA-MM-JJ,
-     * les nombres en notation brute, les booléens en true/false.
+     * Reads the first sheet of an .ods file.
+     * Only non-empty cells are returned. Dates are formatted as YYYY-MM-DD,
+     * numbers keep their raw notation and booleans are returned as true/false.
      *
-     * @return array<int, array<int, string>> n° de ligne (1 = première) => [index de colonne (0 = A) => valeur]
+     * @return array<int, array<int, string>> row number (1 = first row) => [column index (0 = A) => value]
      */
     public static function readFirstSheet(string $filePath): array
     {
@@ -60,8 +60,8 @@ final class OdsReader
         }
 
         $entries = [];
-        $position = (int)$end['cdOffset'];
-        for ($i = 0; $i < (int)$end['entries']; $i++) {
+        $position = To::int($end['cdOffset']);
+        for ($i = 0; $i < To::int($end['entries']); $i++) {
             if (substr($zip, $position, 4) !== "PK\x01\x02") {
                 throw new RuntimeException('Invalid ZIP central directory');
             }
@@ -73,14 +73,14 @@ final class OdsReader
             if ($h === false) {
                 throw new RuntimeException('Invalid ZIP entry');
             }
-            $name = substr($zip, $position + 46, (int)$h['nameLength']);
+            $name = substr($zip, $position + 46, To::int($h['nameLength']));
             $entries[$name] = [
-                'method' => (int)$h['method'],
-                'compressedSize' => (int)$h['compressedSize'],
-                'size' => (int)$h['size'],
-                'offset' => (int)$h['offset'],
+                'method' => To::int($h['method']),
+                'compressedSize' => To::int($h['compressedSize']),
+                'size' => To::int($h['size']),
+                'offset' => To::int($h['offset']),
             ];
-            $position += 46 + (int)$h['nameLength'] + (int)$h['extraLength'] + (int)$h['commentLength'];
+            $position += 46 + To::int($h['nameLength']) + To::int($h['extraLength']) + To::int($h['commentLength']);
         }
         return $entries;
     }
@@ -98,7 +98,7 @@ final class OdsReader
         if ($local === false) {
             throw new RuntimeException('Invalid ZIP local header');
         }
-        $start = $entry['offset'] + 30 + (int)$local['nameLength'] + (int)$local['extraLength'];
+        $start = $entry['offset'] + 30 + To::int($local['nameLength']) + To::int($local['extraLength']);
         $data = substr($zip, $start, $entry['compressedSize']);
 
         if ($entry['method'] === 0) {
@@ -142,7 +142,7 @@ final class OdsReader
                     && $reader->localName === 'table'
                     && $reader->depth === $tableDepth
                 ) {
-                    break; // seule la première feuille est lue
+                    break; // first sheet only
                 }
                 if ($reader->nodeType !== XMLReader::ELEMENT || $reader->localName !== 'table-row') {
                     continue;
@@ -151,10 +151,11 @@ final class OdsReader
                 $repeat = max(1, (int)($reader->getAttributeNs('number-rows-repeated', self::NS_TABLE) ?? '1'));
                 $cells = self::readRow($reader);
                 if ($cells === []) {
-                    $rowNumber += $repeat; // lignes vides (souvent répétées des milliers de fois)
+                    // Empty rows are often repeated thousands of times
+                    $rowNumber += $repeat;
                     continue;
                 }
-                // Deux lignes identiques adjacentes sont écrites une seule fois avec un compteur de répétition
+                // Adjacent identical rows are stored once with a repeat counter
                 for ($i = 0; $i < $repeat; $i++) {
                     $rowNumber++;
                     $rows[$rowNumber] = $cells;
@@ -228,7 +229,7 @@ final class OdsReader
                 if ($nodeType === XMLReader::END_ELEMENT && $reader->depth === $cellDepth) {
                     break;
                 }
-                if ($skipDepth !== null) { // commentaire de cellule (office:annotation) ignoré
+                if ($skipDepth !== null) { // cell comment (office:annotation) is ignored
                     if ($nodeType === XMLReader::END_ELEMENT && $reader->depth === $skipDepth) {
                         $skipDepth = null;
                     }
@@ -268,9 +269,9 @@ final class OdsReader
                     }
                 } elseif (
                     $buffer !== null && in_array($nodeType, [
-                    XMLReader::TEXT,
-                    XMLReader::SIGNIFICANT_WHITESPACE,
-                    XMLReader::CDATA
+                        XMLReader::TEXT,
+                        XMLReader::SIGNIFICANT_WHITESPACE,
+                        XMLReader::CDATA
                     ], true)
                 ) {
                     $buffer .= $reader->value;

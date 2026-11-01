@@ -99,7 +99,7 @@ abstract class AbstractShowController extends AbstractController
             return null;
         }
 
-        $value = $_COOKIE[$cookieName] ?? null;
+        $value = $this->input->cookie($cookieName);
 
         // The cookie is client-controlled: only accept known modes
         return is_string($value) && in_array($value, $allowed, true) ? $value : null;

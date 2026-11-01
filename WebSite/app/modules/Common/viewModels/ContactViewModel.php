@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Common\viewModels;
 
+use app\modules\Common\valueObjects\ContactFeedbackInfo;
 use app\modules\Common\valueObjects\MenuItemRow;
 
 final readonly class ContactViewModel extends LayoutViewModel
@@ -20,6 +21,7 @@ final readonly class ContactViewModel extends LayoutViewModel
         public string $name,
         public string $email,
         public bool $identityReadOnly,
+        public ContactFeedbackInfo $feedback,
         public string $layout,
         ?string $page = null,
         array $layoutParams = [],

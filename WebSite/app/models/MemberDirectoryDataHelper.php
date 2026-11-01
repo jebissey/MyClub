@@ -15,6 +15,13 @@ use app\modules\Common\valueObjects\LocatedMemberRow;
 /**
  * @phpstan-import-type DirectoryPersonRowShape from DirectoryPersonRow
  * @phpstan-import-type LocatedMemberRowShape from LocatedMemberRow
+ * @phpstan-type MemberContactInfoShape object{
+ *     Email: string,
+ *     Phone: string|null,
+ *     FirstName: string,
+ *     LastName: string|null,
+ *     NickName: string|null
+ * }
  */
 final class MemberDirectoryDataHelper extends Data
 {
@@ -31,24 +38,28 @@ final class MemberDirectoryDataHelper extends Data
      * Contact details of every active member, indexed by email. Used by the clipboard
      * copy of the contacts of a filtered group/event type (EventEmailController::copyEmails()).
      *
-     * @return array<string, object{Email: string, Phone: string|null, FirstName: string, LastName: string|null, NickName: string|null}>
+     * @return array<string, MemberContactInfoShape>
      */
     public function getActiveMembersContactInfoByEmail(): array
     {
         $sql = '
-            SELECT i.Email, i.Phone, i.FirstName, i.LastName, i.NickName
-            ' . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN . '
-            WHERE m.Inactivated = 0
-        ';
+        SELECT i.Email, i.Phone, i.FirstName, i.LastName, i.NickName
+        ' . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN . '
+        WHERE m.Inactivated = 0
+    ';
         $stmt = $this->pdo->query($sql);
         if ($stmt === false) {
             return [];
         }
 
+        /** @var list<MemberContactInfoShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
         $result = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $row) {
+        foreach ($rows as $row) {
             $result[$row->Email] = $row;
         }
+
         return $result;
     }
 

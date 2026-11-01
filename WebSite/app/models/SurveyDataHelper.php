@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-use stdClass;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
@@ -18,10 +17,15 @@ use app\modules\Article\valueObjects\SurveyNewsRow;
 use app\modules\Article\valueObjects\SurveyWithCreatorRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
+/**
+ * @phpstan-import-type SurveyNewsRowShape from SurveyNewsRow
+ */
 final class SurveyDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application, private readonly ArticleAuthorizationService $authorizationService)
-    {
+    public function __construct(
+        Application $application,
+        private readonly ArticleAuthorizationService $authorizationService
+    ) {
         parent::__construct(
             $application->getPdo(),
             $application->getErrorManager(),
@@ -39,33 +43,58 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
             AND Survey.ClosingDate >= datetime('now')
             LIMIT 1
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
+
         /** @var object|false $survey */
         $survey = $stmt->fetch(PDO::FETCH_OBJ);
+
         return $survey;
     }
 
     public function getWithCreator(int $articleId): SurveyWithCreatorRow|false
     {
         $article = $this->get('Article', ['Id' => $articleId], 'Id');
+
         if ($article === false) {
             throw new QueryException("Article {$articleId} doesn't exist");
         }
 
         $sql = "
-            SELECT s.Id, s.Question, s.Options, s.IdArticle, s.ClosingDate, s.Visibility, a.CreatedBy
+            SELECT
+                s.Id,
+                s.Question,
+                s.Options,
+                s.IdArticle,
+                s.ClosingDate,
+                s.Visibility,
+                a.CreatedBy
             FROM Survey s
             INNER JOIN Article a ON s.IdArticle = a.Id
             WHERE s.IdArticle = :articleId
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
-        /** @var object{Id: int|string, Question: string, Options: string, IdArticle: int|string, ClosingDate: string, Visibility: string, CreatedBy: int|string}|false $result */
+
+        /**
+         * @var object{
+         *     Id: int|string,
+         *     Question: string,
+         *     Options: string,
+         *     IdArticle: int|string,
+         *     ClosingDate: string,
+         *     Visibility: string,
+         *     CreatedBy: int|string
+         * }|false $result
+         */
         $result = $stmt->fetch(PDO::FETCH_OBJ);
+
         if ($result === false) {
             return false;
         }
+
         return SurveyWithCreatorRow::fromStdClass($result);
     }
 
@@ -75,16 +104,40 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
     public function getRepliesForActivePersons(int $surveyId): array
     {
         $sql = "
-            SELECT r.Id, r.IdPerson, r.IdSurvey, r.Answers, r.LastUpdate
+            SELECT
+                r.Id,
+                r.IdPerson,
+                r.IdSurvey,
+                r.Answers,
+                r.LastUpdate
             FROM Reply r
             JOIN Individual i ON r.IdPerson = i.Id
             INNER JOIN Member m ON m.Id = i.Id
-            WHERE r.IdSurvey = :surveyId and m.Inactivated = 0
+            WHERE r.IdSurvey = :surveyId
+              AND m.Inactivated = 0
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':surveyId' => $surveyId]);
+
+        /**
+         * @var list<object{
+         *     Id: int|string,
+         *     IdPerson: int|string,
+         *     IdSurvey: int|string,
+         *     Answers: string,
+         *     LastUpdate: string
+         * }> $rows
+         */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return array_map(fn($row) => ReplyRow::fromStdClass($row), $rows);
+
+        $replies = [];
+
+        foreach ($rows as $row) {
+            $replies[] = ReplyRow::fromStdClass($row);
+        }
+
+        return $replies;
     }
 
     /**
@@ -93,13 +146,13 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
     public function getPendingSurveyResponses(): array
     {
         $query = "
-            SELECT 
-                i.Id AS PersonId, 
-                i.Email, 
-                a.Id AS ArticleId, 
-                a.Title AS ArticleTitle, 
-                s.Id AS SurveyId, 
-                s.Question AS SurveyQuestion, 
+            SELECT
+                i.Id AS PersonId,
+                i.Email,
+                a.Id AS ArticleId,
+                a.Title AS ArticleTitle,
+                s.Id AS SurveyId,
+                s.Question AS SurveyQuestion,
                 s.ClosingDate
             FROM Individual i
             INNER JOIN Member m ON m.Id = i.Id
@@ -107,24 +160,57 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
             JOIN Article a ON s.IdArticle = a.Id
             LEFT JOIN Reply r ON r.IdSurvey = s.Id AND r.IdPerson = i.Id
             LEFT JOIN MemberGroup mg ON mg.IdMember = i.Id AND mg.IdGroup = a.IdGroup
-            WHERE 
+            WHERE
                 a.PublishedBy IS NOT NULL
                 AND m.Inactivated = 0
                 AND s.ClosingDate > date('now')
                 AND (
                     a.IdGroup IS NULL
-                    OR mg.IdGroup IS NOT NULL 
+                    OR mg.IdGroup IS NOT NULL
                 )
                 AND r.Id IS NULL
-            ORDER BY s.ClosingDate, i.LastName, i.FirstName";
+            ORDER BY s.ClosingDate, i.LastName, i.FirstName
+        ";
 
         $stmt = $this->pdo->query($query);
+
         if ($stmt === false) {
             throw new QueryException('getPendingSurveyResponses query failed');
         }
-        return array_map(PendingSurveyRow::fromStdClass(...), $stmt->fetchAll(PDO::FETCH_OBJ));
+
+        /**
+         * @var list<object{
+         *     PersonId: int|string,
+         *     Email: string,
+         *     ArticleId: int|string,
+         *     ArticleTitle: string,
+         *     SurveyId: int|string,
+         *     SurveyQuestion: string,
+         *     ClosingDate: string
+         * }> $rows
+         */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $responses = [];
+
+        foreach ($rows as $row) {
+            $responses[] = PendingSurveyRow::fromStdClass($row);
+        }
+
+        return $responses;
     }
 
+    /**
+     * @return list<array{
+     *     type: string,
+     *     id: int,
+     *     title: string,
+     *     detail: string,
+     *     from: string,
+     *     date: string,
+     *     url: string
+     * }>
+     */
     public function getNews(ConnectedUser $connectedUser, string $searchFrom): array
     {
         if (!($connectedUser->person ?? false)) {
@@ -134,7 +220,7 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
         // The article columns needed by the authorization rules are read here,
         // so no extra article query is needed for each survey.
         $sql = "
-            SELECT 
+            SELECT
                 p.FirstName,
                 p.LastName,
                 s.Id AS SurveyId,
@@ -161,11 +247,15 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
             GROUP BY s.Id
             ORDER BY LastActivity DESC
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
+
+        /** @var list<SurveyNewsRowShape> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $news = [];
+
         foreach ($rows as $row) {
             $survey = SurveyNewsRow::fromStdClass($row);
 
@@ -176,28 +266,34 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
                 idGroup: $survey->idGroup,
                 onlyForMembers: $survey->onlyForMembers,
             );
+
             $closing = new ClosingVisibilityRow(
                 id: $survey->surveyId,
                 closingDate: $survey->closingDate,
-                visibility: $survey->visibility->value, // ou adapte selon le constructeur de ClosingVisibilityRow
+                visibility: $survey->visibility->value,
             );
 
-            // Same two gates as the results page: read the article, then the visibility chosen by its creator
+            // Apply the same authorization checks as the survey results page.
             if (
                 $this->authorizationService->canRead($article, $connectedUser)
-                && $this->authorizationService->canReadSurveyResults($closing, $article, $connectedUser)
+                && $this->authorizationService->canReadSurveyResults(
+                    $closing,
+                    $article,
+                    $connectedUser
+                )
             ) {
                 $news[] = [
-                'type'   => 'survey',
-                'id'     => $survey->idArticle,
-                'title'  => $survey->question,
-                'detail' => 'Votes : ' . $survey->voters,
-                'from'   => $survey->firstName . ' ' . $survey->lastName,
-                'date'   => $survey->lastActivity,
-                'url'    => '/survey/results/' . $survey->idArticle
+                    'type' => 'survey',
+                    'id' => $survey->idArticle,
+                    'title' => $survey->question,
+                    'detail' => 'Votes : ' . $survey->voters,
+                    'from' => $survey->firstName . ' ' . $survey->lastName,
+                    'date' => $survey->lastActivity,
+                    'url' => '/survey/results/' . $survey->idArticle,
                 ];
             }
         }
+
         return $news;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Event\valueObjects;
 
 use stdClass;
+use app\helpers\To;
 use app\modules\Common\valueObjects\AbstractValueObject;
 
 final readonly class NeedTypeRow extends AbstractValueObject
@@ -21,8 +22,8 @@ final readonly class NeedTypeRow extends AbstractValueObject
     public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            id: (int) $row->Id,
-            name: (string) $row->Name,
+            id: To::int($row->Id),
+            name: To::str($row->Name),
         );
     }
 }

@@ -69,13 +69,8 @@ final class PwaController extends AbstractController
             return;
         }
 
-        $title = isset($_POST['title']) && is_string($_POST['title'])
-            ? $_POST['title']
-            : '';
-
-        $text = isset($_POST['text']) && is_string($_POST['text'])
-            ? $_POST['text']
-            : '';
+        $title = $this->input->formString('title');
+        $text  = $this->input->formString('text');
 
         $files = UploadedFilesInput::fromPhpFiles(
             isset($_FILES['files']) && is_array($_FILES['files']) ? $_FILES['files'] : null

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use PDO;
 use PDOException;
 use stdClass;
 use app\helpers\Application;
+use app\helpers\To;
 
 final class DesignDataHelper extends Data
 {
@@ -49,7 +49,7 @@ final class DesignDataHelper extends Data
     }
 
     /**
-     * @return array{0: array<int, stdClass>, 1: array<int, string>}
+     * @return array{0: list<stdClass>, 1: array<int, string>}
      */
     public function getUsersVotes(int $personId): array
     {
@@ -76,15 +76,15 @@ final class DesignDataHelper extends Data
             GROUP BY d.Id";
         $stmt = $this->pdo->query($query);
         if ($stmt === false) {
-            throw new PDOException('Échec de la requête getUsersVotes');
+            throw new PDOException('getUsersVotes query failed');
         }
-        $designs = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $designs = $this->fetchObjects($stmt);
 
         $userVotes = [];
-        $votes = $this->gets('DesignVote', ['IdPerson' => $personId], '*');
-        foreach ($votes as $vote) {
-            $userVotes[$vote->IdDesign] = $vote->Vote;
+        foreach ($this->gets('DesignVote', ['IdPerson' => $personId], '*') as $vote) {
+            $userVotes[To::requireInt($vote->IdDesign)] = To::requireStr($vote->Vote);
         }
+
         return [$designs, $userVotes];
     }
 
@@ -113,6 +113,6 @@ final class DesignDataHelper extends Data
         if ($stmt === false) {
             throw new PDOException('Échec de la requête getPendingDesignResponses');
         }
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $this->fetchObjects($stmt);
     }
 }

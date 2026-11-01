@@ -8,6 +8,7 @@ use app\helpers\Application;
 use app\helpers\News;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\DesignDataHelper;
@@ -15,7 +16,6 @@ use app\models\MetadataDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\Person;
 use app\modules\Common\viewModels\HomeViewModel;
 use app\modules\User\valueObjects\SidebarMenuChild;
@@ -65,7 +65,7 @@ final class HomeController extends AbstractController
             $pendingDesignResponses = $this->designDataHelper->getPendingDesignResponses();
             $userPendingDesigns = array_values(array_filter(
                 $pendingDesignResponses,
-                static fn($item) => strcasecmp($item->Email, $userEmail) === 0
+                static fn($item) => strcasecmp(To::str($item->email), $userEmail) === 0
             ));
 
             $news = $this->news->anyNews($connectedUser);
@@ -98,10 +98,10 @@ final class HomeController extends AbstractController
                 $connectedUser->person?->alert
             );
         }
-        $latestArticlesCount = (int) $this->dataHelper->getSetting('Home_LatestArticlesCount', '10');
-        $featuredArticleId   = (int) $this->dataHelper->getSetting('Home_FeaturedArticleId', '0');
-        $homeHeader          = $this->dataHelper->get('Languages', ['Name' => 'Home_Header'], $lang)->$lang ?? '';
-        $homeFooter          = $this->dataHelper->get('Languages', ['Name' => 'Home_Footer'], $lang)->$lang ?? '';
+        $latestArticlesCount = To::int($this->dataHelper->getSetting('Home_LatestArticlesCount', '10'));
+        $featuredArticleId   = To::int($this->dataHelper->getSetting('Home_FeaturedArticleId', '0'));
+        $homeHeader          = $this->dataHelper->getLanguageText('Home_Header', $lang);
+        $homeFooter          = $this->dataHelper->getLanguageText('Home_Footer', $lang);
         $articles            = $this->articleDataHelper->getLatestArticles($userEmail, $latestArticlesCount);
 
         $latestArticle = null;
@@ -139,7 +139,7 @@ final class HomeController extends AbstractController
         $footerArticleId = (int) $this->dataHelper->getSetting('Home_FooterArticleId', '0');
 
         $footerArticle = $footerArticleId > 0
-            ? $this->dataHelper->get('Article', ['Id' => $footerArticleId], 'Title, Content') ?: null
+            ? ($this->dataHelper->get('Article', ['Id' => $footerArticleId], 'Title, Content') ?: null)
             : null;
 
         $publishedBy = '';
@@ -244,7 +244,7 @@ final class HomeController extends AbstractController
                 ) ||
                 $all
             ) {
-                $filteredNavItems[$navItem->Id] = $navItem;
+                $filteredNavItems[To::int($navItem->Id)] = $navItem;
             }
         }
 
@@ -258,24 +258,24 @@ final class HomeController extends AbstractController
             $sidebarMenu[] = match ($navItem->Type) {
                 'heading' => new SidebarMenuItem(
                     type: 'heading',
-                    label: (string) $navItem->Label,
+                    label: To::str($navItem->Label),
                 ),
                 'divider' => new SidebarMenuItem(type: 'divider'),
                 'link' => new SidebarMenuItem(
                     type: 'link',
-                    label: (string) $navItem->Label,
-                    icon: $navItem->Icon !== null ? (string) $navItem->Icon : null,
-                    url: $navItem->Url !== null ? (string) $navItem->Url : null,
+                    label: To::str($navItem->Label),
+                    icon: $navItem->Icon !== null ? To::str($navItem->Icon) : null,
+                    url: $navItem->Url !== null ? To::str($navItem->Url) : null,
                 ),
                 'submenu' => new SidebarMenuItem(
                     type: 'submenu',
-                    label: (string) $navItem->Label,
-                    icon: $navItem->Icon !== null ? (string) $navItem->Icon : null,
+                    label: To::str($navItem->Label),
+                    icon: $navItem->Icon !== null ? To::str($navItem->Icon) : null,
                     children: array_values(
                         array_map(
                             static fn($child) => new SidebarMenuChild(
-                                label: (string) $child->Label,
-                                url: $child->Url !== null ? (string) $child->Url : null,
+                                label: To::str($child->Label),
+                                url: $child->Url !== null ? To::str($child->Url) : null,
                             ),
                             array_filter(
                                 $filteredNavItems,
@@ -284,7 +284,7 @@ final class HomeController extends AbstractController
                         )
                     ),
                 ),
-                default => Application::unreachable("Fatal error in file with navItemType={$navItem->Type}"),
+                default => Application::unreachable("Fatal error in file with navItemType=" . To::str($navItem->Type)),
             };
         }
 

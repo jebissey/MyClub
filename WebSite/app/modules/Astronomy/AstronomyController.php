@@ -174,18 +174,19 @@ final class AstronomyController extends AbstractController
             'name' => 'Paris',
         ];
 
-        if (empty($_COOKIE[self::COOKIE_NAME])) {
+        $cookie = $this->input->cookie(self::COOKIE_NAME);
+        if ($cookie === null || $cookie === '') {
             return $default;
         }
 
-        $data = json_decode(To::str($_COOKIE[self::COOKIE_NAME], ''), true);
+        $data = json_decode($cookie, true);
         if (!is_array($data) || !isset($data['lat'], $data['lng'])) {
             return $default;
         }
 
         return [
-            'lat'  => (float) $data['lat'],
-            'lng'  => (float) $data['lng'],
+            'lat'  => To::float($data['lat']),
+            'lng'  => To::float($data['lng']),
             'name' => To::str($data['name'] ?? '', ''),
         ];
     }

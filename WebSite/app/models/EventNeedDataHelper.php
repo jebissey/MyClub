@@ -38,6 +38,6 @@ final class EventNeedDataHelper extends Data
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $this->fetchObjects($stmt);
     }
 }

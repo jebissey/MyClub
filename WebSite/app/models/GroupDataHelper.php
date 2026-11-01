@@ -10,6 +10,7 @@ use Throwable;
 use app\enums\ApplicationError;
 use app\exceptions\QueryException;
 use app\helpers\Application;
+use app\helpers\To;
 use app\helpers\ConnectedUser;
 use app\modules\Common\valueObjects\DirectoryGroupRow;
 
@@ -27,17 +28,22 @@ final class GroupDataHelper extends Data
         );
     }
 
-
-    /** @return array{0: array<int, stdClass>, 1: array<int, stdClass>} */
+    /**
+     * @return array{
+     *     0: list<stdClass>,
+     *     1: list<stdClass>
+     * }
+     */
     public function getAvailableGroups(ConnectedUser $connectedUser, int $personId): array
     {
         $having = $this->getAuthorizationHavingClause($connectedUser);
+
         if ($having === 'HAVING 1 = 0') {
             return [[], []];
         }
 
         $currentGroupsQuery = $this->pdo->prepare("
-            SELECT 
+            SELECT
                 g.Id,
                 g.Name,
                 GROUP_CONCAT(a.Name) AS Authorizations
@@ -52,11 +58,14 @@ final class GroupDataHelper extends Data
             GROUP BY g.Id, g.Name
             $having
         ");
+
         $currentGroupsQuery->execute([$personId]);
+
+        /** @var list<stdClass> $currentGroups */
         $currentGroups = $currentGroupsQuery->fetchAll(PDO::FETCH_OBJ);
 
         $availableGroupsQuery = "
-            SELECT 
+            SELECT
                 g.Id,
                 g.Name,
                 GROUP_CONCAT(a.Name) AS Authorizations
@@ -69,6 +78,7 @@ final class GroupDataHelper extends Data
             GROUP BY g.Id, g.Name
             $having
         ";
+
         $availableGroupsLeftQuery = $this->pdo->prepare("
             SELECT ag.*
             FROM (
@@ -81,28 +91,42 @@ final class GroupDataHelper extends Data
                 WHERE mg.IdMember = ?
             )
         ");
+
         $availableGroupsLeftQuery->execute([$personId]);
 
+        /** @var list<stdClass> $availableGroups */
+        $availableGroups = $availableGroupsLeftQuery->fetchAll(PDO::FETCH_OBJ);
+
         return [
-            $availableGroupsLeftQuery->fetchAll(),
-            $currentGroups
+            $availableGroups,
+            $currentGroups,
         ];
     }
 
-
-    /** @return array<int, stdClass> */
+    /**
+     * @return list<stdClass>
+     */
     public function getCurrentGroups(int $personId): array
     {
         $query = $this->pdo->prepare('
-            SELECT g.*, 
-                CASE WHEN mg.Id IS NOT NULL THEN 1 ELSE 0 END as isMember,
-                g.SelfRegistration as canToggle
-            FROM `Group` g 
-            LEFT JOIN MemberGroup mg ON mg.IdGroup = g.Id AND mg.IdMember = ?
-            WHERE g.Inactivated = 0 AND (g.SelfRegistration = 1 OR mg.Id IS NOT NULL)
-            ORDER BY g.SelfRegistration DESC, g.Name');
+            SELECT
+                g.*,
+                CASE WHEN mg.Id IS NOT NULL THEN 1 ELSE 0 END AS isMember,
+                g.SelfRegistration AS canToggle
+            FROM `Group` g
+            LEFT JOIN MemberGroup mg
+                ON mg.IdGroup = g.Id AND mg.IdMember = ?
+            WHERE g.Inactivated = 0
+              AND (g.SelfRegistration = 1 OR mg.Id IS NOT NULL)
+            ORDER BY g.SelfRegistration DESC, g.Name
+        ');
+
         $query->execute([$personId]);
-        return $query->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<stdClass> $groups */
+        $groups = $query->fetchAll(PDO::FETCH_OBJ);
+
+        return $groups;
     }
 
     /**
@@ -124,8 +148,12 @@ final class GroupDataHelper extends Data
 
         if ($onlyMyGroups) {
             $sql .= ' AND EXISTS (
-                        SELECT 1 FROM MemberGroup mg
-                        WHERE mg.IdGroup = g.Id AND mg.IdMember = ? )';
+                SELECT 1
+                FROM MemberGroup mg
+                WHERE mg.IdGroup = g.Id
+                  AND mg.IdMember = ?
+            )';
+
             $params[] = $personId;
         }
 
@@ -135,8 +163,10 @@ final class GroupDataHelper extends Data
 
         if ($onlyWithAuthorization) {
             $sql .= ' AND EXISTS (
-                        SELECT 1 FROM GroupAuthorization ga
-                        WHERE ga.IdGroup = g.Id )';
+                SELECT 1
+                FROM GroupAuthorization ga
+                WHERE ga.IdGroup = g.Id
+            )';
         }
 
         $sql .= ' ORDER BY g.Name';
@@ -153,15 +183,19 @@ final class GroupDataHelper extends Data
         );
     }
 
-    /** @return array<int, stdClass>|false */
+    /**
+     * @return list<stdClass>|false
+     */
     public function getGroupsWithAuthorizations(ConnectedUser $connectedUser): array|false
     {
         $having = $this->getAuthorizationHavingClause($connectedUser);
+
         if ($having === 'HAVING 1 = 0') {
             return [];
         }
+
         $sql = "
-            SELECT 
+            SELECT
                 g.Id,
                 g.Name,
                 g.SelfRegistration,
@@ -171,13 +205,14 @@ final class GroupDataHelper extends Data
                         FROM (
                             SELECT a2.Name
                             FROM Authorization a2
-                            JOIN GroupAuthorization ga2 ON ga2.IdAuthorization = a2.Id
+                            JOIN GroupAuthorization ga2
+                                ON ga2.IdAuthorization = a2.Id
                             WHERE ga2.IdGroup = g.Id
                             ORDER BY a2.Name
                         )
                     ),
                     ',', ', '
-                ) AS Authorizations                
+                ) AS Authorizations
             FROM `Group` g
             LEFT JOIN GroupAuthorization ga ON g.Id = ga.IdGroup
             LEFT JOIN Authorization a ON ga.IdAuthorization = a.Id
@@ -186,19 +221,26 @@ final class GroupDataHelper extends Data
             $having
             ORDER BY g.Name
         ";
+
         $statement = $this->pdo->query($sql);
+
         if ($statement === false) {
             return false;
         }
-        return $statement->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<stdClass> $groups */
+        $groups = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $groups;
     }
 
-
-    /** @return array<int, stdClass> */
+    /**
+     * @return list<stdClass>
+     */
     public function getGroupsWithType(int $idPerson): array
     {
         $query = $this->pdo->prepare("
-            SELECT 
+            SELECT
                 g.Id,
                 g.Name,
                 CASE
@@ -207,82 +249,134 @@ final class GroupDataHelper extends Data
                     ELSE ''
                 END AS Type
             FROM `Group` g
-            LEFT JOIN MemberGroup mg 
-                ON mg.IdGroup = g.Id 
+            LEFT JOIN MemberGroup mg
+                ON mg.IdGroup = g.Id
                AND mg.IdMember = :idPerson
-            WHERE 
-                (g.SelfRegistration = 1 OR mg.Id IS NOT NULL) AND g.Inactivated = 0        
+            WHERE
+                (g.SelfRegistration = 1 OR mg.Id IS NOT NULL)
+                AND g.Inactivated = 0
             ORDER BY Type, g.Name
         ");
+
         $query->execute([':idPerson' => $idPerson]);
-        return $query->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<stdClass> $groups */
+        $groups = $query->fetchAll(PDO::FETCH_OBJ);
+
+        return $groups;
     }
 
-
-    /** @return array<int, array{name: string, total: int, withPresentation: int}> */
+    /**
+     * @return array<int, array{
+     *     name: string,
+     *     total: int,
+     *     withPresentation: int
+     * }>
+     */
     public function getGroupCount(): array
     {
         $groupCounts = [];
+
         $statement = $this->pdo->query("
-            SELECT 
-                g.Id, 
+            SELECT
+                g.Id,
                 g.Name,
-                COUNT(DISTINCT mg.IdMember) as Total,
-                COUNT(DISTINCT CASE WHEN m.InPresentationDirectory = 1 THEN mg.IdMember END) as WithPresentation
+                COUNT(DISTINCT mg.IdMember) AS Total,
+                COUNT(
+                    DISTINCT CASE
+                        WHEN m.InPresentationDirectory = 1 THEN mg.IdMember
+                    END
+                ) AS WithPresentation
             FROM `Group` g
             JOIN MemberGroup mg ON g.Id = mg.IdGroup
             JOIN Member m ON mg.IdMember = m.Id
             WHERE m.Inactivated = 0
             GROUP BY g.Id, g.Name
         ");
+
         if ($statement === false) {
-            throw new QueryException('getGroupCount query failed', ApplicationError::Error->value);
+            throw new QueryException(
+                'getGroupCount query failed',
+                ApplicationError::Error->value
+            );
         }
+
+        /**
+         * @var list<object{
+         *     Id: int|string,
+         *     Name: string,
+         *     Total: int|string,
+         *     WithPresentation: int|string
+         * }> $groupCountResult
+         */
         $groupCountResult = $statement->fetchAll(PDO::FETCH_OBJ);
 
         foreach ($groupCountResult as $row) {
-            $groupCounts[$row->Id] = [
-                'name'             => $row->Name,
-                'total'            => (int) $row->Total,
-                'withPresentation' => (int) $row->WithPresentation,
+            $groupCounts[To::int($row->Id)] = [
+                'name' => $row->Name,
+                'total' => To::int($row->Total),
+                'withPresentation' => To::int($row->WithPresentation),
             ];
         }
+
         return $groupCounts;
     }
 
-
-    /** @param array<int, int> $selectedAuthorizations */
-    public function insert(string $name, int $selfRegistration, array $selectedAuthorizations): void
-    {
+    /**
+     * @param array<int, int> $selectedAuthorizations
+     */
+    public function insert(
+        string $name,
+        int $selfRegistration,
+        array $selectedAuthorizations
+    ): void {
         $this->pdo->beginTransaction();
-        try {
-            $groupId = $this->set('Group', ['Name' => $name, 'SelfRegistration' => $selfRegistration]);
 
-            $query = $this->pdo->prepare('INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)');
+        try {
+            $groupId = $this->set(
+                'Group',
+                [
+                    'Name' => $name,
+                    'SelfRegistration' => $selfRegistration,
+                ]
+            );
+
+            $query = $this->pdo->prepare(
+                'INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)'
+            );
+
             foreach ($selectedAuthorizations as $authId) {
                 $query->execute([$groupId, $authId]);
             }
+
             $this->pdo->commit();
         } catch (Throwable $e) {
             $this->pdo->rollBack();
             throw $e;
         }
     }
-
 
     public function inactive(int $id): void
     {
         if ($id === 1) {
-            throw new QueryException("Group (1) can't be inactivated", ApplicationError::BadRequest->value);
+            throw new QueryException(
+                "Group (1) can't be inactivated",
+                ApplicationError::BadRequest->value
+            );
         }
 
         $this->pdo->beginTransaction();
+
         try {
             $this->set('Group', ['Inactivated' => 1], ['Id' => $id]);
+
             $query = $this->pdo->prepare('
                 DELETE FROM MemberGroup
-                WHERE IdGroup = ?');
+                WHERE IdGroup = ?
+            ');
+
             $query->execute([$id]);
+
             $this->pdo->commit();
         } catch (Throwable $e) {
             $this->pdo->rollBack();
@@ -290,25 +384,45 @@ final class GroupDataHelper extends Data
         }
     }
 
-
-    /** @param array<int, int> $selectedAuthorizations */
-    public function update(int $id, string $name, int $selfRegistration, array $selectedAuthorizations): void
-    {
+    /**
+     * @param array<int, int> $selectedAuthorizations
+     */
+    public function update(
+        int $id,
+        string $name,
+        int $selfRegistration,
+        array $selectedAuthorizations
+    ): void {
         if ($id === 1) {
-            throw new QueryException('Group (1) can\'t be updated', ApplicationError::BadRequest->value);
+            throw new QueryException(
+                "Group (1) can't be updated",
+                ApplicationError::BadRequest->value
+            );
         }
+
         $this->pdo->beginTransaction();
+
         try {
-            $query = $this->pdo->prepare('UPDATE "Group" SET Name = ?, SelfRegistration = ? WHERE Id = ?');
+            $query = $this->pdo->prepare(
+                'UPDATE "Group" SET Name = ?, SelfRegistration = ? WHERE Id = ?'
+            );
+
             $query->execute([$name, $selfRegistration, $id]);
 
-            $query = $this->pdo->prepare('DELETE FROM "GroupAuthorization" WHERE IdGroup = ?');
+            $query = $this->pdo->prepare(
+                'DELETE FROM "GroupAuthorization" WHERE IdGroup = ?'
+            );
+
             $query->execute([$id]);
 
-            $query = $this->pdo->prepare('INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)');
+            $query = $this->pdo->prepare(
+                'INSERT INTO "GroupAuthorization" (IdGroup, IdAuthorization) VALUES (?, ?)'
+            );
+
             foreach ($selectedAuthorizations as $authId) {
                 $query->execute([$id, $authId]);
             }
+
             $this->pdo->commit();
         } catch (Throwable $e) {
             $this->pdo->rollBack();
@@ -316,8 +430,8 @@ final class GroupDataHelper extends Data
         }
     }
 
-
     #region Private functions
+
     private function getAuthorizationHavingClause(ConnectedUser $connectedUser): string
     {
         $isWebmaster = $connectedUser->isWebmaster();
@@ -326,12 +440,15 @@ final class GroupDataHelper extends Data
         if (!$isWebmaster && !$isPersonManager) {
             return 'HAVING 1 = 0';
         }
+
         if ($isWebmaster && !$isPersonManager) {
             return 'HAVING COUNT(a.Id) > 0';
         }
+
         if (!$isWebmaster) {
             return 'HAVING COUNT(a.Id) = 0';
         }
+
         return '';
     }
 }

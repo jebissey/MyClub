@@ -10,7 +10,6 @@ use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\MemberCustomFields;
-use app\helpers\To;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\PersonManager\services\MemberOdsImporter;
@@ -38,7 +37,7 @@ final class ImportApi extends AbstractApi
 
         $this->renderJsonOk(
             $this->doGetHeadersFromCSV(
-                To::int($_POST['headerRow'] ?? 1)
+                $this->getFormInt('headerRow', 1)
             )
         );
     }
