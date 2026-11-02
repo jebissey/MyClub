@@ -30,6 +30,7 @@
         "squizlabs/php_codesniffer": "^4.0",
         "phpstan/phpstan": "^2.2",
         "friendsofphp/php-cs-fixer": "^3.95",
-        "phpunit/phpunit": "^13.3"
+        "phpunit/phpunit": "^13.3",
+        "efabrica/phpstan-latte": "^0.19.0"
     }
 }

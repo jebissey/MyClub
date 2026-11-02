@@ -32,7 +32,6 @@ use app\modules\Common\valueObjects\NavbarColors;
 
 abstract class AbstractController
 {
-    /** @var Engine<object> */
     protected Engine $flight;
 
     protected LatteEngine $latte;

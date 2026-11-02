@@ -50,7 +50,7 @@ final class Application
 
     private static self $instance;
 
-    /** @var Engine<object> */
+    /** @var Engine */
     private static Engine $flight;
 
     private static LatteEngine $latte;
@@ -146,9 +146,6 @@ final class Application
         return $this->connectedUser;
     }
 
-    /**
-     * @return Engine<object>
-     */
     public function getFlight(): Engine
     {
         return self::$flight;

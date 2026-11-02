@@ -8,14 +8,16 @@ parameters:
         - test        
         - tests        
         - tools
+    excludePaths:
+        - tools/phpstan
     latte:
         collectedPaths:
             - ../WebSite/app/modules
-        # Active la résolution large des {include}/{layout} /
-        # {template path} dans les contextes non standard
         resolveAllPossiblePaths: true
-
         reportUnanalysedTemplates: false
 
-    excludePaths:
-    ignoreErrors:
+services:
+#    - 
+#        class: tools/phpstan/ViewsRenderTemplateResolver
+#        arguments:
+#            modulesDir: %currentWorkingDirectory%/app/modules

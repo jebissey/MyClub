@@ -186,8 +186,6 @@ final class Routes
      *
      * ArticleAuthorizationService only depends on AuthorizationDataHelper, so it belongs to layer 1:
      * SurveyDataHelper (layer 2) can use it without any circular dependency with the services (layer 3).
-     *
-     * @param Engine<object> $flight
      */
     public function __construct(private readonly Application $application, private readonly Engine $flight)
     {
@@ -360,7 +358,6 @@ final class Routes
     }
 
     /**
-     * @param Engine<object> $flight
      * @param array<int, mixed> $extraArgs
      */
     private function mapRoute(
