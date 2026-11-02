@@ -17,8 +17,16 @@ parameters:
         reportUnanalysedTemplates: false
         filters:
             version: 'Closure(string): string'
+            formatFileSize: 'Closure(int): string'
+            longDate: 'Closure(string): string'
         functions: []
-
+    ignoreErrors:
+        -
+            message: '#^Call to function array_key_exists\(\) with .+ will always evaluate to (true|false)\.$#s'
+            path: *.latte
+        -
+            message: '#^Call to function unset\(\) contains undefined variable \$.+_args\.$#u'
+            path: *.latte
 services:
     - 
         class: MyClub\Dev\PhpStan\ViewsRenderTemplateResolver

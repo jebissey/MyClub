@@ -214,6 +214,14 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
  'Click on this link to reset your password:',
  'Cliquez sur ce lien pour initialiser votre mot de passe :',
  'Kliknij ten link, aby zresetować hasło:');
+
+
+ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('event.messages',
+ 'Messages',
+ 'Messages',
+ 'Wiadomości');
+
 SQL);
 
         return 101;
