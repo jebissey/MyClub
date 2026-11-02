@@ -16,6 +16,7 @@ final class ViewRenderer
     /**
      * Render a Latte template, flush the output and stop the request.
      *
+     * @phpstan-latte-ignore
      * @param object|array<string,mixed> $params
      */
     public function render(string $template, object|array $params = []): void

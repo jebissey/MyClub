@@ -29,6 +29,31 @@ final class GroupDataHelper extends Data
     }
 
     /**
+     * Returns the active groups (Id and Name only), ordered by name.
+     *
+     * @return list<object{Id: int|string, Name: string}>
+     */
+    public function getActiveGroups(): array
+    {
+        $statement = $this->pdo->query(
+            'SELECT g.Id, g.Name FROM "Group" g WHERE g.Inactivated = 0 ORDER BY g.Name'
+        );
+
+        if ($statement === false) {
+            throw new QueryException(
+                'getActiveGroups query failed',
+                ApplicationError::Error->value
+            );
+        }
+
+        /** @var list<object{Id: int|string, Name: string}> $groups */
+        $groups = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $groups;
+    }
+
+
+    /**
      * @return array{
      *     0: list<stdClass>,
      *     1: list<stdClass>

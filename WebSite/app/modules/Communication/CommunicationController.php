@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Communication;
 
 use app\helpers\Application;
+use app\models\GroupDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
 use app\modules\Communication\viewModels\CommunicationEditViewModel;
@@ -13,7 +14,8 @@ final class CommunicationController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private readonly EmailService $emailService
+        private readonly EmailService $emailService,
+        private readonly GroupDataHelper $groupDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -27,7 +29,7 @@ final class CommunicationController extends AbstractController
             $contactEmail = $this->dataHelper->getSetting('contactEmail', '');
 
             $viewModel = new CommunicationEditViewModel(
-                groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
+                groups: $this->groupDataHelper->getActiveGroups(),
                 navItems: $this->getNavItems($connectedUser->person?->email),
                 smtpFrom: $this->emailService->getSmtpConfig()?->getSenderAddress($userEmail),
                 i18n: [

@@ -55,7 +55,7 @@
                 </label>
                 <select id="reply-to-select" class="form-select">
                     <option value="">{='communication.index.reply_to_noreply'|translate}</option>
-                    {if $smtpFrom !== ''}
+                    {if $smtpFrom !== null && $smtpFrom !== ''}
                     <option value="{$smtpFrom}">{='communication.index.reply_to_smtp'|translate} ({$smtpFrom})</option>
                     {/if}
                     {if $userEmail !== ''}
@@ -250,9 +250,7 @@
         });
     </script>
     <script>
-    {if isset($i18n)}
         Object.assign(window.i18n, {=$i18n});
-    {/if}
         window.connectedPersonId = {$connectedPersonId};
     </script>
     <script type="module" src="{='/app/modules/Communication/js/main.js'|version}"></script>

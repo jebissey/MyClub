@@ -15,9 +15,12 @@ parameters:
             - ../WebSite/app/modules
         resolveAllPossiblePaths: true
         reportUnanalysedTemplates: false
+        filters:
+            version: 'Closure(string): string'
+        functions: []
 
 services:
-#    - 
-#        class: tools/phpstan/ViewsRenderTemplateResolver
-#        arguments:
-#            modulesDir: %currentWorkingDirectory%/app/modules
+    - 
+        class: MyClub\Dev\PhpStan\ViewsRenderTemplateResolver
+        arguments:
+            modulesDir: %currentWorkingDirectory%/app/modules

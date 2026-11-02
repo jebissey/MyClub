@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\phpstan;
+namespace MyClub\Dev\PhpStan;
 
 use Efabrica\PHPStanLatte\Collector\CollectedData\CollectedResolvedNode;
 use Efabrica\PHPStanLatte\LatteContext\LatteContext;

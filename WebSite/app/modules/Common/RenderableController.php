@@ -20,7 +20,10 @@ abstract class RenderableController
         $this->latte = $application->getLatte();
     }
 
-    /** @param object|array<string,mixed> $params */
+    /**
+     * @phpstan-latte-ignore
+     * @param object|array<string,mixed> $params
+     */
     public function render(string $templateLatteName, object|array $params = []): void
     {
         $content = $this->latte->renderToString($templateLatteName, $params);

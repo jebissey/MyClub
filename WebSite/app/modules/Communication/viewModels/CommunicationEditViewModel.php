@@ -9,7 +9,7 @@ use app\modules\Common\viewModels\LayoutViewModel;
 final readonly class CommunicationEditViewModel extends LayoutViewModel
 {
     /**
-     * @param list<object> $groups
+     * @param list<object{Id: int|string, Name: string}> $groups
      * @param list<mixed> $navItems
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams

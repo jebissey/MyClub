@@ -49,6 +49,7 @@ final class ArticleStatisticsController extends TableController
             availablePeriods: Period::gets($this->languagesDataHelper),
             title: ($this->t)('article.crosstab.title'),
             totalLabels: [($this->t)('article.crosstab.total_articles'), ''],
+            historyBack: true,
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(1),
             ]),

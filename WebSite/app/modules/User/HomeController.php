@@ -65,7 +65,7 @@ final class HomeController extends AbstractController
             $pendingDesignResponses = $this->designDataHelper->getPendingDesignResponses();
             $userPendingDesigns = array_values(array_filter(
                 $pendingDesignResponses,
-                static fn($item) => strcasecmp(To::str($item->email), $userEmail) === 0
+                static fn($item) => strcasecmp(To::str($item->Email), $userEmail) === 0
             ));
 
             $news = $this->news->anyNews($connectedUser);
