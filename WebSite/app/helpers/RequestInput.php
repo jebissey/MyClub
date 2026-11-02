@@ -17,6 +17,22 @@ final readonly class RequestInput
     {
     }
 
+    /**
+     * Builds a query string by merging the current query parameters with the given ones.
+     *
+     * Called from controllers and, through the buildUrl() Latte function registered in
+     * Application, from templates: search both PHP and .latte files before renaming it.
+     *
+     * @param array<string, scalar|null> $newParams
+     */
+    public function buildUrl(array $newParams): string
+    {
+        /** @var array<string, scalar|null> $params */
+        $params = array_merge($this->query(), $newParams);
+
+        return '?' . http_build_query($params);
+    }
+
     /** @return array<string, mixed> */
     public function query(): array
     {

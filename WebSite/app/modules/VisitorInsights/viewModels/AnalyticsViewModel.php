@@ -24,7 +24,6 @@ final readonly class AnalyticsViewModel extends LayoutViewModel
         public mixed $screenResolutionData,
         public mixed $typeData,
         public string $title,
-        public WebApp $control,
         public string $period,
         public mixed $nav,
         public array $i18n,

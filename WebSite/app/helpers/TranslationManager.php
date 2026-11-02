@@ -29,8 +29,9 @@ final class TranslationManager
         'pl_PL' => '🇵🇱',
     ];
 
-    private const COOKIE_NAME = 'user_language';
+    public const COOKIE_NAME = 'user_language'; // now public
 
+    private static ?string $languageCookie = null;
     private static ?string $forcedLanguage = null;
 
     private static function getForcedLanguage(): string
@@ -54,9 +55,7 @@ final class TranslationManager
             return $forcedLanguage;
         }
 
-        $cookieValue = $_COOKIE[self::COOKIE_NAME] ?? null;
-
-        return is_string($cookieValue) ? $cookieValue : self::DEFAULT_LANGUAGE;
+        return self::$languageCookie ?? self::DEFAULT_LANGUAGE;
     }
 
     public static function getDayName(DateTimeInterface $date): string
@@ -189,5 +188,10 @@ final class TranslationManager
             'errorGeneric' => $t('common.creation_time_modal.error_generic'),
             'errorNoData'  => $t('common.creation_time_modal.error_no_data'),
         ];
+    }
+
+    public static function setLanguageCookie(?string $language): void
+    {
+        self::$languageCookie = in_array($language, self::SUPPORTED_LANGUAGES, true) ? $language : null;
     }
 }

@@ -69,6 +69,7 @@ final class Application
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         self::$root = 'https://' . (is_string($host) ? $host : 'localhost');
         self::$flight = new Engine();
+        TranslationManager::setLanguageCookie($this->getRequestInput()->cookie(TranslationManager::COOKIE_NAME));
         self::$latte = new LatteEngine();
         self::$latte->setLoader(new FileLoader(dirname(__DIR__, 2) . '/app/modules'));
         self::$latte->setCacheDirectory(dirname(__DIR__, 2) . '/var/latte/temp');
@@ -361,6 +362,16 @@ final class Application
         self::$latte->addFilter(
             'readableDuration',
             fn(mixed $duration) => TranslationManager::getReadableDuration(To::int($duration))
+        );
+
+        self::$latte->addFunction(
+            'buildUrl',
+            function (array $params): string {
+                /** @var array<string, scalar|null> $typedParams */
+                $typedParams = $params;
+
+                return $this->getRequestInput()->buildUrl($typedParams);
+            }
         );
     }
 }

@@ -207,7 +207,7 @@ final class ContactController extends AbstractController
 
     private function silentFail(string $message): void
     {
-        $url = '/contact' . WebApp::buildUrl([]);
+        $url = '/contact' . $this->input->buildUrl([]);
         $this->redirect($url, ApplicationError::Ok, $message);
     }
 
@@ -271,7 +271,7 @@ final class ContactController extends AbstractController
         }
 
         if ($emailSent) {
-            $url = '/contact' . WebApp::buildUrl([
+            $url = '/contact' . $this->input->buildUrl([
                 'success' => ($this->t)('contact.success.sent'),
                 'who'     => $email,
             ]);

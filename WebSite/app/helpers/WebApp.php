@@ -16,14 +16,14 @@ final class WebApp
      *
      * Examples:
      * ---------
-     * // From $_POST:
+     * // From the form data of the request:
      * $schema = [
      *     'article_id' => FilterInputRule::Int->value,
      *     'question' => FilterInputRule::HtmlSafeText->value,
      *     'closingDate' => FilterInputRule::DateTime->value,
      *     'visibility' => $this->application->enumToValues(SurveyVisibility::class),
      * ];
-     * $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+     * $input = WebApp::filterInput($schema, $this->input->form());
      *
      * @param array<string, string|list<string>> $schema
      * @param array<string, mixed> $source
@@ -245,23 +245,5 @@ final class WebApp
     {
         $val = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
         return $val !== null ? (float)$val : null;
-    }
-
-    /**
-     * Builds a URL query string by merging the current GET parameters
-     * with the supplied parameters.
-     *
-     * IMPORTANT: This method is called both from PHP controllers and directly
-     * from Latte templates. Search both PHP and .latte files before moving,
-     * renaming or removing it, as IDE reference searches may miss template usages.
-     *
-     * @param array<string, scalar|null> $newParams
-     */
-    public static function buildUrl(array $newParams): string
-    {
-        /** @var array<string, scalar|null> $params */
-        $params = array_merge($_GET, $newParams);
-
-        return '?' . http_build_query($params);
     }
 }

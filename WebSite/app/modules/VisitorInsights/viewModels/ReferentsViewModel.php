@@ -20,7 +20,6 @@ final readonly class ReferentsViewModel extends LayoutViewModel
         public string $currentDate,
         public mixed $nav,
         public mixed $externalRefs,
-        public WebApp $control,
         public mixed $rows,
         array $layoutParams = []
     ) {

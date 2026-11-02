@@ -7,16 +7,16 @@
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="btn-group">
-                <a href="{$control->buildUrl(['period' => 'day'])}" class="btn btn-outline-primary {if $period === 'day'}active{/if}">
+                <a href="{buildUrl(['period' => 'day'])}" class="btn btn-outline-primary {if $period === 'day'}active{/if}">
                     {='period.day'|translate}
                 </a>
-                <a href="{$control->buildUrl(['period' => 'week'])}" class="btn btn-outline-primary {if $period === 'week'}active{/if}">
+                <a href="{buildUrl(['period' => 'week'])}" class="btn btn-outline-primary {if $period === 'week'}active{/if}">
                     {='period.week'|translate}
                 </a>
-                <a href="{$control->buildUrl(['period' => 'month'])}" class="btn btn-outline-primary {if $period === 'month'}active{/if}">
+                <a href="{buildUrl(['period' => 'month'])}" class="btn btn-outline-primary {if $period === 'month'}active{/if}">
                     {='period.month'|translate}
                 </a>
-                <a href="{$control->buildUrl(['period' => 'year'])}" class="btn btn-outline-primary {if $period === 'year'}active{/if}">
+                <a href="{buildUrl(['period' => 'year'])}" class="btn btn-outline-primary {if $period === 'year'}active{/if}">
                     {='period.year'|translate}
                 </a>
             </div>
@@ -24,11 +24,11 @@
 
         <div class="col-md-6 text-md-end">
             <div class="btn-group">
-                <a href="{$control->buildUrl(['date' => $nav['first']])}" class="btn btn-outline-secondary">&lt;&lt;</a>
-                <a href="{$control->buildUrl(['date' => $nav['prev']])}" class="btn btn-outline-secondary">&lt;</a>
+                <a href="{buildUrl(['date' => $nav['first']])}" class="btn btn-outline-secondary">&lt;&lt;</a>
+                <a href="{buildUrl(['date' => $nav['prev']])}" class="btn btn-outline-secondary">&lt;</a>
                 <span class="btn btn-secondary">{$nav['current']}</span>
-                <a href="{$control->buildUrl(['date' => $nav['next']])}" class="btn btn-outline-secondary">&gt;</a>
-                <a href="{$control->buildUrl(['date' => $nav['last']])}" class="btn btn-outline-secondary">&gt;&gt;</a>
+                <a href="{buildUrl(['date' => $nav['next']])}" class="btn btn-outline-secondary">&gt;</a>
+                <a href="{buildUrl(['date' => $nav['last']])}" class="btn btn-outline-secondary">&gt;&gt;</a>
             </div>
         </div>
     </div>

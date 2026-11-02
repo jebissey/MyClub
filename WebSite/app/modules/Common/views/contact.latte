@@ -77,7 +77,7 @@
                         <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                     {/if}
                     <input type="text" class="form-control" id="name" name="name"
-                           value="{if $identityReadOnly}{$name}{elseif isset($_GET['old_name'])}{$_GET['old_name']}{/if}"
+                           value="{if $identityReadOnly}{$name}{else}{$feedback->oldName}{/if}"
                            n:attr="disabled => $identityReadOnly, required => !$identityReadOnly">
                 </div>
             </div>
@@ -91,7 +91,7 @@
                         <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                     {/if}
                     <input type="email" class="form-control" id="email" name="email"
-                           value="{if $identityReadOnly}{$email}{elseif isset($_GET['old_email'])}{$_GET['old_email']}{/if}"
+                           value="{if $identityReadOnly}{$email}{else}{$feedback->oldEmail}{/if}"
                            n:attr="disabled => $identityReadOnly, required => !$identityReadOnly">
                 </div>
             </div>
@@ -108,7 +108,7 @@
                         <strong>{='contact.field.message'|translate}</strong>
                     </label>
                     <textarea class="form-control" id="message" name="message"
-                              rows="5" required>{if isset($_GET['old_message'])}{$_GET['old_message']}{/if}</textarea>
+                              rows="5" required>{$feedback->oldMessage}</textarea>
                 </div>
             {/if}
 

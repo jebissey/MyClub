@@ -175,7 +175,6 @@ final class VisitorInsightsController extends TableController
             currentDate: $currentDate,
             nav: $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
             externalRefs: $this->logDataAnalyticsHelper->getExternalReferentStats($period, $currentDate),
-            control: new WebApp(),
             rows: $this->logDataAnalyticsHelper->getReferentStats($period, $currentDate),
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
@@ -237,7 +236,6 @@ final class VisitorInsightsController extends TableController
             screenResolutionData: $this->logDataStatisticsHelper->getScreenResolutionDistribution($period, $currentDate),
             typeData: $this->logDataStatisticsHelper->getTypeDistribution($period, $currentDate),
             title: 'Synthèse des visiteurs',
-            control: new WebApp(),
             period: $period,
             nav: $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
             i18n: [
