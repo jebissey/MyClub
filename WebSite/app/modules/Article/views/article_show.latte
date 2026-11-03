@@ -10,7 +10,7 @@
 
     <div class="ms-auto d-flex flex-wrap align-items-center justify-content-end row-gap-2">
     {if $isCreator}
-        {if $article->PublishedBy !== null}
+        {if $article->publishedBy !== null}
         <a href="/emails/article/{$id}" class="btn btn-warning ms-2">{='article.show.notify_subscribers'|translate}</a>
         {/if}
         <a href="/article/carousel/{$id}" class="btn btn-info ms-2">
@@ -30,25 +30,25 @@
         <small class="text-muted">{='article.show.only_creator_can_edit'|translate}</small>
     {/if}
     {if $isMember}
-        <a href="/article/chat/{$article->Id}" class="btn btn-warning ms-2">
+        <a href="/article/chat/{$article->id}" class="btn btn-warning ms-2">
             {='messages'|translate}{if $countOfMessages > 0} ({$countOfMessages}){/if}
         </a>
     {/if}
     {if $canReadPool}
-        <button class="btn btn-info ms-2" onclick="window.location.href='/survey/results/{$article->Id}'">{='article.show.view_survey_results'|translate}</button>
+        <button class="btn btn-info ms-2" onclick="window.location.href='/survey/results/{$article->id}'">{='article.show.view_survey_results'|translate}</button>
     {/if}
-    {if $hasSurvey && $userConnected && isset($article->PublishedBy) && $article->PublishedBy !== null && $hasSurvey->ClosingDate >= date('Y-m-d')}
+    {if $hasSurvey && $userConnected && isset($article->publishedBy) && $article->publishedBy !== null && $hasSurvey->ClosingDate >= date('Y-m-d')}
         <button id="reply-survey-btn" class="btn btn-success ms-2">{='article.show.reply_survey'|translate}</button>
     {/if}
     {if $canReadOrder}
-        <button class="btn btn-info ms-2" onclick="window.location.href='/order/results/{$article->Id}'">{='article.show.view_order_results'|translate}</button>
+        <button class="btn btn-info ms-2" onclick="window.location.href='/order/results/{$article->id}'">{='article.show.view_order_results'|translate}</button>
     {/if}
-    {if $hasOrder && $userConnected && isset($article->PublishedBy) && $article->PublishedBy !== null && $hasOrder->ClosingDate >= date('Y-m-d')}
+    {if $hasOrder && $userConnected && isset($article->publishedBy) && $article->publishedBy !== null && $hasOrder->ClosingDate >= date('Y-m-d')}
         <button id="reply-order-btn" class="btn btn-success ms-2">{='article.show.reply_order'|translate}</button>
     {/if}
     {if $isCreator}
         <button class="btn ms-2" 
-                onclick="window.location.href='/article/edit/{$article->Id}'" 
+                onclick="window.location.href='/article/edit/{$article->id}'" 
                 style="background-color: {$navbarIconColor|noescape}; border-color: {$navbarIconColor|noescape};">
             <i class="bi bi-pencil" style="color: {$navbarInkColor|noescape};"></i>
         </button>
@@ -71,28 +71,28 @@
     {/if}
 
     <div class="container-fluid"
-         data-article-id="{$article->Id}"
+         data-article-id="{$article->id}"
          data-user-email="{if $userConnected}{$userEmail}{/if}"
          data-is-editor="{$isEditor ? '1' : '0'}">
 
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="card-title" id="article-title-display">{$article->Title}</h2>
+                    <h2 class="card-title" id="article-title-display">{$article->title}</h2>
                     <small class="text-muted">
-                        {='article.show.created_by'|translate} {$article->Author?->FirstName} {$article->Author?->LastName}
-                        {='article.show.on_date'|translate} {date('d/m/Y', strtotime($article->Timestamp))}
+                        {='article.show.created_by'|translate} {$article->author?->firstName} {$article->author?->lastName}
+                        {='article.show.on_date'|translate} {date('d/m/Y', strtotime($article->timestamp))}
                         {$publishedBy}
-                        {if date('Y-m-d', strtotime($article->Timestamp)) !== date('Y-m-d', strtotime($article->LastUpdate))}
-                        {='article.show.modified_on'|translate} {date('d/m/Y', strtotime($article->LastUpdate))}
+                        {if date('Y-m-d', strtotime($article->timestamp)) !== date('Y-m-d', strtotime($article->lastUpdate))}
+                        {='article.show.modified_on'|translate} {date('d/m/Y', strtotime($article->lastUpdate))}
                         {/if}
-                        {if isset($article->PublishedBy) && $article->PublishedBy !== null}
+                        {if isset($article->publishedBy) && $article->publishedBy !== null}
                             <span class="badge bg-success">{='article.show.published'|translate}</span>
                         {else}
                             <span class="badge bg-secondary">{='article.show.not_published'|translate}</span>
                         {/if}
-                        {if $article->Group !== null && $article->Group->Name}
-                            <span class="badge bg-info">{='article.show.group_label'|translate} {$article->Group->Name}</span>
+                        {if $article->group !== null && $article->group?->name}
+                            <span class="badge bg-info">{='article.show.group_label'|translate} {$article->group?->name}</span>
                         {/if}
                     </small>
                 </div>
@@ -100,7 +100,7 @@
 
             <div class="card-body">
                 <div id="content-display">
-                    {$article->Content|noescape}
+                    {$article->content|noescape}
                 </div>
                 {include 'partials/carousel.latte', carouselItems => $carouselItems}
             </div>

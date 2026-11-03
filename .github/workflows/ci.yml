@@ -44,7 +44,7 @@ jobs:
         run: php ../dev/test/CheckNaming.php --level=4
 
   phpstan:
-    name: Analyse statique (PHPStan niveau 9)
+    name: Static Analysis (PHPStan – Maximum Level)
     runs-on: ubuntu-latest
     needs: lint
     steps:

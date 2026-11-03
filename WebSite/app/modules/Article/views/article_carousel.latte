@@ -1,6 +1,6 @@
 {layout '../../Common/views/layout.latte'}
 
-{block title}Gestion du carousel - {$article->Title}{/block}
+{block title}{='article.carousel.title'|translate} - {$article->title}{/block}
 
 {block head}
     <style>
@@ -62,17 +62,17 @@
 {block navbar}
 <div class="container-fluid d-flex align-items-center">
     <div class="d-flex gap-2">
-        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
+        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="{='home'|translate}"></a>
         <button class="btn btn-primary fs-4" onclick="history.back()">
             <i class="bi bi-arrow-left-circle"></i>
         </button>
     </div>
 
     <div class="ms-auto">
-        <a href="/article/{$article->Id}" class="btn btn-success">
+        <a href="/article/{$article->id}" class="btn btn-success">
             <i class="bi bi-eye"></i>
         </a>
-        <a href="/articles" class="btn btn-secondary">Liste des articles</a>
+        <a href="/articles" class="btn btn-secondary">{='article.carousel.back_to_list'|translate}</a>
     </div>
 </div>
 {/block}
@@ -81,32 +81,32 @@
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col">
-            <h1>Gestion du carousel</h1>
-            <p class="text-muted">Article : {$article->Title}</p>
+            <h1>{='article.carousel.title'|translate}</h1>
+            <p class="text-muted">{='article.carousel.article_label'|translate} {$article->title}</p>
         </div>
     </div>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Ajouter une image</h5>
+            <h5 class="mb-0"><i class="bi bi-plus-circle"></i> {='article.carousel.add_image'|translate}</h5>
         </div>
         <div class="card-body">
             <form id="addImageForm">
                 <div class="row">
                     <div class="col-md-8 mb-3">
-                        <label for="imageSrc" class="form-label">Source de l'image (URL)</label>
-                        <input type="text" class="form-control" id="imageSrc" name="imageSrc" 
+                        <label for="imageSrc" class="form-label">{='article.carousel.image_source'|translate}</label>
+                        <input type="text" class="form-control" id="imageSrc" name="imageSrc"
                                placeholder="http://localhost/data/media/2026/01/image.jpg" required>
-                        <small class="form-text text-muted">Entrez l'URL complète de l'image</small>
+                        <small class="form-text text-muted">{='article.carousel.image_source_hint'|translate}</small>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="imageAlt" class="form-label">Texte alternatif</label>
-                        <input type="text" class="form-control" id="imageAlt" name="imageAlt" 
-                               placeholder="Description de l'image" required>
+                        <label for="imageAlt" class="form-label">{='article.carousel.alt_text'|translate}</label>
+                        <input type="text" class="form-control" id="imageAlt" name="imageAlt"
+                               placeholder="{='article.carousel.alt_placeholder'|translate}" required>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-plus-lg"></i> Ajouter l'image
+                    <i class="bi bi-plus-lg"></i> {='article.carousel.add_image_button'|translate}
                 </button>
             </form>
         </div>
@@ -116,8 +116,8 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="bi bi-images"></i> Images du carousel</h5>
-            <span class="badge bg-secondary" id="itemCount">{count($carouselItems)} image(s)</span>
+            <h5 class="mb-0"><i class="bi bi-images"></i> {='article.carousel.gallery_title'|translate}</h5>
+            <span class="badge bg-secondary" id="itemCount">{count($carouselItems)} {='article.carousel.images_count'|translate}</span>
         </div>
         <div class="card-body">
             {if count($carouselItems) > 0}
@@ -128,10 +128,10 @@
                             <div class="card h-100">
                                 <div class="position-relative carousel-item-content">
                                     {$itemHtml|noescape}
-                                    <button type="button" 
-                                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 delete-btn" 
+                                    <button type="button"
+                                            class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 delete-btn"
                                             data-id="{$item->Id}"
-                                            title="Supprimer cette image">
+                                            title="{='article.carousel.delete_image'|translate}">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -147,8 +147,8 @@
             {else}
                 <div class="text-center py-5" id="emptyState">
                     <i class="bi bi-images text-muted" style="font-size: 4rem;"></i>
-                    <p class="text-muted mt-3">Aucune image dans le carousel</p>
-                    <p class="text-muted">Ajoutez votre première image avec le formulaire ci-dessus</p>
+                    <p class="text-muted mt-3">{='article.carousel.empty'|translate}</p>
+                    <p class="text-muted">{='article.carousel.empty_hint'|translate}</p>
                 </div>
             {/if}
         </div>
@@ -159,19 +159,19 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Confirmer la suppression</h5>
+                <h5 class="modal-title">{='article.carousel.delete_confirm_title'|translate}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Êtes-vous sûr de vouloir supprimer cette image du carousel ?</p>
+                <p>{='article.carousel.delete_confirm_text'|translate}</p>
                 <div class="text-center">
                     <img id="deletePreview" src="" alt="" class="img-thumbnail" style="max-height: 150px;">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{='cancel'|translate}</button>
                 <button type="button" class="btn btn-danger" id="confirmDelete">
-                    <i class="bi bi-trash"></i> Supprimer
+                    <i class="bi bi-trash"></i> {='article.carousel.delete'|translate}
                 </button>
             </div>
         </div>
@@ -181,8 +181,15 @@
 
 {block scripts}
 <script>
-    window.ARTICLE_ID = {$article->Id};
+    window.ARTICLE_ID = {$article->id};
+    window.i18n ??= {};
+    window.i18n['article.carousel.js.url_required'] = {='article.carousel.js.url_required'|translate};
+    window.i18n['article.carousel.js.add_error'] = {='article.carousel.js.add_error'|translate};
+    window.i18n['article.carousel.js.delete_error'] = {='article.carousel.js.delete_error'|translate};
+    window.i18n['article.carousel.delete_image'] = {='article.carousel.delete_image'|translate};
+    window.i18n['article.carousel.images_count'] = {='article.carousel.images_count'|translate};
+    window.i18n['article.carousel.empty'] = {='article.carousel.empty'|translate};
+    window.i18n['article.carousel.empty_hint'] = {='article.carousel.empty_hint'|translate};
 </script>
 <script type="module" src="{='/app/modules/Article/js/CarouselManager.js'|version}"></script>
 {/block}
-

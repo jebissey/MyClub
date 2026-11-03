@@ -222,6 +222,137 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
  'Messages',
  'Wiadomości');
 
+-- Article carousel management page: texts previously hard-coded in the view
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('article.carousel.title',
+ 'Carousel management',
+ 'Gestion du carousel',
+ 'Zarządzanie karuzelą'),
+
+('article.carousel.article_label',
+ 'Article:',
+ 'Article :',
+ 'Artykuł:'),
+
+('article.carousel.back_to_list',
+ 'Article list',
+ 'Liste des articles',
+ 'Lista artykułów'),
+
+('article.carousel.add_image',
+ 'Add an image',
+ 'Ajouter une image',
+ 'Dodaj obraz'),
+
+('article.carousel.image_source',
+ 'Image source (URL)',
+ 'Source de l''image (URL)',
+ 'Źródło obrazu (URL)'),
+
+('article.carousel.image_source_hint',
+ 'Enter the full URL of the image',
+ 'Entrez l''URL complète de l''image',
+ 'Wprowadź pełny adres URL obrazu'),
+
+('article.carousel.alt_text',
+ 'Alternative text',
+ 'Texte alternatif',
+ 'Tekst alternatywny'),
+
+('article.carousel.alt_placeholder',
+ 'Image description',
+ 'Description de l''image',
+ 'Opis obrazu'),
+
+('article.carousel.add_image_button',
+ 'Add the image',
+ 'Ajouter l''image',
+ 'Dodaj obraz'),
+
+('article.carousel.gallery_title',
+ 'Carousel images',
+ 'Images du carousel',
+ 'Obrazy karuzeli'),
+
+('article.carousel.images_count',
+ 'image(s)',
+ 'image(s)',
+ 'obraz(y)'),
+
+('article.carousel.delete_image',
+ 'Delete this image',
+ 'Supprimer cette image',
+ 'Usuń ten obraz'),
+
+('article.carousel.empty',
+ 'No images in the carousel',
+ 'Aucune image dans le carousel',
+ 'Brak obrazów w karuzeli'),
+
+('article.carousel.empty_hint',
+ 'Add your first image with the form above',
+ 'Ajoutez votre première image avec le formulaire ci-dessus',
+ 'Dodaj pierwszy obraz za pomocą formularza powyżej'),
+
+('article.carousel.delete_confirm_title',
+ 'Confirm deletion',
+ 'Confirmer la suppression',
+ 'Potwierdź usunięcie'),
+
+('article.carousel.delete_confirm_text',
+ 'Are you sure you want to remove this image from the carousel?',
+ 'Êtes-vous sûr de vouloir supprimer cette image du carousel ?',
+ 'Czy na pewno chcesz usunąć ten obraz z karuzeli?'),
+
+('article.carousel.delete',
+ 'Delete',
+ 'Supprimer',
+ 'Usuń');
+
+-- Article carousel management page: messages previously hard-coded in CarouselManager.js
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('article.carousel.js.url_required',
+ 'Please enter an image URL',
+ 'Veuillez saisir une URL d''image',
+ 'Wprowadź adres URL obrazu'),
+
+('article.carousel.js.add_error',
+ 'Error while adding the image',
+ 'Erreur lors de l''ajout',
+ 'Błąd podczas dodawania obrazu'),
+
+('article.carousel.js.delete_error',
+ 'Error while deleting the image',
+ 'Erreur lors de la suppression',
+ 'Błąd podczas usuwania obrazu');
+
+-- Article edit page: texts previously hard-coded in the view
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('article.edit.page_title',
+ 'Edit',
+ 'Édition',
+ 'Edycja'),
+
+('article.edit.created_by',
+ 'Created by',
+ 'Créé par',
+ 'Utworzony przez'),
+
+('article.edit.on_date',
+ 'on',
+ 'le',
+ 'dnia'),
+
+('article.edit.modified_on',
+ 'modified on',
+ 'modifié le',
+ 'zmodyfikowany dnia'),
+
+('article.edit.no_group',
+ '-- No group --',
+ '-- Aucun groupe --',
+ '-- Brak grupy --');
+
 SQL);
 
         return 101;

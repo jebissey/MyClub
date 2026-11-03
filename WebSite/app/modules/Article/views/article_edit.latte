@@ -1,6 +1,6 @@
 {layout '../../Common/views/layout.latte'}
 
-{block title}Édition - {$article->Title}{/block}
+{block title}{='article.edit.page_title'|translate} - {$article->title}{/block}
 
 {block head}
 <style>
@@ -11,7 +11,7 @@
 {block navbar}
 <div class="container-fluid d-flex align-items-center">
     <div class="d-flex gap-2">
-        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="Home"></a>
+        <a class="navbar-brand" href="/"><img src="/app/images/home.png" alt="{='home'|translate}"></a>
         <button class="btn btn-primary fs-4" onclick="history.back()">
             <i class="bi bi-arrow-left-circle"></i>
         </button>
@@ -21,10 +21,10 @@
         <button type="submit" id="save-btn" class="btn btn-success">
             <i class="bi bi-check-circle"></i> {='save'|translate}
         </button>
-        <a href="/article/{$article->Id}" id="cancel-btn" class="btn btn-secondary">
+        <a href="/article/{$article->id}" id="cancel-btn" class="btn btn-secondary">
             <i class="bi bi-x-circle"></i> {='cancel'|translate}
         </a>
-        <a href="/article/{$article->Id}" class="btn btn-success">
+        <a href="/article/{$article->id}" class="btn btn-success">
             <i class="bi bi-eye"></i>
         </a>
         <a href="/articles" class="btn btn-secondary">{='article.edit.list'|translate}</a>
@@ -38,21 +38,21 @@
         <div class="card mb-3 flex-shrink-0">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="card-title" id="article-title-display">{$article->Title}</h2>
+                    <h2 class="card-title" id="article-title-display">{$article->title}</h2>
                     <small class="text-muted">
-                        Créé par {$article->Author?->FirstName} {$article->Author?->LastName}
-                        le {date('d/m/Y', strtotime($article->Timestamp))}
+                        {='article.edit.created_by'|translate} {$article->author?->firstName} {$article->author?->lastName}
+                        {='article.edit.on_date'|translate} {$article->timestamp|date:'d/m/Y'}
                         {$publishedBy}
-                        {if date('Y-m-d', strtotime($article->Timestamp)) !== date('Y-m-d', strtotime($article->LastUpdate))}
-                        modifié le {date('d/m/Y', strtotime($article->LastUpdate))}
+                        {if ($article->timestamp|date:'Y-m-d') !== ($article->lastUpdate|date:'Y-m-d')}
+                        {='article.edit.modified_on'|translate} {$article->lastUpdate|date:'d/m/Y'}
                         {/if}
-                        {if isset($article->PublishedBy) && $article->PublishedBy !== null}
+                        {if $article->publishedBy !== null}
                             <span class="badge bg-success">{='article.edit.published'|translate}</span>
                         {else}
                             <span class="badge bg-secondary">{='article.edit.not_published'|translate}</span>
                         {/if}
-                        {if isset($article->GroupName) && $article->GroupName}
-                            <span class="badge bg-info">{='article.edit.group_label'|translate}: {$article->GroupName}</span>
+                        {if $article->group?->name}
+                            <span class="badge bg-info">{='article.edit.group_label'|translate}: {$article->group->name}</span>
                         {/if}
                     </small>
                 </div>
@@ -62,13 +62,13 @@
                 <form id="edit-form" method="post" class="d-flex flex-column gap-2">
                     <div class="d-flex align-items-center gap-4 flex-wrap">
                         <div class="form-check">
-                            <input 
-                                class="form-check-input" 
-                                type="checkbox" 
-                                id="published-input" 
-                                name="published" 
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="published-input"
+                                name="published"
                                 value="1"
-                                {if isset($article->PublishedBy) && $article->PublishedBy !== null}checked{/if}
+                                {if $article->publishedBy !== null}checked{/if}
                             >
                             <label class="form-check-label" for="published-input">{='article.edit.publish'|translate}</label>
                         </div>
@@ -76,16 +76,16 @@
                         <div class="d-flex align-items-center gap-2">
                             <label for="group-select" class="form-label mb-0 text-nowrap">{='article.edit.group'|translate}</label>
                             <select class="form-select" id="group-select" name="idGroup">
-                                <option value="">-- Aucun groupe --</option>
+                                <option value="">{='article.edit.no_group'|translate}</option>
                                 {foreach $groups as $group}
-                                <option value="{$group->Id}" {if isset($article->IdGroup) && $article->IdGroup == $group->Id}selected{/if}>{$group->Name}</option>
+                                <option value="{$group->Id}" {if $article->idGroup == $group->Id}selected{/if}>{$group->Name}</option>
                                 {/foreach}
                             </select>
                         </div>
 
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="members-only-checkbox" name="membersOnly" value="1"
-                                {if isset($article->OnlyForMembers) && $article->OnlyForMembers}checked{/if}>
+                                {if $article->onlyForMembers}checked{/if}>
                             <label class="form-check-label" for="members-only-checkbox">{='article.edit.members_only'|translate}</label>
                         </div>
                     </div>
@@ -94,7 +94,7 @@
 
                     <div>
                         <label for="title-input" class="form-label mb-1">{='article.edit.title'|translate}</label>
-                        <input type="text" class="form-control" id="title-input" name="title" value="{$article->Title}" required>
+                        <input type="text" class="form-control" id="title-input" name="title" value="{$article->title}" required>
                     </div>
                     <input type="hidden" id="content-input" name="content">
                 </form>
@@ -105,7 +105,7 @@
             <label class="form-label fw-semibold flex-shrink-0 mb-1">
                 <i class="bi bi-body-text"></i> {='article.edit.content'|translate} <span class="text-danger">*</span>
             </label>
-            <textarea name="content" id="tinymce-editor" class="flex-grow-1">{if isset($article->Content)}{$article->Content|noescape}{/if}</textarea>
+            <textarea name="content" id="tinymce-editor" class="flex-grow-1">{$article->content|noescape}</textarea>
         </div>
     </div>
 {/block}
@@ -113,12 +113,10 @@
 {block scripts}
     <script src="{='/app/modules/Common/js/tinymce/tinymce.min.js'|version}"></script>
     <script>
-        const ARTICLE_ID = {$article->Id};
-        const isEditor = {$isEditor ? 'true' : 'false'} === 'true';
-        
-        {if isset($i18n)}
+        const ARTICLE_ID = {$article->id};
+        const isEditor = {$isEditor};
+
         Object.assign(window.i18n, {=$i18n});
-        {/if}
     </script>
     <script type="module" src="{='/app/modules/Article/js/edit.js'|version}"></script>
 {/block}

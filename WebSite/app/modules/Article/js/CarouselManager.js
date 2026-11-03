@@ -56,7 +56,7 @@ export default class CarouselManager {
         const imageAlt = this.elements.imageAlt.value.trim();
 
         if (!imageSrc) {
-            this.showAlert('Veuillez saisir une URL d\'image', 'warning');
+            this.showAlert(window.t('article.carousel.js.url_required'), 'warning');
             return;
         }
 
@@ -75,7 +75,7 @@ export default class CarouselManager {
             }
             this.elements.addImageForm.reset();
         } else {
-            this.showAlert(result.message || 'Erreur lors de l\'ajout', 'danger');
+            this.showAlert(result.message || window.t('article.carousel.js.add_error'), 'danger');
         }
     }
 
@@ -122,7 +122,7 @@ export default class CarouselManager {
             this.deleteModal?.hide();
             this.itemToDelete = null;
         } else {
-            this.showAlert(result.message || 'Erreur lors de la suppression', 'danger');
+            this.showAlert(result.message || window.t('article.carousel.js.delete_error'), 'danger');
         }
     }
 
@@ -137,7 +137,7 @@ export default class CarouselManager {
                         <button type="button" 
                                 class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 delete-btn" 
                                 data-id="${item.Id}"
-                                title="Supprimer cette image">
+                                title="${window.t('article.carousel.delete_image')}">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -155,8 +155,8 @@ export default class CarouselManager {
         return `
             <div class="text-center py-5" id="emptyState">
                 <i class="bi bi-images text-muted" style="font-size: 4rem;"></i>
-                <p class="text-muted mt-3">Aucune image dans le carousel</p>
-                <p class="text-muted">Ajoutez votre première image avec le formulaire ci-dessus</p>
+                <p class="text-muted mt-3">${window.t('article.carousel.empty')}</p>
+                <p class="text-muted">${window.t('article.carousel.empty_hint')}</p>
             </div>
         `;
     }
@@ -178,7 +178,7 @@ export default class CarouselManager {
         const count = document.querySelectorAll('.carousel-item-wrapper').length;
 
         if (this.elements.itemCount) {
-            this.elements.itemCount.textContent = `${count} image(s)`;
+            this.elements.itemCount.textContent = `${count} ${window.t('article.carousel.images_count')}`;
         }
 
         if (count === 0 && this.elements.carouselGallery) {
@@ -223,7 +223,7 @@ export default class CarouselManager {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const articleId = window.ARTICLE_ID;
     const carouselManager = new CarouselManager(articleId);
     carouselManager.init();
