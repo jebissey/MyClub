@@ -76,6 +76,7 @@ final class WebmasterController extends TableController
         }
     }
 
+
     public function helpAdmin(): void
     {
         $this->renderHelp('Help_Admin', fn($u) => $u->isAdministrator(), __FILE__, __LINE__);
@@ -143,6 +144,7 @@ final class WebmasterController extends TableController
         }
     }
 
+
     public function notifications(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
@@ -191,6 +193,7 @@ final class WebmasterController extends TableController
         }
     }
 
+
     public function sendEmailCredentialsEdit(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
@@ -222,7 +225,7 @@ final class WebmasterController extends TableController
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
             $schema = [
                 'sendMethod'       => FilterInputRule::Text->value,
-                'smtpAccount'      => FilterInputRule::Email->value,
+                'smtpAccount'      => FilterInputRule::Text->value,
                 'smtpPassword'     => FilterInputRule::Password->value,
                 'smtpFrom'         => FilterInputRule::Email->value,
                 'smtpHost'         => FilterInputRule::Uri->value,
@@ -237,6 +240,8 @@ final class WebmasterController extends TableController
                 'monthlyLimit'     => FilterInputRule::Integer->value,
             ];
             $input  = WebApp::filterInput($schema, $this->flight->request()->data->getData());
+#error_log(json_encode($input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));      
+
             $method = To::str($input['sendMethod'] ?? null, 'smtp');
 
             $this->credentials->set('email', 'method', $method);
@@ -276,6 +281,7 @@ final class WebmasterController extends TableController
             $this->redirect('/webmaster');
         }
     }
+
 
     public function showInstallations(): void
     {
@@ -391,6 +397,7 @@ final class WebmasterController extends TableController
         $this->views->render('Webmaster/views/sitemap.latte', ['urls' => $urls]);
     }
 
+
     public function turnstileCredentialsEdit(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
@@ -424,6 +431,7 @@ final class WebmasterController extends TableController
             $this->redirect('/webmaster');
         }
     }
+
 
     public function helloassoCredentialsEdit(): void
     {

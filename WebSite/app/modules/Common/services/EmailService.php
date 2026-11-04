@@ -30,8 +30,7 @@ final class EmailService
     public function __construct(
         private readonly ?SmtpConfigProviderInterface $configProvider,
         private readonly ?EmailQuotaTrackerInterface $quotaTracker,
-    ) {
-    }
+    ) {}
 
     public function getSmtpConfig(): ?SmtpConfig
     {
@@ -111,18 +110,30 @@ final class EmailService
         return mail($message->to, $message->subject, $message->body, $headerString);
     }
 
+
     private function sendWithPHPMailer(EmailMessage $message, SmtpConfig $config): bool
     {
         $mail = new PHPMailer(true);
+
+        // SMTP diagnostics can be enabled temporarily through the environment.
+        $debugEnabled = false;
+
         try {
             $mail->isSMTP();
-            $mail->Host     = $config->host;
-            $mail->SMTPAuth = true;
-            $mail->Username = $config->username;
-            $mail->Password = $config->password;
-            $mail->Port     = $config->port;
-            $mail->Timeout  = 10;
-            $mail->CharSet  = 'UTF-8';
+            $mail->Host      = $config->host;
+            $mail->SMTPAuth  = true;
+            $mail->Username  = $config->username;
+            $mail->Password  = $config->password;
+            $mail->Port      = $config->port;
+            $mail->Timeout   = 10;
+            $mail->CharSet   = 'UTF-8';
+            $mail->SMTPDebug = $debugEnabled ? 2 : 0;
+
+            // Send PHPMailer diagnostics to the PHP error log.
+            // Never log credentials or message contents.
+            $mail->Debugoutput = static function (string $message, int $level): void {
+                error_log("[PHPMailer SMTP][{$level}] " . trim($message));
+            };
 
             match ($config->encryption) {
                 'tls'   => $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS,
@@ -141,6 +152,7 @@ final class EmailService
             foreach ($message->cc as $email) {
                 $mail->addCC($email);
             }
+
             foreach ($message->bcc as $email) {
                 $mail->addBCC($email);
             }
@@ -149,16 +161,41 @@ final class EmailService
             $mail->Subject = $message->subject;
             $mail->Body    = $message->body;
             $mail->AltBody = strip_tags($message->body);
+
             $mail->send();
+
+            if ($debugEnabled) {
+                error_log(
+                    "[PHPMailer SMTP] Successfully sent email"
+                        . " | Host: {$config->host}"
+                        . " | Port: {$config->port}"
+                        . " | From: {$config->from}"
+                        . " | To: {$message->to}"
+                );
+            }
 
             return true;
         } catch (PHPMailerException $e) {
+            $error = $mail->ErrorInfo ?: $e->getMessage();
+
+            error_log(
+                "[PHPMailer SMTP] Sending failed"
+                    . " | Host: {$config->host}"
+                    . " | Port: {$config->port}"
+                    . " | Encryption: {$config->encryption}"
+                    . " | Username: {$config->username}"
+                    . " | From: {$config->from}"
+                    . " | To: {$message->to}"
+                    . " | Error: {$error}"
+            );
+
             throw new EmailException(
-                'SMTP sending failed: ' . $mail->ErrorInfo,
+                'SMTP sending failed: ' . $error,
                 previous: $e
             );
         }
     }
+
 
     private function sendWithMailjet(EmailMessage $message, SmtpConfig $config): bool
     {
