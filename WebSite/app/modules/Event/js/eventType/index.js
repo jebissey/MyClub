@@ -1,6 +1,7 @@
 import ApiClient from '../../../Common/js/ApiClient.js';
 
 const api = new ApiClient('');
+const i18n = window.eventTypesI18n;
 
 export function initAttributes() {
     loadAttributesList();
@@ -17,7 +18,7 @@ export async function createAttribute() {
     const color = document.getElementById('newAttributeColor').value;
 
     if (!name) {
-        alert("Le nom de l'attribut est requis");
+        alert(i18n.nameRequired);
         return;
     }
 
@@ -29,7 +30,7 @@ export async function createAttribute() {
         document.getElementById('newAttributeDetail').value = '';
         document.getElementById('newAttributeColor').value = '#563d7c';
     } else {
-        alert('Erreur : ' + result.message);
+        alert(`${i18n.errorPrefix} ${result.message}`);
     }
 }
 
@@ -38,22 +39,17 @@ export async function editAttribute(id) {
     const detail = document.getElementById(`attributeDetail${id}`).value;
     const color = document.getElementById(`attributeColor${id}`).value;
 
-    const result = await api.post('/api/attribute/update', {
-        id,
-        name,
-        detail,
-        color
-    });
+    const result = await api.post('/api/attribute/update', { id, name, detail, color });
 
     if (result.success) {
         await loadAttributesList();
     } else {
-        alert('Erreur : ' + result.message);
+        alert(`${i18n.errorPrefix} ${result.message}`);
     }
 }
 
 export async function deleteAttribute(id) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet attribut ?')) {
+    if (!confirm(i18n.deleteConfirm)) {
         return;
     }
 
@@ -62,7 +58,7 @@ export async function deleteAttribute(id) {
     if (result.success) {
         await loadAttributesList();
     } else {
-        alert('Erreur : ' + result.message);
+        alert(`${i18n.errorPrefix} ${result.message}`);
     }
 }
 
@@ -72,6 +68,6 @@ export async function loadAttributesList() {
         const html = await response.text();
         document.getElementById('attributesList').innerHTML = html;
     } catch (err) {
-        alert('Impossible de charger la liste des attributs : ' + err.message);
+        alert(`${i18n.loadError} ${err.message}`);
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use InvalidArgumentException;
-use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
@@ -19,6 +18,7 @@ use app\models\EventDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
+use app\modules\Event\valueObjects\EventNeedRow;
 
 final class EventSupplyApi extends AbstractApi
 {
@@ -59,7 +59,9 @@ final class EventSupplyApi extends AbstractApi
             );
         } catch (Throwable $e) {
             http_response_code(500);
-            echo "<div class='alert alert-danger'>Erreur : " . htmlspecialchars($e->getMessage()) . "</div>";
+            echo "<div class='alert alert-danger'>"
+                . htmlspecialchars($this->languagesDataHelper->translate('common.error_prefix') . ' ' . $e->getMessage())
+                . '</div>';
         }
     }
 
@@ -103,29 +105,33 @@ final class EventSupplyApi extends AbstractApi
 
         $eventNeeds = $this->eventDataHelper->getEventNeeds($eventId);
         $updatedNeed = $this->findUpdatedNeed($eventNeeds, $needId);
-        return new ApiResponse(true, ApplicationError::Ok->value, ['updatedNeed' => $updatedNeed], 'Apport mis à jour avec succès');
+
+        return new ApiResponse(
+            true,
+            ApplicationError::Ok->value,
+            ['updatedNeed' => $updatedNeed],
+            $this->languagesDataHelper->translate('event.supply.updated')
+        );
     }
 
     /**
-     * @param array<int, stdClass> $eventNeeds
+     * @param list<EventNeedRow> $eventNeeds
      * @return array{id: int, providedQuantity: int|float, requiredQuantity: int|float, percentage: int|float}|null
      */
     private function findUpdatedNeed(array $eventNeeds, int $needId): ?array
     {
         foreach ($eventNeeds as $need) {
-            $id = To::requireInt($need->Id);
-            if ($id !== $needId) {
+            if ($need->id !== $needId) {
                 continue;
             }
 
-            $provided = To::number($need->ProvidedQuantity);
-            $required = To::number($need->RequiredQuantity);
-
             return [
-                'id' => $id,
-                'providedQuantity' => $provided,
-                'requiredQuantity' => $required,
-                'percentage' => $required > 0 ? min(100, ($provided / $required) * 100) : 0,
+                'id' => $need->id,
+                'providedQuantity' => $need->providedQuantity,
+                'requiredQuantity' => $need->requiredQuantity,
+                'percentage' => $need->requiredQuantity > 0
+                    ? min(100, ($need->providedQuantity / $need->requiredQuantity) * 100)
+                    : 0,
             ];
         }
 

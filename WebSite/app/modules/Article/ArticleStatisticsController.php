@@ -12,6 +12,7 @@ use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\LogDataHelper;
 use app\modules\Common\TableController;
+use app\modules\Common\valueObjects\TopPageRow;
 use app\modules\Common\viewModels\CrosstabViewModel;
 use app\modules\Common\viewModels\TopItemsByPeriodViewModel;
 
@@ -36,12 +37,7 @@ final class ArticleStatisticsController extends TableController
 
         $period = Period::tryFrom(To::str($this->flight->request()->query->period ?? 'month')) ?? Period::Month;
         $dateRange = $period->dateRange();
-        $crosstabData = array_filter(
-            $this->articleCrosstabDataHelper->getItems($dateRange),
-            static fn(mixed $key): bool => is_string($key),
-            ARRAY_FILTER_USE_KEY
-        );
-
+        $crosstabData = $this->articleCrosstabDataHelper->getItems($dateRange);
         $viewModel = new CrosstabViewModel(
             crosstabData: $crosstabData,
             period: $period->value,
@@ -54,7 +50,7 @@ final class ArticleStatisticsController extends TableController
                 'page' => $this->application->getConnectedUser()->getPage(1),
             ]),
         );
-        $this->views->render('Article/views/crosstab.latte', $viewModel->toArray());
+        $this->views->render('Article/views/crosstab.latte', $viewModel);
     }
 
     public function topArticlesByPeriod(): void
@@ -69,18 +65,16 @@ final class ArticleStatisticsController extends TableController
 
         $articleIds = [];
         foreach ($topPages as $page) {
-            $id = To::int($page->articleId ?? null);
-            if ($id > 0) {
-                $articleIds[] = $id;
+            if ($page->articleId !== null && $page->articleId > 0) {
+                $articleIds[] = $page->articleId;
             }
         }
         $authors = $this->articleDataHelper->getAuthorsByArticleIds($articleIds);
 
+        $rows = [];
         foreach ($topPages as $page) {
-            $articleId          = To::int($page->articleId ?? null);
-            $author             = $articleId > 0 ? ($authors[$articleId] ?? null) : null;
-            $page->AuthorName   = $author?->personName;
-            $page->ArticleTitle = $author?->articleTitle;
+            $author = $page->articleId !== null ? ($authors[$page->articleId] ?? null) : null;
+            $rows[] = TopPageRow::fromStdClass($page, $author?->articleTitle, $author?->personName);
         }
 
         $viewModel = new TopItemsByPeriodViewModel(
@@ -88,12 +82,12 @@ final class ArticleStatisticsController extends TableController
             period: $period->value,
             periodFrom: $period->getStart()->format('Y-m-d H:i:s'),
             periodTo: $period->getEnd()->format('Y-m-d H:i:s'),
-            topPages: array_values($topPages),
+            topPages: $rows,
             translations: TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),
         );
-        $this->views->render('Article/views/topArticles.latte', $viewModel->toArray());
+        $this->views->render('Article/views/topArticles.latte', $viewModel);
     }
 }

@@ -36,7 +36,7 @@ final class LoanController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Loan/views/calendar.latte', $viewModel->toArray());
+        $this->views->render('Loan/views/calendar.latte', $viewModel);
     }
 
     public function designer(): void
@@ -54,7 +54,7 @@ final class LoanController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Loan/views/designer.latte', $viewModel->toArray());
+        $this->views->render('Loan/views/designer.latte', $viewModel);
     }
 
     public function designerHelp(): void
@@ -70,12 +70,11 @@ final class LoanController extends AbstractController
         $viewModel = new InfoViewModel(
             content: To::str($content),
             timer: 0,
-            hasAuthorization: $this->application->getConnectedUser()->isRedactor(),
             previousPage: true,
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Common/views/info.latte', $viewModel->toArray());
+        $this->views->render('Common/views/info.latte', $viewModel);
     }
 
     public function manager(): void
@@ -95,7 +94,7 @@ final class LoanController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Loan/views/manager.latte', $viewModel->toArray());
+        $this->views->render('Loan/views/manager.latte', $viewModel);
     }
 
     public function reservations(): void
@@ -118,7 +117,7 @@ final class LoanController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Loan/views/user.latte', $viewModel->toArray());
+        $this->views->render('Loan/views/user.latte', $viewModel);
     }
 
     #region Private methods

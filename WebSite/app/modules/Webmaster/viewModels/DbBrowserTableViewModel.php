@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace app\modules\Webmaster\viewModels;
 
+use app\modules\Common\valueObjects\TableRow;
 use app\modules\Common\viewModels\LayoutViewModel;
 
 final readonly class DbBrowserTableViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $records
+     * @param list<TableRow> $records
      * @param array<string, string> $filterValues
      * @param list<array{name: string, label: string}> $filters
      * @param list<array{field: mixed, label: mixed}> $columns

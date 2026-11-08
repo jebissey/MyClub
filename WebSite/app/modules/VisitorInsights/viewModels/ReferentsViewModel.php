@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace app\modules\VisitorInsights\viewModels;
 
-use app\helpers\WebApp;
+use app\models\LogAnalyticsDataHelper;
 use app\modules\Common\viewModels\LayoutViewModel;
 
+/**
+ * @phpstan-import-type ReferentNavigation from LogAnalyticsDataHelper
+ */
 final readonly class ReferentsViewModel extends LayoutViewModel
 {
     /**
-     * @param mixed $nav
-     * @param mixed $externalRefs
-     * @param mixed $rows
+     * @param ReferentNavigation $nav
+     * @param list<object{source: string, count: int}> $externalRefs
+     * @param list<object{source: string, count: int}> $rows
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
         public string $period,
         public string $currentDate,
-        public mixed $nav,
-        public mixed $externalRefs,
-        public mixed $rows,
+        public array $nav,
+        public array $externalRefs,
+        public array $rows,
         array $layoutParams = []
     ) {
         parent::__construct(

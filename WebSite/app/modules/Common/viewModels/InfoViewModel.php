@@ -9,10 +9,9 @@ final readonly class InfoViewModel extends LayoutViewModel
     /** @param array<string, mixed> $layoutParams */
     public function __construct(
         public string $content,
-        public int $timer = 0,
-        public bool $hasAuthorization = false,
-        public bool $previousPage = false,
-        array $layoutParams = []
+        public int $timer,
+        public bool $previousPage,
+        array $layoutParams,
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),

@@ -46,7 +46,7 @@ final class UserPresentationController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('User/views/user_edit_presentation.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_edit_presentation.latte', $viewModel);
     }
 
     public function savePresentation(): void
@@ -113,6 +113,6 @@ final class UserPresentationController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('User/views/user_presentation.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_presentation.latte', $viewModel);
     }
 }

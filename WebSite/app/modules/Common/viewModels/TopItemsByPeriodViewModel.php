@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace app\modules\Common\viewModels;
 
+use app\modules\Common\valueObjects\TopPageRow;
+
 final readonly class TopItemsByPeriodViewModel extends LayoutViewModel
 {
     /**
-     * @param list<object> $topPages
+     * @param list<TopPageRow> $topPages
      * @param array<string, string> $translations
      * @param array<string, mixed> $layoutParams
      */

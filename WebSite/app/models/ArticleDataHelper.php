@@ -343,7 +343,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
-     * @return list<object>
+     * @return list<object{Id: int, Title: string}>
      */
     public function inArticles(string $path): array
     {
@@ -359,10 +359,11 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
             INNER JOIN Carousel c ON c.IdArticle = a.Id
             WHERE c.Item LIKE :path
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':path' => '%' . $path . '%']);
 
-        /** @var list<object> $rows */
+        /** @var list<object{Id: int, Title: string}> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return $rows;

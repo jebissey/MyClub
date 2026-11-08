@@ -109,7 +109,7 @@ final class PersonController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->views->render('User/views/user_account.latte', $viewModel->toArray());
+            $this->views->render('User/views/user_account.latte', $viewModel);
         }
     }
 
@@ -190,12 +190,11 @@ final class PersonController extends TableController
                 $viewModel = new InfoViewModel(
                     content: $message,
                     timer: 10000,
-                    hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
                     previousPage: true,
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->views->render('Common/views/info.latte', $viewModel->toArray());
+                $this->views->render('Common/views/info.latte', $viewModel);
 
                 return;
             }
@@ -256,7 +255,7 @@ final class PersonController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->views->render('PersonManager/views/personManager.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/personManager.latte', $viewModel);
         }
     }
 
@@ -322,7 +321,7 @@ final class PersonController extends TableController
         };
 
         $viewModel = new PersonsIndexViewModel(
-            persons: array_values($data['items']),
+            persons: $data['items'],
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
             filterValues: $filterValues,
@@ -336,7 +335,7 @@ final class PersonController extends TableController
             ]),
         );
 
-        $this->views->render('PersonManager/views/users_index.latte', $viewModel->toArray());
+        $this->views->render('PersonManager/views/users_index.latte', $viewModel);
     }
 
     public function membershipSettingsEdit(): void
@@ -356,7 +355,7 @@ final class PersonController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->views->render('PersonManager/views/membershipSettings.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/membershipSettings.latte', $viewModel);
         }
     }
 

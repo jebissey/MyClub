@@ -1,6 +1,15 @@
+{varType list<array{
+    href: string,
+    label: string,
+    page?: string,
+    icon?: string,
+    iconHtml?: string,
+    text?: string,
+    visible?: bool
+}> $items}
 <div class="list-group d-lg-none mt-3">
     {foreach $items as $item}
-        {if $item['visible'] ?? true}
+        {if !isset($item['visible']) || $item['visible']}
             <a class="list-group-item list-group-item-action d-flex align-items-center gap-3"
                href="{$item['href']}">
                 <span class="fs-3">

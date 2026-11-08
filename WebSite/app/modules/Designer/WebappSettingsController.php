@@ -12,6 +12,7 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\MetadataDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Designer\viewModels\WebappSettingsViewModel;
 
 final class WebappSettingsController extends AbstractController
 {
@@ -94,11 +95,14 @@ final class WebappSettingsController extends AbstractController
             return;
         }
 
-        $lang     = TranslationManager::getCurrentLanguage();
+        $connectedUser = $this->application->getConnectedUser();
+        $lang = TranslationManager::getCurrentLanguage();
+
+        /** @var array<string, int|string> $settings */
         $settings = [];
         foreach (array_keys($this->htmlSettingsKeys) as $key) {
             $result = $this->dataHelper->get('Languages', ['Name' => $key], $lang);
-            $settings[$key] = $result === false ? '' : ($result->$lang ?? '');
+            $settings[$key] = $result === false ? '' : To::str($result->$lang ?? null);
         }
         foreach ($this->numericSettingsKeys as $key => $config) {
             $settings[$key] = (int) $this->dataHelper->getSetting($key, (string) $config['default']);
@@ -122,23 +126,25 @@ final class WebappSettingsController extends AbstractController
             $this->numericSettingsKeys
         );
 
-        $this->views->render('Designer/views/webappSettings.latte', $this->getAllParams([
-            'navItems'            => $this->getNavItems($this->application->getConnectedUser()->person?->email),
-            'htmlSettingsKeys'    => $htmlSettingsLabels,
-            'numericSettingsKeys' => $numericSettings,
-            'settings'            => $settings,
-            'page'                => $this->application->getConnectedUser()->getPage(),
-            'supportedLanguages'  => TranslationManager::getSupportedLanguages(),
-            'currentLanguage'     => $lang,
-            'forcedLanguage'      => $this->metadataDataHelper->getForcedLanguage(),
-            'btnHistoryBack' => true,
-            'btnParent'      => "/designer",
-            'i18n' => [
+        $viewModel = new WebappSettingsViewModel(
+            navItems: $this->getNavItems($connectedUser->person?->email),
+            htmlSettingsKeys: $htmlSettingsLabels,
+            numericSettingsKeys: $numericSettings,
+            settings: $settings,
+            forcedLanguage: $this->metadataDataHelper->getForcedLanguage(),
+            i18n: [
                 'imageProcessing' => ($this->t)('designer.home_settings.image_processing'),
                 'imageToSave'     => ($this->t)('designer.home_settings.image_to_save'),
                 'imageReadError'  => ($this->t)('designer.home_settings.image_read_error'),
             ],
-        ]));
+            layoutParams: $this->getAllParams([
+                'page'               => $connectedUser->getPage(),
+                'supportedLanguages' => TranslationManager::getSupportedLanguages(),
+                'currentLanguage'    => $lang,
+            ]),
+        );
+
+        $this->views->render('Designer/views/webappSettings.latte', $viewModel);
     }
 
     public function saveSettings(): void

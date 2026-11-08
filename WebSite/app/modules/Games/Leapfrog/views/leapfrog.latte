@@ -1,5 +1,6 @@
 {layout '../../../Common/views/layout.latte'}
-{block title}Saute mouton{/block}
+
+{block title}{$i18n['title']}{/block}
 
 {block head}
     <style>
@@ -45,25 +46,26 @@
 {/block}
 
 {block content}
-    <h1>🐑 SAUTE-MOUTON 🐑</h1>
-    <div class="bg-light rounded">
-        <h3>Les moutons gras de la prairie doivent céder leur place aux moutons maigres de la bergerie.</h3>
-        <h4>Cliquez sur un mouton pour le faire bouger</h4>
-        <h5>Règles du jeu :</h5>
-        <ul>
-            <li>Un mouton peut avancer d'une case si elle est libre devant lui</li>
-            <li>Un mouton peut sauter par-dessus 1 seul autre mouton s'il y a une case libre après lui</li>
-            <li>Les moutons ne peuvent pas reculer</li>
-            <li>Si un mouton est bloqué, il se secoue quand on clique dessus</li>
-        </ul>
-    </div>
-    <div id="sheep-container"></div>
-    <div id="gameboard-container">
-        <h2>0 mouvement</h2>
-    </div>
+<h1>🐑 {$i18n['title']|upper} 🐑</h1>
+<div class="bg-light rounded">
+    <h3>{$i18n['goal']}</h3>
+    <h4>{$i18n['clickHint']}</h4>
+    <h5>{$i18n['rulesTitle']}</h5>
+    <ul>
+        <li>{$i18n['rule1']}</li>
+        <li>{$i18n['rule2']}</li>
+        <li>{$i18n['rule3']}</li>
+        <li>{$i18n['rule4']}</li>
+    </ul>
+</div>
+<div id="sheep-container"></div>
+<div id="gameboard-container">
+    <h2>{$i18n['movesOne']|replace:'{count}','0'}</h2>
+</div>
 {/block}
 
 {block scripts}
-    <script>window.sessionId = {$sessionId};</script>
-    <script src="{='/app/modules/Games/Leapfrog/js/leapfrog.js'|version}"></script>
+<script>window.sessionId = {$sessionId};</script>
+<script>window.leapfrogI18n = {$i18n};</script>
+<script src="{='/app/modules/Games/Leapfrog/js/leapfrog.js'|version}"></script>
 {/block}

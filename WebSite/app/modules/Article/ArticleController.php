@@ -74,11 +74,11 @@ final class ArticleController extends ArticleAccessController
 
         $viewModel = new ArticleCarouselViewModel(
             article: $article,
-            carouselItems: array_values($this->dataHelper->gets('Carousel', ['IdArticle' => $id], 'Id, IdArticle, Item')),
+            carouselItems: $this->carouselDataHelper->getCarouselItems($id),
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Article/views/article_carousel.latte', $viewModel->toArray());
+        $this->views->render('Article/views/article_carousel.latte', $viewModel);
     }
 
     public function changeOwner(int $id): void
@@ -124,7 +124,7 @@ final class ArticleController extends ArticleAccessController
                 redactors: array_values($this->personDataHelper->getRedactors()),
                 layoutParams: $this->getAllParams([]),
             );
-            $this->views->render('User/views/changeOwner.latte', $viewModel->toArray());
+            $this->views->render('User/views/changeOwner.latte', $viewModel);
         } else {
             $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }
@@ -193,9 +193,7 @@ final class ArticleController extends ArticleAccessController
             userConnected: $connectedUser->person ?? false,
             navItems: $this->getNavItems($connectedUser->person->email),
             publishedBy: $this->publisherName($article),
-            carouselItems: array_values(
-                $this->dataHelper->gets('Carousel', ['IdArticle' => $id], 'Id, IdArticle, Item')
-            ),
+            carouselItems: $this->carouselDataHelper->getCarouselItems($id),
             i18n: [
                 'editorNotReady' => ($this->t)('article.edit.error.editor_not_ready'),
                 'titleRequired' => ($this->t)('article.edit.error.title_required'),
@@ -204,7 +202,7 @@ final class ArticleController extends ArticleAccessController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Article/views/article_edit.latte', $viewModel->toArray());
+        $this->views->render('Article/views/article_edit.latte', $viewModel);
     }
 
     public function fetchEmailsForArticle(int $idArticle): void
@@ -257,7 +255,7 @@ final class ArticleController extends ArticleAccessController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->views->render('Article/views/redactor.latte', $viewModel->toArray());
+            $this->views->render('Article/views/redactor.latte', $viewModel);
         }
     }
 
@@ -316,7 +314,7 @@ final class ArticleController extends ArticleAccessController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->views->render('User/views/publish.latte', $viewModel->toArray());
+            $this->views->render('User/views/publish.latte', $viewModel);
         } else {
             $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }
@@ -343,8 +341,8 @@ final class ArticleController extends ArticleAccessController
                 groups: array_values(
                     $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')
                 ),
-                hasSurvey: $survey ?: null,
-                hasOrder: $order ?: null,
+                hasSurvey: $this->toClosingVisibility($survey),
+                hasOrder: $this->toClosingVisibility($order),
                 userConnected: $connectedUser->person !== null,
                 navItems: $this->getNavItems($connectedUser->person?->email),
                 publishedBy: $this->publisherName($article),
@@ -367,7 +365,7 @@ final class ArticleController extends ArticleAccessController
                 btnParent: $this->resolveParentUrl('/articles'),
             );
 
-            $this->views->render('Article/views/article_show.latte', $viewModel->toArray());
+            $this->views->render('Article/views/article_show.latte', $viewModel);
         } catch (QueryException $e) {
             $this->errors->badRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }
@@ -403,7 +401,7 @@ final class ArticleController extends ArticleAccessController
             article: $article,
             event: null,
             group: null,
-            messages: array_values($this->messageDataHelper->getArticleMessages($articleId)),
+            messages: $this->messageDataHelper->getArticleMessages($articleId),
             person: $person,
             navItems: $this->getNavItems($person->email),
             newMessages: $this->messageDataHelper->hasNewMessages($person->id, $lastLogId),
@@ -413,7 +411,7 @@ final class ArticleController extends ArticleAccessController
                 'userImg' => $userImg,
             ]),
         );
-        $this->views->render('Common/views/chat.latte', $viewModel->toArray());
+        $this->views->render('Common/views/chat.latte', $viewModel);
     }
 
     public function update(int $id): void

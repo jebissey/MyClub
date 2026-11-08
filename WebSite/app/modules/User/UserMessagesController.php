@@ -45,6 +45,6 @@ final class UserMessagesController extends AbstractShowController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('User/views/messages.latte', $viewModel->toArray());
+        $this->views->render('User/views/messages.latte', $viewModel);
     }
 }

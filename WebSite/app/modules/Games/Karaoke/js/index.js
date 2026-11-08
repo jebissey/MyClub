@@ -13,9 +13,11 @@ function initApp() {
         app.init();
         window.karaokeApp = app;
     } catch (error) {
-        alert('Erreur de démarrage. Rechargez la page.');
+        console.error('Karaoke startup failed:', error);
+        alert(window.karaokeI18n.startError);
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(initApp);
 });

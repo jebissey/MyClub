@@ -180,6 +180,8 @@ abstract class Data
     public function get(string $table, array $where, string $fields): object|false
     {
         $this->validateTableName($table);
+        $this->validateFields($fields);
+        $this->validateWhereColumns($where);
         $sql = '';
         try {
             $sql = "SELECT {$fields} FROM \"{$table}\"";
@@ -200,7 +202,7 @@ abstract class Data
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
             $result = $stmt->fetch(PDO::FETCH_OBJ);
-            return is_object($result) ? $result : false;
+            return $result instanceof stdClass ? $result : false;
         } catch (PDOException $e) {
             $this->errorManager->raise(
                 ApplicationError::Error,
@@ -234,6 +236,10 @@ abstract class Data
     public function gets(string $table, array $where, string $fields, string $orderBy = '', bool $keyPair = false): array
     {
         $this->validateTableName($table);
+        $this->validateFields($fields);
+        $this->validateWhereColumns($where);
+        $this->validateOrderBy($orderBy);
+
         try {
             $firstField = null;
             if ($keyPair) {
@@ -510,5 +516,46 @@ abstract class Data
         $stmt->execute($values);
 
         return (int) $stmt->fetchColumn();
+    }
+
+    private const COLUMN_PATTERN = '/^(?:[A-Za-z_]\w*|"[A-Za-z_]\w*")$/D';
+    private const SELECT_ITEM_PATTERN = '/^(?:\*|[A-Za-z_]\w*(?:\s+AS\s+[A-Za-z_]\w*)?)$/iD';
+    private const ORDER_ITEM_PATTERN = '/^[A-Za-z_]\w*(?:\s+(?:ASC|DESC))?$/iD';
+
+    /**
+     * Rejects anything that is not a plain SQL identifier (column used in a WHERE clause).
+     *
+     * @param array<string, mixed> $where
+     */
+    private function validateWhereColumns(array $where): void
+    {
+        foreach (array_keys($where) as $column) {
+            if (preg_match(self::COLUMN_PATTERN, $column) !== 1) {
+                throw new InvalidArgumentException("Invalid column name: {$column}");
+            }
+        }
+    }
+
+    /** Rejects a SELECT list that contains anything but columns, '*' or simple aggregates. */
+    private function validateFields(string $fields): void
+    {
+        $this->validateList($fields, self::SELECT_ITEM_PATTERN, 'field list');
+    }
+
+    /** Rejects an ORDER BY list that contains anything but columns with an optional direction. */
+    private function validateOrderBy(string $orderBy): void
+    {
+        if ($orderBy !== '') {
+            $this->validateList($orderBy, self::ORDER_ITEM_PATTERN, 'order by');
+        }
+    }
+
+    private function validateList(string $list, string $itemPattern, string $label): void
+    {
+        foreach (explode(',', $list) as $item) {
+            if (preg_match($itemPattern, trim($item)) !== 1) {
+                throw new InvalidArgumentException("Invalid {$label}: {$list}");
+            }
+        }
     }
 }

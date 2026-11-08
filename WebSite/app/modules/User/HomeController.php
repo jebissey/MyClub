@@ -11,6 +11,7 @@ use app\helpers\TranslationManager;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
+use app\models\CarouselDataHelper;
 use app\models\DesignDataHelper;
 use app\models\MetadataDataHelper;
 use app\models\PersonDataHelper;
@@ -18,6 +19,7 @@ use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\valueObjects\Person;
 use app\modules\Common\viewModels\HomeViewModel;
+use app\modules\Common\viewModels\SignpostViewModel;
 use app\modules\User\valueObjects\SidebarMenuChild;
 use app\modules\User\valueObjects\SidebarMenuItem;
 
@@ -31,6 +33,7 @@ final class HomeController extends AbstractController
         private readonly News $news,
         private readonly PersonDataHelper $personDataHelper,
         private readonly MetadataDataHelper $metadataDataHelper,
+        private readonly CarouselDataHelper $carouselDataHelper
     ) {
         parent::__construct($application);
     }
@@ -157,13 +160,7 @@ final class HomeController extends AbstractController
             && (bool) $this->surveyDataHelper->articleHasSurveyNotClosed($latestArticle->id);
 
         $carouselItems = $latestArticle !== null
-            ? array_values(
-                $this->dataHelper->gets(
-                    'Carousel',
-                    ['IdArticle' => $latestArticle->id],
-                    'Item'
-                )
-            )
+            ? $this->carouselDataHelper->getCarouselItems($latestArticle->id)
             : [];
 
         $viewModel = new HomeViewModel(
@@ -187,7 +184,7 @@ final class HomeController extends AbstractController
             ]),
         );
 
-        $this->views->render('Common/views/home.latte', $viewModel->toArray());
+        $this->views->render('Common/views/home.latte', $viewModel);
     }
 
     public function help(): void
@@ -204,13 +201,14 @@ final class HomeController extends AbstractController
     {
         $user = $this->application->getConnectedUser();
 
-        $this->views->render('Common/views/signpost.latte', $this->getAllParams([
-            'navItems'       => $this->getNavItems($user->person?->email),
-            'title'          => ($this->t)('home.signpost.title'),
-            'page'           => $user->getPage(),
-            'user'           => $user,
-            'btnHistoryBack' => true,
-        ]));
+        $viewModel = new SignpostViewModel(
+            navItems: $this->getNavItems($user->person?->email),
+            title: $this->translate('home.signpost.title'),
+            user: $user,
+            layoutParams: $this->getAllParams(['page' => $user->getPage()]),
+        );
+
+        $this->views->render('Common/views/signpost.latte', $viewModel);
     }
 
 

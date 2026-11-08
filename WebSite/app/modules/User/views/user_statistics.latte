@@ -282,9 +282,7 @@
         const chartData = {$chartData};
         const participationChartData = {$participationChartData};
         const messageChartData = {$messageChartData};
-    {if isset($i18n)}
-        Object.assign(window.i18n, {=$i18n});
-    {/if}
+    Object.assign(window.i18n, {=$i18n});
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script type="module" src="{='/app/modules/User/js/statistics.js'|version}"></script>

@@ -68,7 +68,7 @@ final class ExportController extends AbstractController
                 ]),
             );
 
-            $this->views->render('PersonManager/views/users_export.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/users_export.latte', $viewModel);
         }
     }
 

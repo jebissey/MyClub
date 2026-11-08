@@ -28,7 +28,7 @@ final class MaintenanceController extends AbstractController
                 ]),
             );
 
-            $this->views->render('Webmaster/views/maintenance.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/maintenance.latte', $viewModel);
         }
     }
 

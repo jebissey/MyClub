@@ -53,7 +53,7 @@ final class RegistrationController extends TableController
             $data = $this->prepareTableData($this->tableControllerDataHelper->getActivePersonsQuery(), $filterValues);
 
             $viewModel = new RegistrationIndexViewModel(
-                persons: array_values($data['items']),
+                persons: $data['items'],
                 currentPage: $data['currentPage'],
                 totalPages: $data['totalPages'],
                 filterValues: $filterValues,
@@ -71,7 +71,7 @@ final class RegistrationController extends TableController
                 ]),
             );
 
-            $this->views->render('PersonManager/views/registration_groups_index.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/registration_groups_index.latte', $viewModel);
         }
     }
 
@@ -93,7 +93,7 @@ final class RegistrationController extends TableController
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->views->render('PersonManager/views/registration_user_groups_partial.latte', $viewModel->toArray());
+                $this->views->render('PersonManager/views/registration_user_groups_partial.latte', $viewModel);
             } catch (Throwable $e) {
                 http_response_code(500);
                 echo "<div class='alert alert-danger'>Erreur : " . htmlspecialchars($e->getMessage()) . "</div>";

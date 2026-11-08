@@ -1,8 +1,13 @@
 import { formatTime } from '../utils/formatTime.js';
 
 export class UIController {
-    constructor(elements) {
+    /**
+     * @param {Object<string, HTMLElement|null>} elements
+     * @param {Object<string, string>} i18n Translated texts provided by the server
+     */
+    constructor(elements, i18n) {
         this.elements = elements;
+        this.i18n = i18n;
         this.setupAccessibility();
     }
 
@@ -31,9 +36,8 @@ export class UIController {
 
     updatePlayButton(isPlaying) {
         if (!this.elements.playPauseBtn) return;
-        const label = isPlaying ? 'Pause' : 'Lecture';
-        this.elements.playPauseBtn.innerHTML = label;
-        this.elements.playPauseBtn.setAttribute('aria-label', isPlaying ? 'Mettre en pause' : 'Lancer la lecture');
+        this.elements.playPauseBtn.textContent = isPlaying ? this.i18n.pause : this.i18n.play;
+        this.elements.playPauseBtn.setAttribute('aria-label', isPlaying ? this.i18n.ariaPause : this.i18n.ariaPlay);
     }
 
     updateProgress(currentTime, duration) {
@@ -66,13 +70,14 @@ export class UIController {
 
     updateSyncStatus(isHost, clientsCount) {
         if (!this.elements.connectedClientsEl) return;
-        this.elements.connectedClientsEl.textContent = `${clientsCount} client${clientsCount > 1 ? 's' : ''} connecté${clientsCount > 1 ? 's' : ''}`;
+        const template = clientsCount > 1 ? this.i18n.clientsOther : this.i18n.clientsOne;
+        this.elements.connectedClientsEl.textContent = template.replace('{count}', String(clientsCount));
 
         if (this.elements.launchForAllBtn && this.elements.syncStatus) {
             this.elements.launchForAllBtn.style.display = isHost ? 'block' : 'none';
             this.elements.syncStatus.style.display = isHost ? 'none' : 'block';
             if (!isHost) {
-                this.elements.syncStatus.textContent = "En attente du lancement par l'hôte...";
+                this.elements.syncStatus.textContent = this.i18n.waitingForHost;
             }
         }
     }
@@ -92,24 +97,25 @@ export class UIController {
     }
 
     setLaunchButtonState(isActive) {
-        if (!this.elements.launchForAllBtn) return;
+        const button = this.elements.launchForAllBtn;
+        if (!button) return;
         if (isActive) {
-            this.elements.launchForAllBtn.innerHTML = 'Arrêter la lecture pour tous';
-            this.elements.launchForAllBtn.classList.remove('btn-success');
-            this.elements.launchForAllBtn.classList.add('btn-danger');
-            this.elements.launchForAllBtn.setAttribute('aria-label', 'Arrêter la lecture synchronisée');
+            button.textContent = this.i18n.stopForAll;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-danger');
+            button.setAttribute('aria-label', this.i18n.ariaStopForAll);
         } else {
-            this.elements.launchForAllBtn.innerHTML = 'Lancer la lecture pour tous';
-            this.elements.launchForAllBtn.classList.remove('btn-danger');
-            this.elements.launchForAllBtn.classList.add('btn-success');
-            this.elements.launchForAllBtn.setAttribute('aria-label', 'Lancer la lecture synchronisée pour tous');
+            button.textContent = this.i18n.launchForAll;
+            button.classList.remove('btn-danger');
+            button.classList.add('btn-success');
+            button.setAttribute('aria-label', this.i18n.ariaLaunchForAll);
         }
     }
 
     showError(message) {
         console.error('UI Error:', message);
         if (this.elements.syncStatus) {
-            this.elements.syncStatus.textContent = `Erreur: ${message}`;
+            this.elements.syncStatus.textContent = `${this.i18n.errorPrefix} ${message}`;
             this.elements.syncStatus.style.color = 'red';
         }
     }

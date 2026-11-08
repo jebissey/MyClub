@@ -86,7 +86,7 @@ final class MediaController extends AbstractController
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),
         );
-        $this->views->render('Article/views/media_gpxViewer.latte', $viewModel->toArray());
+        $this->views->render('Article/views/media_gpxViewer.latte', $viewModel);
     }
 
     public function help(): void
@@ -124,6 +124,7 @@ final class MediaController extends AbstractController
             $filteredFiles = $this->getFiles($year, $month, $fileExtension, $search, $unusedOnly);
             $totalFiles    = $this->getFiles($year, $month, '', '', false);
             $connectedUser = $this->application->getConnectedUser();
+            $groups = $this->getActiveGroups();
 
             $viewModel = new MediaListViewModel(
                 files: array_values($filteredFiles),
@@ -138,7 +139,7 @@ final class MediaController extends AbstractController
                 search: $search,
                 unusedOnly: $unusedOnly,
                 baseUrl: WebApp::getBaseUrl(),
-                groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
+                groups: $groups,
                 i18n: [
                     // mediaShare.js
                     'urlCopied'     => ($this->t)('media.manager.share.url_copied'),
@@ -159,7 +160,7 @@ final class MediaController extends AbstractController
                     'isEditor' => $connectedUser->isEditor(),
                 ]),
             );
-            $this->views->render('Article/views/media_index.latte', $viewModel->toArray());
+            $this->views->render('Article/views/media_index.latte', $viewModel);
         }
     }
 
@@ -198,7 +199,7 @@ final class MediaController extends AbstractController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->views->render('Article/views/media_upload.latte', $viewModel->toArray());
+            $this->views->render('Article/views/media_upload.latte', $viewModel);
         }
     }
 
@@ -215,7 +216,7 @@ final class MediaController extends AbstractController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->views->render('Article/views/media_uses_articles.latte', $viewModel->toArray());
+            $this->views->render('Article/views/media_uses_articles.latte', $viewModel);
         }
     }
 
@@ -231,14 +232,14 @@ final class MediaController extends AbstractController
 
             $viewModel = new MediaUsesInMessagesViewModel(
                 path: $path,
-                events: array_values($uses['events']),
-                articles: array_values($uses['articles']),
-                groups: array_values($uses['groups']),
+                events: $uses['events'],
+                articles: $uses['articles'],
+                groups: $uses['groups'],
                 layoutParams: $this->getAllParams([
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->views->render('Article/views/media_uses_messages.latte', $viewModel->toArray());
+            $this->views->render('Article/views/media_uses_messages.latte', $viewModel);
         }
     }
 

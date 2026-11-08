@@ -2,38 +2,38 @@
 
 {block content}
     <div class="container-fluid mt-4">
-        <h1>Les besoins des événements</h1>
-        
+        <h1>{='event.needs.title'|translate}</h1>
+
         <div class="row mb-4">
             <div class="col-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Types de besoins</h5>
+                        <h5 class="mb-0">{='event.needs.types.title'|translate}</h5>
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addNeedTypeModal">
-                            <i class="bi bi-plus"></i> Ajouter
+                            <i class="bi bi-plus"></i> {='event.needs.add'|translate}
                         </button>
                     </div>
                     <div class="card-body">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Nom</th>
-                                    <th>Actions</th>
+                                    <th>{='event.needs.column.name'|translate}</th>
+                                    <th>{='common.table.actions'|translate}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {foreach $needTypes as $type}
                                 <tr>
-                                    <td>{$type->Name}</td>
+                                    <td>{$type->name}</td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-primary edit-need-type" 
-                                                data-id="{$type->Id}" 
-                                                data-name="{$type->Name}">
+                                        <button type="button" class="btn btn-sm btn-primary edit-need-type"
+                                                data-id="{$type->id}"
+                                                data-name="{$type->name}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button type="button" class="btn btn-sm btn-danger delete-need-type"
-                                                data-id="{$type->Id}" 
-                                                data-name="{$type->Name}">
+                                                data-id="{$type->id}"
+                                                data-name="{$type->name}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -44,45 +44,45 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-8">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Besoins</h5>
+                        <h5 class="mb-0">{='event.needs.list.title'|translate}</h5>
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addNeedModal">
-                            <i class="bi bi-plus"></i> Ajouter
+                            <i class="bi bi-plus"></i> {='event.needs.add'|translate}
                         </button>
                     </div>
                     <div class="card-body">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Label</th>
-                                    <th>Nom</th>
-                                    <th>Type</th>
-                                    <th>En fonction des participants</th>
-                                    <th>Actions</th>
+                                    <th>{='event.needs.column.label'|translate}</th>
+                                    <th>{='event.needs.column.name'|translate}</th>
+                                    <th>{='event.needs.column.type'|translate}</th>
+                                    <th>{='event.needs.column.participant_dependent'|translate}</th>
+                                    <th>{='common.table.actions'|translate}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {foreach $needs as $need}
                                 <tr>
-                                    <td><h5>{$need->Label}</h5></td>
-                                    <td>{$need->Name}</td>
-                                    <td>{$need->TypeName}</td>
-                                    <td>{if $need->ParticipantDependent == 1}Oui{else}Non{/if}</td>
+                                    <td><h5>{$need->label}</h5></td>
+                                    <td>{$need->name}</td>
+                                    <td>{$need->typeName}</td>
+                                    <td>{if $need->participantDependent}{='event.needs.yes'|translate}{else}{='event.needs.no'|translate}{/if}</td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-primary edit-need" 
-                                                data-id="{$need->Id}"
-                                                data-label="{$need->Label}" 
-                                                data-name="{$need->Name}" 
-                                                data-participant-dependent="{$need->ParticipantDependent}" 
-                                                data-type="{$need->IdNeedType}">
+                                        <button type="button" class="btn btn-sm btn-primary edit-need"
+                                                data-id="{$need->id}"
+                                                data-label="{$need->label}"
+                                                data-name="{$need->name}"
+                                                data-participant-dependent="{$need->participantDependent ? 1 : 0}"
+                                                data-type="{$need->idNeedType}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger delete-need" 
-                                                data-id="{$need->Id}" 
-                                                data-name="{$need->Name}">
+                                        <button type="button" class="btn btn-sm btn-danger delete-need"
+                                                data-id="{$need->id}"
+                                                data-name="{$need->name}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -103,5 +103,6 @@
 {/block}
 
 {block scripts}
+    <script>window.needsI18n = {$i18n};</script>
     <script src="{='/app/modules/Event/js/needs.js'|version}"></script>
 {/block}

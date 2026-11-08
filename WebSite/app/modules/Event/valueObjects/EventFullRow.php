@@ -4,29 +4,10 @@ declare(strict_types=1);
 
 namespace app\modules\Event\valueObjects;
 
+use stdClass;
+use app\helpers\To;
 use app\modules\Common\valueObjects\AbstractValueObject;
 
-/**
- * Représentation fortement typée d'une ligne brute de la table Event
- * (colonnes SQL en PascalCase, sans jointure).
- *
- * Utilisée par EventDataHelper::duplicate(). À ne pas confondre avec EventRow,
- * qui représente le format camelCase utilisé pour le rendu des semaines
- * (EventArrayShape).
- *
- * @phpstan-type EventFullRowShape object{
- *     Id: int|string,
- *     Summary: string,
- *     Description?: string|null,
- *     Location?: string|null,
- *     StartTime: string,
- *     Duration: int|string,
- *     IdEventType: int|string,
- *     CreatedBy: int|string,
- *     MaxParticipants?: int|string|null,
- *     Audience: string
- * }
- */
 final readonly class EventFullRow extends AbstractValueObject
 {
     public function __construct(
@@ -43,20 +24,19 @@ final readonly class EventFullRow extends AbstractValueObject
     ) {
     }
 
-    /** @param EventFullRowShape $row */
-    public static function fromStdClass(object $row): self
+    public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            id: (int) $row->Id,
-            summary: $row->Summary,
-            description: $row->Description ?? null,
-            location: $row->Location ?? null,
-            startTime: $row->StartTime,
-            duration: (int) $row->Duration,
-            idEventType: (int) $row->IdEventType,
-            createdBy: (int) $row->CreatedBy,
-            maxParticipants: isset($row->MaxParticipants) ? (int) $row->MaxParticipants : null,
-            audience: $row->Audience,
+            id: To::requireInt($row->Id ?? null),
+            summary: To::requireStr($row->Summary ?? null),
+            description: To::nullableStr($row->Description ?? null),
+            location: To::nullableStr($row->Location ?? null),
+            startTime: To::requireStr($row->StartTime ?? null),
+            duration: To::requireInt($row->Duration ?? null),
+            idEventType: To::requireInt($row->IdEventType ?? null),
+            createdBy: To::requireInt($row->CreatedBy ?? null),
+            maxParticipants: To::nullableInt($row->MaxParticipants ?? null),
+            audience: To::requireStr($row->Audience ?? null),
         );
     }
 }

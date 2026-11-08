@@ -14,7 +14,8 @@ use app\models\GroupDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\PersonManager\viewModels\GroupChatViewModel;
+use app\modules\Common\valueObjects\GroupChatRow;
+use app\modules\Common\viewModels\ChatViewModel;
 use app\modules\PersonManager\viewModels\GroupCreateViewModel;
 use app\modules\PersonManager\viewModels\GroupEditViewModel;
 use app\modules\PersonManager\viewModels\GroupIndexViewModel;
@@ -40,7 +41,7 @@ final class GroupController extends AbstractController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->views->render('PersonManager/views/group_create.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/group_create.latte', $viewModel);
         }
     }
 
@@ -66,7 +67,7 @@ final class GroupController extends AbstractController
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->views->render('PersonManager/views/group_create.latte', $viewModel->toArray());
+                $this->views->render('PersonManager/views/group_create.latte', $viewModel);
                 return;
             }
             $selectedAuthorizations = $input['authorizations'] ?? [];
@@ -112,7 +113,7 @@ final class GroupController extends AbstractController
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->views->render('PersonManager/views/group_edit.latte', $viewModel->toArray());
+                $this->views->render('PersonManager/views/group_edit.latte', $viewModel);
             }
         }
     }
@@ -150,7 +151,7 @@ final class GroupController extends AbstractController
                     layoutParams: $this->getAllParams([]),
                 );
 
-                $this->views->render('PersonManager/views/group_edit.latte', $viewModel->toArray());
+                $this->views->render('PersonManager/views/group_edit.latte', $viewModel);
             } else {
                 $this->groupDataHelper->update($id, $name, $selfRegistration, $selectedAuthorizations);
                 $this->redirect('/groups');
@@ -172,7 +173,7 @@ final class GroupController extends AbstractController
                 ]),
             );
 
-            $this->views->render('PersonManager/views/groups_index.latte', $viewModel->toArray());
+            $this->views->render('PersonManager/views/groups_index.latte', $viewModel);
         }
     }
 
@@ -196,19 +197,19 @@ final class GroupController extends AbstractController
         $lastLogId = $_SESSION['last_log_id'] ?? 0;
         $lastLogId = is_numeric($lastLogId) ? (int)$lastLogId : 0;
 
-        $viewModel = new GroupChatViewModel(
+        $viewModel = new ChatViewModel(
             article: null,
             event: null,
-            group: $group,
+            group:  GroupChatRow::fromRow($group),
             messages: $this->messageDataHelper->getGroupMessages($groupId),
             person: $person,
-            navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
-            btnParent: "/user/directory?group={$groupId}",
+            navItems: $this->getNavItems($person->email),
             newMessages: $this->messageDataHelper->hasNewMessages($person->id, $lastLogId),
+            btnParent: "/user/directory?group={$groupId}",
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Common/views/chat.latte', $viewModel->toArray());
+        $this->views->render('Common/views/chat.latte', $viewModel);
     }
 
     #region Privates functions

@@ -62,11 +62,11 @@
                         </div>
                     {else}
                         {foreach $messages as $message}
-                            <div class="mb-3 {if $message->PersonId == $person->Id}text-end{/if}"
+                            <div class="mb-3 {if $message->PersonId == $person->id}text-end{/if}"
                                 data-message-id="{$message->Id}"
                                 data-author-id="{$message->PersonId}">
 
-                                <div class="card d-inline-block {if $message->PersonId == $person->Id}bg-primary bg-opacity-10 border-primary border-opacity-25{else}bg-light{/if}"
+                                <div class="card d-inline-block {if $message->PersonId == $person->id}bg-primary bg-opacity-10 border-primary border-opacity-25{else}bg-light{/if}"
                                     style="max-width:70%">
                                     <div class="card-body p-2">
                                         <div class="d-flex align-items-center gap-2 mb-1">
@@ -94,7 +94,7 @@
                                             </strong>
                                             <span class="small text-muted">({$message->TimeAgo})</span>
 
-                                            {if $message->PersonId == $person->Id}
+                                            {if $message->PersonId == $person->id}
                                                 <i class="bi bi-pencil text-dark opacity-50 edit-message"
                                                     role="button"
                                                     title="{='chat.edit_icon_title'|translate}"></i>
@@ -105,7 +105,7 @@
                                             {$message->Text}
                                         </p>
 
-                                        {if isset($message->ImagePath) && $message->ImagePath !== null && $message->ImagePath !== ''}
+                                        {if $message->ImagePath !== null && $message->ImagePath !== ''}
                                             <img src="{$message->ImagePath}"
                                                  alt="image"
                                                  class="img-fluid rounded mt-2 message-image"

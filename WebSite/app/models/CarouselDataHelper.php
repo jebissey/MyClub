@@ -6,8 +6,8 @@ namespace app\models;
 
 use PDO;
 use RuntimeException;
-use stdClass;
 use app\helpers\Application;
+use app\modules\Common\valueObjects\CarouselItemRow;
 
 final class CarouselDataHelper extends Data
 {
@@ -41,14 +41,15 @@ final class CarouselDataHelper extends Data
     }
 
 
-    /**
-     * @return list<stdClass>
-     */
+    /** @return list<CarouselItemRow> */
     public function getCarouselItems(int $articleId): array
     {
-        return array_values(
-            $this->gets('Carousel', ['IdArticle' => $articleId], 'Id, IdArticle, Item')
-        );
+        $rows = $this->gets('Carousel', ['IdArticle' => $articleId], 'Id, IdArticle, Item');
+
+        return array_values(array_map(
+            static fn(object $row): CarouselItemRow => CarouselItemRow::fromStdClass($row),
+            $rows
+        ));
     }
 
     /**

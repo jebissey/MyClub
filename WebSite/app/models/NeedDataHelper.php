@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use PDO;
 use RuntimeException;
 use stdClass;
 use app\helpers\Application;
+use app\modules\Event\valueObjects\NeedWithTypeRow;
 
 final class NeedDataHelper extends Data
 {
@@ -20,9 +20,7 @@ final class NeedDataHelper extends Data
         );
     }
 
-    /**
-     * @return stdClass[]
-     */
+    /** @return list<NeedWithTypeRow> */
     public function getNeedsAndTheirTypes(): array
     {
         $sql = "
@@ -38,7 +36,10 @@ final class NeedDataHelper extends Data
             throw new RuntimeException('Unable to execute query.');
         }
 
-        return $this->fetchObjects($stmt);
+        return array_map(
+            static fn(object $row): NeedWithTypeRow => NeedWithTypeRow::fromStdClass($row),
+            $this->fetchObjects($stmt)
+        );
     }
 
     /**

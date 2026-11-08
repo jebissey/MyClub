@@ -1,14 +1,6 @@
-{parameters
-    string $name,
-    string $label,
-    string $type         = 'text',
-    mixed  $value        = null,
-    array  $options      = [],
-    string $optionValue  = 'value',
-    string $optionLabel  = 'label',
-    string $placeholder  = '',
-    bool   $autosubmit   = false
-}
+{* Params, all provided by FilterForm.latte:
+   $name, $label, $type, $value, $options, $optionValue, $optionLabel, $placeholder, $autosubmit *}
+{var $toStr = fn($v): string => is_scalar($v) ? (string) $v : ''}
 
 <label for="{$name}" class="form-label">{$label}</label>
 
@@ -19,24 +11,23 @@
         {/if}
         {foreach $options as $optKey => $optItem}
             {if is_object($optItem)}
-                <option value="{$optItem->$optionValue}"
-                    {if (string) $value === (string) $optItem->$optionValue}selected{/if}>
+                {var $optValue = $toStr($optItem->$optionValue)}
+                <option value="{$optValue}" {if $value === $optValue}selected{/if}>
                     {$optItem->$optionLabel}
                 </option>
             {elseif is_array($optItem)}
-                <option value="{$optItem[$optionValue]}"
-                    {if (string) $value === (string) $optItem[$optionValue]}selected{/if}>
-                    {$optItem[$optionLabel]}
+                {var $optValue = $toStr($optItem[$optionValue] ?? null)}
+                <option value="{$optValue}" {if $value === $optValue}selected{/if}>
+                    {$optItem[$optionLabel] ?? ''}
                 </option>
             {else}
-                {{* tableau associatif simple : ['all' => 'Tout', …] *}}
-                <option value="{$optKey}"
-                    {if (string) $value === (string) $optKey}selected{/if}>
+                {* simple associative array: ['all' => 'Everything', …] *}
+                <option value="{$optKey}" {if $value === (string) $optKey}selected{/if}>
                     {$optItem}
                 </option>
             {/if}
         {/foreach}
     </select>
 {else}
-    <input type="text" class="form-control" id="{$name}" name="{$name}" value="{$value ?? ''}">
+    <input type="text" class="form-control" id="{$name}" name="{$name}" value="{$value}">
 {/if}

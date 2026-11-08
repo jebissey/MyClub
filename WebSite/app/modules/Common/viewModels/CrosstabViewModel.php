@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace app\modules\Common\viewModels;
 
+use app\models\CrosstabDataHelper;
+
+/**
+ * @phpstan-import-type CrosstabResult from CrosstabDataHelper
+ */
+
 final readonly class CrosstabViewModel extends LayoutViewModel
 {
     /**
-     * @param array<string, mixed> $crosstabData
+     * @param CrosstabResult $crosstabData
      * @param array{start: string, end: string} $dateRange
      * @param array<string, string> $availablePeriods
      * @param array{0: string, 1: string} $totalLabels Labels for count and count2 (empty string if unused).

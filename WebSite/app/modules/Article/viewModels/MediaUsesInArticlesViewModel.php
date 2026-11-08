@@ -9,7 +9,7 @@ use app\modules\Common\viewModels\LayoutViewModel;
 final readonly class MediaUsesInArticlesViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $articles
+     * @param list<object{Id: int, Title: string}> $articles
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(

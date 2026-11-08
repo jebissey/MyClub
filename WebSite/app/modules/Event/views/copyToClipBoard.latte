@@ -15,9 +15,7 @@
 {block scripts}
     <script>
         window.emailsJson = {$emailsJson|noescape};
-        {if isset($i18n)}
         Object.assign(window.i18n, {=$i18n});
-        {/if}
     </script>
     <script type="module" src="{='/app/modules/Event/js/copyToClipBoard.js'|version}"></script>
 {/block}

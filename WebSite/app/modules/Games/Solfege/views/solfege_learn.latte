@@ -1,0 +1,188 @@
+{extends '../../views/gameManager.latte'}
+
+{block content}
+<div id="liveAlertPlaceholder"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2>{$title}</h2>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{$i18n['staff']}</h5>
+                </div>
+                <div class="card-body">
+                    <div id="staff-container">
+                        <svg id="staff" width="600" height="200" viewBox="0 0 600 200">
+                            <!-- Staff lines -->
+                            <g id="staff-lines">
+                                <line x1="50" y1="50" x2="550" y2="50" stroke="#000" stroke-width="1"/>
+                                <line x1="50" y1="70" x2="550" y2="70" stroke="#000" stroke-width="1"/>
+                                <line x1="50" y1="90" x2="550" y2="90" stroke="#000" stroke-width="1"/>
+                                <line x1="50" y1="110" x2="550" y2="110" stroke="#000" stroke-width="1"/>
+                                <line x1="50" y1="130" x2="550" y2="130" stroke="#000" stroke-width="1"/>
+                                <!-- Treble clef -->
+                                <text x="60" y="95" font-family="Arial" font-size="40" font-weight="bold">𝄞</text>
+                            </g>
+                            <!-- Current note -->
+                            <g id="current-note">
+                                <circle cx="150" cy="90" r="8" fill="#007bff" stroke="#000" stroke-width="1"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{$i18n['statistics']}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>{$i18n['currentNote']}</strong> <span id="current-note-name">{$noteNames['C4']} (C4)</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>{$i18n['attempts']}</strong> <span id="attempts">0</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>{$i18n['time']}</strong> <span id="timer">0.0s</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>{$i18n['totalScore']}</strong> <span id="total-score">0</span>
+                    </div>
+                    <button class="btn btn-success" id="next-note-btn" disabled>{$i18n['nextNote']}</button>
+                    <button class="btn btn-secondary" id="reset-btn">{$i18n['restart']}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{$i18n['piano']}</h5>
+                </div>
+                <div class="card-body">
+                    <div id="piano-container">
+                        <div class="piano-keyboard">
+                            {foreach $pianoKeys as $key}
+                            <div class="piano-key {$key['black'] ? 'black' : 'white'}" data-note="{$key['note']}" data-note-name="{$key['name']}">
+                                <span class="note-label">{$key['name']}</span>
+                            </div>
+                            {/foreach}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block styles}
+<style>
+.piano-keyboard {
+    display: flex;
+    position: relative;
+    margin: 20px 0;
+    user-select: none;
+}
+
+.piano-key {
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transition: background-color 0.1s;
+    border: 1px solid #333;
+}
+
+.piano-key.white {
+    width: 50px;
+    height: 150px;
+    background-color: #fff;
+    z-index: 1;
+}
+
+.piano-key.black {
+    width: 30px;
+    height: 100px;
+    background-color: #333;
+    color: white;
+    position: absolute;
+    z-index: 2;
+    margin-left: -15px;
+}
+
+.piano-key.white:hover {
+    background-color: #f0f0f0;
+}
+
+.piano-key.black:hover {
+    background-color: #666;
+}
+
+.piano-key.active {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.piano-key.correct {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+.piano-key.incorrect {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.note-label {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+/* Positionnement des touches noires */
+.piano-key[data-note="C#4"] { left: 35px; }
+.piano-key[data-note="D#4"] { left: 85px; }
+.piano-key[data-note="F#4"] { left: 185px; }
+.piano-key[data-note="G#4"] { left: 235px; }
+.piano-key[data-note="A#4"] { left: 285px; }
+
+#staff-container {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 10px 0;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+
+#timer {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+</style>
+{/block}
+{block scripts}
+<script>
+window.solfegeConfig = {
+    noteNames: {$noteNames},
+    i18n: {$i18n}
+};
+</script>
+<script src="{='/app/modules/Games/Solfege/js/solfege.js'|version}"></script>
+{/block}
+</script>
+<script src="{='/app/modules/Games/Solfege/js/solfege.js'|version}"></script>
+{/block}
+{/block}

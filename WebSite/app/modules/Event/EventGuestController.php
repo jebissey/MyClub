@@ -14,6 +14,7 @@ use app\models\EventDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\valueObjects\EmailMessage;
+use app\modules\Event\viewModels\EventGuestViewModel;
 
 final class EventGuestController extends AbstractController
 {
@@ -35,16 +36,16 @@ final class EventGuestController extends AbstractController
         $events = $this->eventDataHelper->getEventsForAllOrGuest();
         $connectedUser = $this->application->getConnectedUser();
 
-        $this->views->render('Event/views/guest.latte', $this->getAllParams([
-            'events' => $events,
-            'navbarTemplate' => '../../Webmaster/views/navbar/eventManager.latte',
-            'layout' => $this->getLayout(),
-            'message' => $message,
-            'messageType' => $type,
-            'page' => $connectedUser->getPage(1),
-            'navItems' => $this->getNavItems($connectedUser->person?->email),
-            'btnHistoryBack' => true,
-        ]));
+        $viewModel = new EventGuestViewModel(
+            events: $events,
+            navbarTemplate: '../../Webmaster/views/navbar/eventManager.latte',
+            layout: $this->getLayout(),
+            message: $message,
+            messageType: $type,
+            navItems: $this->getNavItems($connectedUser->person?->email),
+            layoutParams: $this->getAllParams(['page' => $connectedUser->getPage(1)]),
+        );
+        $this->views->render('Event/views/guest.latte', $viewModel);
     }
 
     public function guestInvite(): void
@@ -62,23 +63,23 @@ final class EventGuestController extends AbstractController
             $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
             $email = To::str($input['email'] ?? '');
             if (empty($email)) {
-                $this->guest('Adresse e-mail invalide', 'error');
+                $this->guest($this->translate('event.guest.error.invalid_email'), 'error');
                 return;
             }
             $eventId = To::int($input['eventId'] ?? 0);
             if ($eventId <= 0) {
-                $this->guest('Veuillez sélectionner un événement', 'error');
+                $this->guest($this->translate('event.guest.error.select_event'), 'error');
                 return;
             }
             $event = $this->eventDataHelper->getEventExternal($eventId);
             if ($event === null) {
-                $this->guest('Événement non trouvé ou non accessible', 'error');
+                $this->guest($this->translate('event.guest.error.event_not_found'), 'error');
                 return;
             }
             $nickname = To::str($input['nickname'] ?? '???');
             try {
-                if ($this->eventDataHelper->findPendingInvitation($email, $eventId) !== false) {
-                    $this->guest('Cette personne est déjà invitée à cet événement', 'error');
+                if ($this->eventDataHelper->findPendingInvitation($email, $eventId) !== null) {
+                    $this->guest($this->translate('event.guest.error.already_invited'), 'error');
                     return;
                 }
 
@@ -92,33 +93,40 @@ final class EventGuestController extends AbstractController
                     (new DateTime())->format('Y-m-d H:i:s')
                 );
 
-                $root = Application::$root;
-                $invitationLink = $root . "/event/$eventId?t=$token";
-                $subject = "Invitation à l'événement : " . $event->summary;
-                $body = "Bonjour" . (!empty($nickname) ? " {$nickname}" : "") . ",\n\n";
-                $body .= "Vous êtes invité(e) à participer à l'événement suivant :\n\n";
-                $body .= "Titre : {$event->summary}\n";
-                $body .= "Description : {$event->description}\n";
-                $body .= "Lieu : {$event->location}\n";
-                $body .= "Date : " . (new DateTime($event->startTime))->format('d/m/Y à H:i') . "\n\n";
-                $body .= "Pour confirmer votre participation, cliquez sur le lien suivant :\n";
-                $body .= $invitationLink . "\n\n";
-                $body .= "Cordialement,\nL'équipe des animateurs";
+                $invitationLink = Application::$root . "/event/$eventId?t=$token";
+                $startTime = new DateTime($event->startTime);
+                $greeting = $nickname !== ''
+                    ? $this->translate('event.guest.email.greeting_named', ['nickname' => $nickname])
+                    : $this->translate('event.guest.email.greeting');
+
+                $body = $greeting . "\n\n"
+                    . $this->translate('event.guest.email.invited') . "\n\n"
+                    . $this->translate('event.guest.email.title') . " {$event->summary}\n"
+                    . $this->translate('event.guest.email.description') . " {$event->description}\n"
+                    . $this->translate('event.guest.email.location') . " {$event->location}\n"
+                    . $this->translate('event.guest.email.date', [
+                        'date' => $startTime->format('d/m/Y'),
+                        'time' => $startTime->format('H:i'),
+                    ]) . "\n\n"
+                    . $this->translate('event.guest.email.confirm') . "\n"
+                    . $invitationLink . "\n\n"
+                    . $this->translate('event.guest.email.regards') . "\n"
+                    . $this->translate('event.guest.email.team');
 
                 $emailMessage = new EmailMessage(
                     from: $this->application->getConnectedUser()->person->email ?? '',
                     to: $email,
-                    subject: $subject,
+                    subject: $this->translate('event.guest.email.subject', ['summary' => $event->summary]),
                     body: $body,
                     isHtml: false
                 );
                 if ($this->emailService->send($emailMessage)) {
-                    $this->guest("Invitation envoyée avec succès à {$email}", 'success');
+                    $this->guest($this->translate('event.guest.success.sent', ['email' => $email]), 'success');
                 } else {
-                    $this->guest("Erreur lors de l'envoi de l'invitation à {$email}", 'error');
+                    $this->guest($this->translate('event.guest.error.send_failed', ['email' => $email]), 'error');
                 }
             } catch (Throwable $e) {
-                $this->guest('Erreur lors de l\'envoi de l\'invitation. ' . $e->getMessage(), 'error');
+                $this->guest($this->translate('event.guest.error.send_exception', ['message' => $e->getMessage()]), 'error');
             }
         } else {
             $this->guest();

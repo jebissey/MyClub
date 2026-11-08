@@ -9,9 +9,34 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
+use app\modules\Games\Leapfrog\viewModels\LeapfrogViewModel;
+use app\modules\Games\viewModels\GameStatisticsViewModel;
 
 final class LeapfrogController extends TableController
 {
+    /**
+     * Key used by the template and the JavaScript => translation key.
+     *
+     * @var array<string, string>
+     */
+    private const I18N_KEYS = [
+        'title'      => 'leapfrog.title',
+        'goal'       => 'leapfrog.goal',
+        'clickHint'  => 'leapfrog.click_hint',
+        'rulesTitle' => 'leapfrog.rules_title',
+        'rule1'      => 'leapfrog.rule1',
+        'rule2'      => 'leapfrog.rule2',
+        'rule3'      => 'leapfrog.rule3',
+        'rule4'      => 'leapfrog.rule4',
+        'movesOne'   => 'leapfrog.moves_one',
+        'movesOther' => 'leapfrog.moves_other',
+        'leanSheep'  => 'leapfrog.lean_sheep',
+        'fatSheep'   => 'leapfrog.fat_sheep',
+        'won'        => 'leapfrog.won',
+        'lost'       => 'leapfrog.lost',
+        'replay'     => 'leapfrog.replay',
+    ];
+
     public function __construct(
         Application $application,
         private readonly TableControllerDataHelper $tableControllerDataHelper,
@@ -26,24 +51,18 @@ final class LeapfrogController extends TableController
         }
 
         $connectedUser = $this->application->getConnectedUser(true);
-        $positions = [
-            ['type' => 'bergerie', 'id' => 1],
-            ['type' => 'bergerie', 'id' => 2],
-            ['type' => 'bergerie', 'id' => 3],
-            ['type' => 'vide', 'id' => 4],
-            ['type' => 'paturage', 'id' => 5],
-            ['type' => 'paturage', 'id' => 6],
-            ['type' => 'paturage', 'id' => 7]
-        ];
         $gameId = bin2hex(random_bytes(8));
 
-        $this->views->render('Games/Leapfrog/views/leapfrog.latte', $this->getAllParams([
-            'navItems' => $this->getNavItems($connectedUser->person->email),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'titre' => "Saute-Mouton",
-            'positions' => $positions,
-            'sessionId' => session_id() . '_' . $gameId
-        ]));
+        $viewModel = new LeapfrogViewModel(
+            navItems: $this->getNavItems($connectedUser->person->email),
+            sessionId: session_id() . '_' . $gameId,
+            i18n: array_map(fn(string $key): string => $this->translate($key), self::I18N_KEYS),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+
+        $this->views->render('Games/Leapfrog/views/leapfrog.latte', $viewModel);
     }
 
     public function statistics(): void
@@ -63,30 +82,35 @@ final class LeapfrogController extends TableController
             WebApp::filterInput($schema, $this->flight->request()->query->getData())
         );
         $filterConfig = [
-            ['name' => 'date', 'label' => 'Date'],
-            ['name' => 'who', 'label' => 'Qui'],
-            ['name' => 'sessionId', 'label' => 'Jeu'],
-            ['name' => 'movementCount', 'label' => 'Mouvements'],
-            ['name' => 'gameResult', 'label' => 'Résultat']
+            ['name' => 'date',          'label' => $this->translate('leapfrog.column.date')],
+            ['name' => 'who',           'label' => $this->translate('leapfrog.column.who')],
+            ['name' => 'sessionId',     'label' => $this->translate('leapfrog.column.game')],
+            ['name' => 'movementCount', 'label' => $this->translate('leapfrog.column.movements')],
+            ['name' => 'gameResult',    'label' => $this->translate('leapfrog.column.result')],
         ];
         $columns = [
-            ['field' => 'Date', 'label' => 'Date'],
-            ['field' => 'Who', 'label' => 'Qui'],
-            ['field' => 'SessionId', 'label' => 'Jeu'],
-            ['field' => 'MoveCount', 'label' => 'Mouvements'],
-            ['field' => 'GameResult', 'label' => 'Résultat']
+            ['field' => 'Date',       'label' => $this->translate('leapfrog.column.date')],
+            ['field' => 'Who',        'label' => $this->translate('leapfrog.column.who')],
+            ['field' => 'SessionId',  'label' => $this->translate('leapfrog.column.game')],
+            ['field' => 'MoveCount',  'label' => $this->translate('leapfrog.column.movements')],
+            ['field' => 'GameResult', 'label' => $this->translate('leapfrog.column.result')],
         ];
         $data = $this->prepareTableData($this->tableControllerDataHelper->getLeapfrogQuery(), $filterValues, true);
 
-        $this->views->render('Games/Leapfrog/views/statistics.latte', $this->getAllParams([
-            'games' => $data['items'],
-            'currentPage' => $data['currentPage'],
-            'totalPages' => $data['totalPages'],
-            'filterValues' => $filterValues,
-            'filters' => $filterConfig,
-            'columns' => $columns,
-            'resetUrl' => '/games/leapfrog/statistics',
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+        $viewModel = new GameStatisticsViewModel(
+            games: $data['items'],
+            currentPage: $data['currentPage'],
+            totalPages: $data['totalPages'],
+            filterValues: $filterValues,
+            filters: $filterConfig,
+            columns: $columns,
+            resetUrl: '/games/leapfrog/statistics',
+            title: $this->translate('leapfrog.statistics_title'),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+
+        $this->views->render('Games/views/statistics.latte', $viewModel);
     }
 }

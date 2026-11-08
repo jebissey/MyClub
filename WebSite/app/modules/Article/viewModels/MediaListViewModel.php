@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Article\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\IdNameRow;
 
 final readonly class MediaListViewModel extends LayoutViewModel
 {
@@ -25,7 +26,7 @@ final readonly class MediaListViewModel extends LayoutViewModel
      * @param list<string> $years
      * @param list<string> $months
      * @param list<string> $fileExtensions
-     * @param list<object> $groups
+     * @param list<IdNameRow> $groups
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams
      */

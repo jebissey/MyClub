@@ -5,20 +5,11 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
+use stdClass;
 use app\helpers\Application;
 use app\helpers\To;
+use app\modules\Event\valueObjects\EventParticipantRow;
 
-/**
- * @phpstan-type EventParticipantRow object{
- *     Email: string|null,
- *     NickName: string|null,
- *     FirstName: string|null,
- *     LastName: string|null,
- *     PersonId: int|null,
- *     InPresentationDirectory: int|null,
- *     ContactId: int|null
- * }
- */
 final class ParticipantDataHelper extends Data
 {
     public function __construct(Application $application)
@@ -54,10 +45,14 @@ final class ParticipantDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
 
-        /** @var list<EventParticipantRow> $rows */
-        $rows = array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+        /** @var list<stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        return $rows;
+        return array_map(
+            static fn(stdClass $row): EventParticipantRow =>
+            EventParticipantRow::fromStdClass($row),
+            $rows,
+        );
     }
 
     /**

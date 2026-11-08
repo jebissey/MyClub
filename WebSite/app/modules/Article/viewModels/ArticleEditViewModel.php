@@ -6,6 +6,7 @@ namespace app\modules\Article\viewModels;
 
 use stdClass;
 use app\modules\Common\valueObjects\ArticleRow;
+use app\modules\Common\valueObjects\CarouselItemRow;
 use app\modules\Common\viewModels\LayoutViewModel;
 
 final readonly class ArticleEditViewModel extends LayoutViewModel
@@ -16,7 +17,7 @@ final readonly class ArticleEditViewModel extends LayoutViewModel
      * @param object|null $hasSurvey
      * @param object|null $hasOrder
      * @param list<object> $navItems
-     * @param list<stdClass> $carouselItems
+     * @param list<CarouselItemRow> $carouselItems
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */

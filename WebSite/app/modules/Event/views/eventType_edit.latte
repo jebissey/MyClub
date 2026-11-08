@@ -28,8 +28,8 @@
                             <select class="form-select" id="itemGroup">
                                 <option value="">Aucun</option>
                                 {foreach $groups as $group}
-                                <option value="{$group->Id}" {if $group->Id == $idGroup}selected{/if}>
-                                    {$group->Name}
+                                <option value="{$group->id}" {if $group->id == $idGroup}selected{/if}>
+                                    {$group->name}
                                 </option>
                                 {/foreach}
                             </select>

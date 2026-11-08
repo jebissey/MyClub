@@ -4,18 +4,11 @@ declare(strict_types=1);
 
 namespace app\modules\Event\valueObjects;
 
-use app\modules\Common\valueObjects\AbstractValueObject;
+use stdClass;
 use app\enums\EventAudience;
+use app\helpers\To;
+use app\modules\Common\valueObjects\AbstractValueObject;
 
-/**
- * Ligne minimale de la table Event (Id + Audience uniquement),
- * utilisée pour les vérifications de droit d'accès/inscription.
- *
- * @phpstan-type EventAudienceRowShape object{
- *     Id: int|string,
- *     Audience: string
- * }
- */
 final readonly class EventAudienceRow extends AbstractValueObject
 {
     public function __construct(
@@ -24,12 +17,14 @@ final readonly class EventAudienceRow extends AbstractValueObject
     ) {
     }
 
-    /** @param EventAudienceRowShape $row */
     public static function fromStdClass(object $row): self
     {
+        /** @var stdClass $row */
         return new self(
-            id: (int) $row->Id,
-            audience: EventAudience::from($row->Audience),
+            id: To::requireInt($row->Id ?? null),
+            audience: EventAudience::from(
+                To::requireStr($row->Audience ?? null),
+            ),
         );
     }
 }

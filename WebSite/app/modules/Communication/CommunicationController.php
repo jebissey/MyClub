@@ -50,7 +50,7 @@ final class CommunicationController extends AbstractController
                     'userEmail' => $userEmail,
                 ]),
             );
-            $this->views->render('Communication/views/communication_edit.latte', $viewModel->toArray());
+            $this->views->render('Communication/views/communication_edit.latte', $viewModel);
         }
     }
 

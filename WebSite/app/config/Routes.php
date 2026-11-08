@@ -117,7 +117,9 @@ use app\models\CrosstabDataHelper;
 use app\models\DataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
+use app\models\EventInvitationDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\EventParticipationDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\ExerciseTableDataHelper;
 use app\models\GroupDataHelper;
@@ -562,6 +564,8 @@ final class Routes
         $crosstabDataHelper = new CrosstabDataHelper($this->application, $authorizationDataHelper);
         $languagesDataHelper = new LanguagesDataHelper($this->application, $this->application->getErrorManager());
         $personDataHelper = new PersonDataHelper($this->application);
+        $eventInvitationDataHelper = new EventInvitationDataHelper($this->application);
+        $eventParticipationDataHelper = new EventParticipationDataHelper($this->application);
 
         return new DataHelpers(
             alertRecipientDataHelper: new AlertRecipientDataHelper($this->application, $personDataHelper, $this->personPreferences),
@@ -577,8 +581,15 @@ final class Routes
             dataHelper: $this->dataHelper,
             dbBrowserDataHelper: new DbBrowserDataHelper($this->application),
             designDataHelper: new DesignDataHelper($this->application),
-            eventDataHelper: new EventDataHelper($this->application, $this->dataHelper),
+            eventDataHelper: new EventDataHelper(
+                $this->application,
+                $this->dataHelper,
+                $eventInvitationDataHelper,
+                $eventParticipationDataHelper
+            ),
+            eventInvitationDataHelper: $eventInvitationDataHelper,
             eventNeedDataHelper: new EventNeedDataHelper($this->application),
+            eventParticipationDataHelper: $eventParticipationDataHelper,
             eventTypeDataHelper: new EventTypeDataHelper($this->application),
             exerciseTableDataHelper: new ExerciseTableDataHelper($this->application),
             groupDataHelper: new GroupDataHelper($this->application),

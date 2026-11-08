@@ -13,9 +13,66 @@ use app\models\ArwardsDataHelper;
 use app\models\CarouselDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Designer\viewModels\MenuArticleViewModel;
+use app\modules\Designer\viewModels\MenuItemViewModel;
+use app\modules\Webmaster\viewModels\ArwardsViewModel;
 
 final class MenuItemController extends AbstractController
 {
+    /**
+     * Key given to the JavaScript => translation key.
+     *
+     * @var array<string, string>
+     */
+    private const I18N_KEYS = [
+        'add_item'                => 'menu.add_item',
+        'edit_item'               => 'menu.edit_item',
+        'delete_confirm'          => 'menu.delete_confirm',
+        'label_required'          => 'menu.label_required',
+        'url_required'            => 'menu.url_required',
+        'save_failed'             => 'menu.save_failed',
+        'save_error'              => 'menu.save_error',
+        'delete_failed'           => 'menu.delete_failed',
+        'delete_error'            => 'menu.delete_error',
+        'load_error'              => 'menu.load_error',
+        'error'                   => 'menu.error',
+        'positions_error'         => 'menu.positions_error',
+        'positions_error_generic' => 'menu.positions_error_generic',
+        'modal_title'             => 'menu.modal_title',
+        'field_label'             => 'menu.field_label',
+        'field_url'               => 'menu.field_url',
+        'field_url_placeholder'   => 'menu.field_url_placeholder',
+        'field_group'             => 'menu.field_group',
+        'field_none'              => 'menu.field_none',
+        'field_visible_for'       => 'menu.field_visible_for',
+        'field_members'           => 'menu.field_members',
+        'field_contacts'          => 'menu.field_contacts',
+        'field_anonymous'         => 'menu.field_anonymous',
+        'field_type'              => 'menu.field_type',
+        'type_link'               => 'menu.type_link',
+        'type_heading'            => 'menu.type_heading',
+        'type_divider'            => 'menu.type_divider',
+        'type_submenu'            => 'menu.type_submenu',
+        'field_icon'              => 'menu.field_icon',
+        'field_icon_placeholder'  => 'menu.field_icon_placeholder',
+        'field_parent'            => 'menu.field_parent',
+        'btn_cancel'              => 'cancel',
+        'btn_save'                => 'save',
+        'page_title'              => 'menu.page_title',
+        'tab_navbar'              => 'menu.tab_navbar',
+        'tab_sidebar'             => 'menu.tab_sidebar',
+        'col_name'                => 'menu.col_name',
+        'col_url'                 => 'menu.col_url',
+        'col_group'               => 'menu.col_group',
+        'col_members'             => 'menu.col_members',
+        'col_contacts'            => 'menu.col_contacts',
+        'col_anonymous'           => 'menu.col_anonymous',
+        'col_actions'             => 'menu.col_actions',
+        'col_type'                => 'menu.col_type',
+        'col_icon'                => 'menu.col_icon',
+        'col_label'               => 'menu.col_label',
+        'col_parent'              => 'menu.col_parent',
+    ];
+
     public function __construct(Application $application, private readonly CarouselDataHelper $carouselDataHelper)
     {
         parent::__construct($application);
@@ -23,85 +80,42 @@ final class MenuItemController extends AbstractController
 
     public function index(): void
     {
-        $menuItems = $this->getNavItems($this->application->getConnectedUser()->person?->email, true);
+        $connectedUser = $this->application->getConnectedUser();
+        $menuItems = $this->getNavItems($connectedUser->person?->email, true);
         $tab = MenuItemTab::tryFrom(To::str($this->flight->request()->query->tab ?? '')) ?? MenuItemTab::Navbar;
 
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isMenuDesigner(), __FILE__, __LINE__)) {
-            $this->views->render('Designer/views/menuItem.latte', $this->getAllParams([
-                'navbarItems'  => array_filter($menuItems, fn($i) => $i->what === 'navbar'),
-                'sidebarItems' => array_filter($menuItems, fn($i) => $i->what === 'sidebar'),
-                'groups'       => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'page'         => $this->application->getConnectedUser()->getPage(),
-                'activeTab'    => $tab,
-                'i18n' => [
-                    'add_item'                => ($this->t)('menu.add_item'),
-                    'edit_item'               => ($this->t)('menu.edit_item'),
-                    'delete_confirm'          => ($this->t)('menu.delete_confirm'),
-                    'label_required'          => ($this->t)('menu.label_required'),
-                    'url_required'            => ($this->t)('menu.url_required'),
-                    'save_failed'             => ($this->t)('menu.save_failed'),
-                    'save_error'              => ($this->t)('menu.save_error'),
-                    'delete_failed'           => ($this->t)('menu.delete_failed'),
-                    'delete_error'            => ($this->t)('menu.delete_error'),
-                    'load_error'              => ($this->t)('menu.load_error'),
-                    'error'                   => ($this->t)('menu.error'),
-                    'positions_error'         => ($this->t)('menu.positions_error'),
-                    'positions_error_generic' => ($this->t)('menu.positions_error_generic'),
-                    'modal_title'             => ($this->t)('menu.modal_title'),
-                    'field_label'             => ($this->t)('menu.field_label'),
-                    'field_url'               => ($this->t)('menu.field_url'),
-                    'field_url_placeholder'   => ($this->t)('menu.field_url_placeholder'),
-                    'field_group'             => ($this->t)('menu.field_group'),
-                    'field_none'              => ($this->t)('menu.field_none'),
-                    'field_visible_for'       => ($this->t)('menu.field_visible_for'),
-                    'field_members'           => ($this->t)('menu.field_members'),
-                    'field_contacts'          => ($this->t)('menu.field_contacts'),
-                    'field_anonymous'         => ($this->t)('menu.field_anonymous'),
-                    'field_type'              => ($this->t)('menu.field_type'),
-                    'type_link'               => ($this->t)('menu.type_link'),
-                    'type_heading'            => ($this->t)('menu.type_heading'),
-                    'type_divider'            => ($this->t)('menu.type_divider'),
-                    'type_submenu'            => ($this->t)('menu.type_submenu'),
-                    'field_icon'              => ($this->t)('menu.field_icon'),
-                    'field_icon_placeholder'  => ($this->t)('menu.field_icon_placeholder'),
-                    'field_parent'            => ($this->t)('menu.field_parent'),
-                    'btn_cancel'              => ($this->t)('cancel'),
-                    'btn_save'                => ($this->t)('save'),
-                    'page_title'              => ($this->t)('menu.page_title'),
-                    'tab_navbar'              => ($this->t)('menu.tab_navbar'),
-                    'tab_sidebar'             => ($this->t)('menu.tab_sidebar'),
-                    'col_name'                => ($this->t)('menu.col_name'),
-                    'col_url'                 => ($this->t)('menu.col_url'),
-                    'col_group'               => ($this->t)('menu.col_group'),
-                    'col_members'             => ($this->t)('menu.col_members'),
-                    'col_contacts'            => ($this->t)('menu.col_contacts'),
-                    'col_anonymous'           => ($this->t)('menu.col_anonymous'),
-                    'col_actions'             => ($this->t)('menu.col_actions'),
-                    'col_type'                => ($this->t)('menu.col_type'),
-                    'col_icon'                => ($this->t)('menu.col_icon'),
-                    'col_label'               => ($this->t)('menu.col_label'),
-                    'col_parent'              => ($this->t)('menu.col_parent'),
-                ],
-                'btnHistoryBack' => true,
-                'btnParent'      => "/designer",
-            ]));
+            $viewModel = new MenuItemViewModel(
+                navbarItems: array_values(array_filter($menuItems, static fn($i) => $i->what === 'navbar')),
+                sidebarItems: array_values(array_filter($menuItems, static fn($i) => $i->what === 'sidebar')),
+                groups: $this->getActiveGroups(),
+                activeTab: $tab,
+                i18n: array_map(fn(string $key): string => $this->translate($key), self::I18N_KEYS),
+                layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
+            );
+
+            $this->views->render('Designer/views/menuItem.latte', $viewModel);
         }
     }
 
     public function showArwards(): void
     {
-        $person = $this->application->getConnectedUser()->person ?? false;
-        if ($person && $this->menuItemDataHelper->authorizedUser('/menuitem/show/arwards', $person)) {
+        $connectedUser = $this->application->getConnectedUser();
+        $person = $connectedUser->person;
+        if ($person !== null && $this->menuItemDataHelper->authorizedUser('/menuitem/show/arwards', $person)) {
             $arwardsDataHelper = new ArwardsDataHelper($this->application);
+            $counterNames = $arwardsDataHelper->getCounterNames();
 
-            $this->views->render('Webmaster/views/arwards.latte', $this->getAllParams([
-                'counterNames' => $counterNames = $arwardsDataHelper->getCounterNames(),
-                'data'         => $arwardsDataHelper->getData($counterNames),
-                'groups'       => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'layout'       => $this->getLayout(),
-                'navItems'     => $this->getNavItems($person->email),
-                'page'         => $this->application->getConnectedUser()->getPage(),
-            ]));
+            $viewModel = new ArwardsViewModel(
+                counterNames: $counterNames,
+                data: $arwardsDataHelper->getData($counterNames),
+                groups: $this->getActiveGroups(),
+                layout: $this->getLayout(),
+                navItems: $this->getNavItems($person->email),
+                layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
+            );
+
+            $this->views->render('Webmaster/views/arwards.latte', $viewModel);
         } else {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,
@@ -132,7 +146,7 @@ final class MenuItemController extends AbstractController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->views->render('Article/views/showArticle.latte', $viewModel->toArray());
+            $this->views->render('Article/views/showArticle.latte', $viewModel);
         } catch (QueryException $e) {
             $this->errors->badRequest($e->getMessage(), $e->getFile(), $e->getLine());
         }

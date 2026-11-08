@@ -123,21 +123,21 @@
             {if count($carouselItems) > 0}
                 <div class="row g-3" id="carouselGallery">
                     {foreach $carouselItems as $item}
-                        {var $itemHtml = $item->Item}
-                        <div class="col-md-3 col-sm-4 col-6 carousel-item-wrapper" data-id="{$item->Id}" data-item-html="{$itemHtml|escapeHtml}">
+                        {var $itemHtml = $item->item}
+                        <div class="col-md-3 col-sm-4 col-6 carousel-item-wrapper" data-id="{$item->id}" data-item-html="{$itemHtml|escapeHtml}">
                             <div class="card h-100">
                                 <div class="position-relative carousel-item-content">
                                     {$itemHtml|noescape}
                                     <button type="button"
                                             class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 delete-btn"
-                                            data-id="{$item->Id}"
+                                            data-id="{$item->id}"
                                             title="{='article.carousel.delete_image'|translate}">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
                                 <div class="card-body p-2">
                                     <p class="card-text small mb-0 item-info">
-                                        <small class="text-muted">ID: {$item->Id}</small>
+                                        <small class="text-muted">ID: {$item->id}</small>
                                     </p>
                                 </div>
                             </div>

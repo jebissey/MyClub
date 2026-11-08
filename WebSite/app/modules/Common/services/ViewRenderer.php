@@ -6,6 +6,7 @@ namespace app\modules\Common\services;
 
 use Flight;
 use Latte\Engine as LatteEngine;
+use app\modules\Common\viewModels\LayoutViewModel;
 
 final class ViewRenderer
 {
@@ -17,11 +18,10 @@ final class ViewRenderer
      * Render a Latte template, flush the output and stop the request.
      *
      * @phpstan-latte-ignore
-     * @param object|array<string,mixed> $params
      */
-    public function render(string $template, object|array $params = []): void
+    public function render(string $template, LayoutViewModel $viewModel): void
     {
-        echo $this->latte->renderToString($template, $params);
+        echo $this->latte->renderToString($template, $viewModel);
         if (ob_get_level()) {
             ob_end_flush();
         }

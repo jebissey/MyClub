@@ -1,71 +1,72 @@
 {extends '../../Designer/views/designer.latte'}
 
 {block content}
-    <div class="row">
-        <div class="col-12">
-            {include '../../Common/views/dataTable.latte',
-                'createButton' => [
-                    'url' => '/eventType/create',
-                    'label' => "bi bi-plus"
+<div class="row">
+    <div class="col-12">
+        {include '../../Common/views/dataTable.latte',
+            'createButton' => [
+                'url' => '/eventType/create',
+                'label' => 'bi bi-plus'
+            ],
+            'items' => $eventTypes,
+            'actions' => [
+                [
+                    'type' => 'link',
+                    'label' => 'bi bi-pencil',
+                    'url' => '/eventType/edit/{id}',
+                    'class' => 'btn-warning'
                 ],
-                'items' => $eventTypes,
-                'actions' => [
-                    [
-                        'type' => 'link',
-                        'label' => 'bi bi-pencil',
-                        'url' => '/eventType/edit/{id}',
-                        'class' => 'btn-warning'
-                    ],
-                    [
-                        'type' => 'link',
-                        'label' => 'bi bi-trash',
-                        'url' => '/eventType/delete/{id}',
-                        'class' => 'btn-danger',
-                        'confirm' => "Voulez-vous vraiment le supprimer ?"
-                    ]
+                [
+                    'type' => 'link',
+                    'label' => 'bi bi-trash',
+                    'url' => '/eventType/delete/{id}',
+                    'class' => 'btn-danger',
+                    'confirm' => $deleteConfirm
                 ]
-            }
-        </div>
-        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAttributes" aria-expanded="false" aria-controls="collapseAttributes">
-            Gestions des attributs
-        </button>
-        <div class="collapse" id="collapseAttributes">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title h5 m-0">Gestion des Attributs</h2>
-                </div>
-                <div class="card-body">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="mb-3 d-flex align-items-center gap-2">
-                                <input type="text" id="newAttributeName" class="form-control flex-grow-1" placeholder="Nom de l'attribut" required>
-                                <input type="color" id="newAttributeColor" class="form-control form-control-color" value="#563d7c" style="width: 100px;">
-                                <textarea id="newAttributeDetail" class="form-control flex-grow-1" placeholder="Détail" rows="1" style="resize: none;"></textarea>
-                                <button id="btnCreateAttribute" class="btn btn-primary">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
-                            </div>
+            ]
+        }
+    </div>
+    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAttributes" aria-expanded="false" aria-controls="collapseAttributes">
+        {='event.types.attributes.title'|translate}
+    </button>
+    <div class="collapse" id="collapseAttributes">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title h5 m-0">{='event.types.attributes.title'|translate}</h2>
+            </div>
+            <div class="card-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <input type="text" id="newAttributeName" class="form-control flex-grow-1" placeholder="{='event.types.attributes.name_placeholder'|translate}" required>
+                            <input type="color" id="newAttributeColor" class="form-control form-control-color" value="#563d7c" style="width: 100px;">
+                            <textarea id="newAttributeDetail" class="form-control flex-grow-1" placeholder="{='event.types.attributes.detail_placeholder'|translate}" rows="1" style="resize: none;"></textarea>
+                            <button id="btnCreateAttribute" class="btn btn-primary">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
                         </div>
                     </div>
-                    <div id="attributesList">
-                    </div>
+                </div>
+                <div id="attributesList">
                 </div>
             </div>
         </div>
     </div>
+</div>
 {/block}
 
 {block scripts}
+<script>window.eventTypesI18n = {$i18n};</script>
 <script type="module">
-    import {
-        initAttributes,
-        editAttribute,
-        deleteAttribute
-    } from '/app/modules/Event/js/eventType/index.js';
+import {
+    initAttributes,
+    editAttribute,
+    deleteAttribute
+} from '/app/modules/Event/js/eventType/index.js';
 
-    window.editAttribute = editAttribute;
-    window.deleteAttribute = deleteAttribute;
+window.editAttribute = editAttribute;
+window.deleteAttribute = deleteAttribute;
 
-    initAttributes();
+initAttributes();
 </script>
 {/block}

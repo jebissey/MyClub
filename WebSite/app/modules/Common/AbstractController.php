@@ -9,7 +9,6 @@ use flight\Engine;
 use Closure;
 use Latte\Engine as LatteEngine;
 use app\enums\ApplicationError;
-use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\Params;
@@ -27,6 +26,7 @@ use app\modules\Common\services\DownloadResponder;
 use app\modules\Common\services\ErrorRaiser;
 use app\modules\Common\services\ViewRenderer;
 use app\modules\Common\viewModels\InfoViewModel;
+use app\modules\Common\valueObjects\IdNameRow;
 use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Common\valueObjects\NavbarColors;
 
@@ -219,6 +219,21 @@ abstract class AbstractController
     }
 
     /**
+     * Translates a key and replaces its {placeholders}.
+     *
+     * @param array<string, string> $params Placeholder name (without braces) => value
+     */
+    protected function translate(string $key, array $params = []): string
+    {
+        $replacements = [];
+        foreach ($params as $name => $value) {
+            $replacements['{' . $name . '}'] = $value;
+        }
+
+        return strtr(($this->t)($key), $replacements);
+    }
+
+    /**
      * @param callable(ConnectedUser): bool $permissionCheck
      */
     protected function userIsAllowedAndMethodIsGood(string $method, callable $permissionCheck, string $file, int $line): bool
@@ -294,26 +309,39 @@ abstract class AbstractController
         $viewModel = new InfoViewModel(
             content: $content,
             timer: 0,
+            previousPage: true,
             layoutParams: $this->getAllParams($viewModelOptions),
         );
 
-        $this->views->render('Common/views/info.latte', $viewModel->toArray());
+        $this->views->render('Common/views/info.latte', $viewModel);
     }
 
     protected function renderInfo(string $content, int $timer): void
     {
         $viewModel = new InfoViewModel(
             content: $content,
-            hasAuthorization: $this->application->getConnectedUser()->hasAutorization(),
             timer: $timer,
             previousPage: false,
             layoutParams: $this->getAllParams([]),
         );
-        $this->views->render('Common/views/info.latte', $viewModel->toArray());
+        $this->views->render('Common/views/info.latte', $viewModel);
     }
 
     protected function getRememberMeToken(): ?string
     {
         return $this->input->cookie(AuthenticationService::REMEMBER_ME_COOKIE);
+    }
+
+    /**
+     * Active groups, ordered by name.
+     *
+     * @return list<IdNameRow>
+     */
+    protected function getActiveGroups(): array
+    {
+        return array_map(
+            static fn(object $row): IdNameRow => IdNameRow::fromStdClass($row),
+            array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'))
+        );
     }
 }

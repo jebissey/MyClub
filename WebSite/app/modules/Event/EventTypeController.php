@@ -11,7 +11,11 @@ use app\helpers\WebApp;
 use app\models\EventTypeDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Common\TableController;
+use app\modules\Common\valueObjects\EventAttributeRow;
+use app\modules\Common\valueObjects\IdNameRow;
 use app\modules\Event\valueObjects\EventTypeNameGroupRow;
+use app\modules\Event\viewModels\EventTypeEditViewModel;
+use app\modules\Event\viewModels\EventTypesIndexViewModel;
 
 final class EventTypeController extends TableController
 {
@@ -67,18 +71,27 @@ final class EventTypeController extends TableController
                 );
                 return;
             }
-            /** @var object{Name: string, IdGroup: int|string|null} $eventTypeData */
             $eventType = EventTypeNameGroupRow::fromStdClass($eventTypeData);
             $existingAttributes = $this->dataHelper->gets('EventTypeAttribute', ['IdEventType' => $id], 'IdAttribute');
 
-            $this->views->render('Event/views/eventType_edit.latte', $this->getAllParams([
-                'name' => $eventType->name,
-                'idGroup' => $eventType->idGroup,
-                'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-                'attributes' => $this->dataHelper->gets('Attribute', [], '*', 'Name'),
-                'existingAttributesIds' => array_map(fn($a) => $a->IdAttribute, $existingAttributes),
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]));
+            $viewModel = new EventTypeEditViewModel(
+                name: $eventType->name,
+                idGroup: $eventType->idGroup,
+                groups: array_map(
+                    static fn(object $row): IdNameRow => IdNameRow::fromStdClass($row),
+                    array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'))
+                ),
+                attributes: array_map(
+                    static fn(object $row): EventAttributeRow => EventAttributeRow::fromStdClass($row),
+                    array_values($this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color', 'Name'))
+                ),
+                existingAttributesIds: array_values(array_map(
+                    static fn(object $a): int => To::int($a->IdAttribute),
+                    $existingAttributes
+                )),
+                layoutParams: $this->getAllParams(['page' => $this->application->getConnectedUser()->getPage()]),
+            );
+            $this->views->render('Event/views/eventType_edit.latte', $viewModel);
         }
     }
 
@@ -91,24 +104,32 @@ final class EventTypeController extends TableController
         $filterValues = [];
         $filterConfig = [];
         $columns = [
-            ['field' => 'EventTypeName', 'label' => 'Nom'],
-            ['field' => 'GroupName', 'label' => 'Groupe'],
-            ['field' => 'Attributes', 'label' => 'Attributs'],
+            ['field' => 'EventTypeName', 'label' => $this->translate('event.types.column.name')],
+            ['field' => 'GroupName', 'label' => $this->translate('event.types.column.group')],
+            ['field' => 'Attributes', 'label' => $this->translate('event.types.column.attributes')],
         ];
         $data = $this->prepareTableData($this->tableControllerDataHelper->getEventTypesQuery(), $filterValues);
 
-        $this->views->render('Event/views/eventTypes_index.latte', $this->getAllParams([
-            'eventTypes' => $data['items'],
-            'currentPage' => $data['currentPage'],
-            'totalPages' => $data['totalPages'],
-            'filterValues' => $filterValues,
-            'filters' => $filterConfig,
-            'columns' => $columns,
-            'resetUrl' => '/eventTypes',
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btnHistoryBack' => true,
-            'btnParent'      => "/designer",
-        ]));
+        $viewModel = new EventTypesIndexViewModel(
+            eventTypes: $data['items'],
+            currentPage: $data['currentPage'],
+            totalPages: $data['totalPages'],
+            filterValues: $filterValues,
+            filters: $filterConfig,
+            columns: $columns,
+            resetUrl: '/eventTypes',
+            deleteConfirm: $this->translate('event.types.delete_confirm'),
+            i18n: [
+                'nameRequired'  => $this->translate('event.types.js.name_required'),
+                'errorPrefix'   => $this->translate('event.types.js.error_prefix'),
+                'deleteConfirm' => $this->translate('event.types.js.delete_confirm'),
+                'loadError'     => $this->translate('event.types.js.load_error'),
+            ],
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+        $this->views->render('Event/views/eventTypes_index.latte', $viewModel);
     }
 
     public function update(int $id): void

@@ -9,9 +9,9 @@ use app\modules\Common\viewModels\LayoutViewModel;
 final readonly class MediaUsesInMessagesViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $events
-     * @param list<mixed> $articles
-     * @param list<mixed> $groups
+     * @param list<object{Id: int, Title: string, StartTime: string}> $events
+     * @param list<object{Id: int, Title: string}> $articles
+     * @param list<object{Id: int, Title: string}> $groups
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(

@@ -6,6 +6,7 @@ namespace app\modules\Designer;
 
 use app\helpers\Application;
 use app\modules\Common\AbstractController;
+use app\modules\Designer\viewModels\DesignerHomeViewModel;
 
 final class DesignerController extends AbstractController
 {
@@ -23,14 +24,15 @@ final class DesignerController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'designer';
-            $connectedUser = $this->application->getConnectedUser();
 
-            $this->views->render('Designer/views/designer.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'content' => '',
-                'btnHistoryBack' => true,
-                'btnParent'      => "/admin",
-            ]));
+            $viewModel = new DesignerHomeViewModel(
+                content: '',
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
+            );
+
+            $this->views->render('Designer/views/designer.latte', $viewModel);
         }
     }
 }

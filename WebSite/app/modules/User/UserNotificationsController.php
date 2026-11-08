@@ -60,7 +60,7 @@ final class UserNotificationsController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('User/views/user_notifications.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_notifications.latte', $viewModel);
     }
 
     public function notificationsSave(): void

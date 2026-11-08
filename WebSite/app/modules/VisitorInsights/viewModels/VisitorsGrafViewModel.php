@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace app\modules\VisitorInsights\viewModels;
 
+use app\models\LogAnalyticsDataHelper;
 use app\modules\Common\viewModels\LayoutViewModel;
 
+/**
+ * @phpstan-import-type StatisticsPeriod from LogAnalyticsDataHelper
+ */
 final readonly class VisitorsGrafViewModel extends LayoutViewModel
 {
     /**
      * @param list<string> $periodTypes
-     * @param mixed $data
-     * @param mixed $chartData
+     * @param list<StatisticsPeriod> $data
+     * @param array<string, mixed> $chartData
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
@@ -19,8 +23,8 @@ final readonly class VisitorsGrafViewModel extends LayoutViewModel
         public array $periodTypes,
         public string $currentPeriodType,
         public int $currentOffset,
-        public mixed $data,
-        public mixed $chartData,
+        public array $data,
+        public array $chartData,
         public string $periodLabel,
         public array $i18n,
         array $layoutParams = []

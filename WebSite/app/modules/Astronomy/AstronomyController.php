@@ -103,7 +103,7 @@ final class AstronomyController extends AbstractController
             ]),
         );
 
-        $this->views->render('Astronomy/views/astronomy.latte', $viewModel->toArray());
+        $this->views->render('Astronomy/views/astronomy.latte', $viewModel);
     }
 
     private function parseDateOrToday(?string $date): DateTimeImmutable

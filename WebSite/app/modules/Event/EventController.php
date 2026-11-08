@@ -24,13 +24,15 @@ use app\models\ParticipantDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\MemberMapService;
 use app\modules\Common\valueObjects\EventAttributeRow;
+use app\modules\Common\valueObjects\EventChatRow;
 use app\modules\Common\valueObjects\EventTypeRow;
+use app\modules\Common\viewModels\ChatViewModel;
 use app\modules\Common\viewModels\CrosstabViewModel;
-use app\modules\Event\viewModels\EventChatViewModel;
 use app\modules\Event\viewModels\EventDetailViewModel;
 use app\modules\Event\viewModels\EventManagerHomeViewModel;
 use app\modules\Event\viewModels\EventNextEventsViewModel;
 use app\modules\Event\viewModels\EventWeekEventsViewModel;
+use app\modules\Event\viewModels\RegistrationSuccessViewModel;
 use app\modules\Event\valueObjects\EventAudienceRow;
 use app\modules\Event\valueObjects\NeedTypeRow;
 
@@ -125,7 +127,7 @@ final class EventController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Event/views/nextEvents.latte', $viewModel->toArray());
+        $this->views->render('Event/views/nextEvents.latte', $viewModel);
     }
 
     public function weekEvents(): void
@@ -149,7 +151,7 @@ final class EventController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Event/views/weekEvents.latte', $viewModel->toArray());
+        $this->views->render('Event/views/weekEvents.latte', $viewModel);
     }
 
     public function showEventCrosstab(): void
@@ -179,7 +181,7 @@ final class EventController extends AbstractController
             historyBack: true,
         );
 
-        $this->views->render('Event/views/crosstab.latte', $viewModel->toArray());
+        $this->views->render('Event/views/crosstab.latte', $viewModel);
     }
 
     public function show(int $eventId, string $message = '', string $messageType = ''): void
@@ -215,10 +217,12 @@ final class EventController extends AbstractController
         $carpoolData = [];
         if ($isRegistered) {
             // Contacts (ContactId) have no location: only members (PersonId) are considered
-            $memberIds = array_values(array_map(
-                static fn(object $participant): int => (int) $participant->PersonId,
-                array_filter($participants, static fn(object $participant): bool => (bool) $participant->PersonId)
-            ));
+            $memberIds = [];
+            foreach ($participants as $participant) {
+                if ($participant->personId !== null) {
+                    $memberIds[] = $participant->personId;
+                }
+            }
             $carpoolData = $this->memberMapService->getLocationData(
                 $this->memberDirectoryDataHelper->getLocatedMembers($memberIds)
             );
@@ -242,9 +246,9 @@ final class EventController extends AbstractController
                 '"From"' => 'User',
                 'EventId' => $eventId
             ], '*')),
-            eventNeeds: array_values($this->eventDataHelper->getEventNeeds($eventId)),
-            participantSupplies: array_values($this->eventDataHelper->getParticipantSupplies($eventId)),
-            userSupplies: array_values($this->eventDataHelper->getUserSupplies($eventId, $userEmail)),
+            eventNeeds: $this->eventDataHelper->getEventNeeds($eventId),
+            participantSupplies: $this->eventDataHelper->getParticipantSupplies($eventId),
+            userSupplies: $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
             token: $token,
             carpoolData: $carpoolData,
             carpoolMaxZoom: 12,
@@ -253,7 +257,7 @@ final class EventController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Event/views/event_detail.latte', $viewModel->toArray());
+        $this->views->render('Event/views/event_detail.latte', $viewModel);
     }
 
     public function registerSet(int $eventId, ?string $token = null): void
@@ -291,32 +295,34 @@ final class EventController extends AbstractController
                 } else {
                     $this->eventDataHelper->removeParticipantByIndividual($userId, $eventId);
                 }
-            } elseif ($token != null) {
-                // Contact externe via lien d'invitation.
+            } elseif ($token !== null) {
+                // External contact using an invitation link.
                 $eventData = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
-                if (!$eventData) {
-                    $this->show($eventId, 'Evénement inconnu', 'error');
+
+                if ($eventData === false) {
+                    $this->show($eventId, $this->translate('event.register.error.unknown_event'), 'error');
                     return;
                 }
-                /** @var object{Id: int|string, Audience: string} $eventData */
+
                 $event = EventAudienceRow::fromStdClass($eventData);
-
                 $invitation = $this->eventDataHelper->findInvitationByToken($token);
-                if ($invitation === false || (int) $invitation->IdEvent !== $eventId) {
-                    $this->show($eventId, 'Token inconnu', 'error');
+
+                if ($invitation === null || $invitation->idEvent !== $eventId) {
+                    $this->show($eventId, $this->translate('event.register.error.unknown_token'), 'error');
                     return;
                 }
 
-                $invitedAt = new DateTime($invitation->InvitedAt);
-                $now = new DateTime();
-                $interval = $now->diff($invitedAt);
-                if ($interval->days >= 1 || ($interval->days == 0 && $interval->h >= 24)) {
-                    $this->show($eventId, 'Token expiré', 'error');
+                $invitedAt = new DateTime($invitation->invitedAt);
+                $interval = (new DateTime())->diff($invitedAt);
+
+                if ($interval->days >= 1) {
+                    $this->show($eventId, $this->translate('event.register.error.expired_token'), 'error');
                     return;
                 }
 
-                $individual = $this->eventDataHelper->findIndividualByEmail($invitation->Email);
-                if ($individual !== false && $individual->Type === 'Member') {
+                $individual = $this->eventDataHelper->findIndividualByEmail($invitation->email);
+
+                if ($individual !== null && $individual->type === 'Member') {
                     $this->show(
                         $eventId,
                         'Cette adresse est déjà associée à un compte membre : merci de vous inscrire connecté(e)',
@@ -325,40 +331,45 @@ final class EventController extends AbstractController
                     return;
                 }
 
-                $individualId = $individual !== false
-                    ? $individual->Id
-                    : $this->eventDataHelper->createContactIndividual($invitation->Email, $invitation->NickName ?? '');
+                $individualId = $individual !== null
+                    ? $individual->id
+                    : $this->eventDataHelper->createContactIndividual(
+                        $invitation->email,
+                        $invitation->nickName ?? ''
+                    );
 
                 if ($set) {
                     if ($this->eventDataHelper->isAlreadyRegistered($individualId, $eventId)) {
-                        $this->show($eventId, 'Participant déjà enregistré', 'error');
+                        $this->show($eventId, $this->translate('event.register.error.already_registered'), 'error');
                         return;
                     }
+
                     $this->eventDataHelper->addConfirmedParticipant(
                         $individualId,
                         $eventId,
-                        $invitation->InvitedBy,
-                        $invitation->InvitedAt
+                        $invitation->invitedBy,
+                        $invitation->invitedAt
                     );
 
-                    $this->views->render('Common/views/registration_success.latte', $this->getAllParams([
-                        'event' => $event,
-                        'contact' => (object) [
-                            'Id' => $individualId,
-                            'Email' => $invitation->Email,
-                            'NickName' => $invitation->NickName,
-                        ],
-                        'navItems' => $this->getNavItems($this->application->getConnectedUser(true)->person->email),
-                        'page' => $this->application->getConnectedUser()->getPage()
-                    ]));
+                    $viewModel = new RegistrationSuccessViewModel(
+                        event: $event,
+                        contactId: $individualId,
+                        contactEmail: $invitation->email,
+                        contactNickName: $invitation->nickName,
+                        navItems: $this->getNavItems($this->application->getConnectedUser(true)->person->email),
+                        layoutParams: $this->getAllParams([
+                            'page' => $this->application->getConnectedUser()->getPage(),
+                        ]),
+                    );
+                    $this->views->render('Common/views/registration_success.latte', $viewModel);
+
                     return;
-                } else {
-                    $this->eventDataHelper->removeParticipantByIndividual($individualId, $eventId);
                 }
+
+                $this->eventDataHelper->removeParticipantByIndividual($individualId, $eventId);
             } else {
                 $eventData = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
                 if ($eventData !== false) {
-                    /** @var object{Id: int|string, Audience: string} $eventData */
                     $event = EventAudienceRow::fromStdClass($eventData);
                     if ($event->audience === EventAudience::ForAll) {
                         $this->redirect('/contact/event/' . $eventId);
@@ -396,12 +407,11 @@ final class EventController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Event/views/eventManager.latte', $viewModel->toArray());
+        $this->views->render('Event/views/eventManager.latte', $viewModel);
     }
 
     public function showEventChat(int $eventId): void
     {
-
         if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
@@ -416,17 +426,20 @@ final class EventController extends AbstractController
             ? $_SESSION['last_log_id']
             : 0;
 
-        $viewModel = new EventChatViewModel(
+        $eventChatRow = EventChatRow::fromRow($event);
+
+        $viewModel = new ChatViewModel(
             article: null,
-            event: $event,
+            event: $eventChatRow,
             group: null,
-            messages: array_values($this->messageDataHelper->getEventMessages($eventId)),
+            messages: $this->messageDataHelper->getEventMessages($eventId),
             person: $person,
+            navItems: [],
             newMessages: $this->messageDataHelper->hasNewMessages($person->id, $lastLogId),
-            eventId: $eventId,
+            btnParent: "/event/{$eventId}",
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Common/views/chat.latte', $viewModel->toArray());
+        $this->views->render('Common/views/chat.latte', $viewModel);
     }
 }

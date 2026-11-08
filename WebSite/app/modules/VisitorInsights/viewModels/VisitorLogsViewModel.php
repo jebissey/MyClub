@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace app\modules\VisitorInsights\viewModels;
 
+use app\modules\Common\valueObjects\DataTableTypes;
+use app\modules\Common\valueObjects\TableRow;
 use app\modules\Common\viewModels\LayoutViewModel;
 
+/**
+ * @phpstan-import-type TableColumn from DataTableTypes
+ * @phpstan-import-type TableFilter from DataTableTypes
+ */
 final readonly class VisitorLogsViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $logs
-     * @param array<string, string> $filterValues
-     * @param list<array{name: string, label: string}> $filters
-     * @param list<array{field: string, label: string}> $columns
-     * @param array<string, mixed> $layoutParams Full output of Params::getAll().
+     * @param list<TableRow> $logs
+     * @param array<string, mixed> $filterValues
+     * @param list<TableFilter> $filters
+     * @param list<TableColumn> $columns
+     * @param array<string, mixed> $layoutParams
      */
     public function __construct(
         public array $logs,

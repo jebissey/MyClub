@@ -35,9 +35,7 @@
 
 {block scripts}
     <script>
-    {if isset($i18n)}
-        Object.assign(window.i18n, {=$i18n});
-    {/if}
+    Object.assign(window.i18n, {=$i18n});
     </script>
     <script type="module" src="{='/app/modules/Article/js/mediaUpload.js'|version}"></script>
 {/block}

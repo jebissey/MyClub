@@ -1,11 +1,6 @@
-{parameters
-    array  $topPages,
-    string $period,
-    string $periodFrom,
-    string $periodTo,
-    string $cardTitle,
-    array  $columns      = ['uri', 'visits', 'percentage']
-}
+{* Expected params: $topPages (list<TopPageRow>), $period, $periodFrom, $periodTo, $cardTitle.
+   Optional: $columns *}
+{default $columns = ['uri', 'visits', 'percentage']}
 
 <div class="mb-4">
     <form method="get" class="form-inline">
@@ -54,16 +49,16 @@
 
                             {if in_array('avg_duration', $columns)}
                             <td>
-                                {if isset($pageData->avg_duration) && $pageData->avg_duration !== null}
+                                {if $pageData->avgDuration !== null}
                                     <button
                                         type="button"
                                         class="btn btn-link btn-sm p-0 text-decoration-none creation-time-trigger"
-                                        data-uri="{$pageData->Uri}"
+                                        data-uri="{$pageData->uri}"
                                         data-from="{$periodFrom}"
                                         data-to="{$periodTo}"
                                         title="{='common.table.column.avg_duration.tooltip'|translate}"
                                     >
-                                        ⏱️ {$pageData->avg_duration} ms
+                                        ⏱️ {$pageData->avgDuration} ms
                                     </button>
                                 {else}
                                     <span class="text-muted">—</span>
@@ -73,18 +68,18 @@
 
                             {if in_array('uri', $columns)}
                             <td>
-                                <a href="{$pageData->Uri}" class="text-decoration-none">
-                                    {$pageData->Uri|truncate:80}
+                                <a href="{$pageData->uri}" class="text-decoration-none">
+                                    {$pageData->uri|truncate:80}
                                 </a>
                             </td>
                             {/if}
 
                             {if in_array('title', $columns)}
-                            <td>{$pageData->ArticleTitle ?? ('common.unknown.title'|translate)}</td>
+                            <td>{$pageData->articleTitle ?? ('common.unknown.title'|translate)}</td>
                             {/if}
 
                             {if in_array('author', $columns)}
-                            <td>{$pageData->AuthorName ?? ('common.unknown.author'|translate)}</td>
+                            <td>{$pageData->authorName ?? ('common.unknown.author'|translate)}</td>
                             {/if}
 
                             {if in_array('visits', $columns)}

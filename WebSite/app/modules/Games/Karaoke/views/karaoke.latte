@@ -1,5 +1,6 @@
 {layout '../../../Common/views/layout.latte'}
-{block title}Karaoké{/block}
+
+{block title}{='karaoke.title'|translate}{/block}
 
 {block head}
     <style>
@@ -15,7 +16,7 @@
             height: calc(100vh - 100px);
             display: flex;
             flex-direction: column;
-            min-height: 0; /* Important pour le flex */
+            min-height: 0; /* Important for flex */
             background: rgba(255, 255, 255, 0.95);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -23,7 +24,7 @@
         .song-info {
             border-bottom: 2px solid #667eea;
             padding: 1rem 0;
-            flex-shrink: 0; /* Empêche le rétrécissement */
+            flex-shrink: 0; /* Prevents shrinking */
         }
 
         .song-title {
@@ -39,7 +40,7 @@
 
         .lyrics-display {
             flex: 1 1 auto;
-            min-height: 0; /* Important pour le scroll */
+            min-height: 0; /* Important for scroll */
             background: #f8f9fa;
             font-size: 1.5rem;
             text-align: center;
@@ -89,7 +90,7 @@
             border-radius: 10px;
             overflow: hidden;
             cursor: pointer;
-            flex-shrink: 0; /* Empêche le rétrécissement */
+            flex-shrink: 0; /* Prevents shrinking */
         }
 
         .progress-bar {
@@ -100,7 +101,7 @@
         }
 
         .audio-controls {
-            flex-shrink: 0; /* Empêche le rétrécissement */
+            flex-shrink: 0; /* Prevents shrinking */
             background: #f8f9fa;
             border-top: 1px solid #dee2e6;
         }
@@ -158,17 +159,17 @@
 {block content}
 <div class="karaoke-wrapper d-flex flex-column">
     <div class="song-info text-center">
-        <div class="song-title">{$metadata['ti'] ?? 'Sans titre'}</div>
-        <div class="song-artist">{$metadata['ar'] ?? 'Artiste inconnu'}</div>
+        <div class="song-title">{$metadata['ti'] ?? ('karaoke.untitled'|translate)}</div>
+        <div class="song-artist">{$metadata['ar'] ?? ('karaoke.unknown_artist'|translate)}</div>
     </div>
     <div class="lyrics-display" id="lyricsDisplay">
-        <h4 class="text-muted">Appuyez sur Play pour commencer...</h4>
+        <h4 class="text-muted">{='karaoke.press_play'|translate}</h4>
     </div>
     <div class="mt-auto p-3 bg-light border-top">
         <div class="container-fluid">
             <audio id="audioPlayer" preload="metadata">
                 <source src="{$audioFile}" type="audio/mpeg">
-                Votre navigateur ne supporte pas l'audio HTML5.
+                {='karaoke.audio_unsupported'|translate}
             </audio>
             <div class="progress-bar-container mb-2" id="progressContainer">
                 <div class="progress-bar" id="progressBar"></div>
@@ -179,19 +180,19 @@
             </div>
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex justify-content-center gap-2 flex-grow-1">
-                    <button id="playPauseBtn" class="btn btn-primary">Lecture</button>
-                    <button id="restartBtn" class="btn btn-secondary">Recommencer</button>
+                    <button id="playPauseBtn" class="btn btn-primary">{='karaoke.play'|translate}</button>
+                    <button id="restartBtn" class="btn btn-secondary">{='karaoke.restart'|translate}</button>
                 </div>
                 <div {if !$isAdmin}style="display: none;"{/if}>
                     <input class="form-check-input" type="checkbox" id="syncCheckbox">
-                    <label class="form-check-label ms-2" for="syncCheckbox">Synchronisé</label>
+                    <label class="form-check-label ms-2" for="syncCheckbox">{='karaoke.synchronized'|translate}</label>
                 </div>
             </div>
             <div id="syncControls" style="display: none;">
-                <div id="connectedClients" class="text-right">0 client connecté</div>
+                <div id="connectedClients" class="text-right">{='karaoke.clients_connected'|translate|replace:'{count}','0'}</div>
                 <div>
                     <button id="launchForAllBtn" class="btn btn-success btn-sm" style="display: none;">
-                        Lancer pour tous
+                        {='karaoke.launch_for_all'|translate}
                     </button>
                 </div>
                 <div id="syncStatus" class="my-2"></div>
@@ -203,6 +204,7 @@
 {/block}
 
 {block scripts}
+    <script>window.karaokeI18n = {$i18n};</script>
     <script>window.lyricsData = {$lines};</script>
     <script>window.sessionId = {$sessionId};</script>
     <script src="https://cdn.jsdelivr.net/npm/javascript-state-machine@3.1.0/dist/state-machine.min.js"></script>

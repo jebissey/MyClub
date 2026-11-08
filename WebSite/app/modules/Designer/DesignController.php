@@ -10,6 +10,9 @@ use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\DesignDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Designer\viewModels\DesignCreateViewModel;
+use app\modules\Designer\viewModels\DesignerHomeViewModel;
+use app\modules\Designer\viewModels\DesignsIndexViewModel;
 
 final class DesignController extends AbstractController
 {
@@ -22,20 +25,21 @@ final class DesignController extends AbstractController
 
     public function index(): void
     {
-        if (!$this->application->getConnectedUser()->isHomeDesigner()) {
+        $connectedUser = $this->application->getConnectedUser();
+        if (!$connectedUser->isHomeDesigner()) {
             $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
-        [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($this->application->getConnectedUser()->person->id ?? 0);
+        [$designs, $userVotes] = $this->designDataHelper->getUsersVotes($connectedUser->person->id ?? 0);
 
-        $this->views->render('Article/views/designs_index.latte', $this->getAllParams([
-            'designs' => $designs,
-            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'userVotes' => $userVotes,
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btnHistoryBack' => true,
-            'btnParent'      => "/designer",
-        ]));
+        $viewModel = new DesignsIndexViewModel(
+            designs: $designs,
+            groups: $this->getActiveGroups(),
+            userVotes: $userVotes,
+            layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
+        );
+
+        $this->views->render('Article/views/designs_index.latte', $viewModel);
     }
 
     public function create(): void
@@ -44,10 +48,14 @@ final class DesignController extends AbstractController
             return;
         }
 
-        $this->views->render('Article/views/design_create.latte', $this->getAllParams([
-            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+        $viewModel = new DesignCreateViewModel(
+            groups: $this->getActiveGroups(),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+
+        $this->views->render('Article/views/design_create.latte', $viewModel);
     }
 
     public function save(): void
@@ -92,9 +100,15 @@ final class DesignController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
             $_SESSION['navbar'] = 'designer';
-            $this->views->render('Designer/views/designer.latte', $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]));
+
+            $viewModel = new DesignerHomeViewModel(
+                content: '',
+                layoutParams: $this->getAllParams([
+                    'page' => $this->application->getConnectedUser()->getPage(),
+                ]),
+            );
+
+            $this->views->render('Designer/views/designer.latte', $viewModel);
         }
     }
 }

@@ -13,6 +13,23 @@ use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 use app\helpers\To;
 
+/**
+ * @phpstan-type ReferentNavigation array{first: string, prev: string, current: string, next: string, last: string}
+ * @phpstan-type StatisticsPeriod array{
+ *     label: string,
+ *     start: string,
+ *     end: string,
+ *     uniqueVisitors: int,
+ *     pageViews: int,
+ *     views2xx: int,
+ *     views3xx: int,
+ *     views4xx: int,
+ *     views5xx: int,
+ *     minDailyVisitors?: int,
+ *     avgDailyVisitors?: int|float,
+ *     maxDailyVisitors?: int
+ * }
+ */
 final class LogAnalyticsDataHelper extends Data
 {
     private const PERIOD_TO_SHOW = 13;
@@ -26,7 +43,7 @@ final class LogAnalyticsDataHelper extends Data
         );
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /** @return list<StatisticsPeriod> */
     public function getStatisticsData(string $periodType, int $offset): array
     {
         $periods = $this->generatePeriods($periodType, $offset);
@@ -101,7 +118,7 @@ final class LogAnalyticsDataHelper extends Data
         };
     }
 
-    /** @return array{first: string, prev: string, current: string, next: string, last: string} */
+    /** @return ReferentNavigation */
     public function getReferentNavigation(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -140,7 +157,7 @@ final class LogAnalyticsDataHelper extends Data
         ];
     }
 
-    /** @return array<int, stdClass> */
+    /** @return list<object{source: string, count: int}> */
     public function getReferentStats(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -174,10 +191,13 @@ final class LogAnalyticsDataHelper extends Data
             ':host'       => $this->getHost(),
         ]);
 
-        return $this->fetchAllObjects($query);
+        /** @var list<object{source: string, count: int}> $rows */
+        $rows = $this->fetchAllObjects($query);
+
+        return $rows;
     }
 
-    /** @return array<int, stdClass> */
+    /** @return list<object{source: string, count: int}> */
     public function getExternalReferentStats(string $period, string $currentDate): array
     {
         $date = new DateTime($currentDate);
@@ -200,7 +220,10 @@ final class LogAnalyticsDataHelper extends Data
             ':host'       => $this->getHost(),
         ]);
 
-        return $this->fetchAllObjects($query);
+        /** @var list<object{source: string, count: int}> $rows */
+        $rows = $this->fetchAllObjects($query);
+
+        return $rows;
     }
 
     #region Private helper methods

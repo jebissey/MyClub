@@ -116,9 +116,7 @@
     window.articleId  = {$articleId};
     window.exercises  = {=json_encode($exercises)|noescape};
     
-    {if isset($i18n)}
-        Object.assign(window.i18n, {=$i18n});
-    {/if}
+    Object.assign(window.i18n, {=$i18n});
 </script>
 <script type="module" src="{='/app/modules/Exercise/js/editor.js'|version}"></script>
 {/block}

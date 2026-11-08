@@ -6,12 +6,38 @@ namespace app\modules\Games\Karaoke;
 
 use app\exceptions\LyricsParserException;
 use app\helpers\Application;
-use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
+use app\modules\Games\Karaoke\viewModels\KaraokeViewModel;
 
 final class KaraokeController extends AbstractController
 {
-    private const MEDIA_PATH =  __DIR__ . '/../../../../data/media/karaoke/';
+    private const MEDIA_PATH = __DIR__ . '/../../../../data/media/karaoke/';
+
+    /**
+     * Key used by the JavaScript => translation key.
+     *
+     * @var array<string, string>
+     */
+    private const I18N_KEYS = [
+        'startError'           => 'karaoke.js.start_error',
+        'loadFailed'           => 'karaoke.js.load_failed',
+        'unknownError'         => 'karaoke.js.unknown_error',
+        'errorPrefix'          => 'karaoke.js.error_prefix',
+        'clickToPlay'          => 'karaoke.js.click_to_play',
+        'syncActivationFailed' => 'karaoke.js.sync_activation_failed',
+        'countdownFailed'      => 'karaoke.js.countdown_failed',
+        'play'                 => 'karaoke.play',
+        'pause'                => 'karaoke.pause',
+        'ariaPlay'             => 'karaoke.aria.play',
+        'ariaPause'            => 'karaoke.aria.pause',
+        'clientsOne'           => 'karaoke.clients_connected_one',
+        'clientsOther'         => 'karaoke.clients_connected_other',
+        'waitingForHost'       => 'karaoke.waiting_for_host',
+        'launchForAll'         => 'karaoke.launch_for_all',
+        'stopForAll'           => 'karaoke.stop_for_all',
+        'ariaLaunchForAll'     => 'karaoke.aria.launch_for_all',
+        'ariaStopForAll'       => 'karaoke.aria.stop_for_all',
+    ];
 
     public function __construct(Application $application)
     {
@@ -29,25 +55,19 @@ final class KaraokeController extends AbstractController
             $parser->parse(self::MEDIA_PATH . "{$song}.lrc");
             $connectedUser = $this->application->getConnectedUser();
 
-            $this->views->render('Games/Karaoke/views/karaoke.latte', $this->getAllParams([
-                'navItems' => $this->getNavItems($connectedUser->person?->email),
-                'page' => $this->application->getConnectedUser()->getPage(),
-                'metadata' => $parser->getMetadata(),
-                'lines' => $parser->getLines(),
-                'audioFile' => "/game/karaoke/files/{$song}",
-                'sessionId' => session_id()
-            ]));
-        } catch (LyricsParserException $e) {
-            $content = ($this->t)($e->getMessage());
+            $viewModel = new KaraokeViewModel(
+                navItems: $this->getNavItems($connectedUser->person?->email),
+                metadata: $parser->getMetadata(),
+                lines: $parser->getLines(),
+                audioFile: "/game/karaoke/files/{$song}",
+                sessionId: session_id() ?: '',
+                i18n: array_map(fn(string $key): string => $this->translate($key), self::I18N_KEYS),
+                layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
+            );
 
-            $this->views->render('Common/views/info.latte', $this->getAllParams([
-                'content' => $content,
-                'hasAuthorization' => $this->application->getConnectedUser()->hasAutorization(),
-                'currentVersion' => Application::VERSION,
-                'timer' => 10000,
-                'previousPage' => false,
-                'page' => $this->application->getConnectedUser()->getPage(),
-            ]));
+            $this->views->render('Games/Karaoke/views/karaoke.latte', $viewModel);
+        } catch (LyricsParserException $e) {
+            $this->renderInfo($this->translate($e->getMessage()), 10000);
         }
     }
 

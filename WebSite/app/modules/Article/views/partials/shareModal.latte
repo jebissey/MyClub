@@ -16,7 +16,7 @@
                         <select class="form-select" id="group-select" name="idGroup">
                             <option value="">{='media.manager.share.no_group'|translate}</option>
                             {foreach $groups as $group}
-                            <option value="{$group->Id}">{$group->Name}</option>
+                            <option value="{$group->id}">{$group->name}</option>
                             {/foreach}
                         </select>
                     </div>

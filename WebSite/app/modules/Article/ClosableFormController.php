@@ -14,7 +14,10 @@ use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
+use app\modules\Article\valueObjects\ClosableFormRow;
 use app\modules\Article\valueObjects\PersonNameRow;
+use app\modules\Article\viewModels\ClosableFormAddViewModel;
+use app\modules\Article\viewModels\ClosableFormResultsViewModel;
 use app\modules\Common\AbstractController;
 use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
@@ -60,11 +63,11 @@ abstract class ClosableFormController extends AbstractController
     ): bool;
 
     /**
-     * View parameters specific to the results of the form, or null when the form cannot be loaded.
+     * View model for the results of the form, or null when the form cannot be loaded.
      *
-     * @return array<string, mixed>|null
+     * @param array<string, mixed> $layoutParams
      */
-    abstract protected function buildResultsParams(int $articleId): ?array;
+    abstract protected function buildResultsViewModel(int $articleId, array $layoutParams): ?ClosableFormResultsViewModel;
 
     public function add(int $articleId): void
     {
@@ -82,16 +85,22 @@ abstract class ClosableFormController extends AbstractController
             return;
         }
 
-        $name = $this->formName();
-        $this->views->render('Article/views/' . $name . '_add.latte', $this->getAllParams([
-            'article' => $article,
-            $name     => $this->dataHelper->get(
-                ucfirst($name),
-                ['IdArticle' => $article->id],
-                'Question, Options, ClosingDate, Visibility'
-            ),
-            'page' => $this->application->getConnectedUser()->getPage(),
-        ]));
+        $row = $this->dataHelper->get(
+            ucfirst($this->formName()),
+            ['IdArticle' => $article->id],
+            'Question, Options, ClosingDate, Visibility'
+        );
+
+        $viewModel = new ClosableFormAddViewModel(
+            article: $article,
+            form: $row === false ? null : ClosableFormRow::fromStdClass($row),
+            visibilityOptions: $this->visibilityOptions(),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+
+        $this->views->render('Article/views/' . $this->formName() . '_add.latte', $viewModel);
     }
 
     public function createOrUpdate(): void
@@ -195,19 +204,19 @@ abstract class ClosableFormController extends AbstractController
             return;
         }
 
-        $params = $this->buildResultsParams($articleId);
-        if ($params === null) {
+        $viewModel = $this->buildResultsViewModel(
+            $articleId,
+            $this->getAllParams([
+                'page'           => $connectedUser->getPage(),
+                'currentVersion' => Application::VERSION,
+            ]),
+        );
+        if ($viewModel === null) {
             $this->raiseFormNotFound($articleId);
             return;
         }
 
-        $this->views->render('Article/views/' . $this->formName() . '_results.latte', $this->getAllParams(array_merge($params, [
-            'articleId'       => $articleId,
-            'currentVersion'  => Application::VERSION,
-            'page'            => $connectedUser->getPage(),
-            'btnHistoryBack' => true,
-            'btnParent'      => "/article/{$articleId}",
-        ])));
+        $this->views->render('Article/views/' . $this->formName() . '_results.latte', $viewModel);
     }
 
     /**
@@ -229,5 +238,21 @@ abstract class ClosableFormController extends AbstractController
     {
         $this->errors->badRequest("No {$this->formName()} for article {$articleId}", __FILE__, __LINE__);
         $this->redirect('/article/' . $articleId);
+    }
+
+    /**
+     * Translated label of each visibility, keyed by its value.
+     *
+     * @return array<string, string>
+     */
+    private function visibilityOptions(): array
+    {
+        $enum = $this->visibilityEnum();
+        $options = [];
+        foreach ($enum::cases() as $case) {
+            $options[(string) $case->value] = ($this->t)("article.{$this->formName()}.visibility.{$case->value}");
+        }
+
+        return $options;
     }
 }

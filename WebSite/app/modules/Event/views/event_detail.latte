@@ -44,9 +44,9 @@
 {/block}
 
 {block content}
-    {var $isCanceled = $event->Canceled == 1}
+    {var $isCanceled = $event->canceled == 1}
 
-{if isset($message) && $message !=''}
+{if $message !==''}
     <div class="alert alert-{if $messageType === 'success'}success{else}danger{/if} alert-dismissible">
         {$message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -54,9 +54,9 @@
 {/if}
     <div class="card">
         <div class="card-header">                
-            <strong>{$event->Summary}{if $isCanceled} {='event.cancelled'|translate}{/if}</strong>
+            <strong>{$event->summary}{if $isCanceled} {='event.cancelled'|translate}{/if}</strong>
         </div>
-    {if !$userEmail && !$token && ($event->Audience != 'All' || $event->Audience == 'Guest')}
+    {if !$userEmail && !$token && $event->audience->value !== 'All'}
         <div class="alert alert-info">
             <p>
                 <b>
@@ -68,7 +68,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>{='type'|translate}</strong> {$event->EventTypeName}</p>
+                    <p><strong>{='type'|translate}</strong> {$event->eventTypeName}</p>
                 {if count($attributes) > 0}
                     <p><strong>{='attributes'|translate}</strong>
                         {foreach $attributes as $attribute}
@@ -82,18 +82,18 @@
                 {else}
                         <p>{='noAttributes'|translate}</p>
                 {/if}
-                    <p><strong>{='date_time'|translate}</strong> {=$event->StartTime|longDateTime}</p>
-                    <p><strong>{='duration'|translate}</strong> {=$event->Duration|readableDuration}</p>
+                    <p><strong>{='date_time'|translate}</strong> {=$event->startTime|longDateTime}</p>
+                    <p><strong>{='duration'|translate}</strong> {=$event->duration|readableDuration}</p>
                     <p>
-                        <strong>{='location'|translate}</strong> {$event->Location} 
-                        <a href="https://maps.google.com/maps?q={$event->Location|urlencode}" target="_blank" class="btn btn-sm btn-success me-2" title="{='event.open_google_maps'|translate}">
+                        <strong>{='location'|translate}</strong> {$event->location} 
+                        <a href="https://maps.google.com/maps?q={$event->location|urlencode}" target="_blank" class="btn btn-sm btn-success me-2" title="{='event.open_google_maps'|translate}">
                             <i class="bi bi-geo-alt"></i>
                         </a>
                     </p>
                     <div class="card mb-3">
                         <div class="card-header"><strong>{='description'|translate}</strong></div>
                         <div class="card-body">            
-                            <p>{$event->Description|nl2br|noescape}</p>
+                            <p>{$event->description|nl2br|noescape}</p>
                         </div>
                     </div>
                     <div class="card mb-3">
@@ -136,23 +136,23 @@
                     <div class="card mb-3">
                         <div class="card-header">
                             <strong>{='event.participants'|translate}</strong>
-                            {count($participants)}{if $event->MaxParticipants > 0} / {$event->MaxParticipants}{/if}
+                            {count($participants)}{if $event->maxParticipants > 0} / {$event->maxParticipants}{/if}
                         </div>
                         <div class="card-body">
                     {if count($participants) > 0}
                             <ul class="list-group">
                                 {foreach $participants as $participant}
                                     <li class="list-group-item">
-                                        {if $participant->PersonId}
-                                        {if $participant->PersonId == $event->CreatedBy}<b>{/if}
-                                        {$participant->FirstName} {$participant->LastName} {if $participant->NickName != ''}({$participant->NickName}){/if}
-                                        {if $participant->PersonId == $event->CreatedBy}</b>{/if}
-                                        {elseif $participant->ContactId}
-                                        {$participant->NickName}📩
+                                        {if $participant->personId}
+                                        {if $participant->personId == $event->createdBy}<b>{/if}
+                                        {$participant->firstName} {$participant->lastName} {if $participant->nickName != ''}({$participant->nickName}){/if}
+                                        {if $participant->personId == $event->createdBy}</b>{/if}
+                                        {elseif $participant->contactId}
+                                        {$participant->nickName}📩
                                         {/if}
-                                        {if $participant->Email === $userEmail}👤{/if}
-                                        {if $participant->InPresentationDirectory}
-                                        <a href="/user/presentation/{$participant->PersonId}">ℹ️</a>
+                                        {if $participant->email === $userEmail}👤{/if}
+                                        {if $participant->inPresentationDirectory}
+                                        <a href="/user/presentation/{$participant->personId}">ℹ️</a>
                                         {/if}
                                     </li>
                                 {/foreach}
@@ -168,11 +168,11 @@
                         {/if}
 
                         {if $isRegistered}
-                            {if strtotime($event->StartTime) > time()}
+                            {if strtotime($event->startTime) > time()}
                         <a href="/event/{$eventId}/unregister" class="btn btn-success">{='unregister'|translate}</a>
                             {/if}
-                        {elseif count($participants) < $event->MaxParticipants || $event->MaxParticipants == 0}
-                            {if strtotime($event->StartTime) > time()}
+                        {elseif count($participants) < $event->maxParticipants || $event->maxParticipants == 0}
+                            {if strtotime($event->startTime) > time()}
                                 {if $isCanceled}
                         <button class="btn btn-primary" disabled>
                             {='register'|translate}
@@ -188,7 +188,7 @@
                         {/if}
                     </div>
 
-                        {if strtotime($event->StartTime) > time() && $isRegistered}
+                        {if strtotime($event->startTime) > time() && $isRegistered}
                     <div class="alert alert-light border rounded p-3">
                         <div class="d-flex align-items-center mb-3">
                             <i class="bi bi-calendar-check text-primary me-2 fs-4"></i>
@@ -237,23 +237,23 @@
                         </div>
                         <div class="card-body">
                             {foreach $eventNeeds as $need}
-                                {var $percentage = $need->RequiredQuantity > 0 ? min(100, ($need->ProvidedQuantity / $need->RequiredQuantity) * 100) : 0}
+                                {var $percentage = $need->requiredQuantity > 0 ? min(100, ($need->providedQuantity / $need->requiredQuantity) * 100) : 0}
                                 {var $cssClass = $percentage >= 100 ? 'need-fulfilled' : ($percentage > 0 ? 'need-partial' : 'need-missing')}
                                 {var $progressColor = $percentage >= 100 ? 'success' : ($percentage > 0 ? 'warning' : 'danger')}
                                 
                                 {var $userSupply = 0}
                                 {foreach $userSupplies as $supply}
-                                    {if $supply->IdNeed == $need->Id}
-                                        {var $userSupply = $supply->Supply}
+                                    {if $supply->idNeed == $need->id}
+                                        {var $userSupply = $supply->supply}
                                     {/if}
                                 {/foreach}
                                 
-                                <div class="mb-3 p-3 border rounded {$cssClass}" data-need-id="{$need->Id}">
+                                <div class="mb-3 p-3 border rounded {$cssClass}" data-need-id="{$need->id}">
                                     <div class="row align-items-center">
                                         <div class="col-md-3">
-                                            <strong>{$need->Label}</strong>
-                                            {if $need->Name != $need->Label}
-                                                <br><small class="text-muted">{$need->Name}</small>
+                                            <strong>{$need->label}</strong>
+                                            {if $need->name != $need->label}
+                                                <br><small class="text-muted">{$need->name}</small>
                                             {/if}
                                         </div>
                                         <div class="col-md-3">
@@ -270,9 +270,9 @@
                                         </div>
                                         <div class="col-md-3 text-center">
                                             <span class="badge bg-primary fs-6 supply-count">
-                                                <span class="provided-quantity">{$need->ProvidedQuantity}</span> / {$need->RequiredQuantity}
+                                                <span class="provided-quantity">{$need->providedQuantity}</span> / {$need->requiredQuantity}
                                             </span>
-                                            {if $need->ParticipantDependent == 1}
+                                            {if $need->participantDependent == 1}
                                                 <br><small class="text-muted">{='event.needs_per_participant'|translate}</small>
                                             {/if}
                                         </div>
@@ -286,13 +286,13 @@
                                                                value="{$userSupply}" 
                                                                min="0" 
                                                                max="99"
-                                                               data-need-id="{$need->Id}"
+                                                               data-need-id="{$need->id}"
                                                                data-original-value="{$userSupply}">
                                                     </div>
                                                     <button class="btn btn-outline-success btn-sm update-supply-btn" 
                                                             type="button" 
                                                             data-event-id="{$eventId}"
-                                                            data-need-id="{$need->Id}"
+                                                            data-need-id="{$need->id}"
                                                             style="display: none;">
                                                         {='event.needs_validate'|translate}
                                                     </button>

@@ -45,7 +45,7 @@
                             <select id="previewGroup" class="form-select form-select-sm" style="min-width:130px">
                                 <option value="">{='menu.field_none'|translate}</option>
                                 {foreach $groups as $group}
-                                    <option value="{$group->Id}">{$group->Name}</option>
+                                    <option value="{$group->id}">{$group->name}</option>
                                 {/foreach}
                             </select>
                         </div>
@@ -188,9 +188,7 @@
         window.navbarItemsData = {$navbarItems};
         window.sidebarItemsData = {$sidebarItems};
 
-    {if isset($i18n)}
-        Object.assign(window.i18n, {=$i18n});
-    {/if}
+    Object.assign(window.i18n, {=$i18n});
     </script>
     <script type="module" src="{='/app/modules/Designer/js/menuItem.js'|version}"></script>
 {/block}

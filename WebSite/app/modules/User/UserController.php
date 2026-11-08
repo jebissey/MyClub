@@ -77,7 +77,7 @@ final class UserController extends AbstractController
                 token: $token,
                 layoutParams: $this->getAllParams([]),
             );
-            $this->views->render('User/views/user_set_password.latte', $viewModel->toArray());
+            $this->views->render('User/views/user_set_password.latte', $viewModel);
         } else {
             $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }
@@ -105,7 +105,7 @@ final class UserController extends AbstractController
                 redirect: $redirect,
                 layoutParams: $this->getAllParams([]),
             );
-            $this->views->render('User/views/user_sign_in.latte', $viewModel->toArray());
+            $this->views->render('User/views/user_sign_in.latte', $viewModel);
         } else {
             $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }

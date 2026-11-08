@@ -18,7 +18,9 @@ use app\models\DataHelper;
 use app\models\DbBrowserDataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
+use app\models\EventInvitationDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\EventParticipationDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\ExerciseTableDataHelper;
 use app\models\GroupDataHelper;
@@ -67,7 +69,9 @@ final readonly class DataHelpers
         public DbBrowserDataHelper $dbBrowserDataHelper,
         public DesignDataHelper $designDataHelper,
         public EventDataHelper $eventDataHelper,
+        public EventInvitationDataHelper $eventInvitationDataHelper,
         public EventNeedDataHelper $eventNeedDataHelper,
+        public EventParticipationDataHelper $eventParticipationDataHelper,
         public EventTypeDataHelper $eventTypeDataHelper,
         public ExerciseTableDataHelper $exerciseTableDataHelper,
         public GroupDataHelper $groupDataHelper,

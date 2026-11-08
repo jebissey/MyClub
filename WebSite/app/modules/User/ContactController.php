@@ -78,7 +78,7 @@ final class ContactController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Common/views/contact.latte', $viewModel->toArray());
+        $this->views->render('Common/views/contact.latte', $viewModel);
     }
 
     #region Private functions

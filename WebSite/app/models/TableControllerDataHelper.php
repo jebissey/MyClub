@@ -142,11 +142,11 @@ final class TableControllerDataHelper extends Data
     public function getMakeTheTargetQuery(): Select
     {
         $stmt = $this->pdoForLog->prepare("
-        SELECT name 
-        FROM sqlite_master 
-        WHERE type = 'view' 
-        AND name = 'makethetarget_statistics'
-    ");
+            SELECT name 
+            FROM sqlite_master 
+            WHERE type = 'view' 
+            AND name = 'makethetarget_statistics'
+        ");
         $stmt->execute();
         $exists = $stmt->fetchColumn();
 

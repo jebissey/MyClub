@@ -115,8 +115,8 @@ final class EmailService
     {
         $mail = new PHPMailer(true);
 
-        // SMTP diagnostics can be enabled temporarily through the environment.
-        $debugEnabled = false;
+        // SMTP diagnostics can be enabled temporarily with MYCLUB_SMTP_DEBUG=1 in the environment.
+        $debugEnabled = filter_var(getenv('MYCLUB_SMTP_DEBUG'), FILTER_VALIDATE_BOOLEAN);
 
         try {
             $mail->isSMTP();

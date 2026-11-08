@@ -81,7 +81,7 @@
                         <select class="form-select" id="counterGroup" name="idGroup" required>
                         <option value="" selected disabled>Choisir un groupe</option>
                         {foreach $groups as $group}
-                            <option value="{$group->Id}">{$group->Name}</option>
+                            <option value="{$group->id}">{$group->name}</option>
                         {/foreach}
                         </select>
                     </div>

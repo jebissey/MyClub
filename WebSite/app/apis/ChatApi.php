@@ -46,27 +46,27 @@ final class ChatApi extends AbstractApi
         $result = [];
         foreach ($visits as $visit) {
             $visitPerson = new Person(
-                id: To::int($visit->PersonId),
-                email: To::str($visit->Email ?? ''),
-                useGravatar: To::bool($visit->UseGravatar ?? null),
-                avatar: To::nullableStr($visit->Avatar ?? null),
+                id: $visit->personId,
+                email: $visit->email,
+                useGravatar: To::bool($visit->useGravatar),
+                avatar: To::nullableStr($visit->avatar),
             );
 
             $result[] = [
-                'personId'      => $visit->PersonId,
-                'displayName'   => $visit->NickName ?? $visit->FullName,
-                'timeAgo'       => $visit->TimeAgo,
-                'minutesAgo'    => $visit->MinutesAgo,
-                'formattedDate' => $visit->FormattedDate,
-                'useGravatar'   => $visit->UseGravatar,
+                'personId'      => $visit->personId,
+                'displayName'   => $visit->nickName !== null && $visit->nickName !== '' ? $visit->nickName : $visit->fullName,
+                'timeAgo'       => $visit->timeAgo,
+                'minutesAgo'    => $visit->minutesAgo,
+                'formattedDate' => $visit->formattedDate,
+                'useGravatar'   => $visit->useGravatar,
                 'userImg'       => WebApp::getUserImg(
                     $visitPerson->useGravatar,
                     $visitPerson->email,
                     $visitPerson->avatar,
                     $this->gravatarHandler
                 ),
-                'os'            => $visit->Os,
-                'browser'       => $visit->Browser,
+                'os'            => $visit->os,
+                'browser'       => $visit->browser,
             ];
         }
         $hasNew = $this->messageDataHelper->hasNewMessages($this->connectedUser->person->id ?? 0, $previousLogId);

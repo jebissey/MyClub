@@ -51,7 +51,7 @@
                         <th>All</th>
                         <th>Members</th>
                         {foreach $groups as $group}
-                            <th>{$group->Name}</th>
+                            <th>{$group->name}</th>
                         {/foreach}
                     </tr>
                 </thead>
@@ -89,7 +89,7 @@
                             </td>
                             {foreach $groups as $group}
                                 <td class="text-center">
-                                    {if $design->IdGroup == $group->Id}
+                                    {if $design->IdGroup == $group->id}
                                         <h4>✅</h4>
                                     {/if}
                                 </td>

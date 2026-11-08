@@ -11,6 +11,9 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\ExerciseTableDataHelper;
 use app\modules\Common\TableController;
+use app\modules\Exercise\viewModels\ExerciseEditorViewModel;
+use app\modules\Exercise\viewModels\ExercisePlayerViewModel;
+use app\modules\Exercise\viewModels\ExercisesIndexViewModel;
 
 final class ExerciseController extends TableController
 {
@@ -44,14 +47,15 @@ final class ExerciseController extends TableController
                 return;
             }
 
-            $this->views->render('Exercise/views/editor.latte', $this->getAllParams([
-                'articleId'      => $id,
-                'title'          => $exercise->Title ?? '',
-                'exercises'      => $this->decodeExerciseContent($exercise->Content),
-                'i18n'           => $this->doTranslations(),
-                'btnParent'      => '/exercises',
-                'btnHistoryBack' => true,
-            ]));
+            $viewModel = new ExerciseEditorViewModel(
+                articleId: $id,
+                title: $exercise->Title ?? '',
+                exercises: $this->decodeExerciseContent($exercise->Content),
+                i18n: $this->doTranslations(),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->views->render('Exercise/views/editor.latte', $viewModel);
         }
     }
 
@@ -71,40 +75,41 @@ final class ExerciseController extends TableController
         ];
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
-            ['name' => 'PersonName', 'label' => ($this->t)('article.label.created_by')],
-            ['name' => 'title', 'label' => ($this->t)('article.label.title')],
-            ['name' => 'lastUpdate', 'label' => ($this->t)('article.label.last_update')],
-            ['name' => 'GroupName', 'label' => ($this->t)('article.label.group')],
-            ['name' => 'Content', 'label' => ($this->t)('article.label.content')],
+            ['name' => 'PersonName', 'label' => $this->translate('article.label.created_by')],
+            ['name' => 'title', 'label' => $this->translate('article.label.title')],
+            ['name' => 'lastUpdate', 'label' => $this->translate('article.label.last_update')],
+            ['name' => 'GroupName', 'label' => $this->translate('article.label.group')],
+            ['name' => 'Content', 'label' => $this->translate('article.label.content')],
             ['name' => 'Id', 'label' => 'ID'],
         ];
         $columns = [
-            ['field' => 'PersonName', 'label' => 'Créé par'],
-            ['field' => 'Title', 'label' => 'Titre'],
-            ['field' => 'Detail', 'label' => 'Détails'],
-            ['field' => 'LastUpdate', 'label' => 'Dernière modification'],
-            ['field' => 'GroupName', 'label' => 'Groupe'],
-            ['field' => 'ForMembers', 'label' => 'Club'],
+            ['field' => 'PersonName', 'label' => $this->translate('exercise.column.created_by')],
+            ['field' => 'Title', 'label' => $this->translate('exercise.column.title')],
+            ['field' => 'Detail', 'label' => $this->translate('exercise.column.detail')],
+            ['field' => 'LastUpdate', 'label' => $this->translate('exercise.column.last_update')],
+            ['field' => 'GroupName', 'label' => $this->translate('exercise.column.group')],
+            ['field' => 'ForMembers', 'label' => $this->translate('exercise.column.club')],
         ];
         $query = $this->exerciseTableDataHelper->getQuery($connectedUser);
         /** @var array<string, string> $stringFilterValues */
         $stringFilterValues = array_map(static fn(mixed $v): string => To::str($v), $filterValues);
         $data = $this->prepareTableData($query, $stringFilterValues);
-        $this->views->render('Exercise/views/exercises_index.latte', $this->getAllParams([
-            'exercises' => $data['items'],
-            'currentPage' => $data['currentPage'],
-            'totalPages' => $data['totalPages'],
-            'filterValues' => $filterValues,
-            'filters' => $filterConfig,
-            'columns' => $columns,
-            'resetUrl' => '/articles',
-            'userConnected' => $connectedUser->person ?? false,
-            'layout' => $this->getLayout(),
-            'navItems' => $this->getNavItems($connectedUser->person?->email),
-            'page' => $connectedUser->getPage(),
-            'btnHistoryBack' => true,
-            'btnParent'      => "/designer",
-        ]));
+
+        $viewModel = new ExercisesIndexViewModel(
+            exercises: $data['items'],
+            currentPage: $data['currentPage'],
+            totalPages: $data['totalPages'],
+            filterValues: $stringFilterValues,
+            filters: $filterConfig,
+            columns: $columns,
+            resetUrl: '/exercises',
+            userConnected: $connectedUser->person ?? false,
+            layout: $this->getLayout(),
+            navItems: $this->getNavItems($connectedUser->person?->email),
+            layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
+        );
+
+        $this->views->render('Exercise/views/exercises_index.latte', $viewModel);
     }
 
     public function play(int $id): void
@@ -120,14 +125,15 @@ final class ExerciseController extends TableController
             return;
         }
 
-        $exercises = $this->decodeExerciseContent($exercise->Content);
+        $viewModel = new ExercisePlayerViewModel(
+            articleId: $id,
+            title: $exercise->Title ?? '',
+            exercises: $this->decodeExerciseContent($exercise->Content),
+            i18n: $this->doTranslations(),
+            layoutParams: $this->getAllParams([]),
+        );
 
-        $this->views->render('Exercise/views/player.latte', $this->getAllParams([
-            'articleId' => $id,
-            'title'     => $exercise->Title ?? '',
-            'exercises' => $exercises,
-            'i18n' => $this->doTranslations(),
-        ]));
+        $this->views->render('Exercise/views/player.latte', $viewModel);
     }
 
     public function save(int $id): void
@@ -151,7 +157,7 @@ final class ExerciseController extends TableController
         $exercises = json_decode($rawJson, true);
 
         if (!is_array($exercises)) {
-            $_SESSION['error'] = ($this->t)('exercise.msg.invalid_json');
+            $_SESSION['error'] = $this->translate('exercise.msg.invalid_json');
             $this->redirect('/exercise/edit/' . $id);
             return;
         }
@@ -160,12 +166,12 @@ final class ExerciseController extends TableController
         $title = trim(To::str($titleRaw));
 
         $this->dataHelper->set('Exercise', [
-            'Title'      => $title ?: 'Exercices',
+            'Title'      => $title ?: $this->translate('exercise.default_title'),
             'Content'    => json_encode($exercises, JSON_UNESCAPED_UNICODE),
             'LastUpdate' => date('Y-m-d H:i:s'),
         ], ['Id' => $id]);
 
-        $_SESSION['success'] = ($this->t)('exercise.msg.saved');
+        $_SESSION['success'] = $this->translate('exercise.msg.saved');
         $this->redirect('/exercise/edit/' . $id);
     }
 

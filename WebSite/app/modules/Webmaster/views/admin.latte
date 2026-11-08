@@ -1,6 +1,5 @@
 {layout '../../Common/views/layout.latte'}
 
-{* Single source of truth for the admin menu entries *}
 {var $adminMenuItems = [
     ['visible' => $isCommunicationManager, 'href' => '/communication',   'icon' => '📢', 'label' => 'navbar.admin.communication_manager'],
     ['visible' => $isEventManager,         'href' => '/eventManager',    'icon' => '🗓️', 'label' => 'navbar.admin.event_manager'],

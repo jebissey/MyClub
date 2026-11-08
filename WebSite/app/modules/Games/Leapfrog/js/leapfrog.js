@@ -1,23 +1,29 @@
-const leanSheepJPG = '/app/images/leanSheep.png';
-const fatSheepJPG = '/app/images/fatSheep.png';
+const leanSheepImage = '/app/images/leanSheep.png';
+const fatSheepImage = '/app/images/fatSheep.png';
 
-let container = document.getElementById('sheep-container');
-let moves = 0;
+const i18n = window.leapfrogI18n ?? {};
+const container = document.getElementById('sheep-container');
 const counterElement = document.querySelector('#gameboard-container h2');
 const sessionId = window.sessionId ?? 'no-session';
+let moves = 0;
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML.replace(/"/g, '&quot;');
+}
 
 container.className = 'container mt-4';
 container.innerHTML = `
   <div class="row text-center justify-content-center">
     ${Array.from({ length: 7 }).map((_, i) => `
-      <div class="col sheep-col ${i < 3 ? 'bergerie' : i > 3 ? 'pre' : 'separation'
-    }" data-index="${i}">
+      <div class="col sheep-col ${i < 3 ? 'bergerie' : i > 3 ? 'pre' : 'separation'}" data-index="${i}">
         ${i < 3
-        ? `<img src="${leanSheepJPG}" alt="Mouton maigre" class="sheep" data-type="lean" style="cursor: pointer;">`
-        : i > 3
-            ? `<img src="${fatSheepJPG}" alt="Mouton gras" class="sheep" data-type="fat" style="cursor: pointer;">`
-            : ''
-    }
+            ? `<img src="${leanSheepImage}" alt="${escapeHtml(i18n.leanSheep)}" class="sheep" data-type="lean" style="cursor: pointer;">`
+            : i > 3
+                ? `<img src="${fatSheepImage}" alt="${escapeHtml(i18n.fatSheep)}" class="sheep" data-type="fat" style="cursor: pointer;">`
+                : ''
+        }
       </div>
     `).join('')}
   </div>
@@ -52,7 +58,6 @@ function moveSheep(fromIndex, toIndex) {
         if (isGameOver()) showRestartButton(checkWinOrLose());
     }, 400);
     log(`Moved sheep from ${fromIndex} to ${toIndex} at movement ${moves}`);
-    return;
 }
 
 function shakeSheep(sheep) {
@@ -100,7 +105,8 @@ function isGameOver() {
 
 function updateCounter() {
     moves++;
-    counterElement.textContent = moves + " mouvement" + (moves > 1 ? "s" : "");
+    counterElement.textContent = (moves > 1 ? i18n.movesOther : i18n.movesOne)
+        .replace('{count}', String(moves));
 }
 
 function checkWinOrLose() {
@@ -111,19 +117,16 @@ function checkWinOrLose() {
         return s && getType(s) === 'fat';
     }).length;
 
-    if (fatsAtLeft === 3) {
-        return "won";
-    }
-    return "lost";
+    return fatsAtLeft === 3 ? 'won' : 'lost';
 }
 
 function showRestartButton(result) {
     const div = document.createElement('div');
-    div.className = "text-center mt-3";
+    div.className = 'text-center mt-3';
 
     div.innerHTML = `
-        <h3>${result === "won" ? "🎉 Gagné !" : "❌ Perdu !"}</h3>
-        <button class="btn btn-primary mt-2" onclick="location.reload()">Rejouer</button>
+        <h3>${result === 'won' ? '🎉 ' + escapeHtml(i18n.won) : '❌ ' + escapeHtml(i18n.lost)}</h3>
+        <button class="btn btn-primary mt-2" onclick="location.reload()">${escapeHtml(i18n.replay)}</button>
     `;
     document.getElementById('gameboard-container').appendChild(div);
     log(`Game over: ${result} after ${moves} moves`);
@@ -140,11 +143,11 @@ function log(message) {
         .then(response => response.json())
         .then(result => {
             if (!result.success) {
-                console.error('Erreur lors de la journalisation du mouvement : ' + result.message);
+                console.error('Failed to log the move: ' + result.message);
             }
         })
         .catch(error => {
-            console.error('Erreur lors de la journalisation du mouvement : ' + error.message);
+            console.error('Failed to log the move: ' + error.message);
         });
 }
 
@@ -163,7 +166,7 @@ container.addEventListener('click', (e) => {
     const jumpCell = getCell(jump);
     if (nextCell && !nextCell.querySelector('.sheep')) {
         moveSheep(from, next);
-        return
+        return;
     }
     if (
         nextCell && nextCell.querySelector('.sheep') &&

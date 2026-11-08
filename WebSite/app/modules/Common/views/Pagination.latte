@@ -1,10 +1,7 @@
-{parameters
-    int $currentPage,
-    int $totalPages,
-    string $pageParam = 'page',
-    array $urlParams = [],
-    int $visiblePages = 5
-}
+{* Params: $currentPage, $totalPages. Optional: $pageParam, $urlParams *}
+{default $pageParam = 'page'}
+{default $urlParams = []}
+{var $visiblePages = 5}
 
 {if $totalPages > 1}
     {var $half = (int) floor($visiblePages / 2)}
@@ -14,15 +11,15 @@
         {var $startPage = max(1, $endPage - $visiblePages + 1)}
     {/if}
 
-    {var $buildQuery = fn($p) => '?' . $pageParam . '=' . $p . implode('', array_map(fn($v, $k) => '&' . $k . '=' . $v, $urlParams, array_keys($urlParams)))}
+    {var $buildQuery = fn(int $p): string => '?' . http_build_query([$pageParam => $p] + $urlParams)}
 
-    <nav aria-label="Navigation des pages">
+    <nav aria-label="{='common.pagination.nav'|translate}">
         <ul class="pagination mb-0">
             <li class="page-item {if $currentPage <= 1}disabled{/if}">
-                <a class="page-link" href="{$buildQuery(1)}" aria-label="Première page">&laquo;&laquo;</a>
+                <a class="page-link" href="{$buildQuery(1)}" aria-label="{='common.pagination.first'|translate}">&laquo;&laquo;</a>
             </li>
             <li class="page-item {if $currentPage <= 1}disabled{/if}">
-                <a class="page-link" href="{$buildQuery(max(1, $currentPage - 1))}" aria-label="Page précédente">&laquo;</a>
+                <a class="page-link" href="{$buildQuery(max(1, $currentPage - 1))}" aria-label="{='common.pagination.previous'|translate}">&laquo;</a>
             </li>
 
             {if $startPage > 1}
@@ -46,10 +43,10 @@
             {/if}
 
             <li class="page-item {if $currentPage >= $totalPages}disabled{/if}">
-                <a class="page-link" href="{$buildQuery(min($totalPages, $currentPage + 1))}" aria-label="Page suivante">&raquo;</a>
+                <a class="page-link" href="{$buildQuery(min($totalPages, $currentPage + 1))}" aria-label="{='common.pagination.next'|translate}">&raquo;</a>
             </li>
             <li class="page-item {if $currentPage >= $totalPages}disabled{/if}">
-                <a class="page-link" href="{$buildQuery($totalPages)}" aria-label="Dernière page">&raquo;&raquo;</a>
+                <a class="page-link" href="{$buildQuery($totalPages)}" aria-label="{='common.pagination.last'|translate}">&raquo;&raquo;</a>
             </li>
         </ul>
     </nav>

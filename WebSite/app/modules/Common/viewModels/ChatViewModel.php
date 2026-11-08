@@ -4,23 +4,30 @@ declare(strict_types=1);
 
 namespace app\modules\Common\viewModels;
 
+use app\modules\Common\valueObjects\ArticleRow;
+use app\modules\Common\valueObjects\ChatMessage;
+use app\modules\Common\valueObjects\EventChatRow;
+use app\modules\Common\valueObjects\GroupChatRow;
+use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\Person;
+
 final readonly class ChatViewModel extends LayoutViewModel
 {
     /**
-     * @param list<object> $messages
-     * @param list<mixed> $navItems
+     * @param list<ChatMessage> $messages
+     * @param list<MenuItemRow> $navItems
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(
-        public object $article,
-        public ?object $event,
-        public ?object $group,
+        public ?ArticleRow $article,
+        public ?EventChatRow $event,
+        public ?GroupChatRow $group,
         public array $messages,
-        public object $person,
+        public Person $person,
         public array $navItems,
         public bool $newMessages,
         string $btnParent,
-        array $layoutParams = []
+        array $layoutParams = [],
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),

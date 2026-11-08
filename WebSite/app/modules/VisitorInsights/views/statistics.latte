@@ -90,9 +90,7 @@
 {block scripts}
     <script>
         window.chartData = {$chartData};
-    {if isset($i18n)}
-        Object.assign(window.i18n, {=$i18n});
-    {/if}
+    Object.assign(window.i18n, {=$i18n});
     </script>
     <script type="module" src="{='/app/modules/VisitorInsights/js/statistics.js'|version}"></script>
 {/block}

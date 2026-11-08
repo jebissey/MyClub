@@ -12,6 +12,9 @@ use app\helpers\WebApp;
 use app\models\AlertRecipientDataHelper;
 use app\models\MemberDirectoryDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\valueObjects\IdNameRow;
+use app\modules\Event\viewModels\CopyEmailsViewModel;
+use app\modules\Event\viewModels\FetchEmailsViewModel;
 
 final class EventEmailController extends AbstractController
 {
@@ -60,17 +63,18 @@ final class EventEmailController extends AbstractController
         $dayOfWeekName = $dayOfWeek !== null ? TranslationManager::getWeekdayNames()[$dayOfWeek] : '';
         $translatedTimeOfDay = ($this->t)($timeOfDay);
 
-        $this->views->render('Event/views/copyToClipBoard.latte', $this->getAllParams([
-            'emailsJson' => json_encode($filteredEmails),
-            'emails' => $filteredEmails,
-            'filters' => "{$groupName} / {$eventTypeName} / {$dayOfWeekName} / {$translatedTimeOfDay}",
-            'people' => $this->memberDirectoryDataHelper->getActiveMembersContactInfoByEmail(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'i18n' => [
+        $viewModel = new CopyEmailsViewModel(
+            emailsJson: json_encode($filteredEmails, JSON_THROW_ON_ERROR),
+            emails: array_values($filteredEmails),
+            filters: "{$groupName} / {$eventTypeName} / {$dayOfWeekName} / {$translatedTimeOfDay}",
+            people: $this->memberDirectoryDataHelper->getActiveMembersContactInfoByEmail(),
+            i18n: [
                 'copySuccess' => ($this->t)('event.copy_emails.clipboard.success'),
                 'copyError'   => ($this->t)('event.copy_emails.clipboard.error'),
             ],
-        ]));
+            layoutParams: $this->getAllParams(['page' => $this->application->getConnectedUser()->getPage()]),
+        );
+        $this->views->render('Event/views/copyToClipBoard.latte', $viewModel);
     }
 
     public function fetchEmails(): void
@@ -79,14 +83,20 @@ final class EventEmailController extends AbstractController
             return;
         }
 
-        $this->views->render('Event/views/getEmails.latte', $this->getAllParams([
-            'groups' => $this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'eventTypes' => $this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'),
-            'weekdayNames' => TranslationManager::getWeekdayNames(),
-            'timeOptions' => $this->getAllLabels(),
-            'page' => $this->application->getConnectedUser()->getPage(),
-            'btnHistoryBack' => true,
-        ]));
+        $viewModel = new FetchEmailsViewModel(
+            groups: array_map(
+                static fn(object $row): IdNameRow => IdNameRow::fromStdClass($row),
+                array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'))
+            ),
+            eventTypes: array_map(
+                static fn(object $row): IdNameRow => IdNameRow::fromStdClass($row),
+                array_values($this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name', 'Name'))
+            ),
+            weekdayNames: TranslationManager::getWeekdayNames(),
+            timeOptions: $this->getAllLabels(),
+            layoutParams: $this->getAllParams(['page' => $this->application->getConnectedUser()->getPage()]),
+        );
+        $this->views->render('Event/views/getEmails.latte', $viewModel);
     }
 
     public function help(): void

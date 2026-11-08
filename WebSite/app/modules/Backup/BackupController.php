@@ -58,7 +58,7 @@ final class BackupController extends AbstractController
                 ]),
             );
 
-            $this->views->render('Backup/views/backup.latte', $viewModel->toArray());
+            $this->views->render('Backup/views/backup.latte', $viewModel);
         }
     }
 

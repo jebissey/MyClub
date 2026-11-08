@@ -115,7 +115,7 @@ final class PersonDataHelper extends Data
     }
 
     /**
-     * @return stdClass[]
+     * @return list<object{clubMember: string, NoAlert: string, NewEvent: string, NewArticle: string}>
      */
     public function getMembersAlerts(): array
     {
@@ -145,7 +145,10 @@ final class PersonDataHelper extends Data
               AND m.Inactivated = 0
             ORDER BY clubMember
         ";
-        return $this->fetchObjects($this->queryOrFail($sql));
+        /** @var list<object{clubMember: string, NoAlert: string, NewEvent: string, NewArticle: string}> $rows */
+        $rows = $this->fetchObjects($this->queryOrFail($sql));
+
+        return $rows;
     }
 
     /**

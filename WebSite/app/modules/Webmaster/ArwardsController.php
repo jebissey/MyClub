@@ -30,13 +30,13 @@ final class ArwardsController extends AbstractController
         $viewModel = new ArwardsViewModel(
             counterNames: $counterNames,
             data: $arwardsDataHelper->getData($counterNames),
-            groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
+            groups: $this->getActiveGroups(),
             layout: $this->getLayout(),
             navItems: $this->getNavItems($this->application->getConnectedUser(true)->person->email),
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Webmaster/views/arwards.latte', $viewModel->toArray());
+        $this->views->render('Webmaster/views/arwards.latte', $viewModel);
     }
 
     public function setArward(): void

@@ -2,32 +2,31 @@
 
 {block content}
     <div class="container-fluid">
-        {if $survey}
-        <h1>Modifier le sondage de l'article: {$article->Title}</h1>
+        {if $form !== null}
+        <h1>{='article.survey.add.title_edit'|translate} {$article->title}</h1>
         {else}
-        <h1>Ajouter un sondage à l'article: {$article->Title}</h1>
+        <h1>{='article.survey.add.title_new'|translate} {$article->title}</h1>
         {/if}
         <form action="/survey/create" method="POST">
-            <input type="hidden" name="article_id" value="{$article->Id}">
-            {if $survey !== false}
+            <input type="hidden" name="article_id" value="{$article->id}">
+            {if $form !== null}
             <div class="alert alert-danger" role="alert">
-                <p>On ne peut modifier que la question et les réponses pour lesquelles il n'y a aucun vote</p>
+                <p>{='article.survey.add.edit_warning'|translate}</p>
             </div>
             {/if}
             <div class="mb-3">
-                <label for="question" class="form-label">Question du sondage</label>
-                <input type="text" class="form-control" id="question" name="question" value="{if $survey}{$survey->Question}{/if}" required>
+                <label for="question" class="form-label">{='article.survey.add.question'|translate}</label>
+                <input type="text" class="form-control" id="question" name="question" value="{$form?->question}" required>
             </div>
-            
+
             <div id="options-container">
                 <div class="mb-3">
-                    <label class="form-label">Options (réponses possibles)</label>
-                    {if $survey}
-                        {var $surveyOptions = json_decode($survey->Options, true)}
-                        {foreach $surveyOptions as $optionText}
+                    <label class="form-label">{='article.survey.add.options'|translate}</label>
+                    {if $form !== null}
+                        {foreach $form->options as $optionText}
                         <div class="d-flex mb-2">
                             <input type="text" class="form-control me-2" name="options[]" value="{$optionText}" required>
-                            <button type="button" class="btn btn-danger remove-option" {if count($surveyOptions) <= 2}disabled{/if}>-</button>
+                            <button type="button" class="btn btn-danger remove-option" {if count($form->options) <= 2}disabled{/if}>-</button>
                         </div>
                         {/foreach}
                     {else}
@@ -41,30 +40,28 @@
                         </div>
                     {/if}
                 </div>
-                <button type="button" id="add-option" class="btn btn-secondary mb-3">Ajouter une option</button>
+                <button type="button" id="add-option" class="btn btn-secondary mb-3">{='article.survey.add.add_option'|translate}</button>
                 <div class="mb-3">
-                    <label for="dateInput" class="form-label">Date de cloture</label>
-                    <input type="date" class="form-control w-auto" id="dateInput" name="closingDate" value="{$survey?->ClosingDate ?? ''}" required>
+                    <label for="dateInput" class="form-label">{='article.closable_form.closing_date'|translate}</label>
+                    <input type="date" class="form-control w-auto" id="dateInput" name="closingDate" value="{$form?->closingDate}" required>
                 </div>
                 <div class="mb-3">
-                    <label for="visibility" class="form-label">Visibilité</label>
+                    <label for="visibility" class="form-label">{='article.closable_form.visibility'|translate}</label>
                     <select class="form-select w-auto" id="visibility" name="visibility" required>
-                        <option value="redactor" {if $survey !== false && $survey->Visibility == 'redactor'}selected{/if}>Rédacteur 👁️‍🗨️📝</option>
-                        <option value="all" {if $survey !== false && $survey->Visibility == 'all'}selected{/if}>Tout le monde 👁️‍🗨️👥</option>
-                        <option value="allAfterClosing" {if $survey !== false && $survey->Visibility == 'allAfterClosing'}selected{/if}>Tout le monde après la cloture 👁️‍🗨️👥📅</option>
-                        <option value="voters" {if $survey !== false && $survey->Visibility == 'voters'}selected{/if}>Les votants 👁️‍🗨️🗳️</option>
-                        <option value="votersAfterClosing" {if $survey !== false && $survey->Visibility == 'votersAfterClosing'}selected{/if}>Les votants après la cloture 👁️‍🗨️🗳️📅</option>
+                        {foreach $visibilityOptions as $value => $label}
+                        <option value="{$value}" {if $form !== null && $form->visibility === $value}selected{/if}>{$label}</option>
+                        {/foreach}
                     </select>
                 </div>
             </div>
-            
+
             <div class="mb-3">
-                {if $survey}
-                <button type="submit" class="btn btn-primary">Modifier le sondage</button>
+                {if $form !== null}
+                <button type="submit" class="btn btn-primary">{='article.survey.add.submit_edit'|translate}</button>
                 {else}
-                <button type="submit" class="btn btn-primary">Créer le sondage</button>
+                <button type="submit" class="btn btn-primary">{='article.survey.add.submit_new'|translate}</button>
                 {/if}
-                <a href="/article/{$article->Id}" class="btn btn-secondary">Annuler</a>
+                <a href="/article/{$article->id}" class="btn btn-secondary">{='article.closable_form.cancel'|translate}</a>
             </div>
         </form>
     </div>

@@ -1,21 +1,29 @@
+{* Params: $items, $columns, $filters, $filterValues, $resetUrl, $currentPage, $totalPages.
+   Optional: $actions, $createButton, $modal, $table, $extraParams *}
+{default $actions = []}
+{default $createButton = null}
+{default $modal = null}
+{default $table = ''}
+{default $extraParams = []}
+
 <div class="container-fluid">
     {include 'FilterForm.latte',
         filters:      $filters,
         action:       $resetUrl,
         resetUrl:     $resetUrl,
         filterValues: $filterValues,
-        extraParams:  $extraParams ?? [],
+        extraParams:  $extraParams,
         currentPage:  $currentPage,
         totalPages:   $totalPages,
         pageParam:    'tablePage'}
-    
-    {if isset($createButton)}
+
+    {if $createButton !== null}
         {var $alignmentClass = isset($createButton['alignment']) ? 'd-flex justify-content-' . $createButton['alignment'] : ''}
         <div class="{$alignmentClass}">
             <a href="{$createButton['url']}" class="btn btn-primary mb-3 mt-3"><i class="{$createButton['label']}"></i></a>
         </div>
     {/if}
-    
+
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
@@ -23,18 +31,17 @@
                     {foreach $columns as $column}
                         <th>{$column['label']}</th>
                     {/foreach}
-                    {if isset($actions) && count($actions) > 0}
-                        <th>Actions</th>
+                    {if $actions !== []}
+                        <th>{='common.table.actions'|translate}</th>
                     {/if}
                 </tr>
             </thead>
             <tbody>
                 {foreach $items as $item}
                     <tr>
-                        {php $actionDisplayed = !isset($conditionValue)}
                         {foreach $columns as $column}
-                            <td title="{$item->{$column['field']}}">
-                                {var $v = $item->{$column['field']}}
+                            {var $v = $item->cells[$column['field']] ?? null}
+                            <td title="{$v}">
                                 {if $v !== null}
                                     {var $s = (string) $v}
                                     {if mb_strlen($s) > 400}
@@ -44,29 +51,24 @@
                                     {/if}
                                 {/if}
                             </td>
-                            {if isset($conditionValue) && $column->field == $conditionColumn && $item[$column->field] == $conditionValue}
-                                {php $actionDisplayed = true}
-                            {/if}
                         {/foreach}
-                        {if isset($actions) && count($actions) > 0}
+                        {if $actions !== []}
                             <td>
-                            {if $actionDisplayed}
                                 {foreach $actions as $action}
                                     {if $action['type'] == 'link'}
-                                        <a href="{str_replace('{table}', $table ?? '', str_replace('{id}', (string)$item->Id, $action['url']))}" class="btn btn-sm {$action['class']}"
+                                        <a href="{str_replace('{table}', $table, str_replace('{id}', $item->id, $action['url']))}" class="btn btn-sm {$action['class']}"
                                         {if isset($action['confirm'])}
-                                            onclick="return confirm('{$action['confirm'] | noescape} {$item->{$columns[0]['field']}}')"
+                                            onclick="return confirm({$action['confirm'] . ' ' . ($item->cells[$columns[0]['field']] ?? '')})"
                                         {/if}>
                                             <i class="{$action['label']}"></i>
                                         </a>
                                     {elseif $action['type'] == 'button'}
                                         <button class="btn btn-sm {$action['class']}"
-                                                onclick="{str_replace('{table}', $table ?? '', str_replace('{id}', (string)$item->Id, $action['onClick'])) | noescape}">
+                                                onclick="{str_replace('{table}', $table, str_replace('{id}', $item->id, $action['onClick'])) | noescape}">
                                             <i class="{$action['label']}"></i>
                                         </button>
                                     {/if}
                                 {/foreach}
-                            {/if}
                             </td>
                         {/if}
                     </tr>
@@ -76,7 +78,7 @@
     </div>
 </div>
 
-{if isset($modal)}
+{if $modal !== null}
 <div class="modal fade" id="{$modal['id']}" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

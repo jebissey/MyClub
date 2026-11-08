@@ -133,7 +133,7 @@ final class ImportController extends AbstractController
             ]),
         );
 
-        $this->views->render('PersonManager/views/users_import.latte', $viewModel->toArray());
+        $this->views->render('PersonManager/views/users_import.latte', $viewModel);
     }
 
     private function loadSettings(): void

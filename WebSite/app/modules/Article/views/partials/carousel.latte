@@ -24,7 +24,7 @@
         <div class="carousel-inner">
             {foreach $carouselItems as $index => $item}
                 <div class="carousel-item {if $index === 0}active{/if}">
-                    {$item->Item|noescape}
+                    {$item->item|noescape}
                 </div>
             {/foreach}
         </div>

@@ -26,32 +26,32 @@
                 </thead>
                 <tbody>
                     {foreach $lastVisits as $visit}
-                        <tr class="visit-row" data-person-id="{$visit->PersonId}">
+                        <tr class="visit-row" data-person-id="{$visit->personId}">
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <strong>{$visit->FullName}</strong>
+                                    <strong>{$visit->fullName}</strong>
                                 </div>
                             </td>
                             <td>
-                                <small class="text-muted">{$visit->Email}</small>
+                                <small class="text-muted">{$visit->email}</small>
                             </td>
                             <td>
                                 <div>
-                                    <span class="fw-bold">{$visit->TimeAgo}</span>
+                                    <span class="fw-bold">{$visit->timeAgo}</span>
                                     <br>
-                                    <small class="text-muted">{$visit->FormattedDate}</small>
+                                    <small class="text-muted">{$visit->formattedDate}</small>
                                 </div>
                             </td>
                             <td>
-                                {if $visit->Os}
-                                    <span class="badge bg-light text-dark">{$visit->Os}</span>
+                                {if $visit->os}
+                                    <span class="badge bg-light text-dark">{$visit->os}</span>
                                 {else}
                                     <span class="text-muted">-</span>
                                 {/if}
                             </td>
                             <td>
-                                {if $visit->Browser}
-                                    <span class="badge bg-light text-dark">{$visit->Browser}</span>
+                                {if $visit->browser}
+                                    <span class="badge bg-light text-dark">{$visit->browser}</span>
                                 {else}
                                     <span class="text-muted">-</span>
                                 {/if}

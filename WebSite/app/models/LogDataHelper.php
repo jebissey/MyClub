@@ -12,6 +12,7 @@ use app\enums\Period;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 use app\helpers\To;
+use app\modules\Common\valueObjects\LastVisitRow;
 use app\modules\Common\valueObjects\MemberBasicRow;
 
 final class LogDataHelper extends Data
@@ -91,55 +92,49 @@ final class LogDataHelper extends Data
 
     /**
      * @param list<MemberBasicRow> $activePersons
-     * @return array<int, stdClass>
+     * @return list<LastVisitRow>
      */
     public function getLastVisitPerActivePersonWithTimeAgo(array $activePersons): array
     {
-        $visits = $this->getLastVisitPerActivePerson($activePersons);
+        $rows = [];
 
-        foreach ($visits as &$visit) {
-            $lastActivity = is_string($visit->LastActivity ?? null) ? $visit->LastActivity : '';
-
-            $visit->TimeAgo       = MyClubDateTime::calculateTimeAgo($lastActivity);
-            $visit->MinutesAgo    = MyClubDateTime::calculateMinutesAgo($lastActivity);
-            $visit->FormattedDate = MyClubDateTime::formatDateFromUTC($lastActivity);
-
-            /** @var object{Id: int, Email: string, Avatar: string|null}|false $individual */
+        foreach ($this->getLastVisitPerActivePerson($activePersons) as $visit) {
+            /** @var object{Id: int, Email: string, Avatar: string|null, NickName: string|null}|false $individual */
             $individual = $this->dataHelper->get(
                 'Individual',
-                ['Email' => $visit->Email],
-                'Id, Email, Avatar'
+                ['Email' => $visit['email']],
+                'Id, Email, Avatar, NickName'
             );
 
             /** @var object{UseGravatar: string|null}|false $member */
             $member = $individual !== false
-                ? $this->dataHelper->get(
-                    'Member',
-                    ['Id' => $individual->Id],
-                    'UseGravatar'
-                )
+                ? $this->dataHelper->get('Member', ['Id' => $individual->Id], 'UseGravatar')
                 : false;
 
-            $person = ($individual !== false && $member !== false)
-                ? (object) array_merge((array) $individual, (array) $member)
-                : false;
+            $found = $individual !== false && $member !== false;
 
-            if ($person !== false) {
-                $visit->UseGravatar = $person->UseGravatar ?? 'no';
-                $visit->Avatar      = $person->Avatar ?? '';
-            } else {
-                $visit->UseGravatar = 'no';
-                $visit->Avatar      = '';
-            }
+            $rows[] = new LastVisitRow(
+                personId: $visit['personId'],
+                fullName: $visit['fullName'],
+                email: $visit['email'],
+                lastActivity: $visit['lastActivity'],
+                os: $visit['os'],
+                browser: $visit['browser'],
+                timeAgo: MyClubDateTime::calculateTimeAgo($visit['lastActivity']),
+                minutesAgo: MyClubDateTime::calculateMinutesAgo($visit['lastActivity']),
+                formattedDate: MyClubDateTime::formatDateFromUTC($visit['lastActivity']),
+                useGravatar: $found ? ($member->UseGravatar ?? 'no') : 'no',
+                avatar: $found ? ($individual->Avatar ?? '') : '',
+                nickName: $found ? $individual->NickName : null,
+            );
         }
-        unset($visit);
 
-        return $visits;
+        return $rows;
     }
 
     /**
      * @param list<MemberBasicRow> $activePersons
-     * @return array<int, stdClass>
+     * @return list<array{personId: int, fullName: string, email: string, lastActivity: string, os: string, browser: string}>
      */
     private function getLastVisitPerActivePerson(array $activePersons): array
     {
@@ -193,25 +188,20 @@ final class LogDataHelper extends Data
             if (isset($logByEmail[$email])) {
                 $log = $logByEmail[$email];
 
-                $result[] = (object) [
-                    'PersonId'     => $person->id,
-                    'FullName'     => $person->firstName . ' ' . $person->lastName,
-                    'Email'        => $person->email,
-                    'LastActivity' => is_string($log->CreatedAt ?? null) ? $log->CreatedAt : '',
-                    'Os'           => is_string($log->Os ?? null) ? $log->Os : '',
-                    'Browser'      => is_string($log->Browser ?? null) ? $log->Browser : '',
+                $result[] = [
+                    'personId'     => $person->id,
+                    'fullName'     => $person->firstName . ' ' . $person->lastName,
+                    'email'        => $person->email,
+                    'lastActivity' => is_string($log->CreatedAt ?? null) ? $log->CreatedAt : '',
+                    'os'           => is_string($log->Os ?? null) ? $log->Os : '',
+                    'browser'      => is_string($log->Browser ?? null) ? $log->Browser : '',
                 ];
             }
         }
 
         usort(
             $result,
-            static function (stdClass $a, stdClass $b): int {
-                $aVal = is_string($a->LastActivity ?? null) ? $a->LastActivity : '';
-                $bVal = is_string($b->LastActivity ?? null) ? $b->LastActivity : '';
-
-                return strcmp($bVal, $aVal);
-            }
+            static fn(array $a, array $b): int => strcmp($b['lastActivity'], $a['lastActivity'])
         );
 
         return $result;
@@ -227,7 +217,7 @@ final class LogDataHelper extends Data
 
     /**
      * @param array<int, string> $filteredPersonEmails
-     * @return array<int, stdClass>
+     * @return list<object{Email: string, FirstName: string, LastName: string}>
      */
     public function getPersons(array $filteredPersonEmails): array
     {
@@ -253,14 +243,14 @@ final class LogDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
-        /** @var list<stdClass> $rows */
+        /** @var list<object{Email: string, FirstName: string, LastName: string}> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return $rows;
     }
 
     /**
-     * @return array<int, stdClass>
+     * @return list<object{Uri: string, visits: int, avg_duration: int|float|null, articleId: int|null}>
      */
     public function getTopArticles(string $dateCondition, int $top): array
     {
@@ -300,14 +290,14 @@ final class LogDataHelper extends Data
         $stmt = $this->pdoForLog->prepare($sql);
         $stmt->execute([':top' => $top]);
 
-        /** @var list<stdClass> $rows */
+        /** @var list<object{Uri: string, visits: int, avg_duration: int|float|null, articleId: int|null}> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return $rows;
     }
 
     /**
-     * @return array<int, stdClass>
+     * @return list<object{Uri: string, visits: int, avg_duration: int|float|null}>
      */
     public function getTopPages(Period $period, int $top): array
     {
@@ -337,7 +327,7 @@ final class LogDataHelper extends Data
         $stmt->bindValue(':limit', $top, PDO::PARAM_INT);
         $stmt->execute();
 
-        /** @var list<stdClass> $rows */
+        /** @var list<object{Uri: string, visits: int, avg_duration: int|float|null}> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return $rows;

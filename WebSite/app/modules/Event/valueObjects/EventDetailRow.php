@@ -4,29 +4,11 @@ declare(strict_types=1);
 
 namespace app\modules\Event\valueObjects;
 
-use app\modules\Common\valueObjects\AbstractValueObject;
+use stdClass;
 use app\enums\EventAudience;
+use app\helpers\To;
+use app\modules\Common\valueObjects\AbstractValueObject;
 
-/**
- * Représentation fortement typée d'un événement complet (table Event + jointure EventType),
- * telle que retournée par EventDataHelper::getEvent().
- *
- * @phpstan-type EventDetailRowShape object{
- *     Id: int|string,
- *     Summary: string,
- *     Description: string,
- *     Location: string,
- *     StartTime: string,
- *     Duration: int|string,
- *     IdEventType: int|string,
- *     CreatedBy: int|string,
- *     MaxParticipants: int|string,
- *     Audience: string,
- *     LastUpdate: string,
- *     Canceled: int|string,
- *     EventTypeName: string
- * }
- */
 final readonly class EventDetailRow extends AbstractValueObject
 {
     public function __construct(
@@ -46,23 +28,24 @@ final readonly class EventDetailRow extends AbstractValueObject
     ) {
     }
 
-    /** @param EventDetailRowShape $row */
-    public static function fromStdClass(object $row): self
+    public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            id: (int) $row->Id,
-            summary: $row->Summary,
-            description: $row->Description,
-            location: $row->Location,
-            startTime: $row->StartTime,
-            duration: (int) $row->Duration,
-            idEventType: (int) $row->IdEventType,
-            createdBy: (int) $row->CreatedBy,
-            maxParticipants: (int) $row->MaxParticipants,
-            audience: EventAudience::from($row->Audience),
-            lastUpdate: $row->LastUpdate,
-            canceled: (int) $row->Canceled,
-            eventTypeName: $row->EventTypeName,
+            id: To::requireInt($row->Id ?? null),
+            summary: To::requireStr($row->Summary ?? null),
+            description: To::requireStr($row->Description ?? null),
+            location: To::requireStr($row->Location ?? null),
+            startTime: To::requireStr($row->StartTime ?? null),
+            duration: To::requireInt($row->Duration ?? null),
+            idEventType: To::requireInt($row->IdEventType ?? null),
+            createdBy: To::requireInt($row->CreatedBy ?? null),
+            maxParticipants: To::requireInt($row->MaxParticipants ?? null),
+            audience: EventAudience::from(
+                To::requireStr($row->Audience ?? null),
+            ),
+            lastUpdate: To::requireStr($row->LastUpdate ?? null),
+            canceled: To::requireInt($row->Canceled ?? null),
+            eventTypeName: To::requireStr($row->EventTypeName ?? null),
         );
     }
 }

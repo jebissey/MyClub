@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace app\modules\Article\viewModels;
 
 use stdClass;
-use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\ArticleRow;
+use app\modules\Common\valueObjects\CarouselItemRow;
+use app\modules\Common\valueObjects\ClosingVisibilityRow;
+use app\modules\Common\viewModels\LayoutViewModel;
 
 final readonly class ArticleShowViewModel extends LayoutViewModel
 {
     /**
      * @param ArticleRow $article
      * @param list<stdClass> $groups
-     * @param object|null $hasSurvey
-     * @param object|null $hasOrder
-     * @param list<stdClass> $carouselItems
+     * @param list<CarouselItemRow> $carouselItems
      * @param list<object> $navItems
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
@@ -23,8 +23,8 @@ final readonly class ArticleShowViewModel extends LayoutViewModel
         public int $id,
         public ArticleRow $article,
         public array $groups,
-        public ?object $hasSurvey,
-        public ?object $hasOrder,
+        public ?ClosingVisibilityRow $hasSurvey,
+        public ?ClosingVisibilityRow $hasOrder,
         public bool $userConnected,
         public array $navItems,
         public string $publishedBy,

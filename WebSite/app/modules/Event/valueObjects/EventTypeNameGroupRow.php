@@ -7,8 +7,8 @@ namespace app\modules\Event\valueObjects;
 use app\modules\Common\valueObjects\AbstractValueObject;
 
 /**
- * Ligne minimale de la table EventType (Name + IdGroup uniquement),
- * utilisée pour le formulaire d'édition.
+ * Minimal row of the EventType table (Name and IdGroup only),
+ * used by the edit form.
  *
  * @phpstan-type EventTypeNameGroupRowShape object{
  *     Name: string,
@@ -23,9 +23,9 @@ final readonly class EventTypeNameGroupRow extends AbstractValueObject
     ) {
     }
 
-    /** @param EventTypeNameGroupRowShape $row */
     public static function fromStdClass(object $row): self
     {
+        /** @var EventTypeNameGroupRowShape $row */
         return new self(
             name: $row->Name,
             idGroup: $row->IdGroup !== null ? (int) $row->IdGroup : null,

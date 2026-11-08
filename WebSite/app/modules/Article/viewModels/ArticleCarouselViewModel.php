@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace app\modules\Article\viewModels;
 
 use app\modules\Common\valueObjects\ArticleRow;
+use app\modules\Common\valueObjects\CarouselItemRow;
 use app\modules\Common\viewModels\LayoutViewModel;
-use stdClass;
 
 /**
  * Specific ViewModel for article_carousel.latte, extending the layout requirements.
@@ -14,7 +14,7 @@ use stdClass;
 final readonly class ArticleCarouselViewModel extends LayoutViewModel
 {
     /**
-     * @param list<stdClass> $carouselItems
+     * @param list<CarouselItemRow> $carouselItems
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(

@@ -10,6 +10,7 @@ use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\LogWriterDataHelper;
 use app\modules\Common\EmptyController;
+use app\modules\Common\viewModels\InfoViewModel;
 
 final readonly class ErrorManager implements ErrorManagerInterface
 {
@@ -60,29 +61,30 @@ final readonly class ErrorManager implements ErrorManagerInterface
             if ($displayCode) {
                 $result .= "<h1>{$code->value}</h1>";
             }
-            $result .= "<h2>$message</h2>";
+            $result .= '<h2>' . htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</h2>';
         } else {
             $timeout = max($code === ApplicationError::Error ? 10000 : 5000, $timeout);
         }
-        if ($code == ApplicationError::ServiceUnavailable && $isWebmaster) {
-            $result = str_replace(
-                '<a href="/" class="btn btn-primary mt-3">Retourner à l’accueil maintenant</a>',
-                '<a href="/" class="btn btn-primary mt-3">Retourner à l’accueil maintenant</a>
-    <p><a href="/maintenance/unset" class="btn btn-danger mt-3">Cancel maintenance</a></p>',
-                $result
-            );
+        if ($code === ApplicationError::ServiceUnavailable && $isWebmaster) {
+            $result .= '<p><a href="/maintenance/unset" class="btn btn-danger mt-3">'
+                . htmlspecialchars($this->languagesDataHelper->translate('error.maintenance.cancel'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+                . '</a></p>';
         }
         $navbarColors = $this->dataHelper->getNavbarColors();
         $this->application->getFlight()->response()->status($code->value);
-        $this->emptyController->render('Common/views/info.latte', [
-            'content' => $result,
-            'btnHistoryBack' => true,
-            'previousPage' => true,
-            'timer' => $timeout,
-            'navbarBgColor'   => $navbarColors->bgColor,
-            'navbarInkColor'  => $navbarColors->inkColor,
-            'navbarIconColor' => $navbarColors->iconColor,
-        ]);
+
+        $viewModel = new InfoViewModel(
+            content: $result,
+            timer: $timeout,
+            previousPage: true,
+            layoutParams: [
+                'navbarBgColor'   => $navbarColors->bgColor,
+                'navbarInkColor'  => $navbarColors->inkColor,
+                'navbarIconColor' => $navbarColors->iconColor,
+            ],
+        );
+        $this->emptyController->render('Common/views/info.latte', $viewModel);
+
         if ($code != ApplicationError::Ok) {
             exit;
         }

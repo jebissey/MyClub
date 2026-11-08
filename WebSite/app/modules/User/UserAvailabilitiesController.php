@@ -37,7 +37,7 @@ final class UserAvailabilitiesController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('User/views/user_availabilities.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_availabilities.latte', $viewModel);
     }
 
     public function availabilitiesSave(): void

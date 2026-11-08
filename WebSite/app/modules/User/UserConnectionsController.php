@@ -78,6 +78,6 @@ final class UserConnectionsController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('User/views/user_connections.latte', $viewModel->toArray());
+        $this->views->render('User/views/user_connections.latte', $viewModel);
     }
 }

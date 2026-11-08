@@ -37,13 +37,13 @@
     {if $canReadPool}
         <button class="btn btn-info ms-2" onclick="window.location.href='/survey/results/{$article->id}'">{='article.show.view_survey_results'|translate}</button>
     {/if}
-    {if $hasSurvey && $userConnected && isset($article->publishedBy) && $article->publishedBy !== null && $hasSurvey->ClosingDate >= date('Y-m-d')}
+    {if $hasSurvey && $userConnected && $article->publishedBy !== null && $hasSurvey->closingDate >= date('Y-m-d')}
         <button id="reply-survey-btn" class="btn btn-success ms-2">{='article.show.reply_survey'|translate}</button>
     {/if}
     {if $canReadOrder}
         <button class="btn btn-info ms-2" onclick="window.location.href='/order/results/{$article->id}'">{='article.show.view_order_results'|translate}</button>
     {/if}
-    {if $hasOrder && $userConnected && isset($article->publishedBy) && $article->publishedBy !== null && $hasOrder->ClosingDate >= date('Y-m-d')}
+    {if $hasOrder && $userConnected && $article->publishedBy !== null && $hasOrder->closingDate >= date('Y-m-d')}
         <button id="reply-order-btn" class="btn btn-success ms-2">{='article.show.reply_order'|translate}</button>
     {/if}
     {if $isCreator}
@@ -79,20 +79,33 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="card-title" id="article-title-display">{$article->title}</h2>
+
+                    {var $articleTimestamp = strtotime($article->timestamp)}
+                    {var $lastUpdateTimestamp = strtotime($article->lastUpdate)}
                     <small class="text-muted">
                         {='article.show.created_by'|translate} {$article->author?->firstName} {$article->author?->lastName}
-                        {='article.show.on_date'|translate} {date('d/m/Y', strtotime($article->timestamp))}
-                        {$publishedBy}
-                        {if date('Y-m-d', strtotime($article->timestamp)) !== date('Y-m-d', strtotime($article->lastUpdate))}
-                        {='article.show.modified_on'|translate} {date('d/m/Y', strtotime($article->lastUpdate))}
+
+                        {='article.show.on_date'|translate}
+                        {if $articleTimestamp !== false}
+                            {date('d/m/Y', $articleTimestamp)}
                         {/if}
-                        {if isset($article->publishedBy) && $article->publishedBy !== null}
+
+                        {$publishedBy}
+
+                        {if $articleTimestamp !== false && $lastUpdateTimestamp !== false && date('Y-m-d', $articleTimestamp) !== date('Y-m-d', $lastUpdateTimestamp)}
+                            {='article.show.modified_on'|translate} {date('d/m/Y', $lastUpdateTimestamp)}
+                        {/if}
+
+                        {if $article->publishedBy !== null}
                             <span class="badge bg-success">{='article.show.published'|translate}</span>
                         {else}
                             <span class="badge bg-secondary">{='article.show.not_published'|translate}</span>
                         {/if}
-                        {if $article->group !== null && $article->group?->name}
-                            <span class="badge bg-info">{='article.show.group_label'|translate} {$article->group?->name}</span>
+
+                        {if $article->group?->name}
+                            <span class="badge bg-info">
+                                {='article.show.group_label'|translate} {$article->group->name}
+                            </span>
                         {/if}
                     </small>
                 </div>

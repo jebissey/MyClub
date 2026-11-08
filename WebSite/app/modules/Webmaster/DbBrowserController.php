@@ -48,7 +48,7 @@ final class DbBrowserController extends TableController
                 ]),
             );
 
-            $this->views->render('Webmaster/views/dbbrowser/index.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/dbbrowser/index.latte', $viewModel);
         }
     }
 
@@ -64,7 +64,7 @@ final class DbBrowserController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->views->render('Webmaster/views/dbbrowser/create.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/dbbrowser/create.latte', $viewModel);
         }
     }
 
@@ -82,7 +82,7 @@ final class DbBrowserController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->views->render('Webmaster/views/dbbrowser/edit.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/dbbrowser/edit.latte', $viewModel);
         }
     }
 
@@ -104,7 +104,7 @@ final class DbBrowserController extends TableController
             $data = $this->prepareTableData($this->dbBrowserDataHelper->getQuery($table), $filterValues);
 
             $viewModel = new DbBrowserTableViewModel(
-                records: array_values($data['items']),
+                records: $data['items'],
                 currentPage: $data['currentPage'],
                 totalPages: $data['totalPages'],
                 filterValues: $filterValues,
@@ -117,7 +117,7 @@ final class DbBrowserController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->views->render('Webmaster/views/dbbrowser/table.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/dbbrowser/table.latte', $viewModel);
         }
     }
 

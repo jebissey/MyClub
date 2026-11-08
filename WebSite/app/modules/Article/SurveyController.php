@@ -10,6 +10,8 @@ use app\helpers\ConnectedUser;
 use app\models\ArticleDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\viewModels\ClosableFormResultsViewModel;
+use app\modules\Article\viewModels\SurveyResultsViewModel;
 use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
@@ -44,7 +46,7 @@ final class SurveyController extends ClosableFormController
         return $this->authorizationService->canReadSurveyResults($form, $article, $user);
     }
 
-    protected function buildResultsParams(int $articleId): ?array
+    protected function buildResultsViewModel(int $articleId, array $layoutParams): ?ClosableFormResultsViewModel
     {
         $survey = $this->surveyDataHelper->getWithCreator($articleId);
         if ($survey === false) {
@@ -56,14 +58,14 @@ final class SurveyController extends ClosableFormController
         /** @var array<string, int> $results */
         $results = [];
 
-        /** @var array<string> $options */
+        /** @var list<string> $options */
         $options = json_decode($survey->options) ?? [];
         foreach ($options as $option) {
             $results[$option] = 0;
         }
 
         foreach ($replies as $reply) {
-            /** @var array<string> $answers */
+            /** @var list<string> $answers */
             $answers = json_decode($reply->answers) ?? [];
 
             $participants[] = [
@@ -78,11 +80,13 @@ final class SurveyController extends ClosableFormController
             }
         }
 
-        return [
-            'survey'       => $survey,
-            'options'      => $options,
-            'results'      => $results,
-            'participants' => $participants,
-        ];
+        return new SurveyResultsViewModel(
+            survey: $survey,
+            options: $options,
+            results: $results,
+            participants: $participants,
+            articleId: $articleId,
+            layoutParams: $layoutParams,
+        );
     }
 }

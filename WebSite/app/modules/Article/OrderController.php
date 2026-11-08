@@ -11,6 +11,8 @@ use app\models\ArticleDataHelper;
 use app\models\OrderDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\OrderReplyRow;
+use app\modules\Article\viewModels\ClosableFormResultsViewModel;
+use app\modules\Article\viewModels\OrderResultsViewModel;
 use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
@@ -48,7 +50,10 @@ final class OrderController extends ClosableFormController
         return $this->authorizationService->canReadOrderResults($form, $article, $user);
     }
 
-    protected function buildResultsParams(int $articleId): ?array
+    /**
+     * @param array<string, mixed> $layoutParams
+     */
+    protected function buildResultsViewModel(int $articleId, array $layoutParams): ?ClosableFormResultsViewModel
     {
         $order = $this->orderDataHelper->getWithCreator($articleId);
         if (!$order) {
@@ -67,7 +72,7 @@ final class OrderController extends ClosableFormController
         /** @var array<string, float|int> $results */
         $results = [];
 
-        /** @var array<string> $options */
+        /** @var list<string> $options */
         $options = json_decode($order->options) ?? [];
         foreach ($options as $option) {
             $results[$option] = 0;
@@ -89,11 +94,13 @@ final class OrderController extends ClosableFormController
             }
         }
 
-        return [
-            'order'        => $order,
-            'options'      => $options,
-            'results'      => $results,
-            'participants' => $participants,
-        ];
+        return new OrderResultsViewModel(
+            order: $order,
+            options: $options,
+            results: $results,
+            participants: $participants,
+            articleId: $articleId,
+            layoutParams: $layoutParams,
+        );
     }
 }

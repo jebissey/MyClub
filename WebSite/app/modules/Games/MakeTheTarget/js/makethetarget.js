@@ -7,32 +7,32 @@ const api = new ApiClient();
  * All displayed strings come from window.makeTheTargetConfig.i18n
  */
 export default class MakeTheTargetManager {
-    #config    = window.makeTheTargetConfig ?? {};
+    #config = window.makeTheTargetConfig ?? {};
     #sessionId = this.#config.sessionId ?? 'no-session';
-    #i18n      = this.#config.i18n ?? {};
+    #i18n = this.#config.i18n ?? {};
 
     // Game state
-    #target      = 0;
-    #tiles       = [];
+    #target = 0;
+    #tiles = [];
     #selectedIds = [];
-    #selectedOp  = null;
-    #history     = [];
-    #nextId      = 100;
-    #moves       = 0;
-    #gameActive  = false;
-    #foundExact  = false;
+    #selectedOp = null;
+    #history = [];
+    #nextId = 100;
+    #moves = 0;
+    #gameActive = false;
+    #foundExact = false;
 
     // DOM
-    #btnDraw       = document.getElementById('btn-draw');
-    #btnSolution   = document.getElementById('btn-solution');
-    #btnReset      = document.getElementById('btn-reset');
+    #btnDraw = document.getElementById('btn-draw');
+    #btnSolution = document.getElementById('btn-solution');
+    #btnReset = document.getElementById('btn-reset');
     #targetDisplay = document.getElementById('target-display');
-    #tilesCont     = document.getElementById('tiles-container');
-    #opsCont       = document.getElementById('ops-container');
-    #historyBox    = document.getElementById('history-box');
-    #moveCounter   = document.getElementById('move-counter');
-    #solutionBox   = document.getElementById('solution-box');
-    #endMessage    = document.getElementById('end-message');
+    #tilesCont = document.getElementById('tiles-container');
+    #opsCont = document.getElementById('ops-container');
+    #historyBox = document.getElementById('history-box');
+    #moveCounter = document.getElementById('move-counter');
+    #solutionBox = document.getElementById('solution-box');
+    #endMessage = document.getElementById('end-message');
 
     static #SMALL = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     static #LARGE = [25, 50, 75, 100];
@@ -65,23 +65,23 @@ export default class MakeTheTargetManager {
 
         this.#target = Math.floor(Math.random() * 900) + 100;
 
-        this.#tiles       = drawn.map((v, i) => ({ id: i + 1, value: v, used: false }));
+        this.#tiles = drawn.map((v, i) => ({ id: i + 1, value: v, used: false }));
         this.#selectedIds = [];
-        this.#selectedOp  = null;
-        this.#history     = [];
-        this.#nextId      = 100;
-        this.#moves       = 0;
-        this.#gameActive  = true;
-        this.#foundExact  = false;
+        this.#selectedOp = null;
+        this.#history = [];
+        this.#nextId = 100;
+        this.#moves = 0;
+        this.#gameActive = true;
+        this.#foundExact = false;
 
         this.#targetDisplay.textContent = this.#target;
         this.#solutionBox.style.display = 'none';
-        this.#solutionBox.textContent   = '';
-        this.#endMessage.style.display  = 'none';
-        this.#endMessage.innerHTML      = '';
+        this.#solutionBox.textContent = '';
+        this.#endMessage.style.display = 'none';
+        this.#endMessage.innerHTML = '';
 
         if (this.#btnSolution) this.#btnSolution.disabled = false;
-        if (this.#btnReset)    this.#btnReset.disabled    = false;
+        if (this.#btnReset) this.#btnReset.disabled = false;
 
         this.#renderTiles();
         this.#renderHistory();
@@ -166,7 +166,8 @@ export default class MakeTheTargetManager {
         const b = this.#tiles.find(t => t.id === this.#selectedIds[1]);
         if (!a || !b || a.used || b.used) return;
 
-        const result = this.#applyOp(a.value, b.value, this.#selectedOp);
+        const op = this.#selectedOp;
+        const result = this.#applyOp(a.value, b.value, op);
         if (result === null) {
             this.#flashInvalid();
             return;
@@ -178,25 +179,19 @@ export default class MakeTheTargetManager {
         const newTile = { id: this.#nextId++, value: result, used: false };
         this.#tiles.push(newTile);
 
-        this.#history.push({
-            a: a.value,
-            op: this.#selectedOp,
-            b: b.value,
-            result,
-            id: newTile.id,
-        });
+        this.#history.push({ a: a.value, op, b: b.value, result, id: newTile.id });
         this.#moves++;
 
         this.#selectedIds = [];
-        this.#selectedOp  = null;
-        document.querySelectorAll('.op-btn').forEach(b => b.classList.remove('selected'));
+        this.#selectedOp = null;
+        document.querySelectorAll('.op-btn').forEach(btn => btn.classList.remove('selected'));
 
         this.#renderTiles();
         this.#renderHistory();
         this.#updateOpsState();
         this.#updateCounter();
 
-        this.#log(`Operation: ${a.value} ${this.#selectedOp} ${b.value} = ${result}`);
+        this.#log(`Operation: ${a.value} ${op} ${b.value} = ${result}`);
 
         if (result === this.#target) {
             this.#foundExact = true;
@@ -231,47 +226,40 @@ export default class MakeTheTargetManager {
         });
     }
 
-    // ── History ──────────────────────────────────────────────────────────────
-
     #renderHistory() {
         if (this.#history.length === 0) {
-            this.#historyBox.innerHTML =
-                `<em class="text-muted">${this.#i18n.noOperationYet ?? 'No operation yet.'}</em>`;
+            this.#historyBox.innerHTML = `<em class="text-muted">${this.#i18n.noOperationYet}</em>`;
             return;
         }
 
         this.#historyBox.innerHTML = this.#history.map(h => {
-            const exact  = h.result === this.#target ? ' exact' : '';
+            const exact = h.result === this.#target ? ' exact' : '';
             const symbol = { '+': '+', '-': '−', '*': '×', '/': '÷' }[h.op];
             return `<div class="history-line${exact}">
-                        ${h.a} ${symbol} ${h.b} = <strong>${h.result}</strong>
-                    </div>`;
+                    ${h.a} ${symbol} ${h.b} = <strong>${h.result}</strong>
+                </div>`;
         }).join('');
     }
 
     #updateCounter() {
-        const label = this.#moves <= 1
-            ? (this.#i18n.operationCount ?? '%d operation').replace('%d', String(this.#moves))
-            : (this.#i18n.operationsCount ?? '%d operations').replace('%d', String(this.#moves));
-        this.#moveCounter.textContent = label;
+        const template = this.#moves <= 1 ? this.#i18n.operationCount : this.#i18n.operationsCount;
+        this.#moveCounter.textContent = template.replace('%d', String(this.#moves));
     }
-
-    // ── Win ──────────────────────────────────────────────────────────────────
 
     #showWin() {
         this.#endMessage.style.display = 'block';
-        const obtained = (this.#i18n.obtainedIn ?? 'You obtained %1 in %2 operation(s).')
+        const obtained = this.#i18n.obtainedIn
             .replace('%1', `<strong>${this.#target}</strong>`)
             .replace('%2', String(this.#moves));
 
         this.#endMessage.innerHTML = `
-            <div class="alert alert-success">
-                <h3>🎉 ${this.#i18n.targetReached ?? 'Target reached!'}</h3>
-                <p>${obtained}</p>
-                <button class="btn btn-primary" onclick="location.reload()">
-                    ${this.#i18n.newGame ?? 'New game'}
-                </button>
-            </div>`;
+        <div class="alert alert-success">
+            <h3>🎉 ${this.#i18n.targetReached}</h3>
+            <p>${obtained}</p>
+            <button class="btn btn-primary" onclick="location.reload()">
+                ${this.#i18n.newGame}
+            </button>
+        </div>`;
 
         this.#log(`Game won in ${this.#moves} moves – target ${this.#target}`);
     }
@@ -290,13 +278,11 @@ export default class MakeTheTargetManager {
         this.#solutionBox.style.display = 'block';
         if (solution.found) {
             this.#solutionBox.innerHTML =
-                `<strong>💡 ${this.#i18n.solutionFound ?? 'Solution found:'}</strong>\n\n${solution.steps.join('\n')}`;
+                `<strong>💡 ${this.#i18n.solutionFound}</strong>\n\n${solution.steps.join('\n')}`;
         } else {
             this.#solutionBox.innerHTML =
-                `<strong>💡 ${this.#i18n.bestResult ?? 'Best possible result:'}</strong> ${solution.best}\n\n` +
-                (solution.steps.length
-                    ? solution.steps.join('\n')
-                    : (this.#i18n.noCombination ?? 'No interesting combination found.'));
+                `<strong>💡 ${this.#i18n.bestResult}</strong> ${solution.best}\n\n` +
+                (solution.steps.length ? solution.steps.join('\n') : this.#i18n.noCombination);
         }
 
         this.#log(`Solution requested – found: ${solution.found}, best: ${solution.best}`);
@@ -382,17 +368,17 @@ export default class MakeTheTargetManager {
             .filter(t => t.id < 100)
             .map(t => ({ id: t.id, value: t.value, used: false }));
 
-        this.#tiles       = original;
+        this.#tiles = original;
         this.#selectedIds = [];
-        this.#selectedOp  = null;
-        this.#history     = [];
-        this.#nextId      = 100;
-        this.#moves       = 0;
-        this.#gameActive  = true;
-        this.#foundExact  = false;
+        this.#selectedOp = null;
+        this.#history = [];
+        this.#nextId = 100;
+        this.#moves = 0;
+        this.#gameActive = true;
+        this.#foundExact = false;
 
         this.#solutionBox.style.display = 'none';
-        this.#endMessage.style.display  = 'none';
+        this.#endMessage.style.display = 'none';
 
         this.#renderTiles();
         this.#renderHistory();

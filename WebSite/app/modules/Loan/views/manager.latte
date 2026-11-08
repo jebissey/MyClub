@@ -228,9 +228,7 @@
         window.loanPersons = {$persons};
         window.loanItems   = {$loanItems};
 
-    {if isset($i18n)}
-        Object.assign(window.i18n, {=$i18n});
-    {/if}
+    Object.assign(window.i18n, {=$i18n});
     </script>
 
     <script type="module" src="{='/app/modules/Loan/js/manager.js'|version}"></script>

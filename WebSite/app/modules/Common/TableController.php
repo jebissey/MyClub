@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace app\modules\Common;
 
 use Envms\FluentPDO\Queries\Select;
+use stdClass;
 use app\helpers\Application;
+use app\modules\Common\valueObjects\TableRow;
 
 abstract class TableController extends AbstractController
 {
@@ -19,7 +21,7 @@ abstract class TableController extends AbstractController
     /**
      * @param array<string,string|null> $filters
      * @return array{
-     *     items: array<int, object>,
+     *     items: list<TableRow>,
      *     currentPage: int,
      *     totalPages: int,
      *     filters: array<string,string|null>
@@ -49,11 +51,14 @@ abstract class TableController extends AbstractController
             ->limit($this->itemsPerPage)
             ->offset(($currentPage - 1) * $this->itemsPerPage);
 
-        /** @var array<int, object> $items */
-        $items = $this->dataHelper->query($query->getQuery(), $values, $usePdoForLog) ?: [];
+        /** @var array<int, stdClass> $rows */
+        $rows = $this->dataHelper->query($query->getQuery(), $values, $usePdoForLog) ?: [];
 
         return [
-            'items' => $items,
+            'items' => array_map(
+                static fn(object $row): TableRow => TableRow::fromStdClass($row),
+                array_values($rows)
+            ),
             'currentPage' => $currentPage,
             'totalPages' => $totalPages,
             'filters' => $filters,

@@ -11,12 +11,14 @@ use app\helpers\To;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\CrosstabDataHelper;
+use app\models\GroupDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogAnalyticsDataHelper;
 use app\models\LogStatisticsDataHelper;
 use app\models\MemberDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\TableController;
+use app\modules\Common\valueObjects\TopPageRow;
 use app\modules\VisitorInsights\viewModels\AnalyticsViewModel;
 use app\modules\VisitorInsights\viewModels\CrossTabViewModel;
 use app\modules\VisitorInsights\viewModels\LastVisitsViewModel;
@@ -56,6 +58,7 @@ final class VisitorInsightsController extends TableController
         private readonly LogAnalyticsDataHelper $logDataAnalyticsHelper,
         private readonly LogStatisticsDataHelper $logDataStatisticsHelper,
         private readonly MemberDataHelper $memberDataHelper,
+        private readonly GroupDataHelper $groupDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -115,7 +118,7 @@ final class VisitorInsightsController extends TableController
         $data  = $this->prepareTableData($query, $filterValues, true);
 
         $viewModel = new VisitorLogsViewModel(
-            logs: array_values($data['items']),
+            logs: $data['items'],
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
             filterValues: $filterValues,
@@ -127,7 +130,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->views->render('VisitorInsights/views/visitor.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/visitor.latte', $viewModel);
     }
 
     public function membersAlerts(): void
@@ -137,13 +140,13 @@ final class VisitorInsightsController extends TableController
         }
 
         $viewModel = new MembersAlertsViewModel(
-            membersAlerts: array_values($this->personDataHelper->getMembersAlerts()),
+            membersAlerts: $this->personDataHelper->getMembersAlerts(),
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),
         );
 
-        $this->views->render('VisitorInsights/views/membersAlerts.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/membersAlerts.latte', $viewModel);
     }
 
     public function visitorInsights(): void
@@ -159,7 +162,7 @@ final class VisitorInsightsController extends TableController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('VisitorInsights/views/visitorInsights.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/visitorInsights.latte', $viewModel);
     }
 
     public function referents(): void
@@ -181,7 +184,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->views->render('VisitorInsights/views/referent.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/referent.latte', $viewModel);
     }
 
     public function visitorsGraf(): void
@@ -219,7 +222,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->views->render('VisitorInsights/views/statistics.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/statistics.latte', $viewModel);
     }
 
     public function analytics(): void
@@ -235,7 +238,7 @@ final class VisitorInsightsController extends TableController
             browserData: $this->logDataStatisticsHelper->getBrowserDistribution($period, $currentDate),
             screenResolutionData: $this->logDataStatisticsHelper->getScreenResolutionDistribution($period, $currentDate),
             typeData: $this->logDataStatisticsHelper->getTypeDistribution($period, $currentDate),
-            title: 'Synthèse des visiteurs',
+            title: ($this->t)('visitor_insights.analytics.title'),
             period: $period,
             nav: $this->logDataAnalyticsHelper->getReferentNavigation($period, $currentDate),
             i18n: [
@@ -246,7 +249,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->views->render('VisitorInsights/views/analytics.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/analytics.latte', $viewModel);
     }
 
     public function topPagesByPeriod(): void
@@ -262,14 +265,17 @@ final class VisitorInsightsController extends TableController
             period: $period->value,
             periodFrom: $period->getStart()->format('Y-m-d H:i:s'),
             periodTo: $period->getEnd()->format('Y-m-d H:i:s'),
-            topPages: array_values($this->logDataHelper->getTopPages($period, self::TOP)),
+            topPages: array_map(
+                static fn(object $row): TopPageRow => TopPageRow::fromStdClass($row),
+                $this->logDataHelper->getTopPages($period, self::TOP),
+            ),
             translations: TranslationManager::getCreationTimeModalTranslations($this->languagesDataHelper),
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),
         );
 
-        $this->views->render('VisitorInsights/views/topPages.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/topPages.latte', $viewModel);
     }
 
     public function crossTab(): void
@@ -302,10 +308,10 @@ final class VisitorInsightsController extends TableController
             title: ($this->t)('visitor_insights.cross_tab.title'),
             period: $period->value,
             uris: $sortedCrossTabData,
-            persons: array_values($this->logDataHelper->getPersons($filteredPersons)),
+            persons: $this->logDataHelper->getPersons($filteredPersons),
             columnTotals: $columnTotals,
             grandTotal: array_sum(array_filter($columnTotals, fn($v, $k) => !empty($k), ARRAY_FILTER_USE_BOTH)),
-            groups: array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name')),
+            groups: $this->groupDataHelper->getActiveGroups(),
             uriFilter: $uriFilter,
             emailFilter: $emailFilter,
             groupFilter: $groupFilter,
@@ -318,7 +324,7 @@ final class VisitorInsightsController extends TableController
             ]),
         );
 
-        $this->views->render('VisitorInsights/views/crossTab.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/crossTab.latte', $viewModel);
     }
 
     public function showLastVisits(): void
@@ -332,13 +338,12 @@ final class VisitorInsightsController extends TableController
         $viewModel = new LastVisitsViewModel(
             lastVisits: $this->logDataHelper->getLastVisitPerActivePersonWithTimeAgo($activePersons),
             totalActiveUsers: count($activePersons),
-            navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),
         );
 
-        $this->views->render('VisitorInsights/views/lastVisits.latte', $viewModel->toArray());
+        $this->views->render('VisitorInsights/views/lastVisits.latte', $viewModel);
     }
 
     #region Private functions

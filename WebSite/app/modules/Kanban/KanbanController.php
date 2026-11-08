@@ -64,7 +64,7 @@ final class KanbanController extends AbstractController
             ]),
         );
 
-        $this->views->render('Kanban/views/kanban.latte', $viewModel->toArray());
+        $this->views->render('Kanban/views/kanban.latte', $viewModel);
     }
 
     public function help(): void

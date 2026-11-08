@@ -9,12 +9,13 @@ export class KaraokeApp {
     constructor() {
         this.songId = window.location.pathname.split('/').pop();
         this.clientId = window.sessionId ?? 'no-session';
+        this.i18n = window.karaokeI18n ?? {};
         this.elements = this.getDOMElements();
-        
+
         this.validateDOMElements();
         this.initializeManagers();
         this.initStateMachine();
-        
+
         this.countdownInterval = null;
     }
 
@@ -26,19 +27,19 @@ export class KaraokeApp {
 
     initializeManagers() {
         this.api = new ApiManager(this.songId, this.clientId);
-        
+
         this.audio = new AudioController(this.elements.audioPlayer, {
             onTick: (time) => this.updatePlaybackPosition(time),
             onPlay: () => this.ui.updatePlayButton(true),
             onPause: () => this.ui.updatePlayButton(false),
             onEnded: () => this.handlePlaybackEnded(),
             onError: (err) => this.showError(err),
-            onInteractionRequired: () => this.showError('Cliquez sur "Lecture" pour activer le son')
+            onInteractionRequired: () => this.showError(this.i18n.clickToPlay)
         });
-        
+
         this.lyrics = new LyricsRenderer(this.elements.lyricsDisplay, window.lyricsData || []);
-        this.ui = new UIController(this.elements);
-        
+        this.ui = new UIController(this.elements, this.i18n);
+
         this.sync = new SyncManager(this.api, {
             onActivated: (data) => this.onSyncActivated(data),
             onDeactivated: () => this.onSyncDeactivated(),
@@ -46,7 +47,7 @@ export class KaraokeApp {
             onError: (err) => this.showError(err),
             onCriticalError: (msg) => this.onCriticalSyncError(msg)
         });
-        
+
         this.scheduler = new PlaybackScheduler(this.sync, () => this.startSyncPlayback());
     }
 
@@ -57,7 +58,7 @@ export class KaraokeApp {
                 { name: 'play',        from: 'idle',        to: 'playing' },
                 { name: 'pause',       from: 'playing',     to: 'idle' },
                 { name: 'ended',       from: 'playing',     to: 'idle' },
-                
+
                 { name: 'enableSync',  from: ['idle', 'playing'], to: 'syncReady' },
                 { name: 'disableSync', from: ['syncReady', 'syncSession'], to: 'idle' },
                 { name: 'startSync',   from: 'syncReady',   to: 'syncSession' },
@@ -72,14 +73,14 @@ export class KaraokeApp {
                 onLeavePlaying: () => {
                     this.audio.stopTick();
                 },
-                
+
                 onEnterSyncReady: () => {
                     this.showSyncReadyUI();
                 },
                 onLeaveSyncReady: () => {
-                    // Cleanup si nécessaire
+                    // Cleanup if needed
                 },
-                
+
                 onEnterSyncSession: () => {
                     this.audio.startTick();
                     this.sync.reducePollingFrequency();
@@ -90,12 +91,12 @@ export class KaraokeApp {
                     this.clearCountdown();
                     this.scheduler.cancel();
                 },
-                
+
                 onEnterIdle: () => {
                     this.ui.updatePlayButton(false);
                     this.showSoloUI();
                 },
-                
+
                 onInvalidTransition: (t, from) => {
                     console.warn(`Invalid transition: ${t} from ${from}`);
                 }
@@ -121,7 +122,7 @@ export class KaraokeApp {
             syncStatus: document.getElementById('syncStatus')
         };
     }
-    
+
     async init() {
         try {
             this.lyrics.render();
@@ -129,7 +130,7 @@ export class KaraokeApp {
             await this.checkForActiveSync();
         } catch (error) {
             console.error('Init failed:', error);
-            this.showError('Échec du chargement');
+            this.showError(this.i18n.loadFailed);
         }
     }
 
@@ -137,13 +138,13 @@ export class KaraokeApp {
         this.elements.audioPlayer?.addEventListener('loadedmetadata', () => {
             this.ui.updateDuration(this.audio.getDuration());
         });
-        
+
         this.elements.playPauseBtn?.addEventListener('click', () => this.togglePlayPause());
         this.elements.restartBtn?.addEventListener('click', () => this.restart());
         this.elements.launchForAllBtn?.addEventListener('click', () => this.toggleSyncSession());
         this.elements.syncCheckbox?.addEventListener('change', (e) => this.toggleSyncMode(e.target.checked));
         this.elements.progressContainer?.addEventListener('click', (e) => this.seekFromClick(e));
-        
+
         window.addEventListener('beforeunload', () => this.destroy());
     }
 
@@ -159,7 +160,6 @@ export class KaraokeApp {
         }
     }
 
-    
     showSoloUI() {
         this.ui.showSoloControls();
         this.elements.playPauseBtn?.classList.remove('hidden');
@@ -170,7 +170,7 @@ export class KaraokeApp {
         this.ui.showSyncControls();
         this.elements.playPauseBtn?.classList.add('hidden');
         this.elements.restartBtn?.classList.add('hidden');
-        
+
         if (this.sync.isHost) {
             this.elements.launchForAllBtn?.classList.remove('hidden');
             this.ui.setLaunchButtonState(false);
@@ -178,14 +178,13 @@ export class KaraokeApp {
     }
 
     showSyncSessionUI() {
-        // Les boutons solo restent cachés
-        // Le bouton "Arrêter pour tous" est visible pour l'hôte
+        // Solo buttons stay hidden.
+        // The "stop for everyone" button is visible for the host.
         if (this.sync.isHost) {
             this.ui.setLaunchButtonState(true);
         }
     }
 
-    
     togglePlayPause() {
         if (!this.isSoloMode()) return;
 
@@ -200,20 +199,20 @@ export class KaraokeApp {
 
     restart() {
         if (!this.isSoloMode()) return;
-        
+
         this.audio.seek(0);
         this.lyrics.reset();
     }
 
     seekFromClick(e) {
         if (!this.isSoloMode()) return;
-        
+
         const rect = this.elements.progressContainer.getBoundingClientRect();
         const percent = (e.clientX - rect.left) / rect.width;
         const newTime = percent * this.audio.getDuration();
         this.audio.seek(newTime);
     }
-    
+
     async toggleSyncMode(enable) {
         if (enable) {
             await this.activateSync();
@@ -224,25 +223,25 @@ export class KaraokeApp {
 
     async activateSync() {
         try {
-            // Préparer l'audio (débloquer autoplay sur mobile)
+            // Prepare the audio (unlock autoplay on mobile)
             await this.audio.silentUnlock();
-            
-            // Activer le mode sync côté serveur
+
+            // Enable sync mode on the server
             const result = await this.sync.activate();
             if (!result.success) {
-                throw new Error(result.error || 'Sync activation failed');
+                throw new Error(result.error || this.i18n.syncActivationFailed);
             }
-            
-            // Arrêter la lecture solo si en cours
+
+            // Stop solo playback if running
             if (this.audio.isPlaying) {
                 this.audio.pause();
             }
-            
-            // Transition vers syncReady
+
+            // Move to syncReady
             if (this.fsm.can('enableSync')) {
                 this.fsm.enableSync();
             }
-            
+
         } catch (error) {
             this.showError(error);
             this.elements.syncCheckbox.checked = false;
@@ -252,15 +251,15 @@ export class KaraokeApp {
     async deactivateSync() {
         try {
             await this.sync.deactivate();
-            
+
             if (this.audio.isPlaying) {
                 this.audio.pause();
             }
-            
+
             if (this.fsm.can('disableSync')) {
                 this.fsm.disableSync();
             }
-            
+
         } catch (error) {
             this.showError(error);
         }
@@ -278,25 +277,25 @@ export class KaraokeApp {
 
     async startSyncSession() {
         if (!this.sync.isHost || !this.fsm.can('startSync')) return;
-        
+
         try {
-            // Reset de la lecture
+            // Reset playback
             this.audio.seek(0);
             this.lyrics.reset();
-            
-            // Demander au serveur d'initier le countdown
+
+            // Ask the server to initiate the countdown
             const result = await this.sync.initiateCountdown();
             if (!result.success) {
-                throw new Error('Failed to start countdown');
+                throw new Error(this.i18n.countdownFailed);
             }
-            
-            // Transition vers syncSession
+
+            // Move to syncSession
             this.fsm.startSync();
-            
-            // Planifier la lecture
+
+            // Schedule playback
             this.scheduler.schedule(result.playStartTime);
             this.startCountdown(result.playStartTime);
-            
+
         } catch (error) {
             this.showError(error);
         }
@@ -304,43 +303,43 @@ export class KaraokeApp {
 
     async stopSyncSession() {
         if (!this.sync.isHost || !this.fsm.can('stopSync')) return;
-        
+
         try {
             this.audio.stop();
             this.lyrics.reset();
-            
+
             await this.sync.stopPlayback();
-            
+
             this.fsm.stopSync();
-            
+
         } catch (error) {
             this.showError(error);
         }
     }
 
     // ========================================================================
-    // CALLBACKS SYNC MANAGER
+    // SYNC MANAGER CALLBACKS
     // ========================================================================
-    
+
     onSyncActivated({ isHost }) {
         console.log(`Sync activated. IsHost: ${isHost}`);
-        // La transition FSM est déjà faite dans activateSync()
+        // The FSM transition is already done in activateSync()
     }
 
     onSyncDeactivated() {
         console.log('Sync deactivated');
-        // La transition FSM est déjà faite dans deactivateSync()
+        // The FSM transition is already done in deactivateSync()
     }
 
     onSyncStatusUpdate(status) {
-        // Mise à jour de l'UI
+        // Update the UI
         this.ui.updateSyncStatus(this.sync.isHost, this.sync.clientsCount);
-        
-        // Si on reçoit un statut de countdown depuis le serveur
+
+        // If the server reports a countdown
         if (status.status === 'countdown' && status.playStartTime) {
             this.handleServerCountdown(status);
         } else if (status.status === 'idle') {
-            // La session a été arrêtée par l'hôte
+            // The session was stopped by the host
             if (this.fsm.is('syncSession') && this.fsm.can('stopSync')) {
                 this.fsm.stopSync();
             }
@@ -349,19 +348,19 @@ export class KaraokeApp {
 
     handleServerCountdown(status) {
         const remaining = status.playStartTime - this.sync.getServerNow();
-        
+
         if (remaining > 0) {
-            // Démarrer la session si on n'est pas déjà dedans
+            // Join the session if not already in it
             if (this.fsm.is('syncReady') && this.fsm.can('startSync')) {
                 this.fsm.startSync();
             }
-            
-            // Démarrer le countdown visuel
+
+            // Start the visual countdown
             if (!this.countdownInterval) {
                 this.startCountdown(status.playStartTime);
             }
-            
-            // Planifier la lecture
+
+            // Schedule playback
             this.scheduler.schedule(status.playStartTime);
         }
     }
@@ -376,13 +375,13 @@ export class KaraokeApp {
     // ========================================================================
     // COUNTDOWN
     // ========================================================================
-    
+
     startCountdown(targetTime) {
         this.clearCountdown();
-        
+
         this.countdownInterval = setInterval(() => {
             const remaining = targetTime - this.sync.getServerNow();
-            
+
             if (remaining <= 0) {
                 this.ui.hideCountdown();
                 this.clearCountdown();
@@ -401,9 +400,9 @@ export class KaraokeApp {
     }
 
     // ========================================================================
-    // LECTURE
+    // PLAYBACK
     // ========================================================================
-    
+
     startSyncPlayback() {
         if (this.audio.isPlaying) return;
         this.audio.play();
@@ -423,15 +422,15 @@ export class KaraokeApp {
     }
 
     // ========================================================================
-    // UTILITAIRES
+    // UTILITIES
     // ========================================================================
-    
+
     isSoloMode() {
         return this.fsm.is('idle') || this.fsm.is('playing');
     }
 
     showError(error) {
-        const message = error?.message || error || 'Erreur inconnue';
+        const message = error?.message || error || this.i18n.unknownError;
         console.error('App error:', message);
         this.ui.showError(message);
     }
@@ -439,11 +438,11 @@ export class KaraokeApp {
     destroy() {
         this.clearCountdown();
         this.scheduler.cancel();
-        
+
         if (this.sync.isActive) {
             this.sync.deactivate();
         }
-        
+
         this.audio.destroy();
         this.lyrics.destroy();
         this.api.destroy?.();

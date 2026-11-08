@@ -142,7 +142,7 @@ final class ArticleListController extends TableController
         $data = $this->prepareTableData($query, $filterValues);
 
         $viewModel = new TableIndexViewModel(
-            articles: array_values($data['items']),
+            articles: $data['items'],
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
             filterValues: $filterValues,
@@ -157,6 +157,6 @@ final class ArticleListController extends TableController
                 'btnParent' => '/',
             ]),
         );
-        $this->views->render($template, $viewModel->toArray());
+        $this->views->render($template, $viewModel);
     }
 }

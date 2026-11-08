@@ -7,6 +7,9 @@ namespace app\models;
 use app\helpers\Application;
 use app\models\CrosstabDataHelper;
 
+/**
+ * @phpstan-import-type CrosstabResult from CrosstabDataHelper
+ */
 final class ArticleCrosstabDataHelper extends Data
 {
     public function __construct(Application $application, private readonly CrosstabDataHelper $crosstabDataHelper)
@@ -20,7 +23,7 @@ final class ArticleCrosstabDataHelper extends Data
 
     /**
      * @param array{start: string, end: string} $dateRange
-     * @return array<mixed>
+     * @return CrosstabResult
      */
     public function getItems(array $dateRange): array
     {

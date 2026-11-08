@@ -21,6 +21,7 @@ use app\modules\Webmaster\viewModels\AdminHomeViewModel;
 use app\modules\Webmaster\viewModels\ClubCustomizationViewModel;
 use app\modules\Webmaster\viewModels\EmailCredentialsViewModel;
 use app\modules\Webmaster\viewModels\HelloAssoCredentialsViewModel;
+use app\modules\Webmaster\viewModels\SitemapViewModel;
 use app\modules\Webmaster\viewModels\TurnstileCredentialsViewModel;
 use app\modules\Webmaster\viewModels\WebmasterHomeViewModel;
 use app\modules\Webmaster\viewModels\WebmasterInstallationsViewModel;
@@ -52,7 +53,7 @@ final class WebmasterController extends TableController
                 layoutParams: $this->getAllParams([]),
             );
 
-            $this->views->render('Webmaster/views/clubCustomization.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/clubCustomization.latte', $viewModel);
         }
     }
 
@@ -125,7 +126,7 @@ final class WebmasterController extends TableController
                 content: '',
                 layoutParams: $this->getAllParams([]),
             );
-            $this->views->render('Webmaster/views/admin.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/admin.latte', $viewModel);
         }
     }
 
@@ -140,7 +141,7 @@ final class WebmasterController extends TableController
                 previousPage: true,
                 layoutParams: $this->getAllParams([]),
             );
-            $this->views->render('Webmaster/views/webmaster.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/webmaster.latte', $viewModel);
         }
     }
 
@@ -189,7 +190,7 @@ final class WebmasterController extends TableController
                 ]),
             );
 
-            $this->views->render('Webmaster/views/notifications.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/notifications.latte', $viewModel);
         }
     }
 
@@ -216,7 +217,7 @@ final class WebmasterController extends TableController
                 ]),
             );
 
-            $this->views->render('Webmaster/views/emailCredentials.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/emailCredentials.latte', $viewModel);
         }
     }
 
@@ -240,7 +241,7 @@ final class WebmasterController extends TableController
                 'monthlyLimit'     => FilterInputRule::Integer->value,
             ];
             $input  = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-#error_log(json_encode($input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));      
+#error_log(json_encode($input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
             $method = To::str($input['sendMethod'] ?? null, 'smtp');
 
@@ -355,7 +356,7 @@ final class WebmasterController extends TableController
             ]),
         );
 
-        $this->views->render('Webmaster/views/installations.latte', $viewModel->toArray());
+        $this->views->render('Webmaster/views/installations.latte', $viewModel);
     }
 
     public function sitemapGenerator(): void
@@ -387,14 +388,14 @@ final class WebmasterController extends TableController
                 $lastmod = (new DateTime())->format(DateTime::ATOM);
             }
 
-            $urls[] = [
-                'loc'     => $baseUrl . '/article/' . (int) $article->id,
-                'lastmod' => $lastmod,
+            /** @var list<array{loc: string, lastmod: string}> $urls */
+            $urls = [
+                ['loc' => $baseUrl, 'lastmod' => $homepageLastmod],
             ];
         }
 
         header('Content-Type: application/xml; charset=utf-8');
-        $this->views->render('Webmaster/views/sitemap.latte', ['urls' => $urls]);
+        $this->views->render('Webmaster/views/sitemap.latte', new SitemapViewModel($urls));
     }
 
 
@@ -410,7 +411,7 @@ final class WebmasterController extends TableController
                 ]),
             );
 
-            $this->views->render('Webmaster/views/turnstileCredentials.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/turnstileCredentials.latte', $viewModel);
         }
     }
 
@@ -446,7 +447,7 @@ final class WebmasterController extends TableController
                 ]),
             );
 
-            $this->views->render('Webmaster/views/helloassoCredentials.latte', $viewModel->toArray());
+            $this->views->render('Webmaster/views/helloassoCredentials.latte', $viewModel);
         }
     }
 

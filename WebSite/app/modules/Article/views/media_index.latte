@@ -93,14 +93,16 @@
                             {var $name = strtolower($file['name'])}
                         <tr>
                             <td>
-                            {if strpos($name, '.jpg') !== false || strpos($name, '.jpeg') !== false || strpos($name, '.png') !== false || strpos($name, '.gif') !== false}
+                            {var $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION))}
+
+                            {if in_array($extension, ['jpg', 'jpeg', 'png', 'gif'], true)}
                                 <img src="{$file['urlRedactor']}" class="img-thumbnail" style="max-height: 50px; max-width: 100px;">
-                            {elseif strpos($name, '.mp4') !== false || strpos($name, '.webm') !== false || strpos($name, '.ogg') !== false || strpos($name, '.mov') !== false}
+                            {elseif in_array($extension, ['mp4', 'webm', 'mov'], true)}
                                 <video controls preload="metadata" style="max-height: 60px; max-width: 100px; border-radius: 6px;">
                                     <source src="{$file['urlRedactor']}" type="video/{if strpos($name, '.mp4') !== false}mp4{elseif strpos($name, '.webm') !== false}webm{elseif strpos($name, '.ogg') !== false}ogg{elseif strpos($name, '.mov') !== false}quicktime{/if}">
                                     {='media.manager.video_unsupported'|translate}
                                 </video>
-                            {elseif strpos($name, '.mp3') !== false || strpos($name, '.wav') !== false || strpos($name, '.ogg') !== false || strpos($name, '.m4a') !== false || strpos($name, '.flac') !== false}
+                            {elseif in_array($extension, ['mp3', 'wav', 'ogg', 'm4a', 'flac'], true)}
                                 <i class="bi bi-music-note-beamed text-primary" style="font-size: 2rem;"></i>
                             {else}
                                 <i class="bi bi-file-earmark text-secondary" style="font-size: 2rem;"></i>
@@ -184,9 +186,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 
 <script>
-{if isset($i18n)}
-    Object.assign(window.i18n, {=$i18n});
-{/if}
+Object.assign(window.i18n, {=$i18n});
 </script>
 <script type="module" src="{='/app/modules/Article/js/mediaShare.js'|version}"></script>
 <script type="module" src="{='/app/modules/Article/js/mediaEdit.js'|version}"></script>

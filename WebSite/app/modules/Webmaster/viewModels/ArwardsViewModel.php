@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Webmaster\viewModels;
 
-use stdClass;
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\IdNameRow;
 use app\modules\Common\valueObjects\MenuItemRow;
 
 final readonly class ArwardsViewModel extends LayoutViewModel
@@ -13,7 +13,7 @@ final readonly class ArwardsViewModel extends LayoutViewModel
     /**
      * @param list<string> $counterNames
      * @param mixed $data
-     * @param list<stdClass> $groups
+     * @param list<IdNameRow> $groups
      * @param list<MenuItemRow> $navItems
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */

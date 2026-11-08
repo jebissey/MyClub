@@ -72,6 +72,6 @@ final class TranslatorController extends AbstractController
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Translator/views/translator.latte', $viewModel->toArray());
+        $this->views->render('Translator/views/translator.latte', $viewModel);
     }
 }

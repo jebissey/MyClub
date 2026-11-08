@@ -12,17 +12,15 @@ final class LyricsParser
     private array $metadata = [];
 
     /**
-     * @var array<int, array{
+     * @var list<array{
      *     time: float,
      *     text: string,
-     *     words: array<int, array{time: float, text: string}>
+     *     words: list<array{time: float, text: string}>
      * }>
      */
     private array $lines = [];
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function parse(string $filePath): void
     {
@@ -97,10 +95,10 @@ final class LyricsParser
     }
 
     /**
-     * @return array<int, array{
+     * @return list<array{
      *     time: float,
      *     text: string,
-     *     words: array<int, array{time: float, text: string}>
+     *     words: list<array{time: float, text: string}>
      * }>
      */
     public function getLines(): array

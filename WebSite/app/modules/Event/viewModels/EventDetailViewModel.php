@@ -8,6 +8,10 @@ use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\MemberMapMarker;
 use app\modules\Common\valueObjects\EventAttributeRow;
 use app\modules\Event\valueObjects\EventDetailRow;
+use app\modules\Event\valueObjects\EventParticipantRow;
+use app\modules\Event\valueObjects\EventNeedRow;
+use app\modules\Event\valueObjects\UserSupplyRow;
+use app\modules\Event\valueObjects\ParticipantSupplyRow;
 
 final readonly class EventDetailViewModel extends LayoutViewModel
 {
@@ -24,10 +28,10 @@ final readonly class EventDetailViewModel extends LayoutViewModel
      * would silently discard fields the template likely needs for display.
      *
      * @param list<EventAttributeRow> $attributes
-     * @param list<mixed> $participants
-     * @param list<mixed> $eventNeeds No matching VO exists yet for this Need/EventNeed aggregate shape.
-     * @param list<mixed> $participantSupplies No matching VO exists yet for this shape.
-     * @param list<mixed> $userSupplies No matching VO exists yet for this shape.
+     * @param list<EventParticipantRow> $participants
+     * @param list<EventNeedRow> $eventNeeds No matching VO exists yet for this Need/EventNeed aggregate shape.
+     * @param list<ParticipantSupplyRow> $participantSupplies No matching VO exists yet for this shape.
+     * @param list<UserSupplyRow> $userSupplies No matching VO exists yet for this shape.
      * @param list<MemberMapMarker> $carpoolData Map markers of the registered members who can be located
      *  (empty if the user is not registered).
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().

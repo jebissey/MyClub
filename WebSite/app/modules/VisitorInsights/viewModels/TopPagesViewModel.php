@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace app\modules\VisitorInsights\viewModels;
 
+use app\modules\Common\valueObjects\TopPageRow;
 use app\modules\Common\viewModels\LayoutViewModel;
 
 final readonly class TopPagesViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $topPages
+     * @param list<TopPageRow> $topPages
      * @param array<string, string> $translations
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */

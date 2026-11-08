@@ -9,7 +9,7 @@ use app\modules\Common\viewModels\LayoutViewModel;
 final readonly class MembersAlertsViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $membersAlerts
+     * @param list<object{clubMember: string, NoAlert: string, NewEvent: string, NewArticle: string}> $membersAlerts
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(

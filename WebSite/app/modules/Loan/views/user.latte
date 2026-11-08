@@ -166,9 +166,7 @@
     window.resPersons     = {=json_encode($persons)|noescape};
     window.resItems       = {=json_encode($reservationItems)|noescape};
     
-    {if isset($i18n)}
-        Object.assign(window.i18n, {=$i18n});
-    {/if}
+    Object.assign(window.i18n, {=$i18n});
 </script>
 <script type="module" src="{='/app/modules/Loan/js/user.js'|version}"></script>
 {/block}

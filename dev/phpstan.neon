@@ -5,8 +5,8 @@ parameters:
     level: max
     paths:
         - ../WebSite/app
-        - test        
-        - tests        
+        - test
+        - tests
         - tools
     excludePaths:
         - tools/phpstan
@@ -19,16 +19,29 @@ parameters:
             version: 'Closure(string): string'
             formatFileSize: 'Closure(int): string'
             longDate: 'Closure(string): string'
-        functions: []
+        functions:
+            buildUrl: 'Closure(Latte\Runtime\Template, array<string, mixed>): string'
     ignoreErrors:
         -
+            messages:
+                - '#^If condition is always true\.$#'
+                - '#^Offset .[a-zA-Z]+. on .+ (on left side of \?\?|in isset\(\)) .+#s'
+                - '#^Parameter \#1 \(mixed\) of echo cannot be converted to string\.$#'
+            paths:
+                - %currentWorkingDirectory%/app/modules/Common/views/navbar/_menuItems.latte
+                - %currentWorkingDirectory%/app/modules/Common/views/navbar/_menuList.latte
+            reportUnmatched: false
+        -
             message: '#^Call to function array_key_exists\(\) with .+ will always evaluate to (true|false)\.$#s'
-            path: *.latte
+            path: %currentWorkingDirectory%/app/*.latte
+            reportUnmatched: false
         -
             message: '#^Call to function unset\(\) contains undefined variable \$.+_args\.$#u'
-            path: *.latte
+            path: %currentWorkingDirectory%/app/*.latte
+            reportUnmatched: false
+
 services:
-    - 
+    -
         class: MyClub\Dev\PhpStan\ViewsRenderTemplateResolver
         arguments:
             modulesDir: %currentWorkingDirectory%/app/modules

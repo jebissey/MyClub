@@ -355,7 +355,8 @@ final readonly class ControllerFactory
             $this->designDataHelper,
             $this->news,
             $this->personDataHelper,
-            $this->metadataDataHelper
+            $this->metadataDataHelper,
+            $this->carouselDataHelper
         );
     }
 
@@ -640,7 +641,8 @@ final readonly class ControllerFactory
             $this->crosstabDataHelper,
             new LogAnalyticsDataHelper($this->application),
             new LogStatisticsDataHelper($this->application),
-            $this->memberDataHelper
+            $this->memberDataHelper,
+            $this->groupDataHelper,
         );
     }
 

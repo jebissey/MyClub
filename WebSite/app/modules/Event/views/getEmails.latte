@@ -9,7 +9,7 @@
                     <select class="form-select" id="groupSelect" name="idGroup">
                         <option value="">{='event.get_emails.option.all_groups'|translate}</option>
                         {foreach $groups as $group}
-                            <option value="{$group->Id}">{$group->Name}</option>
+                            <option value="{$group->id}">{$group->name}</option>
                         {/foreach}
                     </select>
                 </div>

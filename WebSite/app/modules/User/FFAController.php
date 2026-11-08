@@ -10,6 +10,7 @@ use app\helpers\FFAScraper;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Common\AbstractController;
+use app\modules\User\viewModels\FfaSearchViewModel;
 
 final class FFAController extends AbstractController
 {
@@ -32,33 +33,31 @@ final class FFAController extends AbstractController
             'question'  => FilterInputRule::HtmlSafeName->value,
             'year'      => FilterInputRule::Int->value,
             'club'      => FilterInputRule::HtmlSafeName->value,
-            'page'      => $connectedUser->getPage() ?? '',
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->query->getData());
 
-        /** @var string $firstName */
-        $firstName = $input['firstName'] ?? $person->firstName ?? '???';
-        /** @var string $lastName */
-        $lastName = $input['lastName'] ?? $person->lastName ?? '???';
-        $question = $input['question'] ?? 'rank';
-        /** @var string $year */
-        $year = $input['year'] ?? date('Y');
-        $club = $input['club'] ?? $this->dataHelper->getSetting('FFA_club', '???');
+        $firstName = To::str($input['firstName'] ?? $person->firstName ?? '???');
+        $lastName  = To::str($input['lastName'] ?? $person->lastName ?? '???');
+        $question  = To::str($input['question'] ?? 'rank');
+        $year      = To::str($input['year'] ?? date('Y'));
+        $club      = To::str($input['club'] ?? $this->dataHelper->getSetting('FFA_club', '???'));
 
         $ffaScraper = new FFAScraper();
         $results = $question === 'rank'
-            ? $ffaScraper->searchAthleteRank($firstName, $lastName, $year, To::str($club))
-            : $ffaScraper->searchAthleteResults($firstName, $lastName, $year, To::str($club));
+            ? $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club)
+            : $ffaScraper->searchAthleteResults($firstName, $lastName, $year, $club);
 
-        $this->views->render('User/views/ffaSearch.latte', $this->getAllParams([
-            'firstName' => $firstName,
-            'lastName'  => $lastName,
-            'question'  => $question,
-            'results'   => $results,
-            'navItems'  => $this->getNavItems($person?->email),
-            'year'      => $year,
-            'club'      => $club,
-            'page'      => $connectedUser->getPage(),
-        ]));
+        $viewModel = new FfaSearchViewModel(
+            firstName: $firstName,
+            lastName: $lastName,
+            question: $question,
+            results: $results,
+            navItems: $this->getNavItems($person?->email),
+            year: $year,
+            club: $club,
+            layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
+        );
+
+        $this->views->render('User/views/ffaSearch.latte', $viewModel);
     }
 }

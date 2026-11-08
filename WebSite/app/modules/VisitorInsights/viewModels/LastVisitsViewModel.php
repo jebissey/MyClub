@@ -5,19 +5,17 @@ declare(strict_types=1);
 namespace app\modules\VisitorInsights\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\LastVisitRow;
 
 final readonly class LastVisitsViewModel extends LayoutViewModel
 {
     /**
-     * @param mixed $lastVisits
-     * @param list<MenuItemRow> $navItems
+     * @param list<LastVisitRow> $lastVisits
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
-        public mixed $lastVisits,
+        public array $lastVisits,
         public int $totalActiveUsers,
-        public array $navItems,
         array $layoutParams = []
     ) {
         parent::__construct(

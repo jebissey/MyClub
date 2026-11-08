@@ -20,34 +20,52 @@ use app\helpers\ConnectedUser;
 use app\helpers\PersonPreferences;
 use app\helpers\TranslationManager;
 use app\helpers\To;
-use app\modules\Common\interfaces\NewsProviderInterface;
 use app\models\DataHelper;
+use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Common\valueObjects\ApiResponse;
 use app\modules\Common\valueObjects\EventAttributeRow;
+use app\modules\Common\valueObjects\Person;
 use app\modules\Event\valueObjects\EventDetailRow;
 use app\modules\Event\valueObjects\EventExternalRow;
 use app\modules\Event\valueObjects\EventFullRow;
-use app\modules\Common\valueObjects\Person;
+use app\modules\Event\valueObjects\EventNeedRow;
+use app\modules\Event\valueObjects\GuestEventRow;
+use app\modules\Event\valueObjects\IndividualRow;
+use app\modules\Event\valueObjects\InvitationRow;
+use app\modules\Event\valueObjects\ParticipantSupplyRow;
+use app\modules\Event\valueObjects\PendingInvitationRow;
+use app\modules\Event\valueObjects\UserSupplyRow;
 
 /**
- * @phpstan-import-type EventArrayShape from \app\modules\Common\valueObjects\EventRow
  * @phpstan-type WeekData array{
  *     weekStart: string,
  *     weekEnd: string,
  *     weekStartFull: string,
  *     days: array<int, list<EventArrayShape>>
  * }
- * @phpstan-import-type EventDetailRowShape from EventDetailRow
+ * @phpstan-import-type EventArrayShape from \app\modules\Common\valueObjects\EventRow
  */
 final class EventDataHelper extends Data implements NewsProviderInterface
 {
     private readonly PersonPreferences $personPreferences;
+    private readonly EventInvitationDataHelper $eventInvitationDataHelper;
+    private readonly EventParticipationDataHelper $eventParticipationDataHelper;
 
+    public function __construct(
+        Application $application,
+        DataHelper $dataHelper,
+        EventInvitationDataHelper $eventInvitationDataHelper,
+        EventParticipationDataHelper $eventParticipationDataHelper
+    ) {
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdo()
+        );
 
-    public function __construct(Application $application, DataHelper $dataHelper)
-    {
-        parent::__construct($application->getPdo(), $application->getErrorManager(), $application->getPdo());
         $this->personPreferences = new PersonPreferences($dataHelper);
+        $this->eventInvitationDataHelper = $eventInvitationDataHelper;
+        $this->eventParticipationDataHelper = $eventParticipationDataHelper;
     }
 
 
@@ -93,7 +111,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':id' => $id]);
-            /** @var EventDetailRowShape|false $event */
+            /** @var stdClass|false $event */
             $event = $stmt->fetch(PDO::FETCH_OBJ);
             if ($event === false) {
                 $this->pdo->rollBack();
@@ -137,147 +155,6 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         $stmt->execute([':eventId' => $eventId]);
         return $stmt->fetch(PDO::FETCH_OBJ) !== false;
     }
-
-
-    /**
-     * Invitation en attente pour ce couple (Email, Événement), si elle existe.
-     * Sert à empêcher une double invitation (EventGuestController::guestInvite()).
-     *
-     * @return object{Id: int, NickName: string|null, Token: string, InvitedAt: string}|false
-     */
-    public function findPendingInvitation(string $email, int $eventId): object|false
-    {
-        /** @var object{Id: int, NickName: string|null, Token: string, InvitedAt: string}|false $row */
-        $row = $this->get('Invitation', ['Email' => $email, 'IdEvent' => $eventId], 'Id, NickName, Token, InvitedAt');
-        return $row;
-    }
-
-
-    /**
-     * Crée une invitation en attente pour un email externe. Aucun Individual
-     * n'est créé à ce stade : ça se fait à la confirmation, voir
-     * createContactIndividual().
-     */
-    public function createInvitation(
-        string $email,
-        string $nickname,
-        int $eventId,
-        string $token,
-        int $invitedBy,
-        string $invitedAt
-    ): void {
-        $this->set('Invitation', [
-            'Email'     => $email,
-            'NickName'  => $nickname,
-            'IdEvent'   => $eventId,
-            'Token'     => $token,
-            'InvitedBy' => $invitedBy,
-            'InvitedAt' => $invitedAt,
-        ]);
-    }
-
-
-    /**
-     * Invitation identifiée par son jeton — utilisée à la confirmation
-     * (EventController::register()). La ligne n'est pas supprimée après usage :
-     * le jeton reste valable pour basculer inscription/désinscription.
-     *
-     * @return object{Id: int, Email: string, NickName: string|null, IdEvent: int, InvitedBy: int, InvitedAt: string}|false
-     */
-    public function findInvitationByToken(string $token): object|false
-    {
-        /** @var object{Id: int, Email: string, NickName: string|null, IdEvent: int, InvitedBy: int, InvitedAt: string}|false $row */
-        $row = $this->get('Invitation', ['Token' => $token], 'Id, Email, NickName, IdEvent, InvitedBy, InvitedAt');
-        return $row;
-    }
-
-
-    /**
-     * Individual existant portant cet email, quel que soit son Type (Member ou
-     * Contact) — évite de recréer un Individual en double à la confirmation
-     * d'une invitation.
-     *
-     * @return object{Id: int, Type: string}|false
-     */
-    public function findIndividualByEmail(string $email): object|false
-    {
-        /** @var object{Id: int, Type: string}|false $row */
-        $row = $this->get('Individual', ['Email' => $email], 'Id, Type');
-        return $row;
-    }
-
-
-    /**
-     * Crée un nouvel Individual de type Contact (+ sa ligne Contact associée,
-     * avec son propre jeton d'accès général) et retourne son Id.
-     */
-    public function createContactIndividual(string $email, string $nickname): int
-    {
-        $id = (int) $this->set('Individual', [
-            'Type' => 'Contact',
-            'Email' => $email,
-            'FirstName' => $nickname !== '' ? $nickname : $email,
-            'LastName' => '',
-            'NickName' => $nickname,
-        ]);
-
-        $this->set('Contact', [
-            'Id' => $id,
-            'Token' => bin2hex(random_bytes(32)),
-            'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s'),
-        ]);
-
-        return $id;
-    }
-
-
-    /**
-     * Un Individual (Member ou Contact confirmé) participe-t-il déjà à cet
-     * événement ?
-     */
-    public function isAlreadyRegistered(int $individualId, int $eventId): bool
-    {
-        return $this->get('Participant', [
-            'IdIndividual' => $individualId,
-            'IdEvent' => $eventId,
-        ], 'Id') !== false;
-    }
-
-
-    /**
-     * Inscrit un Individual comme participant confirmé. $invitedBy/$invitedAt
-     * restent null pour une inscription directe (Member), et sont renseignés
-     * (recopiés depuis l'Invitation) lors de la confirmation d'une invitation.
-     */
-    public function addConfirmedParticipant(int $individualId, int $eventId, ?int $invitedBy = null, ?string $invitedAt = null): void
-    {
-        $this->set('Participant', [
-            'IdEvent'      => $eventId,
-            'IdIndividual' => $individualId,
-            'InvitedBy'    => $invitedBy,
-            'InvitedAt'    => $invitedAt,
-        ]);
-    }
-
-
-    /**
-     * Retire un Individual des participants d'un événement (désinscription),
-     * en purgeant aussi ses éventuels ParticipantSupply.
-     */
-    public function removeParticipantByIndividual(int $individualId, int $eventId): void
-    {
-        /** @var object{Id: int}|false $participant */
-        $participant = $this->get('Participant', [
-            'IdIndividual' => $individualId,
-            'IdEvent' => $eventId,
-        ], 'Id');
-        if ($participant === false) {
-            return;
-        }
-        $this->delete('ParticipantSupply', ['IdParticipant' => $participant->Id]);
-        $this->delete('Participant', ['Id' => $participant->Id]);
-    }
-
 
     /** @return array<int, stdClass> */
     public function getAttributesForNextWeekEvents(): array
@@ -356,7 +233,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
             ";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':eventId' => $eventId]);
-            /** @var EventDetailRowShape|false $result */
+            /** @var stdClass|false $result */
             $result = $stmt->fetch(PDO::FETCH_OBJ);
             if ($result === false) {
                 throw new QueryException("Event type doesn't exist for event ({$eventId})");
@@ -416,7 +293,7 @@ final class EventDataHelper extends Data implements NewsProviderInterface
     }
 
 
-    /** @return array<int, stdClass> */
+    /** @return list<GuestEventRow> */
     public function getEventsForAllOrGuest(): array
     {
         $sql = "
@@ -438,9 +315,10 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':today' => (new DateTime())->format('Y-m-d\TH:i:s')]);
-        /** @var array<int, stdClass> $rows */
+        /** @var list<stdClass> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return $rows;
+
+        return array_map(static fn(object $row): GuestEventRow => GuestEventRow::fromStdClass($row), $rows);
     }
 
 
@@ -467,38 +345,103 @@ final class EventDataHelper extends Data implements NewsProviderInterface
     }
 
 
-    /** @return array<int, stdClass> */
+    /** @return list<EventNeedRow> */
     public function getEventNeeds(int $eventId): array
     {
         $sql = "
-            SELECT 
-                n.Id,
-                n.Label,
-                n.Name,
-                n.ParticipantDependent,
-                en.Counter,
-                CASE 
-                    WHEN n.ParticipantDependent = 1 THEN 
-                        (SELECT COUNT(*) FROM Participant WHERE IdEvent = ?)
-                    ELSE 
-                        COALESCE(en.Counter, 0)
-                END as RequiredQuantity,
-                COALESCE(SUM(ps.Supply), 0) as ProvidedQuantity
-            FROM Need n
-            INNER JOIN EventNeed en ON n.Id = en.IdNeed
-            LEFT JOIN ParticipantSupply ps ON n.Id = ps.IdNeed 
-                AND ps.IdParticipant IN (
-                    SELECT Id FROM Participant WHERE IdEvent = ?
-                )
-            WHERE en.IdEvent = ?
-            GROUP BY n.Id, n.Label, n.Name, n.ParticipantDependent, en.Counter
-            ORDER BY n.IdNeedType, n.Name
-        ";
+        SELECT
+            n.Id,
+            n.Label,
+            n.Name,
+            n.ParticipantDependent,
+            CASE
+                WHEN n.ParticipantDependent = 1 THEN
+                    (SELECT COUNT(*) FROM Participant WHERE IdEvent = ?)
+                ELSE
+                    COALESCE(en.Counter, 0)
+            END AS RequiredQuantity,
+            COALESCE(SUM(ps.Supply), 0) AS ProvidedQuantity
+        FROM Need n
+        INNER JOIN EventNeed en ON n.Id = en.IdNeed
+        LEFT JOIN ParticipantSupply ps ON n.Id = ps.IdNeed
+            AND ps.IdParticipant IN (
+                SELECT Id FROM Participant WHERE IdEvent = ?
+            )
+        WHERE en.IdEvent = ?
+        GROUP BY n.Id, n.Label, n.Name, n.ParticipantDependent, en.Counter
+        ORDER BY n.IdNeedType, n.Name
+    ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$eventId, $eventId, $eventId]);
-        /** @var array<int, stdClass> $rows */
+
+        /** @var list<stdClass> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return $rows;
+
+        return array_map(
+            static fn(stdClass $row): EventNeedRow => EventNeedRow::fromStdClass($row),
+            $rows,
+        );
+    }
+
+    /** @return list<UserSupplyRow> */
+    public function getUserSupplies(int $eventId, string $userEmail): array
+    {
+        $sql = "
+        SELECT ps.Id, ps.IdNeed, ps.Supply, n.Label, n.Name
+        FROM ParticipantSupply ps
+        INNER JOIN Participant part ON ps.IdParticipant = part.Id
+        INNER JOIN Individual i ON part.IdIndividual = i.Id
+        INNER JOIN Need n ON ps.IdNeed = n.Id
+        WHERE part.IdEvent = :eventId
+          AND i.Email COLLATE NOCASE = :userEmail
+    ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':eventId'   => $eventId,
+            ':userEmail' => $userEmail,
+        ]);
+
+        /** @var list<stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(
+            static fn(stdClass $row): UserSupplyRow => UserSupplyRow::fromStdClass($row),
+            $rows,
+        );
+    }
+
+    /** @return list<ParticipantSupplyRow> */
+    public function getParticipantSupplies(int $eventId): array
+    {
+        $sql = "
+        SELECT
+            i.FirstName,
+            i.LastName,
+            i.NickName,
+            n.Label AS NeedLabel,
+            n.Name AS NeedName,
+            ps.Supply
+        FROM ParticipantSupply ps
+        INNER JOIN Participant part ON ps.IdParticipant = part.Id
+        INNER JOIN Individual i ON part.IdIndividual = i.Id
+        INNER JOIN Need n ON ps.IdNeed = n.Id
+        INNER JOIN EventNeed en ON ps.IdNeed = en.IdNeed AND en.IdEvent = part.IdEvent
+        WHERE part.IdEvent = :eventId AND ps.Supply > 0
+        ORDER BY i.FirstName, i.LastName, n.Label
+    ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':eventId' => $eventId]);
+
+        /** @var list<stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(
+            static fn(stdClass $row): ParticipantSupplyRow => ParticipantSupplyRow::fromStdClass($row),
+            $rows,
+        );
     }
 
 
@@ -635,80 +578,6 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         }
         return $news;
     }
-
-
-    /** @return array<int, stdClass> */
-    public function getParticipantSupplies(int $eventId): array
-    {
-        $sql = "
-            SELECT 
-                i.FirstName,
-                i.LastName,
-                i.NickName,
-                n.Label AS NeedLabel,
-                n.Name AS NeedName,
-                ps.Supply
-            FROM ParticipantSupply ps
-            INNER JOIN Participant part ON ps.IdParticipant = part.Id
-            INNER JOIN Individual i ON part.IdIndividual = i.Id
-            INNER JOIN Need n ON ps.IdNeed = n.Id
-            INNER JOIN EventNeed en ON ps.IdNeed = en.IdNeed AND en.IdEvent = part.IdEvent
-            WHERE part.IdEvent = :eventId AND ps.Supply > 0
-            ORDER BY i.FirstName, i.LastName, n.Label
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':eventId' => $eventId]);
-        /** @var array<int, stdClass> $rows */
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return $rows;
-    }
-
-
-    /** @return array<int, stdClass> */
-    public function getUserSupplies(int $eventId, string $userEmail): array
-    {
-        $sql = "
-            SELECT ps.Id, ps.IdNeed, ps.Supply, n.Label, n.Name
-            FROM ParticipantSupply ps
-            INNER JOIN Participant part ON ps.IdParticipant = part.Id
-            INNER JOIN Individual i ON part.IdIndividual = i.Id
-            INNER JOIN Need n ON ps.IdNeed = n.Id
-            WHERE part.IdEvent = :eventId
-              AND i.Email COLLATE NOCASE = :userEmail
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':eventId'   => $eventId,
-            ':userEmail' => $userEmail,
-        ]);
-        /** @var array<int, stdClass> $rows */
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return $rows;
-    }
-
-
-    public function isUserRegistered(int $eventId, string $userEmail): bool
-    {
-        if ($this->eventExists($eventId)) {
-            $sql = "
-                SELECT i.Email
-                FROM Participant pa
-                JOIN Individual i ON pa.IdIndividual = i.Id
-                WHERE pa.IdEvent = :eventId
-                  AND i.Email = :userEmail COLLATE NOCASE
-                LIMIT 1
-            ";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([
-                ':eventId'   => $eventId,
-                ':userEmail' => $userEmail
-            ]);
-            $result = $stmt->fetch(PDO::FETCH_OBJ);
-            return $result !== false;
-        }
-        throw new QueryException("Event ({$eventId}) doesn't exist");
-    }
-
 
     /** @param array<string, mixed> $data */
     public function update(array $data, int $personId): void
@@ -1191,5 +1060,98 @@ final class EventDataHelper extends Data implements NewsProviderInterface
         }
 
         return $attributes;
+    }
+
+
+
+    public function findPendingInvitation(
+        string $email,
+        int $eventId
+    ): ?PendingInvitationRow {
+        return $this->eventInvitationDataHelper->findPendingInvitation($email, $eventId);
+    }
+
+    /**
+     * Creates a pending invitation for an external email address.
+     */
+    public function createInvitation(
+        string $email,
+        string $nickname,
+        int $eventId,
+        string $token,
+        int $invitedBy,
+        string $invitedAt
+    ): void {
+        $this->eventInvitationDataHelper->createInvitation(
+            $email,
+            $nickname,
+            $eventId,
+            $token,
+            $invitedBy,
+            $invitedAt
+        );
+    }
+
+    public function findInvitationByToken(string $token): ?InvitationRow
+    {
+        return $this->eventInvitationDataHelper->findInvitationByToken($token);
+    }
+
+    public function findIndividualByEmail(string $email): ?IndividualRow
+    {
+        return $this->eventInvitationDataHelper->findIndividualByEmail($email);
+    }
+
+    /**
+     * Creates a Contact Individual and its associated Contact record.
+     *
+     * @return int The newly created Individual ID.
+     */
+    public function createContactIndividual(string $email, string $nickname): int
+    {
+        return $this->eventInvitationDataHelper->createContactIndividual($email, $nickname);
+    }
+
+
+    public function isAlreadyRegistered(int $individualId, int $eventId): bool
+    {
+        return $this->eventParticipationDataHelper->isAlreadyRegistered(
+            $individualId,
+            $eventId
+        );
+    }
+
+    public function addConfirmedParticipant(
+        int $individualId,
+        int $eventId,
+        ?int $invitedBy = null,
+        ?string $invitedAt = null
+    ): void {
+        $this->eventParticipationDataHelper->addConfirmedParticipant(
+            $individualId,
+            $eventId,
+            $invitedBy,
+            $invitedAt
+        );
+    }
+
+    public function removeParticipantByIndividual(int $individualId, int $eventId): void
+    {
+        $this->eventParticipationDataHelper->removeParticipantByIndividual(
+            $individualId,
+            $eventId
+        );
+    }
+
+    public function isUserRegistered(int $eventId, string $userEmail): bool
+    {
+        if (!$this->eventExists($eventId)) {
+            throw new QueryException("Event ({$eventId}) doesn't exist");
+        }
+
+        return $this->eventParticipationDataHelper->isUserRegistered(
+            $eventId,
+            $userEmail
+        );
     }
 }
