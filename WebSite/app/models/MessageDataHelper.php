@@ -21,6 +21,17 @@ use app\modules\Common\valueObjects\ChatMessage;
 use app\modules\Common\valueObjects\MessageTarget;
 use app\modules\Event\valueObjects\EventParticipant;
 
+/**
+ * @phpstan-import-type NewsFeedItem from NewsProviderInterface
+ * @phpstan-type MessageGroupItem array{
+ *     type: string,
+ *     Id: int,
+ *     title: string,
+ *     message_count: int,
+ *     LastUpdate: string,
+ *     UserImg: string
+ * }
+ */
 final class MessageDataHelper extends Data implements NewsProviderInterface
 {
     public function __construct(Application $application, private readonly LanguagesDataHelper $languagesDataHelper)
@@ -172,29 +183,31 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return $this->mapChatMessages($rows);
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /** @return list<MessageGroupItem> */
     public function getGroupedMessages(int $personId, string $searchFrom, GravatarHandler $gravatarHandler): array
     {
         $rows = $this->doGetGroupedMessages($personId, $searchFrom);
 
-        /** @var list<array<string, mixed>> $result */
-        $result = array_map(function (stdClass $row) use ($gravatarHandler): array {
-            $userImg = WebApp::computeUserImg(
-                To::bool($row->UseGravatar ?? null),
-                is_string($row->Email ?? null) ? $row->Email : null,
-                is_string($row->Avatar ?? null) ? $row->Avatar : null,
-                $gravatarHandler
-            );
+        return array_values(array_map(
+            static function (stdClass $row) use ($gravatarHandler): array {
+                $userImg = WebApp::computeUserImg(
+                    To::bool($row->UseGravatar ?? null),
+                    is_string($row->Email ?? null) ? $row->Email : null,
+                    is_string($row->Avatar ?? null) ? $row->Avatar : null,
+                    $gravatarHandler
+                );
 
-            /** @var array<string, mixed> $item */
-            $item = (array) $row;
-            $item['UserImg'] = $userImg;
-            unset($item['Avatar'], $item['UseGravatar'], $item['Email']);
-
-            return $item;
-        }, $rows);
-
-        return $result;
+                return [
+                    'type'          => To::str($row->type ?? ''),
+                    'Id'            => To::int($row->Id ?? 0),
+                    'title'         => To::str($row->title ?? ''),
+                    'message_count' => To::int($row->message_count ?? 0),
+                    'LastUpdate'    => To::str($row->LastUpdate ?? ''),
+                    'UserImg'       => $userImg,
+                ];
+            },
+            $rows
+        ));
     }
 
     /** @return array{0: int, 1: int, 2: string} */

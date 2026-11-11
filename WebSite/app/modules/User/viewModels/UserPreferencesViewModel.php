@@ -8,17 +8,31 @@ use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\EventTypeRow;
 use app\modules\Common\valueObjects\MenuItemRow;
 
+/**
+ * @phpstan-type PreferenceEntry array{
+ *     enabled?: bool,
+ *     available?: bool,
+ *     pollOnly?: bool,
+ *     orderOnly?: bool,
+ *     poll_or_order?: bool
+ * }
+ *
+ * @phpstan-type UserPreferences array{
+ *     noAlerts?: bool,
+ *     eventTypes?: array<int|string, PreferenceEntry>
+ * }
+ */
 final readonly class UserPreferencesViewModel extends LayoutViewModel
 {
     /**
      * @param list<MenuItemRow> $navItems
-     * @param mixed $currentPreferences
+     * @param UserPreferences $currentPreferences
      * @param list<EventTypeRow> $eventTypes
-     * @param array<string, mixed> $layoutParams Full output of Params::getAll().
+     * @param array<string, mixed> $layoutParams
      */
     public function __construct(
         public array $navItems,
-        public mixed $currentPreferences,
+        public array $currentPreferences,
         public array $eventTypes,
         array $layoutParams = []
     ) {

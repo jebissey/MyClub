@@ -6,32 +6,42 @@ namespace app\helpers;
 
 use app\modules\Common\interfaces\NewsProviderInterface;
 
+/**
+ * @phpstan-import-type NewsFeedItem from NewsProviderInterface
+ */
 final readonly class News
 {
     /**
-     * @param array<int, NewsProviderInterface> $providers
+     * @param list<NewsProviderInterface> $providers
      */
     public function __construct(private array $providers)
     {
     }
 
     /**
-     * @return array<int, mixed>
+     * @return list<NewsFeedItem>
      */
     public function getNewsForPerson(ConnectedUser $connectedUser, string $searchFrom): array
     {
         $news = [];
-        if ($connectedUser->person ?? false) {
+
+        if ($connectedUser->person !== null) {
             foreach ($this->providers as $provider) {
-                $news = array_merge($news, $provider->getNews($connectedUser, $searchFrom));
+                array_push(
+                    $news,
+                    ...$provider->getNews($connectedUser, $searchFrom)
+                );
             }
         }
+
         return $news;
     }
 
     public function anyNews(ConnectedUser $connectedUser): bool
     {
-        $news = $this->getNewsForPerson($connectedUser, $connectedUser->getLastSignIn() ?? '');
-        return count($news) > 0;
+        return $this->getNewsForPerson(
+            $connectedUser,
+            $connectedUser->getLastSignIn() ?? ''
+        ) !== [];
     }
 }

@@ -1,14 +1,54 @@
 {layout '../../Common/views/layout.latte'}
 
 {var $visitorInsightsMenuItems = [
-    ['page' => 'referents',     'href' => '/referents',     'icon' => '☁️', 'label' => 'navbar.visitor_insights.referents'],
-    ['page' => 'topPages',      'href' => '/topPages',      'icon' => '📈', 'label' => 'navbar.visitor_insights.top_pages'],
-    ['page' => 'crossTab',      'href' => '/crossTab',      'icon' => '🧮', 'label' => 'navbar.visitor_insights.crosstab'],
-    ['page' => 'logs',          'href' => '/logs',          'icon' => '📋', 'label' => 'navbar.visitor_insights.logs'],
-    ['page' => 'visitorsGraf',  'href' => '/visitorsGraf',  'icon' => '📊', 'label' => 'navbar.visitor_insights.visitors'],
-    ['page' => 'analytics',     'href' => '/analytics',     'icon' => '🥧', 'label' => 'navbar.visitor_insights.analytics'],
-    ['page' => 'lastVisits',    'href' => '/lastVisits',    'icon' => '👁️', 'label' => 'navbar.visitor_insights.last_visits'],
-    ['page' => 'membersAlerts', 'href' => '/membersAlerts', 'icon' => '📩', 'label' => 'navbar.visitor_insights.members_alerts'],
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'referents',
+        href: '/referents',
+        icon: '☁️',
+        label: 'navbar.visitor_insights.referents'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'topPages',
+        href: '/topPages',
+        icon: '📈',
+        label: 'navbar.visitor_insights.top_pages'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'crossTab',
+        href: '/crossTab',
+        icon: '🧮',
+        label: 'navbar.visitor_insights.crosstab'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'logs',
+        href: '/logs',
+        icon: '📋',
+        label: 'navbar.visitor_insights.logs'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'visitorsGraf',
+        href: '/visitorsGraf',
+        icon: '📊',
+        label: 'navbar.visitor_insights.visitors'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'analytics',
+        href: '/analytics',
+        icon: '🥧',
+        label: 'navbar.visitor_insights.analytics'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'lastVisits',
+        href: '/lastVisits',
+        icon: '👁️',
+        label: 'navbar.visitor_insights.last_visits'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'membersAlerts',
+        href: '/membersAlerts',
+        icon: '📩',
+        label: 'navbar.visitor_insights.members_alerts'
+    ),
 ]}
 
 {block navbar}
@@ -19,7 +59,6 @@
     {if $content}
         {$content|noescape}
     {else}
-        {* Narrow screens only: the navbar is collapsed, so list the options here *}
         {include '../../Common/views/navbar/_menuList.latte', items: $visitorInsightsMenuItems}
     {/if}
 {/block}

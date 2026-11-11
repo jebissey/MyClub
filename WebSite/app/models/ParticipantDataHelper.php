@@ -10,6 +10,18 @@ use app\helpers\Application;
 use app\helpers\To;
 use app\modules\Event\valueObjects\EventParticipantRow;
 
+/**
+ * @phpstan-type ConnectionLevel array{labelKey: string, color: string}
+ * @phpstan-type ConnectionRow array{
+ *     OtherPerson: int,
+ *     OtherPersonInPresentationDirectory: int,
+ *     EventList: string,
+ *     CommonEvents: int,
+ *     Name: string,
+ *     Percent: int,
+ *     Level: ConnectionLevel
+ * }
+ */
 final class ParticipantDataHelper extends Data
 {
     public function __construct(Application $application)
@@ -83,8 +95,8 @@ final class ParticipantDataHelper extends Data
         return $result;
     }
 
-    /** @return array{connections: array<int, array<string, mixed>>, maxEvents: int} */
-    public function getConnections(int $idPerson): array
+    /** @return array{connections: list<ConnectionRow>, maxEvents: int} */
+    public function getConnections(int $idPerson, string $unknownName = ''): array
     {
         $stmt = $this->pdo->prepare("
             SELECT 
@@ -116,30 +128,16 @@ final class ParticipantDataHelper extends Data
 
         $stmt->execute(['idPerson' => $idPerson]);
 
-        /** @var list<array<string, mixed>> $connections */
-        $connections = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($connections as &$connection) {
-            $eventList = $connection['EventList'] ?? null;
-
-            if (is_string($eventList) && $eventList !== '') {
-                $events = explode(' • ', $eventList);
-
-                usort($events, function (string $a, string $b): int {
-                    $partsA = explode('|', $a);
-                    $partsB = explode('|', $b);
-
-                    return strcmp($partsB[1] ?? '', $partsA[1] ?? '');
-                });
-
-                $connection['EventList'] = implode(' • ', $events);
-            }
-        }
-        unset($connection);
-
-        if ($connections === []) {
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($rows === []) {
             return ['connections' => [], 'maxEvents' => 0];
         }
+
+        $maxEvents = max(array_map(
+            static fn(array $row): int => To::int($row['CommonEvents'] ?? 0),
+            $rows
+        ));
 
         $personsStmt = $this->pdo->query("
             SELECT 
@@ -153,57 +151,52 @@ final class ParticipantDataHelper extends Data
             INNER JOIN Member m ON m.Id = i.Id
         ");
 
-        if ($personsStmt === false) {
-            $commonEvents = array_column($connections, 'CommonEvents');
-            $maxEvents = $commonEvents !== []
-                ? To::int(max(array_map(static fn(mixed $v): int => To::int($v), $commonEvents)))
-                : 0;
+        /** @var array<int|string, string> $persons */
+        $persons = $personsStmt === false ? [] : $personsStmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-            return [
-                'connections' => $connections,
-                'maxEvents'   => $maxEvents,
+        $connections = [];
+        foreach ($rows as $row) {
+            $otherPerson = To::int($row['OtherPerson'] ?? 0);
+            $common = To::int($row['CommonEvents'] ?? 0);
+            $percent = $maxEvents > 0 ? (int) round(($common / $maxEvents) * 100) : 0;
+
+            $connections[] = [
+                'OtherPerson'                        => $otherPerson,
+                'OtherPersonInPresentationDirectory' => To::int($row['OtherPersonInPresentationDirectory'] ?? 0),
+                'EventList'                          => $this->sortEventList(To::str($row['EventList'] ?? '')),
+                'CommonEvents'                       => $common,
+                'Name'                               => $persons[$otherPerson] ?? $unknownName,
+                'Percent'                            => $percent,
+                'Level'                              => $this->levelFor($percent),
             ];
         }
 
-        /** @var array<int|string, string> $persons */
-        $persons = $personsStmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        return ['connections' => $connections, 'maxEvents' => $maxEvents];
+    }
 
-        $commonEvents = array_column($connections, 'CommonEvents');
-        $maxEvents = $commonEvents !== []
-            ? To::int(max(array_map(static fn(mixed $v): int => To::int($v), $commonEvents)))
-            : 0;
-
-        foreach ($connections as &$c) {
-            $otherPerson = $c['OtherPerson'] ?? null;
-            $otherPersonKey = (is_int($otherPerson) || is_string($otherPerson))
-                ? $otherPerson
-                : null;
-
-            $c['Name'] = ($otherPersonKey !== null && isset($persons[$otherPersonKey]))
-                ? $persons[$otherPersonKey]
-                : 'Inconnu';
-
-            $common = is_numeric($c['CommonEvents'] ?? null) ? (int) $c['CommonEvents'] : 0;
-
-            $c['Percent'] = $maxEvents > 0
-                ? (int) round(($common / $maxEvents) * 100)
-                : 0;
-
-            if ($c['Percent'] >= 70) {
-                $c['Level'] = ['label' => 'Très forte', 'color' => 'success'];
-            } elseif ($c['Percent'] >= 50) {
-                $c['Level'] = ['label' => 'Forte', 'color' => 'primary'];
-            } elseif ($c['Percent'] >= 25) {
-                $c['Level'] = ['label' => 'Moyenne', 'color' => 'warning'];
-            } else {
-                $c['Level'] = ['label' => 'Faible', 'color' => 'secondary'];
-            }
+    /** Sorts "id|startTime|summary" entries by start time, most recent first. */
+    private function sortEventList(string $eventList): string
+    {
+        if ($eventList === '') {
+            return '';
         }
-        unset($c);
+        $events = explode(' • ', $eventList);
+        usort(
+            $events,
+            static fn(string $a, string $b): int => strcmp(explode('|', $b)[1] ?? '', explode('|', $a)[1] ?? '')
+        );
 
-        return [
-            'connections' => $connections,
-            'maxEvents'   => $maxEvents,
-        ];
+        return implode(' • ', $events);
+    }
+
+    /** @return ConnectionLevel */
+    private function levelFor(int $percent): array
+    {
+        return match (true) {
+            $percent >= 70 => ['labelKey' => 'user_connections.level.very_strong', 'color' => 'success'],
+            $percent >= 50 => ['labelKey' => 'user_connections.level.strong',      'color' => 'primary'],
+            $percent >= 25 => ['labelKey' => 'user_connections.level.medium',      'color' => 'warning'],
+            default        => ['labelKey' => 'user_connections.level.weak',        'color' => 'secondary'],
+        };
     }
 }

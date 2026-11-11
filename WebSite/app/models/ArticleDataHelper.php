@@ -20,6 +20,7 @@ use app\modules\Common\interfaces\NewsProviderInterface;
 
 /**
  * @phpstan-import-type ArticleRowShape from ArticleRow
+ * @phpstan-import-type NewsFeedItem from NewsProviderInterface
  */
 final class ArticleDataHelper extends Data implements NewsProviderInterface
 {

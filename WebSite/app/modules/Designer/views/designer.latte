@@ -1,16 +1,76 @@
 {layout '../../Common/views/layout.latte'}
 
-{* Single source of truth for the designer menu entries *}
 {var $designerMenuItems = [
-    ['visible' => $isEventDesigner,    'page' => 'eventTypes', 'href' => '/eventTypes', 'icon' => '🗓️', 'label' => 'navbar.designer.event_types'],
-    ['visible' => $isEventDesigner,    'page' => 'needs',      'href' => '/needs',      'icon' => '📋', 'label' => 'navbar.designer.needs'],
-    ['visible' => $isExerciseDesigner, 'page' => 'exercises',  'href' => '/exercises',  'icon' => '🏋️', 'label' => 'navbar.designer.exercise'],
-    ['visible' => $isHomeDesigner,     'page' => 'settings',   'href' => '/settings',   'icon' => '🔧', 'label' => 'navbar.designer.settings'],
-    ['visible' => $isHomeDesigner,     'page' => 'designs',    'href' => '/designs',    'icon' => '🧠', 'label' => 'navbar.designer.designs'],
-    ['visible' => $isKanbanDesigner,   'page' => 'kanban',     'href' => '/kanban',     'icon' => '🟨', 'label' => 'navbar.designer.kanban'],
-    ['visible' => $isMenuDesigner,     'page' => 'menu',       'href' => '/menu',       'icon' => '📑', 'label' => 'navbar.designer.menu'],
-    ['visible' => $isLoanDesigner,     'page' => 'loan',       'href' => '/loan',       'icon' => '🔁', 'label' => 'navbar.designer.loan'],
-    ['visible' => $isTranslator,       'page' => 'translator', 'href' => '/translator', 'icon' => '🌍', 'label' => 'navbar.designer.translator'],
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'eventTypes',
+        href: '/eventTypes',
+        icon: '🗓️',
+        label: 'navbar.designer.event_types',
+        visible: $isEventDesigner
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'needs',
+        href: '/needs',
+        icon: '📋',
+        label: 'navbar.designer.needs',
+        visible: $isEventDesigner
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'exercises',
+        href: '/exercises',
+        icon: '🏋️',
+        label: 'navbar.designer.exercise',
+        visible: $isExerciseDesigner
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'settings',
+        href: '/settings',
+        icon: '🔧',
+        label: 'navbar.designer.settings',
+        visible: $isHomeDesigner
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'designs',
+        href: '/designs',
+        icon: '🧠',
+        label: 'navbar.designer.designs',
+        visible: $isHomeDesigner
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'kanban',
+        href: '/kanban',
+        icon: '🟨',
+        label: 'navbar.designer.kanban',
+        visible: $isKanbanDesigner
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'menu',
+        href: '/menu',
+        icon: '📑',
+        label: 'navbar.designer.menu',
+        visible: $isMenuDesigner
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'loan',
+        href: '/loan',
+        icon: '🔁',
+        label: 'navbar.designer.loan',
+        visible: $isLoanDesigner
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'translator',
+        href: '/translator',
+        icon: '🌍',
+        label: 'navbar.designer.translator',
+        visible: $isTranslator
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'routes',
+        href: '/routes',
+        icon: '🪧',
+        label: 'navbar.designer.routes',
+        visible: $isAnybody
+    ),
 ]}
 
 {block navbar}
@@ -21,7 +81,6 @@
     {if $content}
         {$content|noescape}
     {else}
-        {* Narrow screens only: the navbar is collapsed, so list the options here *}
         {include '../../Common/views/navbar/_menuList.latte', items: $designerMenuItems}
     {/if}
 {/block}

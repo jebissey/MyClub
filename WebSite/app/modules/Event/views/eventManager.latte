@@ -1,13 +1,42 @@
 {layout '../../Common/views/layout.latte'}
 
-{* Single source of truth for the event manager menu entries *}
 {var $eventManagerMenuItems = [
-    ['page' => 'weekEvents',     'href' => '/weekEvents',       'icon' => '🗓️', 'label' => 'navbar.event_manager.week_events'],
-    ['page' => 'nextEvents',     'href' => '/nextEvents',       'icon' => '📅', 'label' => 'navbar.event_manager.next_events'],
-    ['page' => 'guest',          'href' => '/events/guest',     'icon' => '📩', 'label' => 'navbar.event_manager.guest_invitation'],
-    ['page' => 'emails',         'href' => '/emails',           'icon' => '📧', 'label' => 'navbar.event_manager.emails'],
-    ['page' => 'crossTab',       'href' => '/events/crossTab',  'icon' => '🧮', 'label' => 'navbar.event_manager.crosstab'],
-    ['page' => 'availabilities', 'href' => '/availabilities',   'icon' => '🕒', 'label' => 'navbar.event_manager.availabilities'],
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'weekEvents',
+        href: '/weekEvents',
+        icon: '🗓️',
+        label: 'navbar.event_manager.week_events'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'nextEvents',
+        href: '/nextEvents',
+        icon: '📅',
+        label: 'navbar.event_manager.next_events'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'guest',
+        href: '/events/guest',
+        icon: '📩',
+        label: 'navbar.event_manager.guest_invitation'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'emails',
+        href: '/emails',
+        icon: '📧',
+        label: 'navbar.event_manager.emails'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'crossTab',
+        href: '/events/crossTab',
+        icon: '🧮',
+        label: 'navbar.event_manager.crosstab'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'availabilities',
+        href: '/availabilities',
+        icon: '🕒',
+        label: 'navbar.event_manager.availabilities'
+    ),
 ]}
 
 {block navbar}
@@ -18,7 +47,6 @@
     {if $content}
         {$content|noescape}
     {else}
-        {* Narrow screens only: the navbar is collapsed, so list the options here *}
         {include '../../Common/views/navbar/_menuList.latte', items: $eventManagerMenuItems}
     {/if}
 {/block}

@@ -1,12 +1,37 @@
 {layout '../../Common/views/layout.latte'}
 
-{* Single source of truth for the redactor menu entries *}
 {var $redactorMenuItems = [
-    ['visible' => true,      'page' => 'articles',    'href' => '/articles',          'icon' => '📰', 'label' => 'navbar.redactor.articles'],
-    ['visible' => $isEditor, 'page' => 'articles',    'href' => '/articles/public',   'icon' => '⚖️', 'label' => 'navbar.redactor.public_articles'],
-    ['visible' => true,      'page' => 'media',       'href' => '/media/list',        'icon' => '📂', 'label' => 'navbar.redactor.media'],
-    ['visible' => true,      'page' => 'topArticles', 'href' => '/topArticles',       'icon' => '📈', 'label' => 'navbar.redactor.top_articles'],
-    ['visible' => true,      'page' => 'crossTab',    'href' => '/articles/crossTab', 'icon' => '🧮', 'label' => 'navbar.redactor.crossTab'],
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'articles',
+        href: '/articles',
+        icon: '📰',
+        label: 'navbar.redactor.articles'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'articles',
+        href: '/articles/public',
+        icon: '⚖️',
+        label: 'navbar.redactor.public_articles',
+        visible: $isEditor
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'media',
+        href: '/media/list',
+        icon: '📂',
+        label: 'navbar.redactor.media'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'topArticles',
+        href: '/topArticles',
+        icon: '📈',
+        label: 'navbar.redactor.top_articles'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'crossTab',
+        href: '/articles/crossTab',
+        icon: '🧮',
+        label: 'navbar.redactor.crossTab'
+    ),
 ]}
 
 {block navbar}

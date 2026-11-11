@@ -27,20 +27,19 @@
                 </tr>
             </thead>
             <tbody>
-                {foreach $data as $personData}                        
-                    <tr>
-                        <td>{$personData[name]}</td>
-                        {foreach $counterNames as $name}                                
-                            <td class="text-center" data-value="{$personData[counters][$name]}">
-                                {number_format($personData[counters][$name], 0, ',', ' ')}                                
-                            </td>
-                        
-                        {/foreach}
-                        <td class="text-center fw-bold" data-value="{$personData[total]}">
-                            {number_format($personData[total], 0, ',', ' ')}                            
+            {foreach $data as $personData}
+                <tr>
+                    <td>{$personData->name}</td>
+                    {foreach $counterNames as $name}
+                        <td class="text-center" data-value="{$personData->counters[$name] ?? 0}">
+                            {number_format($personData->counters[$name] ?? 0, 0, ',', ' ')}
                         </td>
-                    </tr>
-                {/foreach}
+                    {/foreach}
+                    <td class="text-center fw-bold" data-value="{$personData->total}">
+                        {number_format($personData->total, 0, ',', ' ')}
+                    </td>
+                </tr>
+            {/foreach}
             </tbody>
         </table>
     </div>

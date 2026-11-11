@@ -10,7 +10,7 @@ use app\helpers\ConnectedUser;
 use app\modules\Common\interfaces\NewsProviderInterface;
 
 /**
- * Provides the "member presentation updated" news items.
+ * @phpstan-import-type NewsFeedItem from NewsProviderInterface
  */
 final class PresentationNewsDataHelper extends Data implements NewsProviderInterface
 {

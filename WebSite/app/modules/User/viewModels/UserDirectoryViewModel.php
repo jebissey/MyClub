@@ -15,7 +15,7 @@ final readonly class UserDirectoryViewModel extends LayoutViewModel
      * @param list<DirectoryPersonRow> $persons
      * @param list<MenuItemRow> $navItems
      * @param list<DirectoryGroupRow> $groups
-     * @param array<int|string, mixed> $groupCounts
+     * @param array<int, array{name: string, total: int, withPresentation: int}> $groupCounts
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(

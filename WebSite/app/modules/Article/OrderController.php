@@ -11,7 +11,7 @@ use app\models\ArticleDataHelper;
 use app\models\OrderDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\OrderReplyRow;
-use app\modules\Article\viewModels\ClosableFormResultsViewModel;
+use app\modules\Article\viewModels\ClosableFormAddViewModel;
 use app\modules\Article\viewModels\OrderResultsViewModel;
 use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
@@ -50,10 +50,30 @@ final class OrderController extends ClosableFormController
         return $this->authorizationService->canReadOrderResults($form, $article, $user);
     }
 
+    protected function renderAddPage(ClosableFormAddViewModel $viewModel): void
+    {
+        $this->views->render('Article/views/order_add.latte', $viewModel);
+    }
+
     /**
      * @param array<string, mixed> $layoutParams
      */
-    protected function buildResultsViewModel(int $articleId, array $layoutParams): ?ClosableFormResultsViewModel
+    protected function renderResultsPage(int $articleId, array $layoutParams): bool
+    {
+        $viewModel = $this->buildResultsViewModel($articleId, $layoutParams);
+        if ($viewModel === null) {
+            return false;
+        }
+
+        $this->views->render('Article/views/order_results.latte', $viewModel);
+
+        return true;
+    }
+
+    /**
+     * @param array<string, mixed> $layoutParams
+     */
+    private function buildResultsViewModel(int $articleId, array $layoutParams): ?OrderResultsViewModel
     {
         $order = $this->orderDataHelper->getWithCreator($articleId);
         if (!$order) {

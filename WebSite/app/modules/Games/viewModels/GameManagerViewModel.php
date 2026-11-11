@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Games\viewModels;
 
-use app\modules\Common\viewModels\LayoutViewModel;
-
-final readonly class GameManagerViewModel extends LayoutViewModel
+final readonly class GameManagerViewModel extends GameLayoutViewModel
 {
     /**
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
@@ -14,11 +12,11 @@ final readonly class GameManagerViewModel extends LayoutViewModel
     public function __construct(
         public string $content,
         array $layoutParams = [],
-        public string $sidebarState = 'open',
+        string $sidebarState = 'open',
+        string $category = '',
     ) {
-        $baseArgs = self::baseArgsFrom($layoutParams);
-        $baseArgs['page'] = '';
+        $layoutParams['page'] = '';
 
-        parent::__construct(...$baseArgs);
+        parent::__construct($layoutParams, $sidebarState, $category);
     }
 }

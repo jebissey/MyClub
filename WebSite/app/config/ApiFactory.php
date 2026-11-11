@@ -39,7 +39,6 @@ use app\helpers\NotificationSender;
 use app\models\AlertRecipientDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\AttributeDataHelper;
-use app\models\AuthorizationDataHelper;
 use app\models\AvailabilityDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\DesignDataHelper;
@@ -48,7 +47,9 @@ use app\models\EventNeedDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LanguagesDataHelper;
-use app\models\LoanDataHelper;
+use app\models\LoanItemDataHelper;
+use app\models\LoanRecordDataHelper;
+use app\models\LoanReservationDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\MemberDataHelper;
@@ -65,6 +66,8 @@ use app\modules\Common\services\EmailService;
 use app\modules\Common\services\EventService;
 use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MessageRecipientService;
+use app\modules\Loan\services\LoanAvailabilityService;
+use app\modules\Loan\services\LoanCalendarService;
 use app\modules\PersonManager\services\MemberOdsImporter;
 
 final readonly class ApiFactory
@@ -88,7 +91,11 @@ final readonly class ApiFactory
         private KanbanDataHelper $kanbanDataHelper,
         private KaraokeDataHelper $karaokeDataHelper,
         private LanguagesDataHelper $languagesDataHelper,
-        private LoanDataHelper $loanDataHelper,
+        private LoanAvailabilityService $loanAvailabilityService,
+        private LoanCalendarService $loanCalendarService,
+        private LoanItemDataHelper $loanItemDataHelper,
+        private LoanRecordDataHelper $loanRecordDataHelper,
+        private LoanReservationDataHelper $loanReservationDataHelper,
         private LogDataHelper $logDataHelper,
         private LogWriterDataHelper $logWriterDataHelper,
         private MediaManager $mediaManager,
@@ -104,8 +111,7 @@ final readonly class ApiFactory
         private NotificationSender $notificationSender,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
-    ) {
-    }
+    ) {}
 
     public function makeArticleApi(): ArticleApi
     {
@@ -313,7 +319,11 @@ final readonly class ApiFactory
             $this->connectedUser,
             $this->languagesDataHelper,
             $this->personDataHelper,
-            $this->loanDataHelper
+            $this->loanItemDataHelper,
+            $this->loanRecordDataHelper,
+            $this->loanReservationDataHelper,
+            $this->loanAvailabilityService,
+            $this->loanCalendarService,
         );
     }
 

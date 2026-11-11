@@ -7,7 +7,10 @@ namespace app\modules\Loan;
 use app\helpers\Application;
 use app\helpers\To;
 use app\helpers\TranslationManager;
-use app\models\LoanDataHelper;
+use app\models\LoanItemDataHelper;
+use app\models\LoanRecordDataHelper;
+use app\models\LoanReservationDataHelper;
+use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Loan\viewModels\LoanCalendarViewModel;
@@ -19,7 +22,10 @@ final class LoanController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private readonly LoanDataHelper $loanDataHelper,
+        private readonly LoanItemDataHelper $loanItemDataHelper,
+        private readonly LoanRecordDataHelper $loanRecordDataHelper,
+        private readonly LoanReservationDataHelper $loanReservationDataHelper,
+        private readonly PersonDataHelper $personDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -45,10 +51,10 @@ final class LoanController extends AbstractController
             return;
         }
 
-        $this->loanDataHelper->updateOverdueLoans();
+        $this->loanRecordDataHelper->updateOverdueLoans();
 
         $viewModel = new LoanDesignerViewModel(
-            items: array_values($this->loanDataHelper->getAllItems()),
+            items: $this->loanItemDataHelper->getAllItems(),
             i18n: $this->doTranslations(),
             activeTab: 'designer',
             layoutParams: $this->getAllParams([]),
@@ -83,12 +89,12 @@ final class LoanController extends AbstractController
             return;
         }
 
-        $this->loanDataHelper->updateOverdueLoans();
+        $this->loanRecordDataHelper->updateOverdueLoans();
 
         $viewModel = new LoanManagerViewModel(
-            loans: array_values($this->loanDataHelper->getAllLoans()),
-            loanItems: array_values($this->loanDataHelper->getActiveItems('loan')),
-            persons: array_values($this->loanDataHelper->getAllPersons()),
+            loans: $this->loanRecordDataHelper->getAllLoans(),
+            loanItems: $this->loanItemDataHelper->getActiveItems('loan'),
+            persons: $this->personDataHelper->getMemberOptions(),
             i18n: $this->doTranslations(),
             activeTab: 'manager',
             layoutParams: $this->getAllParams([]),
@@ -107,9 +113,9 @@ final class LoanController extends AbstractController
         $userId = $user->isLoanManager() ? 0 : $user->person->id ?? 0;
 
         $viewModel = new LoanUserViewModel(
-            reservations: array_values($this->loanDataHelper->getAllReservations($userId)),
-            reservationItems: array_values($this->loanDataHelper->getActiveItems('reservation')),
-            persons: array_values($this->loanDataHelper->getAllPersons()),
+            reservations: $this->loanReservationDataHelper->getAllReservations($userId),
+            reservationItems: $this->loanItemDataHelper->getActiveItems('reservation'),
+            persons: $this->personDataHelper->getMemberOptions(),
             isManager: $user->isLoanManager(),
             currentUserId: $userId,
             i18n: $this->doTranslations(),

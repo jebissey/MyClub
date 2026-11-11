@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!btn) return;
 
-    // Rafraîchir le texte et le style du bouton
+    // Refresh the button label and style
     async function refreshButton() {
         const subscribed = await isSubscribed();
-        btnText.textContent = subscribed ? "Se désabonner" : "S'abonner";
+        btnText.textContent = subscribed ? I18N.unsubscribe : I18N.subscribe;
         btn.classList.toggle("btn-danger", subscribed);
         btn.classList.toggle("btn-primary", !subscribed);
     }
@@ -34,27 +34,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         try {
             if (!("Notification" in window)) {
-                throw new Error("Notifications non supportées");
+                throw new Error(I18N.unsupported);
             }
 
             const subscribed = await isSubscribed();
 
             if (subscribed) {
                 await unsubscribePush();
-                notify("Désabonnement réussi", "success");
+                notify(I18N.unsubscribed, "success");
             } else {
                 const permission = await Notification.requestPermission();
 
                 if (permission !== "granted") {
-                    throw new Error("Autorisation refusée");
+                    throw new Error(I18N.permissionDenied);
                 }
 
                 await subscribePush(VAPID_PUBLIC_KEY);
-                notify("Abonnement réussi", "success");
+                notify(I18N.subscribed, "success");
             }
         } catch (e) {
             console.error(e);
-            notify(e.message || "Erreur push", "error");
+            notify(e.message || I18N.error, "error");
         } finally {
             await refreshButton();
             btn.disabled = false;

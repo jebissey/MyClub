@@ -28,7 +28,9 @@ use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogAnalyticsDataHelper;
-use app\models\LoanDataHelper;
+use app\models\LoanItemDataHelper;
+use app\models\LoanRecordDataHelper;
+use app\models\LoanReservationDataHelper;
 use app\models\LogStatisticsDataHelper;
 use app\models\MemberDataHelper;
 use app\models\MemberDirectoryDataHelper;
@@ -139,7 +141,9 @@ final readonly class ControllerFactory
         private ExerciseTableDataHelper $exerciseTableDataHelper,
         private GroupDataHelper $groupDataHelper,
         private KanbanDataHelper $kanbanDataHelper,
-        private LoanDataHelper $loanDataHelper,
+        private LoanItemDataHelper $loanItemDataHelper,
+        private LoanRecordDataHelper $loanRecordDataHelper,
+        private LoanReservationDataHelper $loanReservationDataHelper,
         private LogDataHelper $logDataHelper,
         private MemberCsvImporter $memberCsvImporter,
         private MemberCustomFields $memberCustomFields,
@@ -395,7 +399,10 @@ final readonly class ControllerFactory
     {
         return new LoanController(
             $this->application,
-            $this->loanDataHelper,
+            $this->loanItemDataHelper,
+            $this->loanRecordDataHelper,
+            $this->loanReservationDataHelper,
+            $this->personDataHelper,
         );
     }
 

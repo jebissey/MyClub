@@ -1,6 +1,6 @@
 {extends "user.latte"}
 
-{block title}Recherche FFA{/block}
+{block title}{='user.ffa.title'|translate}{/block}
 
 {block navbar}
 {include '../../Common/views/navbar/home.latte'}
@@ -10,7 +10,7 @@
     <div class="container mt-4">
         <div class="card mb-4">
             <div class="card-header">
-                <h5>Recherche dans la base FFA</h5>
+                <h5>{='user.ffa.search_title'|translate}</h5>
             </div>
             <div class="card-body">
                 <form method="get" action="/ffa/search">
@@ -19,13 +19,13 @@
                     <div class="row">
                         <div class="col-md-5">
                             <div class="form-group">
-                                <label for="firstName">Prénom</label>
+                                <label for="firstName">{='user.ffa.first_name'|translate}</label>
                                 <input type="text" class="form-control" id="firstName" name="firstName" value="{$firstName}">
                             </div>
                         </div>
                         <div class="col-md-5">
                             <div class="form-group">
-                                <label for="lastName">Nom</label>
+                                <label for="lastName">{='user.ffa.last_name'|translate}</label>
                                 <input type="text" class="form-control" id="lastName" name="lastName" value="{$lastName}">
                             </div>
                         </div>
@@ -34,13 +34,13 @@
                     <div class="row">
                         <div class="col-md-5">
                             <div class="form-group">
-                                <label for="year">Année</label>
+                                <label for="year">{='user.ffa.year'|translate}</label>
                                 <input type="number" class="form-control" id="year" name="year" value="{$year}">
                             </div>
                         </div>
                         <div class="col-md-5">
                             <div class="form-group">
-                                <label for="club">Club</label>
+                                <label for="club">{='user.ffa.club'|translate}</label>
                                 <input type="text" class="form-control" id="club" name="club" value="{$club}">
                             </div>
                         </div>
@@ -48,64 +48,69 @@
 
                     <div class="row">
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('rank')">Classement</button>
+                            <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('rank')">{='user.ffa.rank'|translate}</button>
                         </div>
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('results')">Résultats</button>
+                            <button type="submit" class="btn btn-primary w-100" onclick="setQuestion('results')">{='user.ffa.results'|translate}</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
-        
-        {if !empty($results) && !isset($results['error'])}
+
+        {if $error !== null}
+            <div class="alert alert-danger">
+                <strong>{='user.ffa.error'|translate}</strong> {$error}
+            </div>
+        {elseif $question === 'rank' && $rank !== null}
             <div class="card">
-            {if $question == 'rank'}
                 <div class="card-header">
-                    <h5>Classement</h5>
+                    <h5>{='user.ffa.rank'|translate}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Classement</th>
-                                <th>Epreuve</th>
-                                <th>Nom</th>
-                                <th>Club</th>
-                                <th>Points</th>
+                                <th>{='user.ffa.rank'|translate}</th>
+                                <th>{='user.ffa.event'|translate}</th>
+                                <th>{='user.ffa.last_name'|translate}</th>
+                                <th>{='user.ffa.club'|translate}</th>
+                                <th>{='user.ffa.points'|translate}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{$results['rank']}</td>
-                                <td>{$results['event']}</td>
-                                <td>{$results['name']}</td>
-                                <td>{$results['club']}</td>
-                                <td>{$results['points']}</td>
+                                <td>{$rank['rank']}</td>
+                                <td>{$rank['event']}</td>
+                                <td>{$rank['name']}</td>
+                                <td>{$rank['club']}</td>
+                                <td>{$rank['points']}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            {elseif $question == 'results'}
+            </div>
+        {elseif $question !== 'rank' && $results !== []}
+            <div class="card">
                 <div class="card-header">
-                    <h5>Résultats</h5>
+                    <h5>{='user.ffa.results'|translate}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Compétition</th>
-                                <th>Place</th>
-                                <th>Temps</th>
-                                <th>Catégorie</th>
-                                <th>Round</th>
-                                <th>Lieu</th>
-                                {if $firstName == '' && $lastName == ''}<th>Nom</th>{/if}
+                                <th>{='user.ffa.date'|translate}</th>
+                                <th>{='user.ffa.competition'|translate}</th>
+                                <th>{='user.ffa.place'|translate}</th>
+                                <th>{='user.ffa.time'|translate}</th>
+                                <th>{='user.ffa.category'|translate}</th>
+                                <th>{='user.ffa.round'|translate}</th>
+                                <th>{='user.ffa.location'|translate}</th>
+                                {if $firstName === '' && $lastName === ''}<th>{='user.ffa.last_name'|translate}</th>{/if}
                             </tr>
                         </thead>
                         <tbody>
-                        {foreach $results as $result}   
+                            {foreach $results as $result}
                             <tr>
                                 <td>{$result['date']}</td>
                                 <td>{$result['competition']}</td>
@@ -114,21 +119,16 @@
                                 <td>{$result['category']}</td>
                                 <td>{$result['round']}</td>
                                 <td>{$result['location']}</td>
-                                {if $firstName == '' && $lastName == ''}<td>{$result['name']}</td>{/if}
+                                {if $firstName === '' && $lastName === ''}<td>{$result['name']}</td>{/if}
                             </tr>
                             {/foreach}
                         </tbody>
                     </table>
                 </div>
-            {/if}
             </div>
-        {elseif isset($results['error'])}
-            <div class="alert alert-danger">
-                <strong>Erreur :</strong> {$results['error']}
-            </div>
-        {elseif $firstName && $lastName}
+        {elseif $firstName !== '' && $lastName !== ''}
             <div class="alert alert-warning">
-                Aucun résultat trouvé pour cette recherche.
+                {='user.ffa.no_result'|translate}
             </div>
         {/if}
     </div>

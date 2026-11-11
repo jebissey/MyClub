@@ -7,6 +7,7 @@ namespace app\modules\User;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\NotificationSender;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\GroupDataHelper;
 use app\modules\Common\AbstractController;
@@ -36,12 +37,16 @@ final class UserNotificationsController extends AbstractController
             $this->notificationSender->sendToRecipients(
                 [$person->id],
                 [
-                    'title' => 'Notification de test',
-                    'body'  => 'Ceci est une notification push de test.',
+                    'title' => $this->translate('user.notifications.test.title'),
+                    'body'  => $this->translate('user.notifications.test.body'),
                     'url'   => '/',
                 ]
             );
-            $notification = "🚀 Notification de test envoyée à l'utilisateur #{$person->id}.";
+            $notification = str_replace(
+                '{id}',
+                (string) $person->id,
+                $this->translate('user.notifications.test.sent')
+            );
         }
 
         $row = $this->dataHelper->get('Member', ['Id' => $person->id], 'Notifications');
@@ -54,6 +59,8 @@ final class UserNotificationsController extends AbstractController
         $viewModel = new UserNotificationsViewModel(
             navItems: $this->getNavItems($person->email),
             currentNotifications: is_array($decodedNotifications) ? $decodedNotifications : [],
+            subscribedGroupIds: $this->checkedIds($decodedNotifications['groupsSubscribed'] ?? null),
+            joinedGroupIds: $this->checkedIds($decodedNotifications['groupsJoined'] ?? null),
             groups: $this->groupDataHelper->getGroupsWithType($person->id),
             vapidPubliKey: $this->credentials->get('vapid', 'publicKey') ?? '',
             notification: $notification,
@@ -84,5 +91,23 @@ final class UserNotificationsController extends AbstractController
         $person = $this->application->getConnectedUser(true)->person;
         $this->dataHelper->set('Member', ['Notifications' => json_encode($notifications)], ['Id' => $person->id]);
         $this->redirect('/user');
+    }
+
+
+    /**
+     * Turns a checkbox matrix ([groupId => 'on', ...]) into a set of checked group ids.
+     *
+     * @return array<int, true>
+     */
+    private function checkedIds(mixed $matrix): array
+    {
+        $ids = [];
+        if (is_array($matrix)) {
+            foreach (array_keys($matrix) as $id) {
+                $ids[To::int($id)] = true;
+            }
+        }
+
+        return $ids;
     }
 }

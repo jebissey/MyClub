@@ -24,7 +24,6 @@ final readonly class DbBrowserTableViewModel extends LayoutViewModel
         public array $filters,
         public array $columns,
         public string $table,
-        public string $btnPlus,
         public string $resetUrl,
         public string $confirmDeleteMessage,
         array $layoutParams = []

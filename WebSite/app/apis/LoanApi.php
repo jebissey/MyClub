@@ -10,8 +10,12 @@ use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\LanguagesDataHelper;
-use app\models\LoanDataHelper;
+use app\models\LoanItemDataHelper;
+use app\models\LoanRecordDataHelper;
+use app\models\LoanReservationDataHelper;
 use app\models\PersonDataHelper;
+use app\modules\Loan\services\LoanAvailabilityService;
+use app\modules\Loan\services\LoanCalendarService;
 
 final class LoanApi extends AbstractApi
 {
@@ -20,7 +24,11 @@ final class LoanApi extends AbstractApi
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private readonly LoanDataHelper $loanDataHelper,
+        private readonly LoanItemDataHelper $loanItemDataHelper,
+        private readonly LoanRecordDataHelper $loanRecordDataHelper,
+        private readonly LoanReservationDataHelper $loanReservationDataHelper,
+        private readonly LoanAvailabilityService $loanAvailabilityService,
+        private readonly LoanCalendarService $loanCalendarService,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
@@ -29,14 +37,14 @@ final class LoanApi extends AbstractApi
     public function getItems(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
-            $this->renderJsonOk($this->loanDataHelper->getAllItems());
+            $this->renderJsonOk($this->loanItemDataHelper->getAllItems());
         }
     }
 
     public function getItem(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
-            $item = $this->loanDataHelper->getItem($id);
+            $item = $this->loanItemDataHelper->getItem($id);
             if (!$item) {
                 $this->renderJsonBadRequest("Item {$id} not found", __FILE__, __LINE__);
                 return;
@@ -55,7 +63,7 @@ final class LoanApi extends AbstractApi
                 return;
             }
 
-            $id = $this->loanDataHelper->saveItem($data);
+            $id = $this->loanItemDataHelper->saveItem($data);
             $this->renderJsonOk(['id' => $id]);
         }
     }
@@ -63,7 +71,7 @@ final class LoanApi extends AbstractApi
     public function deleteItem(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
-            $deleted = $this->loanDataHelper->deleteItem($id);
+            $deleted = $this->loanItemDataHelper->deleteItem($id);
             if (!$deleted) {
                 $this->renderJsonBadRequest('Cannot delete: active loans or reservations exist for this item.', __FILE__, __LINE__);
                 return;
@@ -76,7 +84,7 @@ final class LoanApi extends AbstractApi
     public function getLoans(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
-            $this->loanDataHelper->updateOverdueLoans();
+            $this->loanRecordDataHelper->updateOverdueLoans();
 
             $status = WebApp::getFiltered(
                 'status',
@@ -85,14 +93,14 @@ final class LoanApi extends AbstractApi
             );
 
             // Missing or invalid status means "no filter"
-            $this->renderJsonOk($this->loanDataHelper->getAllLoans(is_string($status) ? $status : ''));
+            $this->renderJsonOk($this->loanRecordDataHelper->getAllLoans(is_string($status) ? $status : ''));
         }
     }
 
     public function getLoan(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isLoanDesigner(), __FILE__, __LINE__)) {
-            $loan = $this->loanDataHelper->getLoan($id);
+            $loan = $this->loanRecordDataHelper->getLoan($id);
             if (!$loan) {
                 $this->renderJsonBadRequest("Loan {$id} not found", __FILE__, __LINE__);
                 return;
@@ -111,7 +119,7 @@ final class LoanApi extends AbstractApi
                     return;
                 }
             }
-            $available = $this->loanDataHelper->getAvailableQtyForLoan(
+            $available = $this->loanAvailabilityService->getAvailableQtyForLoan(
                 To::int($data['itemId']),
                 To::str($data['loanDate']),
                 To::str($data['dueDate']),
@@ -122,7 +130,7 @@ final class LoanApi extends AbstractApi
                 return;
             }
 
-            $id = $this->loanDataHelper->saveLoan($data);
+            $id = $this->loanRecordDataHelper->saveLoan($data);
             $this->renderJsonOk(['id' => $id]);
         }
     }
@@ -130,16 +138,16 @@ final class LoanApi extends AbstractApi
     public function returnLoan(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanManager(), __FILE__, __LINE__)) {
-            $data        = $this->getJsonInput();
-            $returnDate  = To::str($data['returnDate'] ?? date('Y-m-d'));
-            $returnedTo  = To::int($data['returnedToId'] ?? 0);
+            $data       = $this->getJsonInput();
+            $returnDate = To::str($data['returnDate'] ?? date('Y-m-d'));
+            $returnedTo = To::int($data['returnedToId'] ?? 0);
 
             if ($returnedTo === 0) {
                 $this->renderJsonBadRequest("Invalid returnedToId", __FILE__, __LINE__);
                 return;
             }
 
-            $ok = $this->loanDataHelper->setLoanReturn($id, $returnDate, $returnedTo);
+            $ok = $this->loanRecordDataHelper->setLoanReturn($id, $returnDate, $returnedTo);
             if (!$ok) {
                 $this->renderJsonBadRequest("Loan {$id} not found", __FILE__, __LINE__);
                 return;
@@ -151,7 +159,7 @@ final class LoanApi extends AbstractApi
     public function cancelLoan(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isLoanManager(), __FILE__, __LINE__)) {
-            $ok = $this->loanDataHelper->cancelLoan($id);
+            $ok = $this->loanRecordDataHelper->cancelLoan($id);
             if (!$ok) {
                 $this->renderJsonBadRequest("Loan {$id} not found", __FILE__, __LINE__);
                 return;
@@ -170,14 +178,14 @@ final class LoanApi extends AbstractApi
             $user = $this->application->getConnectedUser();
             // A manager sees everything, a regular user only sees their own
             $userId = $user->isLoanManager() ? 0 : $user->person->id ?? 0;
-            $this->renderJsonOk($this->loanDataHelper->getAllReservations($userId));
+            $this->renderJsonOk($this->loanReservationDataHelper->getAllReservations($userId));
         }
     }
 
     public function getReservation(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
-            $res = $this->loanDataHelper->getReservation($id);
+            $res = $this->loanReservationDataHelper->getReservation($id);
             if (!$res) {
                 $this->renderJsonBadRequest("Reservation {$id} not found", __FILE__, __LINE__);
                 return;
@@ -205,7 +213,7 @@ final class LoanApi extends AbstractApi
             }
 
             // Availability check
-            $available = $this->loanDataHelper->getAvailableQtyForReservation(
+            $available = $this->loanAvailabilityService->getAvailableQtyForReservation(
                 To::int($data['itemId']),
                 To::str($data['reservationDate']),
                 To::str($data['startTime']),
@@ -221,7 +229,7 @@ final class LoanApi extends AbstractApi
                 return;
             }
 
-            $id = $this->loanDataHelper->saveReservation($data);
+            $id = $this->loanReservationDataHelper->saveReservation($data);
             $this->renderJsonOk(['id' => $id]);
         }
     }
@@ -232,7 +240,7 @@ final class LoanApi extends AbstractApi
             $user   = $this->application->getConnectedUser();
             $userId = $user->isLoanManager() ? 0 : $user->person->id ?? 0;
 
-            $ok = $this->loanDataHelper->cancelReservation($id, $userId);
+            $ok = $this->loanReservationDataHelper->cancelReservation($id, $userId);
             if (!$ok) {
                 $this->renderJsonBadRequest("Reservation {$id} not found", __FILE__, __LINE__);
                 return;
@@ -257,7 +265,7 @@ final class LoanApi extends AbstractApi
             $start = is_string($input['start']) ? $input['start'] : date('Y-m-01');
             $end   = is_string($input['end']) ? $input['end'] : date('Y-m-t');
 
-            $this->renderJsonOk($this->loanDataHelper->getCalendarEvents($start, $end));
+            $this->renderJsonOk($this->loanCalendarService->getEvents($start, $end));
         }
     }
 
@@ -280,9 +288,9 @@ final class LoanApi extends AbstractApi
 
             if ($type === 'loan') {
                 $due = is_string($input['dueDate']) ? $input['dueDate'] : $date;
-                $qty = $this->loanDataHelper->getAvailableQtyForLoan($itemId, $date, $due);
+                $qty = $this->loanAvailabilityService->getAvailableQtyForLoan($itemId, $date, $due);
             } else {
-                $qty = $this->loanDataHelper->getAvailableQtyForReservation($itemId, $date, $start, $end);
+                $qty = $this->loanAvailabilityService->getAvailableQtyForReservation($itemId, $date, $start, $end);
             }
             $this->renderJsonOk(['available' => $qty]);
         }

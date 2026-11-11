@@ -1,20 +1,30 @@
 {*
  * Expected parameters:
  *   $items        — flat array of items, each having a 'type' key
- *   $groupConfig  — [type => ['label' =>, 'icon' =>, 'bg' =>], …]
+ *   $groupConfig  — [type => ['label' =>, 'icon' =>, 'bg' =>, 'url' =>?], …]
+ *   $itemTemplate — template rendering one item; receives $item and $cfg
  *   $emptyKey     — i18n key for the empty-state title
  *   $emptyDescKey — i18n key for the empty-state description (may reference {$searchMode})
  *}
 
-{if count($items) > 0}
+{varType list<array{type: string}> $items}
+{varType array<string, array{label: string, icon: string, bg: string, url?: string}> $groupConfig}
+{varType string $itemTemplate}
+{varType string $emptyKey}
+{varType string $emptyDescKey}
+
+{if $items !== []}
+
+    {varType array<string, list<array{type: string}> > $grouped}
 
     {var $grouped = []}
+
     {foreach $items as $item}
         {var $grouped[$item['type']][] = $item}
     {/foreach}
 
     {foreach $groupConfig as $type => $cfg}
-        {if isset($grouped[$type]) && count($grouped[$type]) > 0}
+        {if isset($grouped[$type])}
             <div class="card mb-3 border-0 shadow-sm overflow-hidden">
 
                 <div class="card-header bg-{$cfg['bg']} {if $cfg['bg'] === 'warning'}text-dark{else}text-white{/if} py-2">
@@ -27,7 +37,7 @@
                 <ul class="list-group list-group-flush">
                     {foreach $grouped[$type] as $item}
                         <li class="list-group-item px-2 px-md-3 py-2">
-                            {block item}{/block}
+                            {include $itemTemplate, item: $item, cfg: $cfg}
                         </li>
                     {/foreach}
                 </ul>

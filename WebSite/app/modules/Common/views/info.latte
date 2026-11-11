@@ -3,30 +3,28 @@
 {block navbar}
 <div class="container-fluid">
     {include 'navbar/_userLeft.latte'}
-</div>    
+</div>
 {/block}
 
 {block content}
-    <div class="container mt-4">
-        {ifset $content}
-            {$content|noescape}
-        {/ifset}
-    </div>
+<div class="container mt-4">
+    {$content|noescape}
+</div>
 
-    {if $timer > 0}
-        <div class="fixed-bottom">
-            <div class="progress" style="height: 6px;">
-                <div id="progressBar" 
-                     class="progress-bar bg-success" 
-                     role="progressbar" 
-                     style="width: 0%;" 
-                     aria-valuenow="0" 
-                     aria-valuemin="0" 
-                     aria-valuemax="100">
-                </div>
-            </div>
+{if $timer > 0}
+<div class="fixed-bottom">
+    <div class="progress" style="height: 6px;">
+        <div id="progressBar"
+             class="progress-bar bg-success"
+             role="progressbar"
+             style="width: 0%;"
+             aria-valuenow="0"
+             aria-valuemin="0"
+             aria-valuemax="100">
         </div>
-    {/if}
+    </div>
+</div>
+{/if}
 {/block}
 
 {block scripts}
@@ -51,11 +49,11 @@
 
             if (elapsed >= duration) {
                 clearInterval(interval);
-                {ifset $previousPage}
-                    history.back();
+                {if $previousPage}
+                history.back();
                 {else}
-                    window.location.href = "/";
-                {/ifset}
+                window.location.href = "/";
+                {/if}
             }
         }, step);
     })();

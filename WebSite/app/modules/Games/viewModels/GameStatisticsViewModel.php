@@ -6,13 +6,12 @@ namespace app\modules\Games\viewModels;
 
 use app\modules\Common\valueObjects\DataTableTypes;
 use app\modules\Common\valueObjects\TableRow;
-use app\modules\Common\viewModels\LayoutViewModel;
 
 /**
  * @phpstan-import-type TableColumn from DataTableTypes
  * @phpstan-import-type TableFilter from DataTableTypes
  */
-final readonly class GameStatisticsViewModel extends LayoutViewModel
+final readonly class GameStatisticsViewModel extends GameLayoutViewModel
 {
     /**
      * @param list<TableRow> $games
@@ -30,8 +29,9 @@ final readonly class GameStatisticsViewModel extends LayoutViewModel
         public array $columns,
         public string $resetUrl,
         public string $title,
+        string $category,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct($layoutParams, category: $category);
     }
 }

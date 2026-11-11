@@ -86,7 +86,7 @@
 </div>
 {/block}
 
-{block styles}
+{block head}
 <style>
 .piano-keyboard {
     display: flex;
@@ -149,7 +149,7 @@
     margin-bottom: 5px;
 }
 
-/* Positionnement des touches noires */
+/* Black keys positioning */
 .piano-key[data-note="C#4"] { left: 35px; }
 .piano-key[data-note="D#4"] { left: 85px; }
 .piano-key[data-note="F#4"] { left: 185px; }
@@ -173,6 +173,7 @@
 }
 </style>
 {/block}
+
 {block scripts}
 <script>
 window.solfegeConfig = {
@@ -181,8 +182,4 @@ window.solfegeConfig = {
 };
 </script>
 <script src="{='/app/modules/Games/Solfege/js/solfege.js'|version}"></script>
-{/block}
-</script>
-<script src="{='/app/modules/Games/Solfege/js/solfege.js'|version}"></script>
-{/block}
 {/block}

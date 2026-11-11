@@ -15,7 +15,7 @@
     </h2>
     <div class="d-flex gap-2">
         <select class="form-select form-select-sm" id="filterStatus" style="width:auto">
-            <option value="">{='loan.record.status'|translate} – Tous</option>
+            <option value="">{='loan.record.status'|translate} – {='loan.record.status.all'|translate}</option>
             <option value="active">{='loan.record.status.active'|translate}</option>
             <option value="overdue">{='loan.record.status.overdue'|translate}</option>
             <option value="returned">{='loan.record.status.returned'|translate}</option>
@@ -46,41 +46,41 @@
             </thead>
             <tbody id="tbodyLoans">
             {foreach $loans as $loan}
-                {var $statusClass = match($loan['Status']) {
+                {var $statusClass = match($loan->status) {
                     'returned'  => 'bg-success',
                     'overdue'   => 'bg-danger',
                     'cancelled' => 'bg-secondary',
                     default     => 'bg-primary'
                 }}
-                <tr data-id="{$loan['Id']}" data-status="{$loan['Status']}">
-                    <td class="fw-semibold">{$loan['ItemName']}</td>
-                    <td>{$loan['BorrowerName']}</td>
-                    <td class="text-muted small">{$loan['LenderName']}</td>
-                    <td>{$loan['LoanDate']}</td>
+                <tr data-id="{$loan->id}" data-status="{$loan->status}">
+                    <td class="fw-semibold">{$loan->itemName}</td>
+                    <td>{$loan->borrowerName}</td>
+                    <td class="text-muted small">{$loan->lenderName}</td>
+                    <td>{$loan->loanDate}</td>
                     <td>
-                        {$loan['DueDate']}
-                        {if $loan['Status'] === 'overdue'}
+                        {$loan->dueDate}
+                        {if $loan->status === 'overdue'}
                             <i class="bi bi-exclamation-triangle-fill text-danger ms-1"></i>
                         {/if}
                     </td>
-                    <td class="text-center">{$loan['QuantityLent']}</td>
+                    <td class="text-center">{$loan->quantityLent}</td>
                     <td>
                         <span class="badge {$statusClass}">
-                            {=('loan.record.status.' . $loan['Status'])|translate}
+                            {=('loan.record.status.' . $loan->status)|translate}
                         </span>
                     </td>
                     <td class="text-end text-nowrap">
-                        {if $loan['Status'] === 'active' || $loan['Status'] === 'overdue'}
+                        {if $loan->status === 'active' || $loan->status === 'overdue'}
                         <button class="btn btn-sm btn-outline-success btn-return me-1"
-                                data-id="{$loan['Id']}" title="{='loan.record.return_action'|translate}">
+                                data-id="{$loan->id}" title="{='loan.record.return_action'|translate}">
                             <i class="bi bi-check2-circle"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-secondary btn-edit-loan me-1"
-                                data-id="{$loan['Id']}">
+                                data-id="{$loan->id}">
                             <i class="bi bi-pencil"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger btn-cancel-loan"
-                                data-id="{$loan['Id']}">
+                                data-id="{$loan->id}">
                             <i class="bi bi-x-lg"></i>
                         </button>
                         {/if}
@@ -115,7 +115,7 @@
                         <select class="form-select" id="loanItem" required>
                             <option value="">–</option>
                             {foreach $loanItems as $item}
-                            <option value="{$item['Id']}" data-qty="{$item['Quantity']}">{$item['Name']}</option>
+                            <option value="{$item->id}" data-qty="{$item->quantity}">{$item->name}</option>
                             {/foreach}
                         </select>
                         <div class="form-text" id="loanItemAvail"></div>
@@ -133,7 +133,7 @@
                         <select class="form-select" id="loanBorrower" required>
                             <option value="">–</option>
                             {foreach $persons as $p}
-                            <option value="{$p['Id']}">{$p['FullName']}</option>
+                            <option value="{$p->id}">{$p->fullName}</option>
                             {/foreach}
                         </select>
                     </div>
@@ -144,7 +144,7 @@
                         <select class="form-select" id="loanLender" required>
                             <option value="">–</option>
                             {foreach $persons as $p}
-                            <option value="{$p['Id']}">{$p['FullName']}</option>
+                            <option value="{$p->id}">{$p->fullName}</option>
                             {/foreach}
                         </select>
                     </div>
@@ -205,7 +205,7 @@
                     <select class="form-select" id="returnedTo" required>
                         <option value="">–</option>
                         {foreach $persons as $p}
-                        <option value="{$p['Id']}">{$p['FullName']}</option>
+                        <option value="{$p->id}">{$p->fullName}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -225,10 +225,7 @@
 
 {block scripts}
     <script>
-        window.loanPersons = {$persons};
-        window.loanItems   = {$loanItems};
-
-    Object.assign(window.i18n, {=$i18n});
+        Object.assign(window.i18n, {=$i18n});
     </script>
 
     <script type="module" src="{='/app/modules/Loan/js/manager.js'|version}"></script>

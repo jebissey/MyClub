@@ -11,6 +11,16 @@ use app\modules\User\viewModels\UserNewsViewModel;
 
 final class UserNewsController extends AbstractShowController
 {
+    /** @var array<string, array{label: string, icon: string, bg: string}> */
+    private const GROUP_CONFIG = [
+        'article'      => ['label' => 'user.news.group.articles',      'icon' => 'bi-file-text',      'bg' => 'primary'],
+        'event'        => ['label' => 'user.news.group.events',        'icon' => 'bi-calendar-event', 'bg' => 'success'],
+        'message'      => ['label' => 'user.news.group.messages',      'icon' => 'bi-envelope',       'bg' => 'info'],
+        'presentation' => ['label' => 'user.news.group.presentations', 'icon' => 'bi-person-badge',   'bg' => 'warning'],
+        'survey'       => ['label' => 'user.news.group.surveys',       'icon' => 'bi-bar-chart',      'bg' => 'secondary'],
+        'order'        => ['label' => 'user.news.group.orders',        'icon' => 'bi-cart-check',     'bg' => 'warning'],
+    ];
+
     public function __construct(
         Application $application,
         private readonly News $news,
@@ -37,6 +47,7 @@ final class UserNewsController extends AbstractShowController
             navItems: $this->getNavItems($connectedUser->person?->email),
             person: $connectedUser->person,
             news: $this->news->getNewsForPerson($connectedUser, $searchFrom),
+            groupConfig: self::GROUP_CONFIG,
             btnParent: '/user',
             layoutParams: $this->getAllParams([]),
         );

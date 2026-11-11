@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modalEvents');
     const nameEl = document.getElementById('modalPersonName');
     const listEl = document.getElementById('modalEventList');
+    const locale = document.documentElement.lang || undefined;
 
     modal.addEventListener('show.bs.modal', event => {
         const link = event.relatedTarget;
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const small = document.createElement('small');
                     small.className = 'text-muted';
-                    small.textContent = new Date(date).toLocaleDateString('fr-FR', {
+                    small.textContent = new Date(date).toLocaleDateString(locale, {
                         weekday: 'short',
                         day: '2-digit',
                         month: 'short',
@@ -45,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const li = document.createElement('li');
             li.className = 'list-group-item text-muted fst-italic';
-            li.textContent = 'Aucun événement trouvé';
+            li.textContent = I18N.noEvents;
             listEl.appendChild(li);
         }
     });

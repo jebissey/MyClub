@@ -26,7 +26,7 @@
             <thead class="table-dark">
                 <tr>
                     <th>{='loan.reservation.item'|translate}</th>
-                    {if $isManager}<th>Utilisateur</th>{/if}
+                    {if $isManager}<th>{='loan.reservation.user'|translate}</th>{/if}
                     <th>{='loan.reservation.date'|translate}</th>
                     <th>{='loan.reservation.start'|translate}</th>
                     <th>{='loan.reservation.end'|translate}</th>
@@ -37,15 +37,15 @@
             </thead>
             <tbody>
             {foreach $reservations as $res}
-                <tr data-id="{$res['Id']}" data-status="{$res['Status']}">
-                    <td class="fw-semibold">{$res['ItemName']}</td>
-                    {if $isManager}<td class="text-muted small">{$res['UserName']}</td>{/if}
-                    <td>{$res['ReservationDate']}</td>
-                    <td>{$res['StartTime']}</td>
-                    <td>{$res['EndTime']}</td>
-                    <td class="text-center">{$res['QuantityReserved']}</td>
+                <tr data-id="{$res->id}" data-status="{$res->status}">
+                    <td class="fw-semibold">{$res->itemName}</td>
+                    {if $isManager}<td class="text-muted small">{$res->userName}</td>{/if}
+                    <td>{$res->reservationDate}</td>
+                    <td>{$res->startTime}</td>
+                    <td>{$res->endTime}</td>
+                    <td class="text-center">{$res->quantityReserved}</td>
                     <td>
-                        {if $res['Status'] === 'active'}
+                        {if $res->status === 'active'}
                             <span class="badge bg-success">
                                 {='loan.reservation.status.active'|translate}
                             </span>
@@ -56,13 +56,13 @@
                         {/if}
                     </td>
                     <td class="text-end text-nowrap">
-                        {if $res['Status'] === 'active'}
+                        {if $res->status === 'active'}
                         <button class="btn btn-sm btn-warning btn-edit-res me-1"
-                                data-id="{$res['Id']}">
+                                data-id="{$res->id}">
                             <i class="bi bi-pencil"></i>
                         </button>
                         <button class="btn btn-sm btn-danger btn-cancel-res"
-                                data-id="{$res['Id']}">
+                                data-id="{$res->id}">
                             <i class="bi bi-trash"></i>
                         </button>
                         {/if}
@@ -80,7 +80,7 @@
     </div>
 </div>
 
-{* ── Modal réservation ────────────────────────────────────────────── *}
+{* ── Reservation modal ────────────────────────────────────────────── *}
 <div class="modal fade" id="modalRes" tabindex="-1" aria-labelledby="modalResLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -98,7 +98,7 @@
                         <select class="form-select" id="resItem" required>
                             <option value="">–</option>
                             {foreach $reservationItems as $item}
-                            <option value="{$item['Id']}" data-qty="{$item['Quantity']}">{$item['Name']}</option>
+                            <option value="{$item->id}" data-qty="{$item->quantity}">{$item->name}</option>
                             {/foreach}
                         </select>
                         <div class="form-text" id="resItemAvail"></div>
@@ -111,11 +111,13 @@
                     </div>
                     {if $isManager}
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold" for="resUser">Utilisateur <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold" for="resUser">
+                            {='loan.reservation.user'|translate} <span class="text-danger">*</span>
+                        </label>
                         <select class="form-select" id="resUser">
                             <option value="">–</option>
                             {foreach $persons as $p}
-                            <option value="{$p['Id']}">{$p['FullName']}</option>
+                            <option value="{$p->id}">{$p->fullName}</option>
                             {/foreach}
                         </select>
                     </div>
@@ -163,9 +165,7 @@
 <script>
     window.isManager      = {=json_encode($isLoanManager)|noescape};
     window.currentUserId  = {$currentUserId};
-    window.resPersons     = {=json_encode($persons)|noescape};
-    window.resItems       = {=json_encode($reservationItems)|noescape};
-    
+
     Object.assign(window.i18n, {=$i18n});
 </script>
 <script type="module" src="{='/app/modules/Loan/js/user.js'|version}"></script>

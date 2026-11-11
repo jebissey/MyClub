@@ -27,7 +27,9 @@ use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LanguagesDataHelper;
-use app\models\LoanDataHelper;
+use app\models\LoanItemDataHelper;
+use app\models\LoanRecordDataHelper;
+use app\models\LoanReservationDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\MemberDataHelper;
@@ -78,7 +80,9 @@ final readonly class DataHelpers
         public KanbanDataHelper $kanbanDataHelper,
         public KaraokeDataHelper $karaokeDataHelper,
         public LanguagesDataHelper $languagesDataHelper,
-        public LoanDataHelper $loanDataHelper,
+        public LoanItemDataHelper $loanItemDataHelper,
+        public LoanRecordDataHelper $loanRecordDataHelper,
+        public LoanReservationDataHelper $loanReservationDataHelper,
         public LogDataHelper $logDataHelper,
         public LogWriterDataHelper $logWriterDataHelper,
         public MemberDataHelper $memberDataHelper,

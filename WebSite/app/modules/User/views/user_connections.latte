@@ -43,7 +43,7 @@
 
               <td class="text-center">
                 <span class="badge bg-{$c['Level']['color']} px-3 py-2">
-                  {$c['Level']['label']}
+                  {=$c['Level']['labelKey']|translate}
                 </span>
               </td>
 
@@ -97,5 +97,10 @@
 {/block}
 
 {block scripts}
+<script>
+    const I18N = {
+        noEvents: {='user_connections.modal.no_events'|translate}
+    };
+</script>
 <script src="{='/app/modules/User/js/connections.js'|version}"></script>
 {/block}

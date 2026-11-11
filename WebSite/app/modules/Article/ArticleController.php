@@ -121,10 +121,10 @@ final class ArticleController extends ArticleAccessController
             }
             $viewModel = new ChangeOwnerViewModel(
                 article: $article,
-                redactors: array_values($this->personDataHelper->getRedactors()),
+                redactors: $this->personDataHelper->getRedactors(),
                 layoutParams: $this->getAllParams([]),
             );
-            $this->views->render('User/views/changeOwner.latte', $viewModel);
+            $this->views->render('Article/views/changeOwner.latte', $viewModel);
         } else {
             $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }
@@ -314,7 +314,7 @@ final class ArticleController extends ArticleAccessController
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
             );
-            $this->views->render('User/views/publish.latte', $viewModel);
+            $this->views->render('Article/views/publish.latte', $viewModel);
         } else {
             $this->errors->methodNotAllowed(__FILE__, __LINE__);
         }

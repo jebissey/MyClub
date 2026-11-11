@@ -1,17 +1,21 @@
-<form method="post" action="/publish/article/{$article->Id}">
+<form method="post" action="/publish/article/{$article->id}">
     <div class="row mb-4">
         <div class="col-12">
             <h4>{='article.publish.title'|translate}</h4>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">{$article->Title}</h5>
+                    <h5 class="card-title">{$article->title}</h5>
                     <p class="card-text">
-                        <strong>{='article.publish.created_by'|translate}</strong> {$article->FirstName} {$article->LastName} {$article->NickName ? "({$article->NickName})" : ''}
+                        <strong>{='article.publish.created_by'|translate}</strong>
+                        {if $article->author !== null}
+                            {$article->author->firstName} {$article->author->lastName}
+                            {$article->author->nickName ? "({$article->author->nickName})" : ''}
+                        {/if}
                     </p>
                     <div class="form-check form-switch mt-3">
-                        <input class="form-check-input" type="checkbox" id="published" name="published" value="1" {if $article->PublishedBy}checked{/if}>
+                        <input class="form-check-input" type="checkbox" id="published" name="published" value="1" {if $article->publishedBy}checked{/if}>
                         <label class="form-check-label" for="published">
-                            {if $article->PublishedBy}
+                            {if $article->publishedBy}
                                 {='article.publish.is_published'|translate}
                             {else}
                                 {='article.publish.do_publish'|translate}

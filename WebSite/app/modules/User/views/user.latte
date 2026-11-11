@@ -1,19 +1,78 @@
 {layout '../../Common/views/layout.latte'}
 
-{* Single source of truth for the user menu entries *}
 {var $userMenuItems = [
-    ['page' => 'account',        'href' => '/user/account',          'icon' => '👤', 'label' => 'navbar.user.account'],
-    ['page' => 'availabilities', 'href' => '/user/availabilities',   'icon' => '🕒', 'label' => 'navbar.user.availabilities'],
-    ['page' => 'groups',         'href' => '/user/groups',           'icon' => '🔐', 'label' => 'navbar.user.groups'],
-    ['page' => 'preferences',    'href' => '/user/preferences',      'icon' => '⭐', 'label' => 'navbar.user.preferences'],
-    ['page' => 'notifications',  'href' => '/user/notifications',    'icon' => '🔔', 'label' => 'navbar.user.notifications'],
-    ['page' => 'statistics',     'href' => '/user/statistics',       'icon' => '📊', 'label' => 'navbar.user.statistics'],
-    ['page' => 'directory',      'href' => '/user/presentation/edit','icon' => '🎭', 'label' => 'navbar.user.directory'],
-    ['page' => 'news',           'href' => '/user/news',             'icon' => '📰', 'label' => 'navbar.user.news'],
-    ['page' => 'messages',       'href' => '/user/messages',         'icon' => '💬', 'label' => 'navbar.user.messages'],
-    ['page' => 'notepad',        'href' => '/user/notepad',          'icon' => '🗒️', 'label' => 'navbar.user.notepad'],
-    ['page' => 'connections',    'href' => '/user/connections',      'icon' => '🕸️', 'label' => 'navbar.user.connections'],
-    ['page' => 'membership',     'href' => '/user/membership',       'icon' => '🤝', 'label' => 'navbar.user.membership'],
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'account',
+        href: '/user/account',
+        icon: '👤',
+        label: 'navbar.user.account'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'availabilities',
+        href: '/user/availabilities',
+        icon: '🕒',
+        label: 'navbar.user.availabilities'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'groups',
+        href: '/user/groups',
+        icon: '🔐',
+        label: 'navbar.user.groups'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'preferences',
+        href: '/user/preferences',
+        icon: '⭐',
+        label: 'navbar.user.preferences'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'notifications',
+        href: '/user/notifications',
+        icon: '🔔',
+        label: 'navbar.user.notifications'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'statistics',
+        href: '/user/statistics',
+        icon: '📊',
+        label: 'navbar.user.statistics'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'directory',
+        href: '/user/presentation/edit',
+        icon: '🎭',
+        label: 'navbar.user.directory'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'news',
+        href: '/user/news',
+        icon: '📰',
+        label: 'navbar.user.news'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'messages',
+        href: '/user/messages',
+        icon: '💬',
+        label: 'navbar.user.messages'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'notepad',
+        href: '/user/notepad',
+        icon: '🗒️',
+        label: 'navbar.user.notepad'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'connections',
+        href: '/user/connections',
+        icon: '🕸️',
+        label: 'navbar.user.connections'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'membership',
+        href: '/user/membership',
+        icon: '🤝',
+        label: 'navbar.user.membership'
+    ),
 ]}
 
 {block navbar}

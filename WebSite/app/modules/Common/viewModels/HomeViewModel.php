@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace app\modules\Common\viewModels;
 
 use app\modules\Common\valueObjects\ArticleRow;
+use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\User\valueObjects\SidebarMenuItem;
 
 final readonly class HomeViewModel extends LayoutViewModel
 {
     /**
-     * @param list<object> $latestArticles
-     * @param list<mixed> $navItems
-     * @param list<mixed> $sidebarMenu
-     * @param list<object> $pendingSurveys
-     * @param list<object> $pendingDesigns
-     * @param list<object> $carouselItems
+     * @param list<object{id: int, title: string, lastUpdate: string}> $latestArticles
+     * @param list<MenuItemRow> $navItems
+     * @param list<SidebarMenuItem> $sidebarMenu
+     * @param list<object{articleTitle: string, closingDate: string, surveyQuestion: string, articleId: int}> $pendingSurveys
+     * @param list<object{designName: string, designDetail: string}> $pendingDesigns
+     * @param list<object{item: string}> $carouselItems
+     * @param object{Title: string, Content: string}|null $footerArticle
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(

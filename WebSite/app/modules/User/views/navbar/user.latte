@@ -1,3 +1,5 @@
+{varType list<app\modules\Common\valueObjects\MenuItem> $items}
+
 <div class="container-fluid">
     {include '../../../Common/views/navbar/_userLeft.latte'}
 
@@ -11,12 +13,12 @@
             <ul class="navbar-nav me-auto">
                 {foreach $items as $item}
                     <li class="nav-item">
-                        <a class="nav-link {if $page == $item['page']}active{/if}"
-                           href="{$item['href']}"
+                        <a class="nav-link {if $page === $item->page}active{/if}"
+                           href="{$item->href}"
                            data-bs-toggle="tooltip"
                            data-bs-placement="bottom"
-                           title="{= $item['label']|translate}">
-                            <h2>{$item['icon']}</h2>
+                           title="{$item->label|translate}">
+                            <h2>{$item->icon}</h2>
                         </a>
                     </li>
                 {/foreach}

@@ -35,21 +35,21 @@
             </thead>
             <tbody>
             {foreach $items as $item}
-                <tr data-id="{$item['Id']}">
-                    <td class="fw-semibold">{$item['Name']}</td>
-                    <td class="text-muted small">{$item['Description']}</td>
+                <tr data-id="{$item->id}">
+                    <td class="fw-semibold">{$item->name}</td>
+                    <td class="text-muted small">{$item->description}</td>
                     <td class="text-center">
-                        {if $item['Type'] === 'loan'}
+                        {if $item->type === 'loan'}
                             <span class="badge bg-primary">{='loan.item.type.loan'|translate}</span>
-                        {elseif $item['Type'] === 'reservation'}
+                        {elseif $item->type === 'reservation'}
                             <span class="badge bg-warning text-dark">{='loan.item.type.reservation'|translate}</span>
                         {else}
                             <span class="badge bg-secondary">{='loan.item.type.both'|translate}</span>
                         {/if}
                     </td>
-                    <td class="text-center">{$item['Quantity']}</td>
+                    <td class="text-center">{$item->quantity}</td>
                     <td class="text-center">
-                        {if $item['IsActive']}
+                        {if $item->isActive}
                             <i class="bi bi-check-circle-fill text-success"></i>
                         {else}
                             <i class="bi bi-x-circle-fill text-danger"></i>
@@ -57,11 +57,11 @@
                     </td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-warning btn-edit-item"
-                                data-id="{$item['Id']}">
+                                data-id="{$item->id}">
                             <i class="bi bi-pencil"></i>
                         </button>
                         <button class="btn btn-sm btn-danger btn-delete-item"
-                                data-id="{$item['Id']}" data-name="{$item['Name']}">
+                                data-id="{$item->id}" data-name="{$item->name}">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
@@ -83,8 +83,8 @@
 {/block}
 
 {block scripts}
-    <script>
+<script>
     Object.assign(window.i18n, {=$i18n});
-    </script>
-    <script type="module" src="{='/app/modules/Loan/js/designer.js'|version}"></script>
+</script>
+<script type="module" src="{='/app/modules/Loan/js/designer.js'|version}"></script>
 {/block}

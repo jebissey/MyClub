@@ -4,14 +4,23 @@ declare(strict_types=1);
 
 namespace app\modules\Common\viewModels;
 
+use app\modules\Common\valueObjects\DataTableTypes;
+use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\Person;
+use app\modules\Common\valueObjects\TableRow;
+
+/**
+ * @phpstan-import-type TableColumn from DataTableTypes
+ * @phpstan-import-type TableFilter from DataTableTypes
+ */
 final readonly class TableIndexViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $articles
+     * @param list<TableRow> $articles
      * @param array<string, string> $filterValues
-     * @param list<array{name: string, label: string}> $filters
-     * @param list<array{field: string, label: string}> $columns
-     * @param list<mixed> $navItems
+     * @param list<TableFilter> $filters
+     * @param list<TableColumn> $columns
+     * @param list<MenuItemRow> $navItems
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(
@@ -22,7 +31,7 @@ final readonly class TableIndexViewModel extends LayoutViewModel
         public array $filters,
         public array $columns,
         public string $resetUrl,
-        public object|false $userConnected,
+        public Person|false $userConnected,
         public array $navItems,
         array $layoutParams = []
     ) {

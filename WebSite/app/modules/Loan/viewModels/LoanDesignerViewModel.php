@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace app\modules\Loan\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Loan\valueObjects\LoanItemRow;
 
 final readonly class LoanDesignerViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $items
+     * @param list<LoanItemRow> $items
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */

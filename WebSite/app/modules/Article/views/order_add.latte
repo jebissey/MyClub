@@ -2,76 +2,115 @@
 
 {block content}
 <div class="container-fluid">
-    {if $order}
-        <h1>Modifier la commande groupée de l'article: {$article->Title}</h1>
+    {if $form !== null}
+        <h1>{='order.add.title.edit'|translate} {$article->title}</h1>
     {else}
-        <h1>Ajouter une commande groupée à l'article: {$article->Title}</h1>
+        <h1>{='order.add.title.create'|translate} {$article->title}</h1>
     {/if}
 
     <form action="/order/create" method="POST">
-        <input type="hidden" name="article_id" value="{$article->Id}">
+        <input type="hidden" name="article_id" value="{$article->id}">
 
-        {if $order !== false}
+        {if $form !== null}
             <div class="alert alert-danger" role="alert">
-                <p>On ne peut modifier que la description et les articles pour lesquels il n'y a aucune commande</p>
+                <p>{='order.add.warning'|translate}</p>
             </div>
         {/if}
 
         <div class="mb-3">
-            <label for="question" class="form-label">Description de la commande</label>
-            <input type="text" class="form-control" id="question" name="question" value="{if $order}{$order->Question}{/if}" required>
+            <label for="question" class="form-label">
+                {='order.add.description'|translate}
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="question"
+                name="question"
+                value="{$form->question ?? ''}"
+                required
+            >
         </div>
 
         <div id="options-container">
             <div class="mb-3">
-                <label class="form-label">Articles disponibles</label>
+                <label class="form-label">
+                    {='order.add.available_items'|translate}
+                </label>
 
-                {if $order}
-                    {var $orderOptions = json_decode($order->Options, true)}
-                    {foreach $orderOptions as $optionText}
-                        <div class="d-flex mb-2">
-                            <input type="text" class="form-control me-2" name="options[]" value="{$optionText}" required>
-                            <button type="button" class="btn btn-danger remove-option" {if count($orderOptions) <= 2}disabled{/if}>-</button>
-                        </div>
+                {var $options = $form->options ?? ['', '']}
+
+                {foreach $options as $option}
+                    <div class="d-flex mb-2">
+                        <input
+                            type="text"
+                            class="form-control me-2"
+                            name="options[]"
+                            value="{$option}"
+                            required
+                        >
+                        <button
+                            type="button"
+                            class="btn btn-danger remove-option"
+                            {if count($options) <= 2}disabled{/if}
+                        >-</button>
+                    </div>
+                {/foreach}
+            </div>
+
+            <button
+                type="button"
+                id="add-option"
+                class="btn btn-secondary mb-3"
+            >{='order.add.add_item'|translate}</button>
+
+            <div class="mb-3">
+                <label for="dateInput" class="form-label">
+                    {='order.add.closing_date'|translate}
+                </label>
+                <input
+                    type="date"
+                    class="form-control w-auto"
+                    id="dateInput"
+                    name="closingDate"
+                    value="{$form->closingDate ?? ''}"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="visibility" class="form-label">
+                    {='order.add.visibility'|translate}
+                </label>
+                <select
+                    class="form-select w-auto"
+                    id="visibility"
+                    name="visibility"
+                    required
+                >
+                    {foreach $visibilityOptions as $value => $label}
+                        <option
+                            value="{$value}"
+                            n:attr="selected => $form?->visibility === $value"
+                        >{$label}</option>
                     {/foreach}
-                {else}
-                    <div class="d-flex mb-2">
-                        <input type="text" class="form-control me-2" name="options[]" required>
-                        <button type="button" class="btn btn-danger remove-option" disabled>-</button>
-                    </div>
-                    <div class="d-flex mb-2">
-                        <input type="text" class="form-control me-2" name="options[]" required>
-                        <button type="button" class="btn btn-danger remove-option" disabled>-</button>
-                    </div>
-                {/if}
-            </div>
-
-            <button type="button" id="add-option" class="btn btn-secondary mb-3">Ajouter un article</button>
-
-            <div class="mb-3">
-                <label for="dateInput" class="form-label">Date de cloture</label>
-                <input type="date" class="form-control w-auto" id="dateInput" name="closingDate" value="{$order?->ClosingDate ?? ''}" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="visibility" class="form-label">Visibilité</label>
-                <select class="form-select w-auto" id="visibility" name="visibility" required>
-                    <option value="redactor"            {if $order !== false && $order->Visibility == 'redactor'}selected{/if}>Rédacteur 👁️‍🗨️📝</option>
-                    <option value="all"                 {if $order !== false && $order->Visibility == 'all'}selected{/if}>Tout le monde 👁️‍🗨️👥</option>
-                    <option value="allAfterClosing"     {if $order !== false && $order->Visibility == 'allAfterClosing'}selected{/if}>Tout le monde après la cloture 👁️‍🗨️👥📅</option>
-                    <option value="orderers"              {if $order !== false && $order->Visibility == 'orderers'}selected{/if}>Les personnes ayant répondu 👁️‍🗨️🛒</option>
-                    <option value="orderersAfterClosing"  {if $order !== false && $order->Visibility == 'orderersAfterClosing'}selected{/if}>Les commandants après la cloture 👁️‍🗨️🛒📅</option>
                 </select>
             </div>
         </div>
 
         <div class="mb-3">
-            {if $order}
-                <button type="submit" class="btn btn-primary">Modifier la commande groupée</button>
+            {if $form !== null}
+                <button type="submit" class="btn btn-primary">
+                    {='order.add.button.edit'|translate}
+                </button>
             {else}
-                <button type="submit" class="btn btn-primary">Créer la commande groupée</button>
+                <button type="submit" class="btn btn-primary">
+                    {='order.add.button.create'|translate}
+                </button>
             {/if}
-            <a href="/article/{$article->Id}" class="btn btn-secondary">Annuler</a>
+
+            <a href="/article/{$article->id}" class="btn btn-secondary">
+                {='order.add.button.cancel'|translate}
+            </a>
         </div>
     </form>
 </div>

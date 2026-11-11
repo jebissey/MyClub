@@ -10,7 +10,16 @@ use DOMDocument;
 use DOMNameSpaceNode;
 use DOMNode;
 use DOMXPath;
+use RuntimeException;
 
+/**
+ * @phpstan-type FfaRankRow array{rank: string, event: string, name: string, club: string, points: string}
+ * @phpstan-type FfaResultRow array{
+ *     date: string, name: string, competition: string, place: string,
+ *     time: string, category: string, round: string, location: string
+ * }
+ * @phpstan-type FfaError array{error: string}
+ */
 final class FFAScraper
 {
     private string $baseUrl = 'https://bases.athle.fr/asp.net/liste.aspx';
@@ -30,7 +39,8 @@ final class FFAScraper
     }
 
     /**
-     * @return array{rank: string, event: string, name: string, club: string, points: string}|array{error: string}|null
+     * @return FfaRankRow|null
+     * @throws RuntimeException When the FFA site cannot be queried
      */
     public function searchAthleteRank(string $firstName, string $lastName, string $year, string $club): ?array
     {
@@ -53,18 +63,16 @@ final class FFAScraper
                 'query' => $params,
                 'allow_redirects' => true
             ]);
-            $html = (string) $response->getBody();
-            return $this->parseAthleteRank($html);
         } catch (GuzzleException $e) {
-            return ['error' => 'Erreur lors de la récupération des données : ' . $e->getMessage()];
+            throw new RuntimeException($e->getMessage(), 0, $e);
         }
+
+        return $this->parseAthleteRank((string) $response->getBody());
     }
 
     /**
-     * @return array<int, array{
-     *     date: string, name: string, competition: string, place: string,
-     *     time: string, category: string, round: string, location: string
-     * }>|array{error: string}
+     * @return list<FfaResultRow>
+     * @throws RuntimeException When the FFA site cannot be queried
      */
     public function searchAthleteResults(string $firstName, string $lastName, string $year, string $club): array
     {
@@ -84,16 +92,14 @@ final class FFAScraper
                 'query' => $params,
                 'allow_redirects' => true
             ]);
-            $html = (string) $response->getBody();
-            return $this->parseAthleteResults($html);
         } catch (GuzzleException $e) {
-            return ['error' => 'Erreur lors de la récupération des données: ' . $e->getMessage()];
+            throw new RuntimeException($e->getMessage(), 0, $e);
         }
+
+        return $this->parseAthleteResults((string) $response->getBody());
     }
 
-    /**
-     * @return array{rank: string, event: string, name: string, club: string, points: string}|null
-     */
+    /** @return FfaRankRow|FfaError|null */
     private function parseAthleteRank(string $html): ?array
     {
         $dom = new DOMDocument();
@@ -125,12 +131,7 @@ final class FFAScraper
         return null;
     }
 
-    /**
-     * @return array<int, array{
-     *     date: string, name: string, competition: string, place: string,
-     *     time: string, category: string, round: string, location: string
-     * }>
-     */
+    /** @return list<FfaResultRow> */
     private function parseAthleteResults(string $html): array
     {
         $dom = new DOMDocument();

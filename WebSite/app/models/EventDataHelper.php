@@ -44,6 +44,7 @@ use app\modules\Event\valueObjects\UserSupplyRow;
  *     days: array<int, list<EventArrayShape>>
  * }
  * @phpstan-import-type EventArrayShape from \app\modules\Common\valueObjects\EventRow
+ * @phpstan-import-type NewsFeedItem from NewsProviderInterface
  */
 final class EventDataHelper extends Data implements NewsProviderInterface
 {

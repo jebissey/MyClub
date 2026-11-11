@@ -139,7 +139,7 @@ final class MenuItemController extends AbstractController
 
         try {
             $viewModel = new MenuArticleViewModel(
-                chosenArticle: $this->dataHelper->get('Article', ['Id' => $id], 'Content'),
+                content: $this->dataHelper->getString('Article', ['Id' => $id], 'Content'),
                 carouselItems: $this->carouselDataHelper->getCarouselItems($id),
                 navItems: $this->getNavItems($person?->email),
                 hasAuthorization: $connectedUser->hasAutorization(),

@@ -7,6 +7,7 @@ namespace app\models;
 use PDOException;
 use app\helpers\Application;
 use app\helpers\To;
+use app\modules\Webmaster\valueObjects\CounterPersonRow;
 
 final class ArwardsDataHelper extends Data
 {
@@ -21,7 +22,7 @@ final class ArwardsDataHelper extends Data
 
     /**
      * @param list<string> $counterNames
-     * @return array<int, array{name: string, counters: array<string, int|float>, total: int|float}>
+     * @return list<CounterPersonRow>
      */
     public function getData(array $counterNames): array
     {
@@ -31,20 +32,23 @@ final class ArwardsDataHelper extends Data
                 p.FirstName,
                 p.LastName,
                 p.NickName,
-                c.Name as CounterName,
-                SUM(c.Value) as CounterValue,
-                (SELECT SUM(Value) FROM Counter WHERE IdPerson = p.Id) as Total
+                c.Name AS CounterName,
+                SUM(c.Value) AS CounterValue,
+                (SELECT SUM(Value) FROM Counter WHERE IdPerson = p.Id) AS Total
             FROM Individual p
             LEFT JOIN Counter c ON p.Id = c.IdPerson
             GROUP BY p.Id, p.FirstName, p.LastName, p.NickName, c.Name
             HAVING Total > 0
-            ORDER BY Total DESC');
+            ORDER BY Total DESC
+        ');
+
         if ($query === false) {
             throw new PDOException('getData query failed');
         }
 
         /** @var array<int, array{name: string, counters: array<string, int|float>, total: int|float}> $data */
         $data = [];
+
         foreach ($this->fetchObjects($query) as $row) {
             $personId = To::int($row->Id);
 
@@ -64,12 +68,20 @@ final class ArwardsDataHelper extends Data
             }
 
             $counterName = To::str($row->CounterName);
+
             if ($counterName !== '') {
                 $data[$personId]['counters'][$counterName] = To::number($row->CounterValue);
             }
         }
 
-        return $data;
+        return array_values(array_map(
+            static fn(array $personData): CounterPersonRow => new CounterPersonRow(
+                name: $personData['name'],
+                counters: $personData['counters'],
+                total: $personData['total'],
+            ),
+            $data
+        ));
     }
 
     /**
@@ -78,6 +90,7 @@ final class ArwardsDataHelper extends Data
     public function getCounterNames(): array
     {
         $query = $this->pdo->query('SELECT DISTINCT Name FROM Counter ORDER BY Name');
+
         if ($query === false) {
             throw new PDOException('getCounterNames query failed');
         }

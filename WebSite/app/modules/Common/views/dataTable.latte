@@ -1,10 +1,13 @@
-{* Params: $items, $columns, $filters, $filterValues, $resetUrl, $currentPage, $totalPages.
-   Optional: $actions, $createButton, $modal, $table, $extraParams *}
 {default $actions = []}
 {default $createButton = null}
 {default $modal = null}
 {default $table = ''}
 {default $extraParams = []}
+
+{varType list<\app\modules\Common\valueObjects\TableRow> $items}
+{varType list<array{field: string, label: string}> $columns}
+{varType list<array{type: 'link', label: string, url: string, class: string, confirm?: string}|array{type: 'button', label: string, class: string, onClick: string}> $actions}
+{varType ?array{url: string, label: string, alignment?: string} $createButton}
 
 <div class="container-fluid">
     {include 'FilterForm.latte',
@@ -55,16 +58,16 @@
                         {if $actions !== []}
                             <td>
                                 {foreach $actions as $action}
-                                    {if $action['type'] == 'link'}
-                                        <a href="{str_replace('{table}', $table, str_replace('{id}', $item->id, $action['url']))}" class="btn btn-sm {$action['class']}"
+                                    {if $action['type'] === 'link'}
+                                        <a href="{str_replace('{table}', $table, str_replace('{id}', (string)$item->id, $action['url']))}" class="btn btn-sm {$action['class']}"
                                         {if isset($action['confirm'])}
                                             onclick="return confirm({$action['confirm'] . ' ' . ($item->cells[$columns[0]['field']] ?? '')})"
                                         {/if}>
                                             <i class="{$action['label']}"></i>
                                         </a>
-                                    {elseif $action['type'] == 'button'}
+                                    {elseif $action['type'] === 'button'}
                                         <button class="btn btn-sm {$action['class']}"
-                                                onclick="{str_replace('{table}', $table, str_replace('{id}', $item->id, $action['onClick'])) | noescape}">
+                                                onclick="{str_replace('{table}', $table, str_replace('{id}', (string) $item->id, $action['onClick'])) | noescape}">
                                             <i class="{$action['label']}"></i>
                                         </button>
                                     {/if}

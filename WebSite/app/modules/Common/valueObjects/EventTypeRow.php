@@ -10,14 +10,14 @@ use app\helpers\To;
 final readonly class EventTypeRow
 {
     /**
-     * @param list<object> $attributes
+     * @param list<EventTypeAttributeRow> $attributes
      */
     public function __construct(
-        public readonly int $id,
-        public readonly string $name,
-        public readonly int $inactivated,
-        public readonly ?int $idGroup,
-        public readonly array $attributes = [],
+        public int $id,
+        public string $name,
+        public int $inactivated,
+        public ?int $idGroup,
+        public array $attributes = [],
     ) {
     }
 
@@ -35,7 +35,7 @@ final readonly class EventTypeRow
     }
 
     /**
-     * @param list<object> $attributes
+     * @param list<EventTypeAttributeRow> $attributes
      */
     public function withAttributes(array $attributes): self
     {

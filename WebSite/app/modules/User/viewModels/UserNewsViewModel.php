@@ -8,11 +8,15 @@ use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Common\valueObjects\Person;
 
+/**
+ * @phpstan-import-type NewsFeedItem from \app\modules\Common\interfaces\NewsProviderInterface
+ */
 final readonly class UserNewsViewModel extends LayoutViewModel
 {
     /**
      * @param list<MenuItemRow> $navItems
-     * @param array<int, mixed> $news
+     * @param list<NewsFeedItem> $news
+     * @param array<string, array{label: string, icon: string, bg: string}> $groupConfig
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
@@ -21,6 +25,7 @@ final readonly class UserNewsViewModel extends LayoutViewModel
         public array $navItems,
         public ?Person $person,
         public array $news,
+        public array $groupConfig,
         string $btnParent = '/user',
         array $layoutParams = []
     ) {

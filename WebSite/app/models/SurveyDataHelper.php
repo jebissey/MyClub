@@ -19,6 +19,7 @@ use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 /**
  * @phpstan-import-type SurveyNewsRowShape from SurveyNewsRow
+ * @phpstan-import-type NewsFeedItem from NewsProviderInterface
  */
 final class SurveyDataHelper extends Data implements NewsProviderInterface
 {

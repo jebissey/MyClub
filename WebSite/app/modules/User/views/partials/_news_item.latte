@@ -1,0 +1,33 @@
+{varType array{
+    type: string,
+    id: int,
+    title: string,
+    date: string,
+    url: string,
+    from?: string,
+    detail?: string
+} $item}
+
+<div class="d-flex align-items-start gap-2">
+    <div class="flex-grow-1 text-truncate">
+        <a href="{$item['url']}" class="fw-semibold small text-dark text-decoration-none">
+            {$item['title']}
+        </a>
+    </div>
+    <small class="text-muted flex-shrink-0">
+        {\app\helpers\TranslationManager::getShortDateTime($item['date'])}
+    </small>
+</div>
+
+{if (isset($item['from']) && $item['from'] !== '') || (isset($item['detail']) && $item['detail'] !== '')}
+    <div class="d-flex flex-wrap gap-2 mt-1">
+        {if isset($item['from']) && $item['from'] !== ''}
+            <small class="text-muted">
+                <i class="bi bi-person me-1"></i>{='user.news.item.by'|translate} {$item['from']}
+            </small>
+        {/if}
+        {if isset($item['detail']) && $item['detail'] !== ''}
+            <small class="text-muted fst-italic">{$item['detail']}</small>
+        {/if}
+    </div>
+{/if}

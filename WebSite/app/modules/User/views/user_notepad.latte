@@ -2,31 +2,31 @@
 
 {block head}
 <style>
-    html, body {
-        height: 100%;
-    }
+html, body {
+    height: 100%;
+}
 
-    /* Conteneur principal */
-    .editor-wrapper {
-        height: calc(100vh - 180px);
-        display: flex;
-        flex-direction: column;
-    }
+/* Main container */
+.editor-wrapper {
+    height: calc(100vh - 180px);
+    display: flex;
+    flex-direction: column;
+}
 
-    /* Formulaire et conteneur */
-    #edit-form,
-    .editor-container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-    }
+/* Form and container */
+#edit-form,
+.editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
 
-    /* TinyMCE pleine hauteur */
-    .tox-tinymce {
-        height: 100% !important;
-        border: 1px solid #ddd;
-    }
+/* Full-height TinyMCE */
+.tox-tinymce {
+    height: 100% !important;
+    border: 1px solid #ddd;
+}
 </style>
 {/block}
 
@@ -36,20 +36,20 @@
 
     <div class="ms-auto">
         <button type="submit" form="edit-form" class="btn btn-success">
-            <i class="bi bi-check-circle"></i> Enregistrer
+            <i class="bi bi-check-circle"></i> {='user.notepad.save'|translate}
         </button>
-        <a href="/user" class="btn btn-secondary bi bi-x-circle"> Annuler</a>
+        <a href="/user" class="btn btn-secondary bi bi-x-circle"> {='user.notepad.cancel'|translate}</a>
     </div>
 </div>
 {/block}
 
 {block content}
 <div class="container-fluid mt-3">
-    <h1 class="mb-3">Mon calepin numérique</h1>
+    <h1 class="mb-3">{='user.notepad.title'|translate}</h1>
     <div class="editor-wrapper">
         <form id="edit-form" method="post">
             <div class="editor-container">
-                <textarea name="content" id="tinymce">{if isset($notepad)}{$notepad|noescape}{/if}</textarea>
+                <textarea name="content" id="tinymce">{$notepad|noescape}</textarea>
             </div>
         </form>
     </div>
@@ -57,6 +57,11 @@
 {/block}
 
 {block scripts}
+<script>
+    const I18N = {
+        emptyContent: {='user.notepad.empty_content'|translate}
+    };
+</script>
 <script src="{='/app/modules/Common/js/tinymce/tinymce.min.js'|version}"></script>
 <script type="module" src="{='/app/modules/User/js/edit_notepad.js'|version}"></script>
 {/block}

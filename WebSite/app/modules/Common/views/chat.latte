@@ -1,13 +1,15 @@
 {layout '../../Common/views/layout.latte'}
 
+
 {block title}
     Chat : 
     {if isset($event)}
-        {$event->Summary}
+        {$event->summary}
     {elseif isset($article)}
-        {$article->Title}
+        {$article->title}
     {/if}
 {/block}
+
 
 {block navbar}
     {include 'navbar/_userLeft.latte'}
@@ -27,11 +29,11 @@
                 <div class="d-flex align-items-center mb-2">
                     <h2 class="mb-0">
                         {if isset($event)}
-                            {$event->Summary}
+                            {$event->summary}
                         {elseif isset($article)}
-                            {$article->Title}
+                            {$article->title}
                         {elseif isset($group)}
-                            {$group->Name}
+                            {$group->name}
                         {/if}
                     </h2>
                 </div>
@@ -41,13 +43,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <i class="bi bi-calendar"></i>
-                                {$event->StartTime|longDate}
+                                {$event->startTime|longDate}
                                 <i class="bi bi-clock ms-3"></i>
-                                {date('H:i', strtotime($event->StartTime))} -
-                                {date('H:i', strtotime($event->StartTime) + $event->Duration)}
+                                {date('H:i', (int) strtotime($event->startTime))} -
+                                {date('H:i', (int) strtotime($event->startTime) + $event->duration)}
                             </div>
                             <div class="col-md-6">
-                                <i class="bi bi-geo-alt"></i> {$event->Location}
+                                <i class="bi bi-geo-alt"></i> {$event->location}
                             </div>
                         </div>
                     </h4>
@@ -62,39 +64,39 @@
                         </div>
                     {else}
                         {foreach $messages as $message}
-                            <div class="mb-3 {if $message->PersonId == $person->id}text-end{/if}"
-                                data-message-id="{$message->Id}"
-                                data-author-id="{$message->PersonId}">
+                            <div class="mb-3 {if $message->personId == $person->id}text-end{/if}"
+                                data-message-id="{$message->id}"
+                                data-author-id="{$message->personId}">
 
-                                <div class="card d-inline-block {if $message->PersonId == $person->id}bg-primary bg-opacity-10 border-primary border-opacity-25{else}bg-light{/if}"
+                                <div class="card d-inline-block {if $message->personId == $person->id}bg-primary bg-opacity-10 border-primary border-opacity-25{else}bg-light{/if}"
                                     style="max-width:70%">
                                     <div class="card-body p-2">
                                         <div class="d-flex align-items-center gap-2 mb-1">
 
-                                            {if $message->UseGravatar == 'yes'}
-                                                <img src="{$message->UserImg}"
+                                            {if $message->useGravatar}
+                                                <img src="{$message->userImg}"
                                                     class="rounded-circle"
                                                     style="width:48px;height:48px;object-fit:cover"
                                                     alt="User gravatar">
-                                            {elseif $message->Avatar}
+                                            {elseif $message->avatar}
                                                 <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light"
                                                     style="width:48px;height:48px;font-size:32px">
-                                                    {$message->UserImg}
+                                                    {$message->userImg}
                                                 </span>
                                             {else}
                                                 <i class="bi bi-person-circle text-secondary" style="font-size:3rem"></i>
                                             {/if}
 
                                             <strong class="text-dark">
-                                                {if $message->NickName}
-                                                    {$message->NickName}
+                                                {if $message->nickName}
+                                                    {$message->nickName}
                                                 {else}
-                                                    {$message->FirstName} {$message->LastName}
+                                                    {$message->firstName} {$message->lastName}
                                                 {/if}
                                             </strong>
-                                            <span class="small text-muted">({$message->TimeAgo})</span>
+                                            <span class="small text-muted">({$message->timeAgo})</span>
 
-                                            {if $message->PersonId == $person->id}
+                                            {if $message->personId == $person->id}
                                                 <i class="bi bi-pencil text-dark opacity-50 edit-message"
                                                     role="button"
                                                     title="{='chat.edit_icon_title'|translate}"></i>
@@ -102,11 +104,11 @@
                                         </div>
 
                                         <p class="card-text mb-0 text-dark">
-                                            {$message->Text}
+                                            {$message->text}
                                         </p>
 
-                                        {if $message->ImagePath !== null && $message->ImagePath !== ''}
-                                            <img src="{$message->ImagePath}"
+                                        {if $message->imagePath !== null && $message->imagePath !== ''}
+                                            <img src="{$message->imagePath}"
                                                  alt="image"
                                                  class="img-fluid rounded mt-2 message-image"
                                                  style="max-height:300px; cursor:pointer"
@@ -135,18 +137,18 @@
                     </div>
 
                     <form id="new-message-form" class="d-flex flex-wrap gap-2 align-items-end p-3">
-                        <input type="hidden" id="article-id" value="{$article->Id ?? null}">
-                        <input type="hidden" id="event-id"   value="{$event->Id ?? null}">
-                        <input type="hidden" id="group-id"   value="{$group->Id ?? null}">
+                        <input type="hidden" id="article-id" value="{$article->id ?? null}">
+                        <input type="hidden" id="event-id"   value="{$event->id ?? null}">
+                        <input type="hidden" id="group-id"   value="{$group->id ?? null}">
 
                         <div id="image-preview-wrapper" class="w-100 d-none">
                             <div class="position-relative d-inline-block">
                                 <img id="image-preview" src="" alt="preview"
-                                     class="rounded border"
-                                     style="max-height:120px; max-width:100%; object-fit:contain">
+                                    class="rounded border"
+                                    style="max-height:120px; max-width:100%; object-fit:contain">
                                 <button type="button" id="remove-image-btn"
-                                        class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                        style="transform:translate(50%,-50%); line-height:1; padding:2px 6px">
+                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                    style="transform:translate(50%,-50%); line-height:1; padding:2px 6px">
                                     &times;
                                 </button>
                             </div>
@@ -164,6 +166,7 @@
                             <i class="bi bi-camera"></i>
                             <input type="file" id="message-image" accept="image/*" class="d-none">
                         </label>
+
 
                         <button type="submit" class="btn btn-primary flex-shrink-0">{='chat.send'|translate}</button>
                     </form>

@@ -37,6 +37,7 @@ use app\modules\Common\valueObjects\ClosingVisibilityRow;
  * }
  * @phpstan-import-type OrderNewsRowShape from OrderNewsRow
  * @phpstan-import-type ClosingVisibilityRowShape from ClosingVisibilityRow
+ * @phpstan-import-type NewsFeedItem from NewsProviderInterface
  */
 final class OrderDataHelper extends Data implements NewsProviderInterface
 {

@@ -88,6 +88,7 @@ final class Params
             'userImg' => '👻',
             'userEmail' => '',
             'isAdmin' => false,
+            'isAnybody' => true,
             'isBackupManager' => false,
             'isCommunicationManager' => false,
             'isEditor' => false,

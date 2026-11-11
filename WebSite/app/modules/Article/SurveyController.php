@@ -10,7 +10,7 @@ use app\helpers\ConnectedUser;
 use app\models\ArticleDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Article\services\ArticleAuthorizationService;
-use app\modules\Article\viewModels\ClosableFormResultsViewModel;
+use app\modules\Article\viewModels\ClosableFormAddViewModel;
 use app\modules\Article\viewModels\SurveyResultsViewModel;
 use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
@@ -46,7 +46,30 @@ final class SurveyController extends ClosableFormController
         return $this->authorizationService->canReadSurveyResults($form, $article, $user);
     }
 
-    protected function buildResultsViewModel(int $articleId, array $layoutParams): ?ClosableFormResultsViewModel
+    protected function renderAddPage(ClosableFormAddViewModel $viewModel): void
+    {
+        $this->views->render('Article/views/survey_add.latte', $viewModel);
+    }
+
+    /**
+     * @param array<string, mixed> $layoutParams
+     */
+    protected function renderResultsPage(int $articleId, array $layoutParams): bool
+    {
+        $viewModel = $this->buildResultsViewModel($articleId, $layoutParams);
+        if ($viewModel === null) {
+            return false;
+        }
+
+        $this->views->render('Article/views/survey_results.latte', $viewModel);
+
+        return true;
+    }
+
+    /**
+     * @param array<string, mixed> $layoutParams
+     */
+    private function buildResultsViewModel(int $articleId, array $layoutParams): ?SurveyResultsViewModel
     {
         $survey = $this->surveyDataHelper->getWithCreator($articleId);
         if ($survey === false) {

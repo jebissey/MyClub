@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\User;
 
+use RuntimeException;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\FFAScraper;
@@ -43,15 +44,27 @@ final class FFAController extends AbstractController
         $club      = To::str($input['club'] ?? $this->dataHelper->getSetting('FFA_club', '???'));
 
         $ffaScraper = new FFAScraper();
-        $results = $question === 'rank'
-            ? $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club)
-            : $ffaScraper->searchAthleteResults($firstName, $lastName, $year, $club);
+        $rank = null;
+        $results = [];
+        $error = null;
+
+        try {
+            if ($question === 'rank') {
+                $rank = $ffaScraper->searchAthleteRank($firstName, $lastName, $year, $club);
+            } else {
+                $results = $ffaScraper->searchAthleteResults($firstName, $lastName, $year, $club);
+            }
+        } catch (RuntimeException $e) {
+            $error = $e->getMessage();
+        }
 
         $viewModel = new FfaSearchViewModel(
             firstName: $firstName,
             lastName: $lastName,
             question: $question,
+            rank: $rank,
             results: $results,
+            error: $error,
             navItems: $this->getNavItems($person?->email),
             year: $year,
             club: $club,

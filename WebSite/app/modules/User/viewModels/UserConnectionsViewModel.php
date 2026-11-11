@@ -7,10 +7,13 @@ namespace app\modules\User\viewModels;
 use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\MenuItemRow;
 
+/**
+ * @phpstan-import-type ConnectionRow from \app\models\ParticipantDataHelper
+ */
 final readonly class UserConnectionsViewModel extends LayoutViewModel
 {
     /**
-     * @param array<int, array<string, mixed>> $connections
+     * @param list<ConnectionRow> $connections
      * @param list<MenuItemRow> $navItems
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */

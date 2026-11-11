@@ -1,17 +1,68 @@
 {layout '../../Common/views/layout.latte'}
 
-{* Single source of truth for the webmaster menu entries *}
 {var $webmasterMenuItems = [
-    ['page' => 'dbbrowser',         'href' => '/dbbrowser',          'icon' => '🗂️',  'label' => 'navbar.webmaster.dbbrowser'],
-    ['page' => 'groups',            'href' => '/groups',             'icon' => '🧑‍🤝‍🧑',  'label' => 'navbar.webmaster.groups'],
-    ['page' => 'registration',      'href' => '/registration',       'icon' => '🎟️',  'label' => 'navbar.webmaster.registration'],
-    ['page' => 'notifications',     'href' => '/notifications',      'icon' => '🔔',  'label' => 'navbar.webmaster.notifications'],
-    ['page' => 'sendEmails',        'href' => '/sendEmails',         'icon' => '📥',  'label' => 'navbar.webmaster.send_emails'],
-    ['page' => 'turnstile',         'href' => '/turnstile',          'icon' => '🛡️',  'label' => 'navbar.webmaster.turnstile'],
-    ['page' => 'helloasso',         'href' => '/helloasso',          'iconHtml' => '<i class="bi bi-recycle"></i>', 'text' => 'helloasso', 'label' => 'navbar.webmaster.helloasso'],
-    ['page' => 'clubCustomization', 'href' => '/club-customization', 'icon' => '🏷️',  'label' => 'navbar.webmaster.club_customization'],
-    ['page' => 'maintenance',       'href' => '/maintenance',        'icon' => '🚧',  'label' => 'navbar.webmaster.maintenance'],
-    ['visible' => $isMyclubWebSite, 'page' => 'installations', 'href' => '/installations', 'icon' => '🌐', 'label' => 'navbar.webmaster.installations'],
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'dbbrowser',
+        href: '/dbbrowser',
+        icon: '🗂️',
+        label: 'navbar.webmaster.dbbrowser'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'groups',
+        href: '/groups',
+        icon: '🧑‍🤝‍🧑',
+        label: 'navbar.webmaster.groups'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'registration',
+        href: '/registration',
+        icon: '🎟️',
+        label: 'navbar.webmaster.registration'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'notifications',
+        href: '/notifications',
+        icon: '🔔',
+        label: 'navbar.webmaster.notifications'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'sendEmails',
+        href: '/sendEmails',
+        icon: '📥',
+        label: 'navbar.webmaster.send_emails'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'turnstile',
+        href: '/turnstile',
+        icon: '🛡️',
+        label: 'navbar.webmaster.turnstile'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'helloasso',
+        href: '/helloasso',
+        iconHtml: '<i class="bi bi-recycle"></i>',
+        text: 'helloasso',
+        label: 'navbar.webmaster.helloasso'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'clubCustomization',
+        href: '/club-customization',
+        icon: '🏷️',
+        label: 'navbar.webmaster.club_customization'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'maintenance',
+        href: '/maintenance',
+        icon: '🚧',
+        label: 'navbar.webmaster.maintenance'
+    ),
+    new app\modules\Common\valueObjects\MenuItem(
+        page: 'installations',
+        href: '/installations',
+        icon: '🌐',
+        label: 'navbar.webmaster.installations',
+        visible: $isMyclubWebSite
+    ),
 ]}
 
 {block navbar}
@@ -29,7 +80,6 @@
     {if $content}
         {$content|noescape}
     {else}
-        {* Narrow screens only: the navbar is collapsed, so list the options here *}
         {include '../../Common/views/navbar/_menuList.latte', items: $webmasterMenuItems}
     {/if}
 {/block}

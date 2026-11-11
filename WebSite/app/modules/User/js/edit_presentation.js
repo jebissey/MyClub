@@ -1,31 +1,33 @@
 /**
  * @module edit_presentation
- * Initialise TinyMCE, la carte Leaflet et les interactions de la vue
- * edit_presentation.latte.
+ * Initializes TinyMCE, the Leaflet map and the interactions of the
+ * edit_presentation.latte view.
  *
- * Dépendances globales (chargées avant ce module via <script> classique) :
- *   - tinymce  (window.tinymce)
- *   - Leaflet  (window.L)
+ * Globals provided before this module is loaded:
+ *   - tinymce (window.tinymce) and Leaflet (window.L), loaded as classic scripts
+ *   - window.validationMsg and mapMaxZoom, defined by the template
  */
 
 import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
+
+const DEFAULT_CENTER = [47.3220, 5.0415];
 
 function initEditor() {
     initTinyMCE('#tinymce', {
         height: 400,
         imageMaxWidth: 1200,
         imageQuality: 0.85,
-        onSave(editor) {
+        onSave() {
             document.getElementById('presentationForm').submit();
         },
     });
 }
 
 // ---------------------------------------------------------------------------
-// Carte privée (Leaflet)
+// Private location map (Leaflet)
 // ---------------------------------------------------------------------------
 function initMap() {
-    const map = L.map('map').setView([47.3220, 5.0415], 12);
+    const map = L.map('map').setView(DEFAULT_CENTER, 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
@@ -36,16 +38,11 @@ function initMap() {
     let marker = null;
     const locationInput = document.getElementById('location');
 
-    if (locationInput.value) {
-        try {
-            const [lat, lng] = locationInput.value.split(',');
-            if (lat && lng) {
-                marker = L.marker([parseFloat(lat), parseFloat(lng)]).addTo(map);
-                map.setView([parseFloat(lat), parseFloat(lng)], 14);
-            }
-        } catch (e) {
-            console.error('Erreur lors du parsing des coordonnées', e);
-        }
+    // The stored value is "lat,lng"
+    const [lat, lng] = locationInput.value.split(',').map(parseFloat);
+    if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+        marker = L.marker([lat, lng]).addTo(map);
+        map.setView([lat, lng], 14);
     }
 
     map.on('click', (e) => {
@@ -56,28 +53,7 @@ function initMap() {
 }
 
 // ---------------------------------------------------------------------------
-// Trombinoscope — affichage des options d'annuaire
-// ---------------------------------------------------------------------------
-function initDirectoryOptions() {
-    const inDirectoryCheckbox = document.getElementById('inPresentationDirectory');
-    const directoryOptions    = document.getElementById('directoryOptions');
-
-    inDirectoryCheckbox.addEventListener('change', function () {
-        if (this.checked) {
-            directoryOptions.classList.remove('d-none');
-        } else {
-            directoryOptions.classList.add('d-none');
-            document.getElementById('showPhoneInPresentationDirectory').checked = false;
-            document.getElementById('showEmailInPresentationDirectory').checked = false;
-            document.getElementById('showLocationInDirectory').checked = false;
-            publicLocationZone.classList.add('d-none');   // eslint-disable-line no-use-before-define
-            publicLocationInput.value = '';               // eslint-disable-line no-use-before-define
-        }
-    });
-}
-
-// ---------------------------------------------------------------------------
-// Localisation publique
+// Public location
 // ---------------------------------------------------------------------------
 function initPublicLocation() {
     const showLocationCheckbox = document.getElementById('showLocationInDirectory');
@@ -94,34 +70,53 @@ function initPublicLocation() {
         }
     });
 
-    // On expose ces deux références pour que initDirectoryOptions() puisse y
-    // accéder via la fermeture créée ci-dessous.
     return { publicLocationZone, publicLocationInput };
 }
 
 // ---------------------------------------------------------------------------
-// Validation du formulaire
+// Member directory options
+// ---------------------------------------------------------------------------
+function initDirectoryOptions({ publicLocationZone, publicLocationInput }) {
+    const inDirectoryCheckbox = document.getElementById('inPresentationDirectory');
+    const directoryOptions    = document.getElementById('directoryOptions');
+
+    inDirectoryCheckbox.addEventListener('change', function () {
+        if (this.checked) {
+            directoryOptions.classList.remove('d-none');
+            return;
+        }
+
+        directoryOptions.classList.add('d-none');
+        document.getElementById('showPhoneInPresentationDirectory').checked = false;
+        document.getElementById('showEmailInPresentationDirectory').checked = false;
+        document.getElementById('showLocationInDirectory').checked = false;
+        publicLocationZone.classList.add('d-none');
+        publicLocationInput.value = '';
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Form validation
 // ---------------------------------------------------------------------------
 function initFormValidation() {
     document.getElementById('presentationForm').addEventListener('submit', function (e) {
         const content  = tinymce.get('tinymce').getContent().trim();
         const checkbox = document.getElementById('inPresentationDirectory');
 
-        if (checkbox.checked && (!content || content === '' || content === '<p><br></p>')) {
+        if (checkbox.checked && (content === '' || content === '<p><br></p>')) {
             e.preventDefault();
             alert(window.validationMsg);
-            return false;
         }
     });
 }
 
 // ---------------------------------------------------------------------------
-// Point d'entrée
+// Entry point
 // ---------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
     initEditor();
     initMap();
-    initPublicLocation();   // doit être appelé avant initDirectoryOptions
-    initDirectoryOptions();
+    const publicLocation = initPublicLocation();
+    initDirectoryOptions(publicLocation);
     initFormValidation();
 });

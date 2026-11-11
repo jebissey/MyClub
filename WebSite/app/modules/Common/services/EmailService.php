@@ -30,7 +30,8 @@ final class EmailService
     public function __construct(
         private readonly ?SmtpConfigProviderInterface $configProvider,
         private readonly ?EmailQuotaTrackerInterface $quotaTracker,
-    ) {}
+    ) {
+    }
 
     public function getSmtpConfig(): ?SmtpConfig
     {

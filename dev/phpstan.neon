@@ -14,22 +14,26 @@ parameters:
         collectedPaths:
             - ../WebSite/app/modules
         resolveAllPossiblePaths: true
-        reportUnanalysedTemplates: false
+        reportUnanalysedTemplates: true
         filters:
             version: 'Closure(string): string'
             formatFileSize: 'Closure(int): string'
             longDate: 'Closure(string): string'
+            longDateTime: 'Closure(string): string'
+            shortDate: 'Closure(string): string'
+            shortDateTime: 'Closure(string): string'
+            extractFirstElement: 'Closure(string): string'
         functions:
             buildUrl: 'Closure(Latte\Runtime\Template, array<string, mixed>): string'
     ignoreErrors:
         -
             messages:
-                - '#^If condition is always true\.$#'
+                - '#^If condition is always (true|false)\.$#'
+                - '#^Result of && is always (true|false)\.$#'
+                - '#^Strict comparison using (===|!==) between .+ will always evaluate to (true|false)\.$#'
                 - '#^Offset .[a-zA-Z]+. on .+ (on left side of \?\?|in isset\(\)) .+#s'
-                - '#^Parameter \#1 \(mixed\) of echo cannot be converted to string\.$#'
             paths:
-                - %currentWorkingDirectory%/app/modules/Common/views/navbar/_menuItems.latte
-                - %currentWorkingDirectory%/app/modules/Common/views/navbar/_menuList.latte
+                - %currentWorkingDirectory%/app/modules/Common/views/dataTable.latte
             reportUnmatched: false
         -
             message: '#^Call to function array_key_exists\(\) with .+ will always evaluate to (true|false)\.$#s'

@@ -8,6 +8,54 @@ use PDO;
 use app\helpers\Application;
 use app\modules\Common\valueObjects\Person;
 
+
+/**
+ * @phpstan-type PercentageStat array{
+ *     user: int,
+ *     total: int,
+ *     percentage: int|float
+ * }
+ *
+ * @phpstan-type EventStat array{
+ *     typeName: string,
+ *     user: int,
+ *     total: int,
+ *     percentage: int|float
+ * }
+ *
+ * @phpstan-type EventParticipationStat array{
+ *     typeName: string,
+ *     events: int,
+ *     user: int,
+ *     total: int,
+ *     percentage: int|float
+ * }
+ *
+ * @phpstan-type ParticipantMessageStat array{
+ *     user: int,
+ *     totalUsers: int,
+ *     percentage: int|float,
+ *     webapp: int,
+ *     totalWebapp: int,
+ *     percentageWebapp: int|float
+ * }
+ *
+ * @phpstan-type UserStatistics array{
+ *     person: Person,
+ *     seasonStart: string,
+ *     seasonEnd: string,
+ *     articles: PercentageStat,
+ *     surveys: PercentageStat,
+ *     surveyReplies: PercentageStat,
+ *     designs: PercentageStat,
+ *     designVotes: PercentageStat,
+ *     events: array<int|string, EventStat>,
+ *     eventParticipations: array<int|string, EventParticipationStat>,
+ *     participantSupplies: PercentageStat,
+ *     participantMessages: ParticipantMessageStat
+ * }
+ */
+
 final class PersonStatisticsDataHelper extends Data
 {
     public function __construct(Application $application)
@@ -20,23 +68,7 @@ final class PersonStatisticsDataHelper extends Data
     }
 
     /**
-     * @return array{
-     *     person: object,
-     *     seasonStart: string,
-     *     seasonEnd: string,
-     *     articles: array{user: int, total: int, percentage: int|float},
-     *     surveys: array{user: int, total: int, percentage: int|float},
-     *     surveyReplies: array{user: int, total: int, percentage: int|float},
-     *     designs: array{user: int, total: int, percentage: int|float},
-     *     designVotes: array{user: int, total: int, percentage: int|float},
-     *     events: array<int|string, array{typeName: string, user: int, total: int, percentage: int|float}>,
-     *     eventParticipations: array<int|string, array{typeName: string, events: int, user: int, total: int, percentage: int|float}>,
-     *     participantSupplies: array{user: int, total: int, percentage: int|float},
-     *     participantMessages: array{
-     *         user: int, totalUsers: int, percentage: int|float,
-     *         webapp: int, totalWebapp: int, percentageWebapp: int|float
-     *     }
-     * }
+     * @return UserStatistics
      */
     public function getStats(Person $person, string $seasonStart, string $seasonEnd): array
     {

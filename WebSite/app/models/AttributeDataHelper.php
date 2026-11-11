@@ -9,6 +9,7 @@ use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
 use app\helpers\Application;
+use app\modules\Common\valueObjects\EventTypeAttributeRow;
 
 final class AttributeDataHelper extends Data
 {
@@ -109,7 +110,7 @@ final class AttributeDataHelper extends Data
     }
 
     /**
-     * @return list<stdClass>
+     * @return list<EventTypeAttributeRow>
      */
     public function getAttributesOf(int $eventTypeId): array
     {
@@ -125,8 +126,13 @@ final class AttributeDataHelper extends Data
             ':id' => $eventTypeId,
         ]);
 
-        /** @var list<stdClass> */
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<stdClass> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(
+            EventTypeAttributeRow::fromStdClass(...),
+            $rows
+        );
     }
 
     /**

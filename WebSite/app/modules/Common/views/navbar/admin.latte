@@ -1,6 +1,7 @@
 {default $items = []}
+{varType ?string $btnPlus}
 {default $btnPlus = null}
 
-{include '_adminLeft.latte'}
+{include '_adminLeft.latte', btnPlus: $btnPlus}
 {include '_menuItems.latte', items: $items}
 {include '_adminRight.latte'}

@@ -136,8 +136,8 @@ final class UserStatisticsController extends AbstractController
     }
 
     /**
-     * @param  array<string, int> $memberCounts
-     * @return array<int, array{tranche: string, count: int, isHighlighted: bool}>
+     * @param array<string, int> $memberCounts
+     * @return list<array{tranche: string, count: int, isHighlighted: bool}>
      */
     private function buildChartData(array $memberCounts, Person $person): array
     {

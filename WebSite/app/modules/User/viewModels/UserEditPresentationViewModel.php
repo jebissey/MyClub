@@ -6,11 +6,12 @@ namespace app\modules\User\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\LocatedMemberRow;
+use app\modules\Common\valueObjects\MenuItemRow;
 
 final readonly class UserEditPresentationViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $navItems
+     * @param list<MenuItemRow> $navItems
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(

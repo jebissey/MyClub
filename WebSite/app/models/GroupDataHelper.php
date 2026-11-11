@@ -260,7 +260,7 @@ final class GroupDataHelper extends Data
     }
 
     /**
-     * @return list<stdClass>
+     * @return list<object{Id: int, Name: string, Type: string}>
      */
     public function getGroupsWithType(int $idPerson): array
     {
@@ -285,8 +285,17 @@ final class GroupDataHelper extends Data
 
         $query->execute([':idPerson' => $idPerson]);
 
-        /** @var list<stdClass> $groups */
-        $groups = $query->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<object{Id: int|string, Name: string, Type: string}> $rows */
+        $rows = $query->fetchAll(PDO::FETCH_OBJ);
+
+        $groups = [];
+        foreach ($rows as $row) {
+            $groups[] = (object) [
+                'Id'   => To::int($row->Id),
+                'Name' => $row->Name,
+                'Type' => $row->Type,
+            ];
+        }
 
         return $groups;
     }

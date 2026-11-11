@@ -1,0 +1,47 @@
+{varType array{
+    type: string,
+    Id: int,
+    title: string,
+    message_count: int,
+    LastUpdate: string,
+    UserImg: string
+} $item}
+{varType array{label: string, icon: string, bg: string, url: string} $cfg}
+
+<div class="d-flex align-items-center gap-2">
+
+    <div class="flex-grow-1 text-truncate fw-semibold small">
+        {$item['title']}
+    </div>
+
+    <span class="badge rounded-pill bg-info text-dark flex-shrink-0"
+          title="{$item['message_count']} {='user.messages.item.messages'|translate}">
+        {$item['message_count']}
+    </span>
+
+    <small class="text-muted flex-shrink-0 d-none d-sm-inline">
+        {$item['LastUpdate']|shortDateTime}
+    </small>
+
+    {var $isUrl = strlen($item['UserImg']) > 10}
+    <div class="flex-shrink-0" style="width:2rem; height:2rem;">
+        {if $isUrl}
+        <img src="{$item['UserImg']}" alt="{='user.messages.item.avatar_alt'|translate}" class="rounded-circle"
+            style="width:2rem; height:2rem; object-fit:cover;">
+        {else}
+            <span style="font-size:1.5rem; line-height:2rem; display:block; text-align:center;">
+                {$item['UserImg']}
+            </span>
+        {/if}
+    </div>
+
+    <a href="{$cfg['url']}{$item['Id']}"
+       class="btn btn-success btn-sm flex-shrink-0"
+       title="{='user.messages.action.view'|translate}">
+        <i class="bi bi-eye"></i>
+    </a>
+
+</div>
+<div class="d-sm-none text-muted mt-1" style="font-size:.75rem;">
+    <i class="bi bi-clock me-1"></i>{$item['LastUpdate']|date:'d/m/Y H:i'}
+</div>

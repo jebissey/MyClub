@@ -53,21 +53,19 @@ final class UserConnectionsController extends AbstractController
         if ($individual === false || $member === false) {
             $this->errors->badRequest("User ({$idPerson}) not found", __FILE__, __LINE__);
             return;
-        } else {
-            $user = (object) array_merge(
-                (array) $individual,
-                (array) $member
-            );
         }
         $user = (object) array_merge(
             (array) $individual,
             (array) $member
         );
 
-/** @var stdClass&PersonRow $userRow */
+        /** @var stdClass&PersonRow $userRow */
         $userRow = $user;
         $person = Person::fromRow($userRow);
-        $data = $this->participantDataHelper->getConnections($idPerson);
+        $data = $this->participantDataHelper->getConnections(
+            $idPerson,
+            $this->translate('user_connections.unknown_person')
+        );
 
         $viewModel = new UserConnectionsViewModel(
             connections: $data['connections'],

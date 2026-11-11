@@ -66,6 +66,7 @@ final class HomeController extends AbstractController
             ));
 
             $pendingDesignResponses = $this->designDataHelper->getPendingDesignResponses();
+            /** @var list<object{designName: string, designDetail: string}> $userPendingDesigns */
             $userPendingDesigns = array_values(array_filter(
                 $pendingDesignResponses,
                 static fn($item) => strcasecmp(To::str($item->Email), $userEmail) === 0
@@ -141,6 +142,7 @@ final class HomeController extends AbstractController
 
         $footerArticleId = (int) $this->dataHelper->getSetting('Home_FooterArticleId', '0');
 
+        /** @var object{Title: string, Content: string}|null $footerArticle */
         $footerArticle = $footerArticleId > 0
             ? ($this->dataHelper->get('Article', ['Id' => $footerArticleId], 'Title, Content') ?: null)
             : null;

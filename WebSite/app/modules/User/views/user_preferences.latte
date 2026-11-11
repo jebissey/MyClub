@@ -96,7 +96,7 @@
                                         </div>
                                         <div class="availability-options" 
                                             id="availabilityOptions{$eventType->id}" 
-                                            {if !isset($currentPreferences->eventTypes[$eventType->id]->enabled) || !$currentPreferences->eventTypes[$eventType->id]->enabled}style="display: none;"{/if}>
+                                            {if !isset($currentPreferences['eventTypes'][$eventType->id]['enabled']) || !$currentPreferences['eventTypes'][$eventType->id]['enabled']}style="display: none;"{/if}>
                                             <div class="form-check">
                                                 <input type="checkbox" class="form-check-input" 
                                                     id="availability{$eventType->id}"

@@ -10,6 +10,8 @@ use RuntimeException;
 use stdClass;
 use app\helpers\Application;
 use app\modules\Common\valueObjects\MemberExportRow;
+use app\modules\Common\valueObjects\PersonOptionRow;
+use app\modules\Common\valueObjects\RedactorRow;
 
 /**
  * @phpstan-import-type MemberExportRowShape from MemberExportRow
@@ -152,6 +154,29 @@ final class PersonDataHelper extends Data
     }
 
     /**
+     * Returns all members as id/display-name pairs (for select lists).
+     *
+     * @return list<PersonOptionRow>
+     */
+    public function getMemberOptions(): array
+    {
+        $sql = "
+        SELECT i.Id, i.FirstName || ' ' || i.LastName AS FullName
+        " . self::MEMBER_INDIVIDUAL_JOIN . "
+        ORDER BY i.LastName ASC, i.FirstName ASC
+    ";
+
+        /** @var list<PersonOptionRowShape> $rows */
+        $rows = $this->fetchObjects($this->queryOrFail($sql));
+
+        return array_map(
+            static fn(object $row): PersonOptionRow => PersonOptionRow::fromStdClass($row),
+            $rows
+        );
+    }
+
+
+    /**
      * @return list<MemberExportRow>
      */
     public function getMembersForExport(): array
@@ -285,22 +310,24 @@ final class PersonDataHelper extends Data
         return "publié par " . $name;
     }
 
-    /**
-     * @return stdClass[]
-     */
+    /** @return list<RedactorRow> */
     public function getRedactors(): array
     {
         $sql = "
-            SELECT i.Id AS PersonId, i.FirstName, i.LastName, i.NickName, i.Email
-            " . self::MEMBER_INDIVIDUAL_JOIN . "
-            INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
-            INNER JOIN GroupAuthorization ga ON ga.IdGroup = mg.IdGroup
-            WHERE m.Inactivated = 0
-              AND ga.IdAuthorization = 4
-            GROUP BY i.Id
-            ORDER BY i.FirstName, i.LastName
-        ";
-        return $this->fetchObjects($this->queryOrFail($sql));
+        SELECT i.Id AS PersonId, i.FirstName, i.LastName, i.NickName, i.Email
+        " . self::MEMBER_INDIVIDUAL_JOIN . "
+        INNER JOIN MemberGroup mg ON mg.IdMember = m.Id
+        INNER JOIN GroupAuthorization ga ON ga.IdGroup = mg.IdGroup
+        WHERE m.Inactivated = 0
+          AND ga.IdAuthorization = 4
+        GROUP BY i.Id
+        ORDER BY i.FirstName, i.LastName
+    ";
+
+        return array_map(
+            static fn(object $row): RedactorRow => RedactorRow::fromStdClass($row),
+            array_values($this->fetchObjects($this->queryOrFail($sql)))
+        );
     }
 
     public function getWebmasterEmail(): string

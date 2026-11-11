@@ -17,7 +17,6 @@ use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\ClosableFormRow;
 use app\modules\Article\valueObjects\PersonNameRow;
 use app\modules\Article\viewModels\ClosableFormAddViewModel;
-use app\modules\Article\viewModels\ClosableFormResultsViewModel;
 use app\modules\Common\AbstractController;
 use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
@@ -32,9 +31,10 @@ use app\modules\Common\valueObjects\ClosingVisibilityRow;
  *   visibility chosen by the creator (see canReadResults()).
  *
  * A concrete controller only describes what differs: its name, its visibility
- * vocabulary, the visibility rule and the way the results are computed.
- * Views are resolved by convention: Article/views/{formName}_add.latte and
- * Article/views/{formName}_results.latte; the table is ucfirst($formName).
+ * vocabulary, the visibility rule, the way the results are computed and the
+ * templates it renders. The templates are rendered by the concrete controllers
+ * with literal paths, so that the template analysis can resolve them; the table
+ * is ucfirst($formName).
  *
  * @phpstan-import-type ClosingVisibilityRowShape from ClosingVisibilityRow
  */
@@ -62,12 +62,16 @@ abstract class ClosableFormController extends AbstractController
         ConnectedUser $user
     ): bool;
 
+    /** Renders the page used to add or edit the form. */
+    abstract protected function renderAddPage(ClosableFormAddViewModel $viewModel): void;
+
     /**
-     * View model for the results of the form, or null when the form cannot be loaded.
+     * Builds and renders the results page.
      *
      * @param array<string, mixed> $layoutParams
+     * @return bool False when the form cannot be loaded (nothing is rendered)
      */
-    abstract protected function buildResultsViewModel(int $articleId, array $layoutParams): ?ClosableFormResultsViewModel;
+    abstract protected function renderResultsPage(int $articleId, array $layoutParams): bool;
 
     public function add(int $articleId): void
     {
@@ -100,7 +104,7 @@ abstract class ClosableFormController extends AbstractController
             ]),
         );
 
-        $this->views->render('Article/views/' . $this->formName() . '_add.latte', $viewModel);
+        $this->renderAddPage($viewModel);
     }
 
     public function createOrUpdate(): void
@@ -204,19 +208,16 @@ abstract class ClosableFormController extends AbstractController
             return;
         }
 
-        $viewModel = $this->buildResultsViewModel(
+        $rendered = $this->renderResultsPage(
             $articleId,
             $this->getAllParams([
                 'page'           => $connectedUser->getPage(),
                 'currentVersion' => Application::VERSION,
             ]),
         );
-        if ($viewModel === null) {
+        if (!$rendered) {
             $this->raiseFormNotFound($articleId);
-            return;
         }
-
-        $this->views->render('Article/views/' . $this->formName() . '_results.latte', $viewModel);
     }
 
     /**

@@ -5,6 +5,7 @@
 36 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CheckJs.php
 51 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CheckMissingTests.php
 549 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CheckMissingTranslation.php
+188 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CheckNaming.php
 225 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Analysis/MethodSignatureAnalyzer.php
 21 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Analysis/PropertyAnalysis.php
 251 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Analysis/PropertyAnalyzer.php
@@ -13,7 +14,7 @@
 46 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Analysis/ValueObjectReferenceAnalyzer.php
 195 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/ClassScanner.php
 79 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/CodingStandardsChecker.php
-36 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/CodingStandards.php
+34 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/CodingStandards.php
 92 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/JsVersionChecker.php
 58 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/ApisRule.php
 104 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/CodingStandards/Rules/CommonValueObjectUsageRule.php
@@ -57,14 +58,14 @@
 59 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Database/SqliteMyClubDataRepository.php
 158 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Database/SqliteTestDataRepository.php
 306 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/FlightRouteTester.php
-170 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/CurlHttpClient.php
-228 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/CurrentWebSite.php
+171 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/CurlHttpClient.php
+233 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/CurrentWebSite.php
 145 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/FlightRouteExtractor.php
 180 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/RouteReferenceExtractor.php
 75 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/RouteTestFactory.php
 177 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/RouteTestOrchestrator.php
 47 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/SessionAuthenticator.php
-110 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/SimulationExtractor.php
+105 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Infrastructure/SimulationExtractor.php
 17 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Interfaces/HttpClientInterface.php
 30 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Interfaces/TestDataRepositoryInterface.php
 15 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/Interfaces/TestExporterInterface.php
@@ -84,10 +85,11 @@
 22 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/apis/WebmasterApiTest.php
 21 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/helpers/ApplicationTest.php
 214 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/helpers/ClientTest.php
-526 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/helpers/ConnectedUserTest.php
+527 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/helpers/ConnectedUserTest.php
 22 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/helpers/MediaManagerTest.php
 21 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/helpers/NotificationSenderTest.php
 20 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/helpers/PersonPreferencesTest.php
+251 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/helpers/RequestInputTest.php
 90 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/helpers/ToTest.php
 39 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/AlertRecipientDataHelperTest.php
 83 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/ArticleCrosstabDataHelperTest.php
@@ -105,10 +107,12 @@
 172 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/DataHelperTestCase.php
 34 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/DataHelperTest.php
 367 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/DataTest.php
-334 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/DbBrowserDataHelperTest.php
+348 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/DbBrowserDataHelperTest.php
 125 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/DesignDataHelperTest.php
 293 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventDataHelperTest.php
+37 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventInvitationDataHelperTest.php
 67 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventNeedDataHelperTest.php
+34 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventParticipationDataHelperTest.php
 102 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventTypeDataHelperTest.php
 56 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/ExerciseTableDataHelperTest.php
 264 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/GroupDataHelperTest.php
@@ -148,8 +152,8 @@
 747 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Article/services/ArticleAuthorizationServiceTest.php
 42 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Article/SurveyControllerTest.php
 20 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Backup/BackupControllerTest.php
-371 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Common/services/ArticleServiceTest.php
-341 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Common/services/AuthenticationServiceTest.php
+374 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Common/services/ArticleServiceTest.php
+350 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Common/services/AuthenticationServiceTest.php
 288 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Common/services/MessageRecipientServiceTest.php
 35 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Communication/CommunicationControllerTest.php
 35 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/modules/Designer/DesignControllerTest.php
@@ -190,10 +194,11 @@
 17 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/TestCoverage/ValueObjects/UncoveredColumns.php
 57 /home/jeb/Clones/GitHub/MyClub/dev/tools/../test/testRouteReferenceExtractor.php
 434 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tools/install.php
+116 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tools/phpstan/ViewsRenderTemplateResolver.php
 
 === Total by file type ===
 PHP files:
-22342
+22994
 Latte files:
 
 JavaScript files:
@@ -202,4 +207,4 @@ TypeScript files:
 
 
 === Grand total ===
- 22342 Total all files
+ 22994 Total all files

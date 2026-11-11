@@ -126,7 +126,9 @@ use app\models\GroupDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LanguagesDataHelper;
-use app\models\LoanDataHelper;
+use app\models\LoanItemDataHelper;
+use app\models\LoanRecordDataHelper;
+use app\models\LoanReservationDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\MemberDataHelper;
@@ -160,6 +162,8 @@ use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\services\MemberMapService;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Common\services\RegistrationLinkService;
+use app\modules\Loan\services\LoanAvailabilityService;
+use app\modules\Loan\services\LoanCalendarService;
 use app\modules\PersonManager\services\MemberCsvImporter;
 use app\modules\PersonManager\services\MemberOdsImporter;
 use app\modules\Common\valueObjects\Route;
@@ -596,7 +600,9 @@ final class Routes
             kanbanDataHelper: new KanbanDataHelper($this->application),
             karaokeDataHelper: new KaraokeDataHelper($this->application),
             languagesDataHelper: $languagesDataHelper,
-            loanDataHelper: new LoanDataHelper($this->application),
+            loanItemDataHelper: new LoanItemDataHelper($this->application),
+            loanRecordDataHelper: new LoanRecordDataHelper($this->application),
+            loanReservationDataHelper: new LoanReservationDataHelper($this->application),
             logDataHelper: new LogDataHelper($this->application, $this->dataHelper),
             logWriterDataHelper: new LogWriterDataHelper($this->application, $this->application->getErrorManager()),
             memberDataHelper: new MemberDataHelper($this->application),
@@ -648,6 +654,15 @@ final class Routes
                 new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
                 $this->quotaTracker
             ),
+            loanAvailabilityService: new LoanAvailabilityService(
+                $dataHelpers->loanItemDataHelper,
+                $dataHelpers->loanRecordDataHelper,
+                $dataHelpers->loanReservationDataHelper,
+            ),
+            loanCalendarService: new LoanCalendarService(
+                $dataHelpers->loanRecordDataHelper,
+                $dataHelpers->loanReservationDataHelper,
+            ),
             mediaManager: new MediaManager(
                 $this->dataHelper,
                 $dataHelpers->sharedFileDataHelper,
@@ -689,7 +704,9 @@ final class Routes
             $dataHelpers->exerciseTableDataHelper,
             $dataHelpers->groupDataHelper,
             $dataHelpers->kanbanDataHelper,
-            $dataHelpers->loanDataHelper,
+            $dataHelpers->loanItemDataHelper,
+            $dataHelpers->loanRecordDataHelper,
+            $dataHelpers->loanReservationDataHelper,
             $dataHelpers->logDataHelper,
             new MemberCsvImporter($dataHelpers->memberImportDataHelper),
             new MemberCustomFields($dataHelpers->dataHelper),
@@ -732,7 +749,11 @@ final class Routes
             $dataHelpers->kanbanDataHelper,
             $dataHelpers->karaokeDataHelper,
             $dataHelpers->languagesDataHelper,
-            $dataHelpers->loanDataHelper,
+            $services->loanAvailabilityService,
+            $services->loanCalendarService,
+            $dataHelpers->loanItemDataHelper,
+            $dataHelpers->loanRecordDataHelper,
+            $dataHelpers->loanReservationDataHelper,
             $dataHelpers->logDataHelper,
             $dataHelpers->logWriterDataHelper,
             $services->mediaManager,

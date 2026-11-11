@@ -5,10 +5,10 @@
 {block head}
     {*-- PWA --*}
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="{$themeColor ?? '#0d6efd'}">
+    <meta name="theme-color" content="#0d6efd">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="{$pwaName ?? 'MyClub'}">
+    <meta name="apple-mobile-web-app-title" content="MyClub">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
@@ -18,7 +18,7 @@
 {/block}
 
 {block sidebar_toggle}
-    {if isset($sidebarMenu) && is_array($sidebarMenu) && count($sidebarMenu) > 0}
+    {if $sidebarMenu !== []}
         {include 'partials/sidebarToggle.latte'}
     {/if}
 {/block}
@@ -38,7 +38,7 @@
 {block sidebar}
     <nav id="sidebar" class="d-flex flex-column flex-shrink-0 py-2">
         <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
-        {if isset($sidebarMenu) && is_array($sidebarMenu) && count($sidebarMenu) > 0}
+        {if $sidebarMenu !== []}
             {foreach $sidebarMenu as $item}
                 {if $item->type === 'heading'}
                     <li class="sidebar-heading fw-bold">{$item->label}</li>
@@ -48,7 +48,7 @@
                 {elseif $item->type === 'link'}
                     <li class="nav-item">
                         <a href="{$item->url}"
-                           class="nav-link fw-bold{if isset($currentPath) && $currentPath === $item->url} active{/if}">
+                           class="nav-link fw-bold{if $currentPath === $item->url} active{/if}">
                             <i class="bi {$item->icon ?? 'bi-circle'}"></i>
                             {$item->label}
                         </a>
@@ -72,7 +72,7 @@
                                 {foreach $item->children as $child}
                                     <li>
                                         <a href="{$child->url}"
-                                           class="nav-link fw-bold py-1{if isset($currentPath) && $currentPath === $child->url} active{/if}">
+                                           class="nav-link fw-bold py-1{if $currentPath === $child->url} active{/if}">
                                             <i class="bi bi-dash"></i>
                                             {$child->label}
                                         </a>
@@ -92,13 +92,6 @@
     <div class="container-fluid"{if file_exists('app/images/header-banner.jpg')} style="margin-top: calc(-1 * var(--navbar-height));"{/if}>
         {if $homeHeader !== ''}
             {$homeHeader|noescape}
-        {/if}
-
-        {if isset($message) && $message !== ''}
-        <div class="alert alert-success alert-dismissible">
-            {$message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{='home.close'|translate}"></button>
-        </div>
         {/if}
 
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -150,10 +143,10 @@
             <div class="card-header">
                 <h2 class="card-title">{$latestArticle->title}</h2>
                 <small class="text-muted">
-                    {='created_by'|translate} {$latestArticle->author?->displayName ?? ''}
+                    {='created_by'|translate} {$latestArticle->author->displayName ?? ''}
                     {='on'|translate} {=$latestArticle->timestamp|shortDate}
                     {$publishedBy}
-                    {if date('Y-m-d', strtotime($latestArticle->timestamp)) !== date('Y-m-d', strtotime($latestArticle->lastUpdate))}
+                    {if substr($latestArticle->timestamp, 0, 10) !== substr($latestArticle->lastUpdate, 0, 10)}
                         {='modified_on'|translate} {=$latestArticle->lastUpdate|shortDate}
                     {/if}
                     {if $latestArticleHasSurvey}
@@ -167,7 +160,7 @@
             <div class="card-body">
                 {if $homeParagraphsCount === 0}
                     {$latestArticle->content|noescape}
-                    {if $carouselItems && count($carouselItems) > 0}
+                    {if $carouselItems !== []}
                         <div id="homeCarousel-{$latestArticle->id}" class="carousel slide mt-3" data-bs-ride="carousel">
                             <div class="carousel-inner">
                                 {foreach $carouselItems as $key => $item}
@@ -217,7 +210,7 @@
         </ul>
         {/if}
 
-        {if isset($homeFooter) && $homeFooter !== ''}
+        {if $homeFooter !== ''}
             {$homeFooter|noescape}
         {/if}
     </div>

@@ -106,6 +106,7 @@ final class ConnectedUser
                 ),
                 'userEmail' => $this->person->email,
                 'isAdmin' => $this->isAdministrator(),
+                'isAnybody' => $this->isAnybody(),
                 'isBackupManager' => $this->isBackupManager(),
                 'isCommunicationManager' => $this->isCommunicationManager(),
                 'isDesigner' => $this->isDesigner(),

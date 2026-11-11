@@ -19,7 +19,7 @@
                     <select class="form-select" id="eventTypeSelect" name="idEventType">
                         <option value="">{='event.get_emails.option.choose_type'|translate}</option>
                         {foreach $eventTypes as $type}
-                            <option value="{$type->Id}">{$type->Name}</option>
+                            <option value="{$type->id}">{$type->name}</option>
                         {/foreach}
                     </select>
                 </div>

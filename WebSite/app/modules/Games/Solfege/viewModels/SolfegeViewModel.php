@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace app\modules\Games\Solfege\viewModels;
 
-use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Games\viewModels\GameLayoutViewModel;
 
-final readonly class SolfegeViewModel extends LayoutViewModel
+final readonly class SolfegeViewModel extends GameLayoutViewModel
 {
     /**
-     * @param list<object> $navItems
+     * @param list<MenuItemRow> $navItems
      * @param list<array{note: string, name: string, black: bool}> $pianoKeys
      * @param array<string, string> $noteNames Note code (e.g. "C4") => displayed name
      * @param array<string, string> $i18n
@@ -23,6 +24,6 @@ final readonly class SolfegeViewModel extends LayoutViewModel
         public array $i18n,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct($layoutParams, category: 'other');
     }
 }

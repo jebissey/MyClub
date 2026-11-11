@@ -2,63 +2,14 @@
 
 {block content}
 
-{var $groupConfig = [
-    'event'   => ['label' => 'user.messages.group.events',   'icon' => 'bi-calendar-event', 'bg' => 'success', 'url' => '/event/chat/'],
-    'article' => ['label' => 'user.messages.group.articles', 'icon' => 'bi-file-text',      'bg' => 'primary', 'url' => '/article/chat/'],
-    'group'   => ['label' => 'user.messages.group.groups',   'icon' => 'bi-people',         'bg' => 'info',    'url' => '/group/chat/'],
-]}
-
 {embed 'partials/_filter_card.latte', baseUrl: '/user/messages', searchMode: $searchMode, searchFrom: $searchFrom}
     {block body}
-
-        {embed 'partials/_grouped_list.latte',
+        {include 'partials/_grouped_list.latte',
             items: $messages,
             groupConfig: $groupConfig,
+            itemTemplate: '_messages_item.latte',
             emptyKey: 'user.messages.empty.title',
             emptyDescKey: "user.messages.empty.since_{$searchMode}"}
-
-            {block item}
-                <div class="d-flex align-items-center gap-2">
-
-                    <div class="flex-grow-1 text-truncate fw-semibold small">
-                        {$item['title']}
-                    </div>
-
-                    <span class="badge rounded-pill bg-info text-dark flex-shrink-0"
-                          title="{$item['message_count']} messages">
-                        {$item['message_count']}
-                    </span>
-
-                    <small class="text-muted flex-shrink-0 d-none d-sm-inline">
-                        {$item['LastUpdate']|shortDateTime}
-                    </small>
-
-                    {var $isUrl = strlen($item['UserImg']) > 10}
-                    <div class="flex-shrink-0" style="width:2rem; height:2rem;">
-                        {if $isUrl}
-                            <img src="{$item['UserImg']}" alt="Avatar" class="rounded-circle"
-                                 style="width:2rem; height:2rem; object-fit:cover;">
-                        {else}
-                            <span style="font-size:1.5rem; line-height:2rem; display:block; text-align:center;">
-                                {$item['UserImg']}
-                            </span>
-                        {/if}
-                    </div>
-
-                    <a href="{$cfg['url']}{$item['Id']}"
-                       class="btn btn-success btn-sm flex-shrink-0"
-                       title="{='user.messages.action.view'|translate}">
-                        <i class="bi bi-eye"></i>
-                    </a>
-
-                </div>
-                <div class="d-sm-none text-muted mt-1" style="font-size:.75rem;">
-                    <i class="bi bi-clock me-1"></i>{$item['LastUpdate']|date:'d/m/Y H:i'}
-                </div>
-            {/block}
-
-        {/embed}
-
     {/block}
 {/embed}
 

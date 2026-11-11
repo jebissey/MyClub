@@ -8,11 +8,15 @@ use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Common\valueObjects\Person;
 
+/**
+ * @phpstan-import-type MessageGroupItem from \app\models\MessageDataHelper
+ */
 final readonly class UserMessagesViewModel extends LayoutViewModel
 {
     /**
      * @param list<MenuItemRow> $navItems
-     * @param array<int, array<string, mixed>> $messages
+     * @param list<MessageGroupItem> $messages
+     * @param array<string, array{label: string, icon: string, bg: string, url: string}> $groupConfig
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
@@ -21,6 +25,7 @@ final readonly class UserMessagesViewModel extends LayoutViewModel
         public array $navItems,
         public ?Person $person,
         public array $messages,
+        public array $groupConfig,
         string $btnParent = '/user',
         array $layoutParams = []
     ) {

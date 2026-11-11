@@ -73,7 +73,8 @@ final class ArticleListController extends TableController
 
         $query = $this->articleTableDataHelper->getQuery($connectedUser, $spotlightArticleId);
 
-        $this->renderIndex('Article/views/articles_index.latte', $query, $filterValues, $filters, $columns);
+        $viewModel = $this->buildIndexViewModel($query, $filterValues, $filters, $columns, '/articles');
+        $this->views->render('Article/views/articles_index.latte', $viewModel);
     }
 
     public function publicIndex(): void
@@ -101,7 +102,8 @@ final class ArticleListController extends TableController
 
         $query = $this->articleTableDataHelper->getQueryForPublicArticles();
 
-        $this->renderIndex('Article/views/publicArticles_index.latte', $query, $filterValues, $filters, $columns);
+        $viewModel = $this->buildIndexViewModel($query, $filterValues, $filters, $columns, '/articles/public');
+        $this->views->render('Article/views/publicArticles_index.latte', $viewModel);
     }
 
     /**
@@ -120,7 +122,7 @@ final class ArticleListController extends TableController
      */
     private function filter(string $name, string $labelKey): array
     {
-        return ['name' => $name, 'label' => ($this->t)($labelKey)];
+        return ['name' => $name, 'label' => $this->translate($labelKey)];
     }
 
     /**
@@ -128,7 +130,7 @@ final class ArticleListController extends TableController
      */
     private function column(string $field, string $labelKey): array
     {
-        return ['field' => $field, 'label' => ($this->t)($labelKey)];
+        return ['field' => $field, 'label' => $this->translate($labelKey)];
     }
 
     /**
@@ -136,27 +138,27 @@ final class ArticleListController extends TableController
      * @param list<array{name: string, label: string}> $filters
      * @param list<array{field: string, label: string}> $columns
      */
-    private function renderIndex(string $template, Select $query, array $filterValues, array $filters, array $columns): void
-    {
+    private function buildIndexViewModel(
+        Select $query,
+        array $filterValues,
+        array $filters,
+        array $columns,
+        string $resetUrl,
+    ): TableIndexViewModel {
         $connectedUser = $this->application->getConnectedUser();
         $data = $this->prepareTableData($query, $filterValues);
 
-        $viewModel = new TableIndexViewModel(
+        return new TableIndexViewModel(
             articles: $data['items'],
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
             filterValues: $filterValues,
             filters: $filters,
             columns: $columns,
-            resetUrl: '/articles',
+            resetUrl: $resetUrl,
             userConnected: $connectedUser->person ?? false,
             navItems: $this->getNavItems($connectedUser->person?->email),
-            layoutParams: $this->getAllParams([
-                'page' => $connectedUser->getPage(),
-                'btnHistoryBack' => true,
-                'btnParent' => '/',
-            ]),
+            layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
         );
-        $this->views->render($template, $viewModel);
     }
 }

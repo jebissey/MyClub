@@ -14,6 +14,8 @@ use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
+use app\modules\Loan\services\LoanAvailabilityService;
+use app\modules\Loan\services\LoanCalendarService;
 use app\modules\PersonManager\services\MemberCsvImporter;
 
 /**
@@ -27,6 +29,8 @@ final readonly class Services
         public ArticleAuthorizationService $articleAuthorizationService,
         public AuthenticationService $authenticationService,
         public EmailService $emailService,
+        public LoanAvailabilityService $loanAvailabilityService,
+        public LoanCalendarService $loanCalendarService,
         public MediaManager $mediaManager,
         public MemberCsvImporter $memberCsvImporter,
         public News $news,

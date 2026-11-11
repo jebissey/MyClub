@@ -2,51 +2,14 @@
 
 {block content}
 
-{var $groupConfig = [
-    'article'      => ['label' => 'user.news.group.articles',      'icon' => 'bi-file-text',      'bg' => 'primary'],
-    'event'        => ['label' => 'user.news.group.events',        'icon' => 'bi-calendar-event', 'bg' => 'success'],
-    'message'      => ['label' => 'user.news.group.messages',      'icon' => 'bi-envelope',       'bg' => 'info'],
-    'presentation' => ['label' => 'user.news.group.presentations', 'icon' => 'bi-person-badge',   'bg' => 'warning'],
-    'survey'       => ['label' => 'user.news.group.surveys',       'icon' => 'bi-bar-chart',      'bg' => 'secondary'],
-]}
-
 {embed 'partials/_filter_card.latte', baseUrl: '/user/news', searchMode: $searchMode, searchFrom: $searchFrom}
     {block body}
-
-        {embed 'partials/_grouped_list.latte',
+        {include 'partials/_grouped_list.latte',
             items: $news,
             groupConfig: $groupConfig,
+            itemTemplate: '_news_item.latte',
             emptyKey: 'user.news.empty.title',
             emptyDescKey: "user.news.empty.since_{$searchMode}"}
-
-            {block item}
-                <div class="d-flex align-items-start gap-2">
-                    <div class="flex-grow-1 text-truncate">
-                        <a href="{$item['url']}" class="fw-semibold small text-dark text-decoration-none">
-                            {$item['title']}
-                        </a>
-                    </div>
-                    <small class="text-muted flex-shrink-0">
-                        {$item['date']|shortDateTime}
-                    </small>
-                </div>
-
-                {if (isset($item['from']) && $item['from']) || (isset($item['detail']) && $item['detail'])}
-                    <div class="d-flex flex-wrap gap-2 mt-1">
-                        {if isset($item['from']) && $item['from']}
-                            <small class="text-muted">
-                                <i class="bi bi-person me-1"></i>{='user.news.item.by'|translate} {$item['from']}
-                            </small>
-                        {/if}
-                        {if isset($item['detail']) && $item['detail']}
-                            <small class="text-muted fst-italic">{$item['detail']}</small>
-                        {/if}
-                    </div>
-                {/if}
-            {/block}
-
-        {/embed}
-
     {/block}
 {/embed}
 

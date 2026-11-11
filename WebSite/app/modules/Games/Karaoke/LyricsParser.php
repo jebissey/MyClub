@@ -20,7 +20,9 @@ final class LyricsParser
      */
     private array $lines = [];
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function parse(string $filePath): void
     {
