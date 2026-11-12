@@ -35,6 +35,11 @@ final readonly class TableIndexViewModel extends LayoutViewModel
         public array $navItems,
         array $layoutParams = []
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

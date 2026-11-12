@@ -57,6 +57,7 @@ final readonly class EventDetailViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/nextEvents',
+            btnPlus: false,
         );
     }
 }

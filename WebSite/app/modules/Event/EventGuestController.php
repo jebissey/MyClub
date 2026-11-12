@@ -11,6 +11,8 @@ use app\helpers\Application;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\EventDataHelper;
+use app\models\EventInvitationDataHelper;
+use app\models\EventListDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\valueObjects\EmailMessage;
@@ -20,8 +22,10 @@ final class EventGuestController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private readonly EventDataHelper $eventDataHelper,
         private readonly EmailService $emailService,
+        private readonly EventDataHelper $eventDataHelper,
+        private readonly EventInvitationDataHelper $eventInvitationDataHelper,
+        private readonly EventListDataHelper $eventListDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -33,7 +37,7 @@ final class EventGuestController extends AbstractController
             $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
-        $events = $this->eventDataHelper->getEventsForAllOrGuest();
+        $events = $this->eventListDataHelper->getEventsForAllOrGuest();
         $connectedUser = $this->application->getConnectedUser();
 
         $viewModel = new EventGuestViewModel(
@@ -78,13 +82,13 @@ final class EventGuestController extends AbstractController
             }
             $nickname = To::str($input['nickname'] ?? '???');
             try {
-                if ($this->eventDataHelper->findPendingInvitation($email, $eventId) !== null) {
+                if ($this->eventInvitationDataHelper->findPendingInvitation($email, $eventId) !== null) {
                     $this->guest($this->translate('event.guest.error.already_invited'), 'error');
                     return;
                 }
 
                 $token = bin2hex(random_bytes(32));
-                $this->eventDataHelper->createInvitation(
+                $this->eventInvitationDataHelper->createInvitation(
                     $email,
                     $nickname,
                     $eventId,

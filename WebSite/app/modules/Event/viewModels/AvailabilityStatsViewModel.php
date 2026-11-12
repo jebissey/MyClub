@@ -33,6 +33,7 @@ final readonly class AvailabilityStatsViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: "/eventManager",
+            btnPlus: false,
         );
     }
 }

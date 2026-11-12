@@ -25,6 +25,7 @@ final readonly class MemberFieldsViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/personManager',
+            btnPlus: false,
         );
     }
 }

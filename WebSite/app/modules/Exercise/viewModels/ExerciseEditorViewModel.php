@@ -20,6 +20,11 @@ final readonly class ExerciseEditorViewModel extends LayoutViewModel
         public array $i18n,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams), btnHistoryBack: true, btnParent: '/exercises');
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/exercises',
+            btnPlus: false,
+        );
     }
 }

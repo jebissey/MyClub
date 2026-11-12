@@ -24,6 +24,8 @@ final readonly class MediaUsesInMessagesViewModel extends LayoutViewModel
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
+            btnPlus: false,
+            btnParent: null,
         );
     }
 }

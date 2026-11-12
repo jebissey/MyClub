@@ -44,6 +44,9 @@ final readonly class UsersImportViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/',
+            btnPlus: false,
         );
     }
 }

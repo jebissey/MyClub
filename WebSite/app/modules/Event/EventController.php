@@ -16,8 +16,13 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\To;
 use app\helpers\WebApp;
+use app\models\AttributeDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\EventDataHelper;
+use app\models\EventInvitationDataHelper;
+use app\models\EventListDataHelper;
+use app\models\EventNeedDataHelper;
+use app\models\EventParticipationDataHelper;
 use app\models\MemberDirectoryDataHelper;
 use app\models\MessageDataHelper;
 use app\models\ParticipantDataHelper;
@@ -40,12 +45,17 @@ final class EventController extends AbstractController
 {
     public function __construct(
         Application $application,
-        private readonly EventDataHelper $eventDataHelper,
+        private readonly AttributeDataHelper $attributeDataHelper,
         private readonly CrosstabDataHelper $crosstabDataHelper,
-        private readonly ParticipantDataHelper $participantDataHelper,
+        private readonly EventDataHelper $eventDataHelper,
+        private readonly EventInvitationDataHelper $eventInvitationDataHelper,
+        private readonly EventListDataHelper $eventListDataHelper,
+        private readonly EventNeedDataHelper $eventNeedDataHelper,
+        private readonly EventParticipationDataHelper $eventParticipationDataHelper,
         private readonly MessageDataHelper $messageDataHelper,
         private readonly MemberDirectoryDataHelper $memberDirectoryDataHelper,
         private readonly MemberMapService $memberMapService,
+        private readonly ParticipantDataHelper $participantDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -95,7 +105,7 @@ final class EventController extends AbstractController
         $connectedUser = $this->application->getConnectedUser();
 
         $viewModel = new EventNextEventsViewModel(
-            events: array_values($this->eventDataHelper->getEvents(
+            events: array_values($this->eventListDataHelper->getEvents(
                 $connectedUser->person,
                 $mode,
                 $offset,
@@ -138,7 +148,7 @@ final class EventController extends AbstractController
         }
 
         $viewModel = new EventWeekEventsViewModel(
-            events: $this->eventDataHelper->getNextWeekEvents(),
+            events: $this->eventListDataHelper->getNextWeekEvents(),
             eventTypes: array_map(
                 static fn(stdClass $row): EventTypeRow => EventTypeRow::fromStdClass($row),
                 array_values($this->dataHelper->gets('EventType', ['Inactivated' => 0], 'Id, Name, Inactivated, IdGroup'))
@@ -147,7 +157,7 @@ final class EventController extends AbstractController
                 static fn(stdClass $row): EventAttributeRow => EventAttributeRow::fromStdClass($row),
                 array_values($this->dataHelper->gets('Attribute', [], 'Id, Name, Detail, Color'))
             ),
-            attributes: $this->eventDataHelper->getAttributesForNextWeekEvents(),
+            attributes: $this->eventListDataHelper->getAttributesForNextWeekEvents(),
             layoutParams: $this->getAllParams([]),
         );
 
@@ -211,7 +221,7 @@ final class EventController extends AbstractController
 
         $userEmail = $person->email ?? '';
         $participants = $this->participantDataHelper->getEventParticipants($eventId);
-        $isRegistered = $this->eventDataHelper->isUserRegistered($eventId, $userEmail);
+        $isRegistered = $this->eventParticipationDataHelper->isUserRegistered($eventId, $userEmail);
 
         // Carpooling map: only for registered users, restricted to the event participants
         $carpoolData = [];
@@ -238,7 +248,7 @@ final class EventController extends AbstractController
                     detail: To::str($row->Detail),
                     color: To::str($row->Color),
                 ),
-                array_values($this->eventDataHelper->getEventAttributes($eventId))
+                array_values($this->attributeDataHelper->getEventAttributes($eventId))
             ),
             participants: $participants,
             isRegistered: $isRegistered,
@@ -246,9 +256,9 @@ final class EventController extends AbstractController
                 '"From"' => 'User',
                 'EventId' => $eventId
             ], '*')),
-            eventNeeds: $this->eventDataHelper->getEventNeeds($eventId),
-            participantSupplies: $this->eventDataHelper->getParticipantSupplies($eventId),
-            userSupplies: $this->eventDataHelper->getUserSupplies($eventId, $userEmail),
+            eventNeeds: $this->eventNeedDataHelper->getEventNeeds($eventId),
+            participantSupplies: $this->eventNeedDataHelper->getParticipantSupplies($eventId),
+            userSupplies: $this->eventNeedDataHelper->getUserSupplies($eventId, $userEmail),
             token: $token,
             carpoolData: $carpoolData,
             carpoolMaxZoom: 12,
@@ -289,11 +299,11 @@ final class EventController extends AbstractController
                 // Membre connecté : inscription/désinscription directe, sans passer par une Invitation.
                 $userId = $person->id;
                 if ($set) {
-                    if ($eventId > 0 && !$this->eventDataHelper->isAlreadyRegistered($userId, $eventId)) {
-                        $this->eventDataHelper->addConfirmedParticipant($userId, $eventId);
+                    if ($eventId > 0 && !$this->eventParticipationDataHelper->isAlreadyRegistered($userId, $eventId)) {
+                        $this->eventParticipationDataHelper->addConfirmedParticipant($userId, $eventId);
                     }
                 } else {
-                    $this->eventDataHelper->removeParticipantByIndividual($userId, $eventId);
+                    $this->eventParticipationDataHelper->removeParticipantByIndividual($userId, $eventId);
                 }
             } elseif ($token !== null) {
                 // External contact using an invitation link.
@@ -305,7 +315,7 @@ final class EventController extends AbstractController
                 }
 
                 $event = EventAudienceRow::fromStdClass($eventData);
-                $invitation = $this->eventDataHelper->findInvitationByToken($token);
+                $invitation = $this->eventInvitationDataHelper->findInvitationByToken($token);
 
                 if ($invitation === null || $invitation->idEvent !== $eventId) {
                     $this->show($eventId, $this->translate('event.register.error.unknown_token'), 'error');
@@ -320,7 +330,7 @@ final class EventController extends AbstractController
                     return;
                 }
 
-                $individual = $this->eventDataHelper->findIndividualByEmail($invitation->email);
+                $individual = $this->eventInvitationDataHelper->findIndividualByEmail($invitation->email);
 
                 if ($individual !== null && $individual->type === 'Member') {
                     $this->show(
@@ -333,18 +343,18 @@ final class EventController extends AbstractController
 
                 $individualId = $individual !== null
                     ? $individual->id
-                    : $this->eventDataHelper->createContactIndividual(
+                    : $this->eventInvitationDataHelper->createContactIndividual(
                         $invitation->email,
                         $invitation->nickName ?? ''
                     );
 
                 if ($set) {
-                    if ($this->eventDataHelper->isAlreadyRegistered($individualId, $eventId)) {
+                    if ($this->eventParticipationDataHelper->isAlreadyRegistered($individualId, $eventId)) {
                         $this->show($eventId, $this->translate('event.register.error.already_registered'), 'error');
                         return;
                     }
 
-                    $this->eventDataHelper->addConfirmedParticipant(
+                    $this->eventParticipationDataHelper->addConfirmedParticipant(
                         $individualId,
                         $eventId,
                         $invitation->invitedBy,
@@ -366,7 +376,7 @@ final class EventController extends AbstractController
                     return;
                 }
 
-                $this->eventDataHelper->removeParticipantByIndividual($individualId, $eventId);
+                $this->eventParticipationDataHelper->removeParticipantByIndividual($individualId, $eventId);
             } else {
                 $eventData = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
                 if ($eventData !== false) {

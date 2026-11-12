@@ -23,6 +23,11 @@ final readonly class FetchEmailsViewModel extends LayoutViewModel
         public array $timeOptions,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams), btnHistoryBack: true);
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnPlus: false,
+            btnParent: null,
+        );
     }
 }

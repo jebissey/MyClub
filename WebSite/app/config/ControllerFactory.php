@@ -11,17 +11,21 @@ use app\helpers\ErrorManager;
 use app\helpers\MemberCustomFields;
 use app\helpers\News;
 use app\helpers\NotificationSender;
-use app\helpers\WebApp;
 use app\models\AlertRecipientDataHelper;
 use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
 use app\models\ArticleTableDataHelper;
+use app\models\AttributeDataHelper;
 use app\models\AvailabilityDataHelper;
 use app\models\CarouselDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\DbBrowserDataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
+use app\models\EventInvitationDataHelper;
+use app\models\EventListDataHelper;
+use app\models\EventNeedDataHelper;
+use app\models\EventParticipationDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\ExerciseTableDataHelper;
 use app\models\GroupDataHelper;
@@ -129,6 +133,7 @@ final readonly class ControllerFactory
         private ArticleDataHelper $articleDataHelper,
         private ArticleService $articleService,
         private ArticleTableDataHelper $articleTableDataHelper,
+        private AttributeDataHelper $attributeDataHelper,
         private AuthenticationService $authenticationService,
         private Backup $backup,
         private CarouselDataHelper $carouselDataHelper,
@@ -136,8 +141,12 @@ final readonly class ControllerFactory
         private DbBrowserDataHelper $dbBrowserDataHelper,
         private DesignDataHelper $designDataHelper,
         private EmailService $emailService,
+        private EventListDataHelper $eventListDataHelper,
         private ErrorManager $errorManager,
         private EventDataHelper $eventDataHelper,
+        private EventInvitationDataHelper $eventInvitationDataHelper,
+        private EventNeedDataHelper $eventNeedDataHelper,
+        private EventParticipationDataHelper $eventParticipationDataHelper,
         private EventTypeDataHelper $eventTypeDataHelper,
         private ExerciseTableDataHelper $exerciseTableDataHelper,
         private GroupDataHelper $groupDataHelper,
@@ -166,8 +175,7 @@ final readonly class ControllerFactory
         private SharedFileDataHelper $sharedFileDataHelper,
         private SurveyDataHelper $surveyDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
-    ) {
-    }
+    ) {}
 
     public function makeArticleController(): ArticleController
     {
@@ -262,12 +270,17 @@ final readonly class ControllerFactory
     {
         return new EventController(
             $this->application,
-            $this->eventDataHelper,
+            $this->attributeDataHelper,
             $this->crosstabDataHelper,
-            $this->participantDataHelper,
+            $this->eventDataHelper,
+            $this->eventInvitationDataHelper,
+            $this->eventListDataHelper,
+            $this->eventNeedDataHelper,
+            $this->eventParticipationDataHelper,
             $this->messageDataHelper,
             $this->memberDirectoryDataHelper,
-            $this->memberMapService
+            $this->memberMapService,
+            $this->participantDataHelper,
         );
     }
 
@@ -300,8 +313,10 @@ final readonly class ControllerFactory
     {
         return new EventGuestController(
             $this->application,
+            $this->emailService,
             $this->eventDataHelper,
-            $this->emailService
+            $this->eventInvitationDataHelper,
+            $this->eventListDataHelper,
         );
     }
 
@@ -492,7 +507,7 @@ final readonly class ControllerFactory
         return new RssController(
             $this->application,
             $this->articleDataHelper,
-            $this->eventDataHelper
+            $this->eventListDataHelper
         );
     }
 
@@ -613,6 +628,7 @@ final readonly class ControllerFactory
     {
         return new UserPreferencesController(
             $this->application,
+            $this->attributeDataHelper,
             $this->eventTypeDataHelper
         );
     }

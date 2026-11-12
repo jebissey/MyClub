@@ -1601,6 +1601,37 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 'Aucun résultat trouvé pour cette recherche.',
 'Nie znaleziono wyników dla tego wyszukiwania.');
 
+-- Event type edit form: texts previously hard-coded in French
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('event.types.edit.title',
+'Edit an event type',
+'Éditer un type d''événement',
+'Edytuj typ wydarzenia'),
+('event.types.edit.name',
+'Name',
+'Nom',
+'Nazwa'),
+('event.types.edit.name_required',
+'Name is required',
+'Le nom est requis',
+'Nazwa jest wymagana'),
+('event.types.edit.group',
+'Group:',
+'Groupe :',
+'Grupa:'),
+('event.types.edit.group_none',
+'None',
+'Aucun',
+'Brak'),
+('event.types.edit.cancel',
+'Cancel',
+'Annuler',
+'Anuluj'),
+('event.types.edit.save',
+'Save',
+'Enregistrer',
+'Zapisz');
+
 SQL);
 
         return 101;

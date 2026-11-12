@@ -24,6 +24,7 @@ final readonly class GroupIndexViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/webmaster',
+            btnPlus: false,
         );
     }
 }

@@ -18,7 +18,9 @@ use app\modules\User\viewModels\UserPreferencesViewModel;
  */
 final class UserPreferencesController extends AbstractController
 {
-    public function __construct(Application $application, private readonly EventTypeDataHelper $eventTypeDataHelper)
+    public function __construct(Application $application, 
+    private readonly AttributeDataHelper $attributeDataHelper,
+    private readonly EventTypeDataHelper $eventTypeDataHelper)
     {
         parent::__construct($application);
     }
@@ -32,10 +34,9 @@ final class UserPreferencesController extends AbstractController
         $person = $this->application->getConnectedUser(true)->person;
         $eventTypes = $this->eventTypeDataHelper->getsFor($person->id);
         $eventTypesWithAttributes = [];
-        $attributeDataHelper = new AttributeDataHelper($this->application);
         foreach ($eventTypes as $eventType) {
             $eventTypesWithAttributes[] = $eventType->withAttributes(
-                $attributeDataHelper->getAttributesOf($eventType->id)
+                $this->attributeDataHelper->getAttributesOf($eventType->id)
             );
         }
 

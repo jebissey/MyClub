@@ -8,12 +8,13 @@ use PDO;
 use stdClass;
 use Throwable;
 use app\enums\ApplicationError;
+use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\modules\Common\valueObjects\EventTypeAttributeRow;
 
 final class AttributeDataHelper extends Data
 {
-    public function __construct(Application $application)
+    public function __construct(Application $application, private readonly EventDataHelper $eventDataHelper)
     {
         parent::__construct(
             $application->getPdo(),
@@ -161,4 +162,30 @@ final class AttributeDataHelper extends Data
 
         $this->pdo->commit();
     }
+
+
+    /** @return array<int, stdClass> */
+    public function getEventAttributes(int $eventId): array
+    {
+        if ($this->eventDataHelper->eventExists($eventId)) {
+            $sql = "
+                SELECT 
+                    Attribute.Name AS Name, 
+                    Attribute.Detail AS Detail, 
+                    Attribute.Color AS Color, 
+                    Attribute.Id AS AttributeId
+                FROM EventAttribute
+                JOIN Attribute ON EventAttribute.IdAttribute = Attribute.Id
+                WHERE EventAttribute.IdEvent = :eventId
+            ";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['eventId' => $eventId]);
+            /** @var array<int, stdClass> $result */
+            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+            return $result;
+        }
+        throw new QueryException("Event ({$eventId}) doesn't exist");
+    }
+
+
 }

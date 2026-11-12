@@ -44,6 +44,7 @@ use app\models\CarouselDataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\EventParticipationDataHelper;
 use app\models\KanbanDataHelper;
 use app\models\KaraokeDataHelper;
 use app\models\LanguagesDataHelper;
@@ -85,6 +86,7 @@ final readonly class ApiFactory
         private EmailService $emailService,
         private EventDataHelper $eventDataHelper,
         private EventNeedDataHelper $eventNeedDataHelper,
+        private EventParticipationDataHelper $eventParticipationDataHelper,
         private EventService $eventService,
         private GravatarHandler $gravatarHandler,
         private JsonEmailQuotaTracker $quotaTracker,
@@ -111,8 +113,7 @@ final readonly class ApiFactory
         private NotificationSender $notificationSender,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
-    ) {
-    }
+    ) {}
 
     public function makeArticleApi(): ArticleApi
     {
@@ -168,6 +169,7 @@ final readonly class ApiFactory
     {
         return new EventApi(
             $this->application,
+            $this->attributeDataHelper,
             $this->eventDataHelper,
             $this->eventService,
             $this->participantDataHelper,
@@ -230,10 +232,11 @@ final readonly class ApiFactory
     {
         return new EventSupplyApi(
             $this->application,
-            $this->eventDataHelper,
             $this->connectedUser,
             $this->languagesDataHelper,
-            $this->personDataHelper
+            $this->personDataHelper,
+            $this->eventNeedDataHelper,
+            $this->eventParticipationDataHelper,
         );
     }
 

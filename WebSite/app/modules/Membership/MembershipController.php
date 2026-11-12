@@ -54,7 +54,7 @@ final class MembershipController extends AbstractController
 
         // ── HelloAsso widget URL ──────────────────────────────────────────────
         $widgetUrl = null;
-        if (!$current || $current->Status !== 'paid') {
+        if (!$current || $current->status !== 'paid') {
             $widgetUrl = $helloAsso->getWidgetUrl(
                 formType: 'adhesions',
                 formSlug: 'saison-2026-2027',
@@ -69,7 +69,7 @@ final class MembershipController extends AbstractController
         $viewModel = new MembershipIndexViewModel(
             season: $season,
             current: $current,
-            history: array_values($history),
+            history: $history,
             amountCents: $this->membershipDataHelper->getAmountCents(),
             paymentFeedback: $paymentFeedback,
             translations: $this->doTranslations(),

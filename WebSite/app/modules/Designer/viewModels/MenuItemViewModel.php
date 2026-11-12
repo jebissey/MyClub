@@ -26,6 +26,11 @@ final readonly class MenuItemViewModel extends LayoutViewModel
         public array $i18n,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams), btnHistoryBack: true, btnParent: '/designer');
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/designer',
+            btnPlus: false,
+        );
     }
 }

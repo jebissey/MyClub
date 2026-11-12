@@ -23,6 +23,7 @@ final readonly class BackupViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: "/admin",
+            btnPlus: false,
         );
     }
 }

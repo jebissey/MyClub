@@ -21,6 +21,11 @@ final readonly class DesignsIndexViewModel extends LayoutViewModel
         public array $userVotes,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams), btnHistoryBack: true, btnParent: '/designer');
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/designer',
+            btnPlus: false,
+        );
     }
 }

@@ -16,6 +16,11 @@ final readonly class MediaUploadViewModel extends LayoutViewModel
         public array $i18n,
         array $layoutParams = []
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

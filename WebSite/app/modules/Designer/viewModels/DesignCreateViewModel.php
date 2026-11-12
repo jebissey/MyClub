@@ -17,6 +17,11 @@ final readonly class DesignCreateViewModel extends LayoutViewModel
         public array $groups,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

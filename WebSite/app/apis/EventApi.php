@@ -17,6 +17,7 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Common\interfaces\EventServiceInterface;
 use app\models\AlertRecipientDataHelper;
+use app\models\AttributeDataHelper;
 use app\models\EventDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\MessageDataHelper;
@@ -35,6 +36,7 @@ final class EventApi extends AbstractApi
 {
     public function __construct(
         Application $application,
+        private readonly AttributeDataHelper $attributeDataHelper,
         private readonly EventDataHelper $eventDataHelper,
         private readonly EventServiceInterface $eventService,
         private readonly ParticipantDataHelper $participantDataHelper,
@@ -99,7 +101,7 @@ final class EventApi extends AbstractApi
             try {
                 $apiResponse = new ApiResponse(true, ApplicationError::Ok->value, [
                     'event' => $this->eventDataHelper->getEvent($id),
-                    'attributes' => $this->eventDataHelper->getEventAttributes($id),
+                    'attributes' => $this->attributeDataHelper->getEventAttributes($id),
                 ]);
                 $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode, $apiResponse->message ?? '');
             } catch (Throwable $e) {

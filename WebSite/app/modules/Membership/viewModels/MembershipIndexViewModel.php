@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace app\modules\Membership\viewModels;
 
-use stdClass;
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Membership\valueObjects\MembershipRow;
 
 final readonly class MembershipIndexViewModel extends LayoutViewModel
 {
     /**
-     * @param object{Id:int, PersonId:int, Season:string, Status:string, AmountCents:int}|false $current
-     * @param array<int, stdClass> $history
+     * @param list<MembershipRow> $history
      * @param array<string, string> $translations
-     * @param array<string, mixed> $layoutParams Full output of Params::getAll().
+     * @param array<string, mixed> $layoutParams
      */
     public function __construct(
         public string $season,
-        public object|false $current,
+        public MembershipRow|false $current,
         public array $history,
         public int $amountCents,
         public ?string $paymentFeedback,
@@ -30,6 +29,7 @@ final readonly class MembershipIndexViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/user',
+            btnPlus: false,
         );
     }
 }

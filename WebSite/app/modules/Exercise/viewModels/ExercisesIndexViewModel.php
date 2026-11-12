@@ -37,6 +37,11 @@ final readonly class ExercisesIndexViewModel extends LayoutViewModel
         public array $navItems,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams), btnHistoryBack: true, btnParent: '/designer');
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/designer',
+            btnPlus: false,
+        );
     }
 }

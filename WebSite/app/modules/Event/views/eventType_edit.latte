@@ -5,21 +5,22 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title h5 m-0">Editer un type d'événement</h2>
+                    <h2 class="card-title h5 m-0">{='event.types.edit.title'|translate}</h2>
                 </div>
                 <div class="card-body">
                     <form method="POST">
                         <div class="mb-3">
-                            <label for="name" class="form-label">Nom</label>
-                            <input type="text" class="form-control {if isset($error)}is-invalid{/if}"
-                                id="name" name="name" value="{$name}" required>
-                            <div class="invalid-feedback">Le nom est requis</div>
+                            <label for="name" class="form-label">{='event.types.edit.name'|translate}</label>
+                            <input type="text" class="form-control"
+                                id="name" name="name" value="{$name}" required
+                                data-required-message="{='event.types.edit.name_required'|translate}">
+                            <div class="invalid-feedback">{='event.types.edit.name_required'|translate}</div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="itemGroup" class="form-label">Groupe:</label>
+                            <label for="itemGroup" class="form-label">{='event.types.edit.group'|translate}</label>
                             <select class="form-select" id="itemGroup">
-                                <option value="">Aucun</option>
+                                <option value="">{='event.types.edit.group_none'|translate}</option>
                                 {foreach $groups as $group}
                                 <option value="{$group->id}" {if $group->id == $idGroup}selected{/if}>
                                     {$group->name}
@@ -31,7 +32,7 @@
 
                         <div class="card-body">
                             <div class="card-header">
-                                <h2 class="card-title h5 m-0">Attributs</h2>
+                                <h2 class="card-title h5 m-0">{='event.types.attributes.title'|translate}</h2>
                             </div>
                             <div class="card-body">
                                 <div class="row" id="attributeContainer">
@@ -59,8 +60,8 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="/eventTypes" class="btn btn-secondary">Annuler</a>
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <a href="/eventTypes" class="btn btn-secondary">{='event.types.edit.cancel'|translate}</a>
+                            <button type="submit" class="btn btn-primary">{='event.types.edit.save'|translate}</button>
                         </div>
                     </form>
                 </div>
@@ -75,7 +76,7 @@
         const nameInput = document.getElementById("name");
 
         nameInput.addEventListener("invalid", function () {
-            this.setCustomValidity("Le nom est requis");
+            this.setCustomValidity(this.dataset.requiredMessage ?? "");
         });
 
         nameInput.addEventListener("input", function () {

@@ -24,6 +24,7 @@ final readonly class LoanDesignerViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/admin',
+            btnPlus: false,
         );
     }
 }

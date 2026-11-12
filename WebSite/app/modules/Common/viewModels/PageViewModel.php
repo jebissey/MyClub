@@ -13,6 +13,11 @@ final readonly class PageViewModel extends LayoutViewModel
     /** @param array<string, mixed> $layoutParams */
     public function __construct(array $layoutParams = [])
     {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

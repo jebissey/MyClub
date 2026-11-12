@@ -19,6 +19,11 @@ final readonly class ChangeOwnerViewModel extends LayoutViewModel
         public array $redactors,
         array $layoutParams = []
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

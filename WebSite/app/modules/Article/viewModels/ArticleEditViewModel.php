@@ -39,6 +39,7 @@ final readonly class ArticleEditViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/articles',
+            btnPlus: false,
         );
     }
 }

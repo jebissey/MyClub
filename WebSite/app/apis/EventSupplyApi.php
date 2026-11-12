@@ -14,7 +14,8 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\exceptions\QueryException;
 use app\exceptions\UnauthorizedAccessException;
-use app\models\EventDataHelper;
+use app\models\EventNeedDataHelper;
+use app\models\EventParticipationDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
@@ -24,10 +25,11 @@ final class EventSupplyApi extends AbstractApi
 {
     public function __construct(
         Application $application,
-        private readonly EventDataHelper $eventDataHelper,
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
+        private readonly EventNeedDataHelper $eventNeedDataHelper,
+        private readonly EventParticipationDataHelper $eventParticipationDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
@@ -53,8 +55,8 @@ final class EventSupplyApi extends AbstractApi
             $this->render(
                 'Event/views/participants-supplies_partial.latte',
                 [
-                    'participantSupplies' => $this->eventDataHelper->getParticipantSupplies($eventId),
-                    'isRegistered' => $this->eventDataHelper->isUserRegistered($eventId, $userEmail),
+                    'participantSupplies' => $this->eventNeedDataHelper->getParticipantSupplies($eventId),
+                    'isRegistered' => $this->eventParticipationDataHelper->isUserRegistered($eventId, $userEmail),
                 ]
             );
         } catch (Throwable $e) {
@@ -94,16 +96,16 @@ final class EventSupplyApi extends AbstractApi
 
     private function doUpdateSupply(int $eventId, string $userEmail, int $needId, int $supply): ApiResponse
     {
-        if (!$this->eventDataHelper->isUserRegistered($eventId, $userEmail)) {
+        if (!$this->eventParticipationDataHelper->isUserRegistered($eventId, $userEmail)) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'User not registered');
         }
 
-        $success = $this->eventDataHelper->updateUserSupply($eventId, $userEmail, $needId, $supply);
+        $success = $this->eventNeedDataHelper->updateUserSupply($eventId, $userEmail, $needId, $supply);
         if (!$success) {
             return new ApiResponse(false, ApplicationError::BadRequest->value, [], 'Update error');
         }
 
-        $eventNeeds = $this->eventDataHelper->getEventNeeds($eventId);
+        $eventNeeds = $this->eventNeedDataHelper->getEventNeeds($eventId);
         $updatedNeed = $this->findUpdatedNeed($eventNeeds, $needId);
 
         return new ApiResponse(

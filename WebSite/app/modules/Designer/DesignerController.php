@@ -35,4 +35,11 @@ final class DesignerController extends AbstractController
             $this->views->render('Designer/views/designer.latte', $viewModel);
         }
     }
+
+    public function showRoutes(): void
+    {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
+            return;
+        }
+    }
 }

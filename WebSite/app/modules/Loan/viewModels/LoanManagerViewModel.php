@@ -30,6 +30,7 @@ final readonly class LoanManagerViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/user',
+            btnPlus: false,
         );
     }
 }

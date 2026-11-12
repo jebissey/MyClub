@@ -7313,7 +7313,14 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1785,'user.ffa.round','Round','Round','Runda'),
  (1786,'user.ffa.location','Location','Lieu','Lokalizacja'),
  (1787,'user.ffa.error','Error:','Erreur :','Błąd:'),
- (1788,'user.ffa.no_result','No results found for this search.','Aucun résultat trouvé pour cette recherche.','Nie znaleziono wyników dla tego wyszukiwania.');
+ (1788,'user.ffa.no_result','No results found for this search.','Aucun résultat trouvé pour cette recherche.','Nie znaleziono wyników dla tego wyszukiwania.'),
+ (1789,'event.types.edit.title','Edit an event type','Éditer un type d''événement','Edytuj typ wydarzenia'),
+ (1790,'event.types.edit.name','Name','Nom','Nazwa'),
+ (1791,'event.types.edit.name_required','Name is required','Le nom est requis','Nazwa jest wymagana'),
+ (1792,'event.types.edit.group','Group:','Groupe :','Grupa:'),
+ (1793,'event.types.edit.group_none','None','Aucun','Brak'),
+ (1794,'event.types.edit.cancel','Cancel','Annuler','Anuluj'),
+ (1795,'event.types.edit.save','Save','Enregistrer','Zapisz');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
 INSERT INTO "Metadata" VALUES (1,'MyClub',101,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);

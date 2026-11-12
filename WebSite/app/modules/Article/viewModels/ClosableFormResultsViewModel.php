@@ -17,6 +17,7 @@ abstract readonly class ClosableFormResultsViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: "/article/{$articleId}",
+            btnPlus: false,
         );
     }
 }

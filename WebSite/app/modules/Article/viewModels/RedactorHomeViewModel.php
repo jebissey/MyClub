@@ -13,6 +13,11 @@ final readonly class RedactorHomeViewModel extends LayoutViewModel
         public string $content,
         array $layoutParams = []
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

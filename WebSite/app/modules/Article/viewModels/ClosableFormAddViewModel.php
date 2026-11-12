@@ -20,6 +20,11 @@ final readonly class ClosableFormAddViewModel extends LayoutViewModel
         public array $visibilityOptions,
         array $layoutParams = []
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

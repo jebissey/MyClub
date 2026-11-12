@@ -9,7 +9,7 @@
 {block content}
 <div class="container-fluid">
     <h1 class="mb-4">{='events.calendar.heading'|translate}</h1>
-    
+
     {if count($events) > 0}
     <div class="table-responsive">
         <table class="table table-bordered table-sm align-middle">
@@ -18,91 +18,89 @@
                     <th class="text-center" style="width: 14%;">{='events.calendar.week'|translate}</th>
                 {var $startOfWeek = new DateTime('monday this week')}
                 {for $i = 0; $i < 7; $i++}
-                    {var $day = (clone $startOfWeek)->modify("+$i days")}
+                    {var $headerDay = (clone $startOfWeek)->modify("+$i days")}
                     <th class="bg-primary-subtle text-center">
-                        {$day|dayName}
+                        {$headerDay|dayName}
                     </th>
                 {/for}
                 </tr>
             </thead>
             <tbody>
-                {foreach $events as $weekData}
-                    <tr>
-                        <td class="table-secondary fw-bold text-center small">
-                            <div>{$weekData['weekStart']} - {$weekData['weekEnd']}</div>
-                        </td>
-                        
-                        {for $day = 1; $day <= 7; $day++}
-                            {var $currentDayOffset = $day - 1}
-                            {var $currentDayTimestamp = strtotime($weekData['weekStartFull'] . ' +' . $currentDayOffset . ' days')}
-                            {var $todayTimestamp = strtotime('today')}
-                            {var $isToday = date('Y-m-d', $currentDayTimestamp) === date('Y-m-d', $todayTimestamp)}
-                            
-                            <td class="{if $isToday}bg-warning-subtle border border-warning border-2{/if}">
-                                {if count($weekData['days'][$day]) > 0}
-                                    {foreach $weekData['days'][$day] as $event}
+            {foreach $events as $weekData}
+                <tr>
+                    <td class="table-secondary fw-bold text-center small">
+                        <div>{$weekData->weekStart} - {$weekData->weekEnd}</div>
+                    </td>
 
-                                        {if $event['audience'] == 'All'}
-                                        <a href="/contact/event/{$event['id']}" 
-                                           class="mb-2 p-2 bg-light rounded d-block text-decoration-none text-dark fw-bold small">
-                                        {else}
-                                        <div class="mb-2 p-2 bg-light rounded small">
-                                        {/if}
+                    {for $day = 1; $day <= 7; $day++}
+                        {var $currentDay = (new DateTimeImmutable($weekData->weekStartFull))->modify('+' . ($day - 1) . ' days')}
+                        {var $isToday = $currentDay->format('Y-m-d') === date('Y-m-d')}
 
-                                            <div class="d-flex justify-content-between align-items-center"
-                                                 data-bs-toggle="tooltip"
-                                                 title="{$event['date']|longDate}">
-                                                
-                                                <div class="fw-bold text-primary">
-                                                    {$event['startTime']}
-                                                </div>
+                        <td class="{if $isToday}bg-warning-subtle border border-warning border-2{/if}">
+                            {if count($weekData->days[$day]) > 0}
+                                {foreach $weekData->days[$day] as $event}
 
-                                                <div class="fst-italic text-muted small">
-                                                    ({$event['duration']})
-                                                </div>
+                                    {if $event->audience === 'All'}
+                                    <a href="/contact/event/{$event->id}"
+                                    class="mb-2 p-2 bg-light rounded d-block text-decoration-none text-dark fw-bold small">
+                                    {else}
+                                    <div class="mb-2 p-2 bg-light rounded small">
+                                    {/if}
 
-                                                {ifset $event['groupName']}
-                                                <div class="fw-bold text-muted small">
-                                                    [{$event['groupName']}]
-                                                </div>
-                                                {/ifset}
+                                        <div class="d-flex justify-content-between align-items-center"
+                                            data-bs-toggle="tooltip"
+                                            title="{$event->date|longDate}">
+
+                                            <div class="fw-bold text-primary">
+                                                {$event->startTime}
                                             </div>
 
-                                            <div class="my-1">
-                                                {$event['summary']}
+                                            <div class="fst-italic text-muted small">
+                                                ({$event->duration})
                                             </div>
 
-                                            <div>
-                                                {if count($event['attributes']) > 0}
-                                                    {foreach $event['attributes'] as $attribute}
-                                                        <span 
-                                                            class="d-inline-block me-1 border rounded"
-                                                            style="width:20px; height:20px; background-color: {$attribute->color|noescape};"
-                                                            data-bs-toggle="tooltip"
-                                                            title="{$attribute->name} : {$attribute->detail}"
-                                                        ></span>
-                                                    {/foreach}
-                                                {else}
-                                                    <span class="fs-6">⌧</span>
-                                                {/if}
+                                            {if $event->groupName !== null}
+                                            <div class="fw-bold text-muted small">
+                                                [{$event->groupName}]
                                             </div>
-
-                                        {if $event['audience'] == 'All'}
-                                        </a>
-                                        {else}
+                                            {/if}
                                         </div>
-                                        {/if}
 
-                                    {/foreach}
-                                {else}
-                                    <div class="text-secondary fst-italic text-center small">
-                                        {='events.calendar.no_event'|translate}
+                                        <div class="my-1">
+                                            {$event->summary}
+                                        </div>
+
+                                        <div>
+                                            {if count($event->attributes) > 0}
+                                                {foreach $event->attributes as $attribute}
+                                                    <span
+                                                        class="d-inline-block me-1 border rounded"
+                                                        style="width:20px; height:20px; background-color: {$attribute->color|noescape};"
+                                                        data-bs-toggle="tooltip"
+                                                        title="{$attribute->name} : {$attribute->detail}"
+                                                    ></span>
+                                                {/foreach}
+                                            {else}
+                                                <span class="fs-6">⌧</span>
+                                            {/if}
+                                        </div>
+
+                                    {if $event->audience === 'All'}
+                                    </a>
+                                    {else}
                                     </div>
-                                {/if}
-                            </td>
-                        {/for}
-                    </tr>
-                {/foreach}
+                                    {/if}
+
+                                {/foreach}
+                            {else}
+                                <div class="text-secondary fst-italic text-center small">
+                                    {='events.calendar.no_event'|translate}
+                                </div>
+                            {/if}
+                        </td>
+                    {/for}
+                </tr>
+            {/foreach}
             </tbody>
         </table>
     </div>
@@ -120,12 +118,12 @@
                 <ul class="list-group">
                     {foreach $attributes as $attribute}
                         <li class="list-group-item d-flex align-items-center">
-                            <span 
+                            <span
                                 class="me-2 d-inline-block rounded border"
-                                style="width:20px; height:20px; background-color:{$attribute->Color|noescape};">
+                                style="width:20px; height:20px; background-color:{$attribute->color|noescape};">
                             </span>
                             <span>
-                                <strong>{$attribute->Name}</strong> : {$attribute->Detail}
+                                <strong>{$attribute->name}</strong> : {$attribute->detail}
                             </span>
                         </li>
                     {/foreach}

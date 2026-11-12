@@ -13,6 +13,11 @@ final readonly class DesignerHomeViewModel extends LayoutViewModel
         public string $content,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams), btnHistoryBack: true, btnParent: '/admin');
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/admin',
+            btnPlus: false,
+        );
     }
 }

@@ -26,6 +26,7 @@ final readonly class ArticleCarouselViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/articles',
+            btnPlus: false,
         );
     }
 }

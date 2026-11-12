@@ -7,7 +7,6 @@ namespace app\models;
 use PDO;
 use app\helpers\Application;
 use app\helpers\To;
-use app\exceptions\QueryException;
 
 final class EventParticipationDataHelper extends Data
 {
@@ -18,14 +17,6 @@ final class EventParticipationDataHelper extends Data
             $application->getErrorManager(),
             $application->getPdoForLog()
         );
-    }
-
-    public function isAlreadyRegistered(int $individualId, int $eventId): bool
-    {
-        return $this->get('Participant', [
-            'IdIndividual' => $individualId,
-            'IdEvent' => $eventId,
-        ], 'Id') !== false;
     }
 
     /**
@@ -46,21 +37,12 @@ final class EventParticipationDataHelper extends Data
         ]);
     }
 
-    public function removeParticipantByIndividual(int $individualId, int $eventId): void
+    public function isAlreadyRegistered(int $individualId, int $eventId): bool
     {
-        $participant = $this->get('Participant', [
+        return $this->get('Participant', [
             'IdIndividual' => $individualId,
             'IdEvent' => $eventId,
-        ], 'Id');
-
-        if ($participant === false) {
-            return;
-        }
-
-        $participantId = To::requireInt($participant->Id ?? null);
-
-        $this->delete('ParticipantSupply', ['IdParticipant' => $participantId]);
-        $this->delete('Participant', ['Id' => $participantId]);
+        ], 'Id') !== false;
     }
 
     public function isUserRegistered(int $eventId, string $userEmail): bool
@@ -81,5 +63,22 @@ final class EventParticipationDataHelper extends Data
         ]);
 
         return $stmt->fetch(PDO::FETCH_OBJ) !== false;
+    }
+
+    public function removeParticipantByIndividual(int $individualId, int $eventId): void
+    {
+        $participant = $this->get('Participant', [
+            'IdIndividual' => $individualId,
+            'IdEvent' => $eventId,
+        ], 'Id');
+
+        if ($participant === false) {
+            return;
+        }
+
+        $participantId = To::requireInt($participant->Id ?? null);
+
+        $this->delete('ParticipantSupply', ['IdParticipant' => $participantId]);
+        $this->delete('Participant', ['Id' => $participantId]);
     }
 }

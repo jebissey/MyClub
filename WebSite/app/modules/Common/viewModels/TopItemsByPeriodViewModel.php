@@ -22,6 +22,11 @@ final readonly class TopItemsByPeriodViewModel extends LayoutViewModel
         public array $translations,
         array $layoutParams = []
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

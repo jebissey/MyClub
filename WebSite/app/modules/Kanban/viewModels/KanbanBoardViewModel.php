@@ -32,6 +32,7 @@ final readonly class KanbanBoardViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/designer',
+            btnPlus: false,
         );
     }
 }

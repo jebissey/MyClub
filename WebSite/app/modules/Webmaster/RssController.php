@@ -9,20 +9,18 @@ use DateTime;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
-use app\models\EventDataHelper;
+use app\models\EventListDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\valueObjects\ArticleRssRow;
-use app\modules\Common\valueObjects\EventRow;
+use app\modules\Event\valueObjects\CalendarEventRow;
+use app\modules\Event\valueObjects\CalendarWeekRow;
 
-/**
- * @phpstan-import-type WeekData from EventDataHelper
- */
 final class RssController extends AbstractController
 {
     public function __construct(
         Application $application,
         private readonly ArticleDataHelper $articleDataHelper,
-        private readonly EventDataHelper $eventDataHelper
+        private readonly EventListDataHelper $eventListDataHelper
     ) {
         parent::__construct($application);
     }
@@ -49,7 +47,7 @@ final class RssController extends AbstractController
         $feedUrl         = $baseUrl . "events-rss.xml";
         $feedDescription = "Calendrier des événements et activités du club";
 
-        $weeklyEvents = $this->eventDataHelper->getNextWeekEvents();
+        $weeklyEvents = $this->eventListDataHelper->getNextWeekEvents();
         $events       = $this->flattenWeeklyEvents($weeklyEvents);
 
         $this->sendRssHeaders();
@@ -130,31 +128,32 @@ final class RssController extends AbstractController
     }
 
     /**
-     * @param array<string, WeekData> $weeklyEvents
-     * @return list<EventRow>
+     * @param list<CalendarWeekRow> $weeks
+     * @return list<CalendarEventRow>
      */
-    private function flattenWeeklyEvents(array $weeklyEvents): array
+    private function flattenWeeklyEvents(array $weeks): array
     {
         $events = [];
 
-        foreach ($weeklyEvents as $week) {
-            foreach ($week['days'] as $day) {
+        foreach ($weeks as $week) {
+            foreach ($week->days as $day) {
                 foreach ($day as $event) {
-                    $events[] = EventRow::fromArray($event);
+                    $events[] = $event;
                 }
             }
         }
 
+        // fullDateTime is "Y-m-d H:i:s", so a string comparison is chronological
         usort(
             $events,
-            static fn(EventRow $a, EventRow $b): int =>
-            strtotime($a->fullDateTime) <=> strtotime($b->fullDateTime)
+            static fn(CalendarEventRow $a, CalendarEventRow $b): int =>
+            $a->fullDateTime <=> $b->fullDateTime
         );
 
         return $events;
     }
 
-    private function formatEventDescription(EventRow $event): string
+    private function formatEventDescription(CalendarEventRow $event): string
     {
         $parts = [];
 
@@ -181,7 +180,7 @@ final class RssController extends AbstractController
         if (!empty($event->groupName)) {
             $parts[] = "👥 Groupe : {$event->groupName}";
         }
-        if (isset($event->audience)) {
+        if ($event->audience !== null) {
             $audienceText = $event->audience === 'All' ? 'Ouvert à tous' : 'Réservé aux membres';
             $parts[] = "🎯 Public : {$audienceText}";
         }
@@ -201,7 +200,7 @@ final class RssController extends AbstractController
     }
 
     /**
-     * @param list<EventRow> $events
+     * @param list<CalendarEventRow> $events
      */
     private function generateEventsRSS(
         array $events,
@@ -240,7 +239,7 @@ final class RssController extends AbstractController
 
             $rss .= '<ev:startdate>' . (new DateTime($event->fullDateTime))->format('c') . '</ev:startdate>';
 
-            if ($event->duration !== null && $event->duration !== '') {
+            if ($event->duration !== '') {
                 $endDateTime = $this->computeEndDateTime($event->fullDateTime, $event->duration);
 
                 if ($endDateTime !== null) {

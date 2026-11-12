@@ -24,6 +24,9 @@ final readonly class GroupCreateViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
         );
     }
 }

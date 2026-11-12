@@ -38,18 +38,18 @@
 			</div>
 
 			{if $current}
-				{if $current->Status === 'paid'}
+				{if $current->status === 'paid'}
 					<div class="d-flex align-items-center gap-2 text-success">
 						<i class="bi bi-check-circle-fill fs-4"></i>
 						<span class="fw-semibold">{='membership.status.paid'|translate}</span>
 						<span class="text-muted small ms-auto">
-							{$current->PaidAt|shortDate}
+							{$current->paidAtForDisplay()|shortDate}
 						</span>
 					</div>
 					<p class="text-muted small mt-2 mb-0">
 						{='membership.already_paid'|translate}
 					</p>
-				{elseif $current->Status === 'pending'}
+				{elseif $current->status === 'pending'}
 					<div class="d-flex align-items-center gap-2 text-warning mb-3">
 						<i class="bi bi-hourglass-split fs-4"></i>
 						<span class="fw-semibold">{='membership.status.pending'|translate}</span>
@@ -123,16 +123,16 @@
 					<tbody>
 						{foreach $history as $row}
 							<tr>
-								<td>{$row->Season}</td>
+								<td>{$row->season}</td>
 								<td class="text-end">
-									{=number_format($row->Amount / 100, 2, ',', ' ')} €
+									{=number_format($row->amountCents / 100, 2, ',', ' ')} €
 								</td>
 								<td>
-									{if $row->Status === 'paid'}
+									{if $row->status === 'paid'}
 										<span class="badge bg-success">
 											{='membership.status.paid'|translate}
 										</span>
-									{elseif $row->Status === 'pending'}
+									{elseif $row->status === 'pending'}
 										<span class="badge bg-warning text-dark">
 											{='membership.status.pending'|translate}
 										</span>
@@ -143,7 +143,7 @@
 									{/if}
 								</td>
 								<td class="text-muted small">
-									{if $row->PaidAt}{$row->PaidAt|shortDate}{/if}
+									{if $row->paidAt}{$row->paidAt|shortDate}{/if}
 								</td>
 							</tr>
 						{/foreach}

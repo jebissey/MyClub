@@ -17,6 +17,7 @@ final readonly class EventTypesIndexViewModel extends LayoutViewModel
     /**
      * @param list<TableRow> $eventTypes
      * @param array<string, string> $filterValues
+     * @param array<string, string> $extraParams
      * @param list<TableFilter> $filters
      * @param list<TableColumn> $columns
      * @param array<string, string> $i18n
@@ -27,6 +28,7 @@ final readonly class EventTypesIndexViewModel extends LayoutViewModel
         public int $currentPage,
         public int $totalPages,
         public array $filterValues,
+        public array $extraParams,
         public array $filters,
         public array $columns,
         public string $resetUrl,
@@ -34,6 +36,11 @@ final readonly class EventTypesIndexViewModel extends LayoutViewModel
         public array $i18n,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams), btnHistoryBack: true, btnParent: '/designer');
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/designer',
+            btnPlus: false,
+        );
     }
 }

@@ -32,6 +32,9 @@ final readonly class PersonsIndexViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/',
+            btnPlus: false,
         );
     }
 }

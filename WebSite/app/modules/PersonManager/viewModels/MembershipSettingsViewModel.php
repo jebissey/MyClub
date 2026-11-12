@@ -26,6 +26,7 @@ final readonly class MembershipSettingsViewModel extends LayoutViewModel
             ...$baseArgs,
             btnHistoryBack: true,
             btnParent: '/personManager',
+            btnPlus: false,
         );
     }
 }

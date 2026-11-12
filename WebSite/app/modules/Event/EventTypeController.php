@@ -115,6 +115,7 @@ final class EventTypeController extends TableController
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
             filterValues: $filterValues,
+            extraParams: [],
             filters: $filterConfig,
             columns: $columns,
             resetUrl: '/eventTypes',

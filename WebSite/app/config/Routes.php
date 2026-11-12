@@ -118,6 +118,7 @@ use app\models\DataHelper;
 use app\models\DesignDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventInvitationDataHelper;
+use app\models\EventListDataHelper;
 use app\models\EventNeedDataHelper;
 use app\models\EventParticipationDataHelper;
 use app\models\EventTypeDataHelper;
@@ -569,15 +570,14 @@ final class Routes
         $crosstabDataHelper = new CrosstabDataHelper($this->application, $authorizationDataHelper);
         $languagesDataHelper = new LanguagesDataHelper($this->application, $this->application->getErrorManager());
         $personDataHelper = new PersonDataHelper($this->application);
-        $eventInvitationDataHelper = new EventInvitationDataHelper($this->application);
-        $eventParticipationDataHelper = new EventParticipationDataHelper($this->application);
+        $eventDataHelper = new EventDataHelper($this->application);
 
         return new DataHelpers(
             alertRecipientDataHelper: new AlertRecipientDataHelper($this->application, $personDataHelper, $this->personPreferences),
             articleCrosstabDataHelper: new ArticleCrosstabDataHelper($this->application, $crosstabDataHelper),
             articleDataHelper: $articleDataHelper,
             articleTableDataHelper: new ArticleTableDataHelper($this->application),
-            attributeDataHelper: new AttributeDataHelper($this->application),
+            attributeDataHelper: new AttributeDataHelper($this->application, $eventDataHelper),
             authorizationDataHelper: $authorizationDataHelper,
             availabilityDataHelper: new AvailabilityDataHelper($this->application),
             carouselDataHelper: new CarouselDataHelper($this->application),
@@ -586,15 +586,11 @@ final class Routes
             dataHelper: $this->dataHelper,
             dbBrowserDataHelper: new DbBrowserDataHelper($this->application),
             designDataHelper: new DesignDataHelper($this->application),
-            eventDataHelper: new EventDataHelper(
-                $this->application,
-                $this->dataHelper,
-                $eventInvitationDataHelper,
-                $eventParticipationDataHelper
-            ),
-            eventInvitationDataHelper: $eventInvitationDataHelper,
+            eventListDataHelper: new EventListDataHelper($this->application, new PersonPreferences($this->dataHelper)),
+            eventDataHelper: $eventDataHelper,
+            eventInvitationDataHelper: new EventInvitationDataHelper($this->application),
             eventNeedDataHelper: new EventNeedDataHelper($this->application),
-            eventParticipationDataHelper: $eventParticipationDataHelper,
+            eventParticipationDataHelper: new EventParticipationDataHelper($this->application),
             eventTypeDataHelper: new EventTypeDataHelper($this->application),
             exerciseTableDataHelper: new ExerciseTableDataHelper($this->application),
             groupDataHelper: new GroupDataHelper($this->application),
@@ -693,6 +689,7 @@ final class Routes
             $dataHelpers->articleDataHelper,
             new ArticleService($dataHelpers->carouselDataHelper, $services->mediaManager, $this->dataHelper),
             $dataHelpers->articleTableDataHelper,
+            $dataHelpers->attributeDataHelper,
             $services->authenticationService,
             new Backup(),
             $dataHelpers->carouselDataHelper,
@@ -700,8 +697,12 @@ final class Routes
             $dataHelpers->dbBrowserDataHelper,
             $dataHelpers->designDataHelper,
             $services->emailService,
+            $dataHelpers->eventListDataHelper,
             new ErrorManager($this->application),
             $dataHelpers->eventDataHelper,
+            $dataHelpers->eventInvitationDataHelper,
+            $dataHelpers->eventNeedDataHelper,
+            $dataHelpers->eventParticipationDataHelper,
             $dataHelpers->eventTypeDataHelper,
             $dataHelpers->exerciseTableDataHelper,
             $dataHelpers->groupDataHelper,
@@ -745,6 +746,7 @@ final class Routes
             $services->emailService,
             $dataHelpers->eventDataHelper,
             $dataHelpers->eventNeedDataHelper,
+            $dataHelpers->eventParticipationDataHelper,
             new EventService($dataHelpers->eventDataHelper),
             new GravatarHandler(),
             $this->quotaTracker,

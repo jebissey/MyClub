@@ -33,6 +33,8 @@ final readonly class CrosstabViewModel extends LayoutViewModel
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: $historyBack,
+            btnParent: null,
+            btnPlus: false,
         );
     }
 }
