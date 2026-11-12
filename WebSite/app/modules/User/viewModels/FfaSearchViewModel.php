@@ -31,6 +31,11 @@ final readonly class FfaSearchViewModel extends LayoutViewModel
         public string $club,
         array $layoutParams,
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

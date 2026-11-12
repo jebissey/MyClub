@@ -15,9 +15,11 @@ final readonly class UserDashboardViewModel extends LayoutViewModel
         public string $content,
         array $layoutParams = []
     ) {
-        $baseArgs = self::baseArgsFrom($layoutParams);
-        $baseArgs['page'] = '';
-
-        parent::__construct(...$baseArgs);
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

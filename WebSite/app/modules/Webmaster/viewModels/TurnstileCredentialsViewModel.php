@@ -23,6 +23,7 @@ final readonly class TurnstileCredentialsViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/webmaster',
+            btnPlus: false,
         );
     }
 }

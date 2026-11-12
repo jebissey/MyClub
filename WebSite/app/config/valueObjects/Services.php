@@ -17,6 +17,7 @@ use app\modules\Common\services\EmailService;
 use app\modules\Loan\services\LoanAvailabilityService;
 use app\modules\Loan\services\LoanCalendarService;
 use app\modules\PersonManager\services\MemberCsvImporter;
+use app\modules\Webmaster\services\InstallationDisplayService;
 
 /**
  * Services shared by several factories, built once by Routes::buildServices().
@@ -29,6 +30,7 @@ final readonly class Services
         public ArticleAuthorizationService $articleAuthorizationService,
         public AuthenticationService $authenticationService,
         public EmailService $emailService,
+        public InstallationDisplayService $installationDisplayService,
         public LoanAvailabilityService $loanAvailabilityService,
         public LoanCalendarService $loanCalendarService,
         public MediaManager $mediaManager,

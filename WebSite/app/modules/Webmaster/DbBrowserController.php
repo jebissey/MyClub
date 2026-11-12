@@ -111,7 +111,6 @@ final class DbBrowserController extends TableController
                 filters: array_values($filterConfig),
                 columns: array_values($columns),
                 table: $table,
-                btnPlus: "/dbbrowser/{$table}/create",
                 resetUrl: '/dbbrowser',
                 confirmDeleteMessage: ($this->t)('dbbrowser.delete.confirm'),
                 layoutParams: $this->getAllParams([]),

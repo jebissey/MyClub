@@ -28,6 +28,9 @@ final readonly class ArwardsViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/admin',
+            btnPlus: false,
         );
     }
 }

@@ -20,6 +20,7 @@ final readonly class MembersAlertsViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/admin',
+            btnPlus: false,
         );
     }
 }

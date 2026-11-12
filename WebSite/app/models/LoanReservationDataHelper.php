@@ -46,7 +46,7 @@ final class LoanReservationDataHelper extends Data
                 "$base ORDER BY res.ReservationDate DESC, res.StartTime ASC"
             );
         }
-        return array_values(array_map(LoanReservationRow::fromArray(...), $this->fetchAllOrFail($stmt)));
+        return array_map(LoanReservationRow::fromArray(...), $this->fetchAllOrFail($stmt));
     }
 
     /**
@@ -63,7 +63,7 @@ final class LoanReservationDataHelper extends Data
              ORDER BY res.ReservationDate ASC, res.StartTime ASC"
         );
         $stmt->execute([':start' => $start, ':end' => $end]);
-        return array_values(array_map(LoanReservationRow::fromArray(...), $this->fetchAllOrFail($stmt)));
+        return array_map(LoanReservationRow::fromArray(...), $this->fetchAllOrFail($stmt));
     }
 
     /** @return array<string, mixed>|null */

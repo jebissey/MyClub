@@ -102,10 +102,12 @@ final class LeapfrogController extends TableController
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
             filterValues: $filterValues,
+            extraParams: [],
             filters: $filterConfig,
             columns: $columns,
             resetUrl: '/games/leapfrog/statistics',
             title: $this->translate('leapfrog.statistics_title'),
+            category: 'leapfrog',
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),

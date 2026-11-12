@@ -26,6 +26,7 @@ final readonly class ClubCustomizationViewModel extends LayoutViewModel
             ...$baseArgs,
             btnHistoryBack: true,
             btnParent: '/webmaster',
+            btnPlus: false,
         );
     }
 }

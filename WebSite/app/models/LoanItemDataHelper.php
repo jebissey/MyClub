@@ -30,7 +30,7 @@ final class LoanItemDataHelper extends Data
              FROM LoanItem
              ORDER BY IsActive DESC, Name ASC"
         );
-        return array_values(array_map(LoanItemRow::fromArray(...), $this->fetchAllOrFail($stmt)));
+        return array_map(LoanItemRow::fromArray(...), $this->fetchAllOrFail($stmt));
     }
 
     /**
@@ -56,7 +56,7 @@ final class LoanItemDataHelper extends Data
             );
             $stmt->execute([':type' => $type]);
         }
-        return array_values(array_map(LoanItemRow::fromArray(...), $this->fetchAllOrFail($stmt)));
+        return array_map(LoanItemRow::fromArray(...), $this->fetchAllOrFail($stmt));
     }
 
     /** @return array<string, mixed>|null */

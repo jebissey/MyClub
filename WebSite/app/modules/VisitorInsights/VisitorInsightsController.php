@@ -90,7 +90,10 @@ final class VisitorInsightsController extends TableController
             'Code'      => FilterInputRule::String->value,
             'Message'   => FilterInputRule::Content->value,
         ];
-        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        $filterValues = array_map(
+            static fn(mixed $value): string => is_string($value) ? $value : '',
+            WebApp::filterInput($schema, $this->flight->request()->query->getData())
+        );
         /** @var array<string, string> $filterValues */
 
         $filterConfig = [
@@ -122,6 +125,7 @@ final class VisitorInsightsController extends TableController
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
             filterValues: $filterValues,
+            extraParams: [],
             filters: $filterConfig,
             columns: $columns,
             resetUrl: '/logs',

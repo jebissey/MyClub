@@ -99,7 +99,9 @@ final class FFAScraper
         return $this->parseAthleteResults((string) $response->getBody());
     }
 
-    /** @return FfaRankRow|FfaError|null */
+    /**
+     * @return FfaRankRow|null
+     */
     private function parseAthleteRank(string $html): ?array
     {
         $dom = new DOMDocument();

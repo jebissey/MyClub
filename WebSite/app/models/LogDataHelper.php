@@ -367,33 +367,6 @@ final class LogDataHelper extends Data
             ->orderBy('lastCheck DESC');
     }
 
-    private function getTimeAgo(string $datetime): string
-    {
-        $time = time() - strtotime($datetime);
-
-        if ($time < 60) {
-            return 'Il y a ' . $time . ' secondes';
-        }
-
-        if ($time < 3600) {
-            return 'Il y a ' . round($time / 60) . ' minutes';
-        }
-
-        if ($time < 86400) {
-            return 'Il y a ' . round($time / 3600) . ' heures';
-        }
-
-        if ($time < 2592000) {
-            return 'Il y a ' . round($time / 86400) . ' jours';
-        }
-
-        if ($time < 31536000) {
-            return 'Il y a ' . round($time / 2592000) . ' mois';
-        }
-
-        return 'Il y a ' . round($time / 31536000) . ' ans';
-    }
-
     #region Creation time distribution
 
     /**
@@ -599,58 +572,6 @@ final class LogDataHelper extends Data
         };
 
         return max(1, (int) ($niceStep * $magnitude));
-    }
-
-    /**
-     * Adds display fields (resolved host, time ago, translated status) to installation rows.
-     * Call it on the current page only, to limit reverse DNS lookups.
-     *
-     * @param array<int, stdClass> $rows
-     * @param callable(string): string $t Translator
-     * @return array<int, stdClass>
-     */
-    public function enrichInstallations(array $rows, callable $t): array
-    {
-        /** @var array<string, string|false> $dnsCache */
-        $dnsCache = [];
-        $unknownVersion = $t('webmaster.installations.unknown_version');
-
-        foreach ($rows as $installation) {
-            $host = To::str($installation->Host);
-
-            if (strpos($host, '%') !== false) {
-                $decoded = urldecode($host);
-                $parsedHost = parse_url($decoded, PHP_URL_HOST);
-                $installation->Host = is_string($parsedHost) && $parsedHost !== ''
-                    ? $parsedHost
-                    : $decoded;
-            } elseif (filter_var($host, FILTER_VALIDATE_IP)) {
-                $dnsCache[$host] ??= @gethostbyaddr($host);
-                $hostname = $dnsCache[$host];
-
-                if ($hostname !== false && $hostname !== $host) {
-                    $installation->Host = $hostname;
-                }
-            }
-
-            $installation->webappVersions ??= $unknownVersion;
-            $installation->phpVersions    ??= $unknownVersion;
-
-            $lastCheck = To::str($installation->lastCheck);
-            $installation->timeAgo = $this->getTimeAgo($lastCheck);
-
-            $status = To::str($installation->status);
-            $installation->status = $t('webmaster.installations.status.' . $status);
-
-            $daysSinceLastCheck = (time() - strtotime($lastCheck)) / 86400;
-            $installation->status = $t(match (true) {
-                $daysSinceLastCheck < 7  => 'webmaster.installations.status.active',
-                $daysSinceLastCheck < 30 => 'webmaster.installations.status.recent',
-                default                  => 'webmaster.installations.status.inactive',
-            });
-        }
-
-        return $rows;
     }
 
     #region Backups

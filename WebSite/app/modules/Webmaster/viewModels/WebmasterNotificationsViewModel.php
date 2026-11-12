@@ -26,6 +26,7 @@ final readonly class WebmasterNotificationsViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/webmaster',
+            btnPlus: false,
         );
     }
 }

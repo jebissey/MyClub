@@ -40,6 +40,7 @@ final readonly class UserAccountViewModel extends LayoutViewModel
         parent::__construct(
             ...$baseArgs,
             btnHistoryBack: true,
+            btnPlus: false,
             btnParent: '/user',
         );
     }

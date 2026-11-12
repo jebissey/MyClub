@@ -25,7 +25,8 @@ final readonly class UserEditPresentationViewModel extends LayoutViewModel
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
-            btnParent: '/user/directory'
+            btnParent: '/user/directory',
+            btnPlus: false,
         );
     }
 }

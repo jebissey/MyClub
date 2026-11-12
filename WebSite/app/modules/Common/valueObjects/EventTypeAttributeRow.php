@@ -10,18 +10,18 @@ use app\helpers\To;
 final readonly class EventTypeAttributeRow
 {
     public function __construct(
-        public string $Name,
-        public string $Detail,
-        public string $Color,
+        public string $name,
+        public string $detail,
+        public string $color,
     ) {
     }
 
     public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            Name: To::str($row->Name),
-            Detail: To::str($row->Detail),
-            Color: To::str($row->Color),
+            name: To::str($row->Name),
+            detail: To::str($row->Detail),
+            color: To::str($row->Color),
         );
     }
 }

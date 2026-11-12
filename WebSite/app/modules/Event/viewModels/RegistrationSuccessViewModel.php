@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace app\modules\Event\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Event\valueObjects\EventAudienceRow;
 
 final readonly class RegistrationSuccessViewModel extends LayoutViewModel
 {
     /**
-     * @param list<object> $navItems
+     * @param list<MenuItemRow> $navItems
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(

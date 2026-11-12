@@ -22,6 +22,7 @@ final readonly class LastVisitsViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/admin',
+            btnPlus: false,
         );
     }
 }

@@ -1,6 +1,14 @@
-{* Params, all provided by FilterForm.latte:
-   $name, $label, $type, $value, $options, $optionValue, $optionLabel, $placeholder, $autosubmit *}
-{var $toStr = fn($v): string => is_scalar($v) ? (string) $v : ''}
+{varType string $name}
+{varType string $label}
+{varType string $type}
+{varType string $value}
+{varType array<string|array<string, mixed>|object> $options}
+{varType string $optionValue}
+{varType string $optionLabel}
+{varType string $placeholder}
+{varType bool $autosubmit}
+
+{var $toStr = fn($v): string => is_scalar($v) || $v === null ? (string) $v : ''}
 
 <label for="{$name}" class="form-label">{$label}</label>
 
@@ -11,19 +19,20 @@
         {/if}
         {foreach $options as $optKey => $optItem}
             {if is_object($optItem)}
-                {var $optValue = $toStr($optItem->$optionValue)}
+                {var $optValue = $toStr($optItem->$optionValue ?? null)}
                 <option value="{$optValue}" {if $value === $optValue}selected{/if}>
-                    {$optItem->$optionLabel}
+                    {$toStr($optItem->$optionLabel ?? null)}
                 </option>
             {elseif is_array($optItem)}
                 {var $optValue = $toStr($optItem[$optionValue] ?? null)}
                 <option value="{$optValue}" {if $value === $optValue}selected{/if}>
-                    {$optItem[$optionLabel] ?? ''}
+                    {$toStr($optItem[$optionLabel] ?? null)}
                 </option>
             {else}
-                {* simple associative array: ['all' => 'Everything', …] *}
-                <option value="{$optKey}" {if $value === (string) $optKey}selected{/if}>
-                    {$optItem}
+                {* Associative array of simple values: ['all' => 'Everything', …] *}
+                {var $optValue = $toStr($optKey)}
+                <option value="{$optValue}" {if $value === $optValue}selected{/if}>
+                    {$toStr($optItem)}
                 </option>
             {/if}
         {/foreach}

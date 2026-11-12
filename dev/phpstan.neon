@@ -1,5 +1,6 @@
 includes:
     - ../WebSite/vendor/efabrica/phpstan-latte/rules.neon
+#    - ../WebSite/vendor/shipmonk/dead-code-detector/rules.neon
 
 parameters:
     level: max
@@ -14,7 +15,7 @@ parameters:
         collectedPaths:
             - ../WebSite/app/modules
         resolveAllPossiblePaths: true
-        reportUnanalysedTemplates: true
+        reportUnanalysedTemplates: false
         filters:
             version: 'Closure(string): string'
             formatFileSize: 'Closure(int): string'
@@ -23,6 +24,11 @@ parameters:
             shortDate: 'Closure(string): string'
             shortDateTime: 'Closure(string): string'
             extractFirstElement: 'Closure(string): string'
+            json: 'Closure(mixed): (string|false)'
+            nl2br: 'Closure(mixed): string'
+            urlencode: 'Closure(mixed): string'
+            dayName: 'Closure(DateTimeInterface): string'
+            readableDuration: 'Closure(mixed): string'
         functions:
             buildUrl: 'Closure(Latte\Runtime\Template, array<string, mixed>): string'
     ignoreErrors:

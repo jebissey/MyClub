@@ -167,6 +167,7 @@ use app\modules\Loan\services\LoanCalendarService;
 use app\modules\PersonManager\services\MemberCsvImporter;
 use app\modules\PersonManager\services\MemberOdsImporter;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Webmaster\services\InstallationDisplayService;
 
 final class Routes
 {
@@ -654,6 +655,7 @@ final class Routes
                 new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
                 $this->quotaTracker
             ),
+            installationDisplayService: new InstallationDisplayService(),
             loanAvailabilityService: new LoanAvailabilityService(
                 $dataHelpers->loanItemDataHelper,
                 $dataHelpers->loanRecordDataHelper,

@@ -13,7 +13,7 @@ final readonly class DbBrowserTableViewModel extends LayoutViewModel
      * @param list<TableRow> $records
      * @param array<string, string> $filterValues
      * @param list<array{name: string, label: string}> $filters
-     * @param list<array{field: mixed, label: mixed}> $columns
+     * @param list<array{field: string, label: string}> $columns
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
@@ -32,6 +32,7 @@ final readonly class DbBrowserTableViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/dbbrowser',
+            btnPlus: true,
         );
     }
 }

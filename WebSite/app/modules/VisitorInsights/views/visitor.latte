@@ -2,8 +2,13 @@
 
 {block content}
     {include '../../Common/views/dataTable.latte',
-
-        'items' => $logs,
-
+        items:        $logs,
+        filters:      $filters,
+        resetUrl:     $resetUrl,
+        filterValues: $filterValues,
+        extraParams:  $extraParams,
+        currentPage:  $currentPage,
+        totalPages:   $totalPages,
+        columns:      $columns
     }
 {/block}

@@ -1,6 +1,11 @@
-{* Params: $currentPage, $totalPages. Optional: $pageParam, $urlParams *}
+{varType int $currentPage}
+{varType int $totalPages}
+{varType string $pageParam}
+{varType array<string, string> $urlParams}
+
 {default $pageParam = 'page'}
 {default $urlParams = []}
+
 {var $visiblePages = 5}
 
 {if $totalPages > 1}
@@ -16,10 +21,10 @@
     <nav aria-label="{='common.pagination.nav'|translate}">
         <ul class="pagination mb-0">
             <li class="page-item {if $currentPage <= 1}disabled{/if}">
-                <a class="page-link" href="{$buildQuery(1)}" aria-label="{='common.pagination.first'|translate}">&laquo;&laquo;</a>
+                <a class="page-link" href="{$buildQuery(1)}" aria-label="{='common.pagination.first'|translate}">««</a>
             </li>
             <li class="page-item {if $currentPage <= 1}disabled{/if}">
-                <a class="page-link" href="{$buildQuery(max(1, $currentPage - 1))}" aria-label="{='common.pagination.previous'|translate}">&laquo;</a>
+                <a class="page-link" href="{$buildQuery(max(1, $currentPage - 1))}" aria-label="{='common.pagination.previous'|translate}">«</a>
             </li>
 
             {if $startPage > 1}
@@ -43,10 +48,10 @@
             {/if}
 
             <li class="page-item {if $currentPage >= $totalPages}disabled{/if}">
-                <a class="page-link" href="{$buildQuery(min($totalPages, $currentPage + 1))}" aria-label="{='common.pagination.next'|translate}">&raquo;</a>
+                <a class="page-link" href="{$buildQuery(min($totalPages, $currentPage + 1))}" aria-label="{='common.pagination.next'|translate}">»</a>
             </li>
             <li class="page-item {if $currentPage >= $totalPages}disabled{/if}">
-                <a class="page-link" href="{$buildQuery($totalPages)}" aria-label="{='common.pagination.last'|translate}">&raquo;&raquo;</a>
+                <a class="page-link" href="{$buildQuery($totalPages)}" aria-label="{='common.pagination.last'|translate}">»»</a>
             </li>
         </ul>
     </nav>

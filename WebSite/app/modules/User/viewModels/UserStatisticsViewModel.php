@@ -85,6 +85,7 @@ final readonly class UserStatisticsViewModel extends LayoutViewModel
             ...$baseArgs,
             btnHistoryBack: true,
             btnParent: '/user',
+            btnPlus: false,
         );
     }
 }

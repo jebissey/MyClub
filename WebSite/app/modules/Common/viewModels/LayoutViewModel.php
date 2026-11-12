@@ -17,16 +17,16 @@ abstract readonly class LayoutViewModel
      * @param array<string, mixed> $allParams Anything not yet promoted to a typed property.
      */
     public function __construct(
+        // Navigation buttons
+        public bool $btnPlus,
+        public bool $btnHistoryBack,
+        public ?string $btnParent,
         // Navbar colors
         public string $navbarInkColor,
         public string $navbarIconColor,
         public string $navbarBgColor,
         public ?string $productionSiteUrl = null,
         public ?string $memberAlert = null,
-        // Navigation buttons
-        public bool $btnHistoryBack = true,
-        public ?string $btnParent = '/',
-        public ?string $btnPlus = null,
         // Session / connected-user context
         public string $href = '/user/sign/in',
         public string $userImg = '👻',
@@ -61,8 +61,7 @@ abstract readonly class LayoutViewModel
         public string $flag = '',
         public bool $isMyclubWebSite = false,
         public array $allParams = []
-    ) {
-    }
+    ) {}
 
     /**
      * Extracts the LayoutViewModel constructor arguments from the raw

@@ -16,6 +16,7 @@ final readonly class GameStatisticsViewModel extends GameLayoutViewModel
     /**
      * @param list<TableRow> $games
      * @param array<string, string> $filterValues
+     * @param array<string, string> $extraParams
      * @param list<TableFilter> $filters
      * @param list<TableColumn> $columns
      * @param array<string, mixed> $layoutParams
@@ -25,6 +26,7 @@ final readonly class GameStatisticsViewModel extends GameLayoutViewModel
         public int $currentPage,
         public int $totalPages,
         public array $filterValues,
+        public array $extraParams,
         public array $filters,
         public array $columns,
         public string $resetUrl,

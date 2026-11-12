@@ -111,7 +111,8 @@ final readonly class ApiFactory
         private NotificationSender $notificationSender,
         private ParticipantDataHelper $participantDataHelper,
         private PersonDataHelper $personDataHelper,
-    ) {}
+    ) {
+    }
 
     public function makeArticleApi(): ArticleApi
     {

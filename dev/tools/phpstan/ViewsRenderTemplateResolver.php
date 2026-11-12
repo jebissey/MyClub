@@ -21,7 +21,7 @@ use PHPStan\Reflection\ReflectionProvider;
 use ReflectionProperty;
 
 /**
- * Resolves templates rendered through: $this->views->render('Module/views/x.latte', $viewModel->toArray())
+ * Resolves templates rendered through: $this->views->render('Module/views/x.latte', $viewModel)
  * Template variables are the public properties of the ViewModel.
  */
 final class ViewsRenderTemplateResolver implements NodeLatteTemplateResolverInterface
@@ -37,7 +37,7 @@ final class ViewsRenderTemplateResolver implements NodeLatteTemplateResolverInte
     }
 
     /**
-     * Runs on every parsed node: keeps only `->views->render('literal', $vm->toArray())` calls.
+     * Runs on every parsed node: keeps only `->views->render('literal', $viewModel)` calls.
      *
      * @return list<CollectedResolvedNode>
      */
@@ -58,15 +58,16 @@ final class ViewsRenderTemplateResolver implements NodeLatteTemplateResolverInte
             return [];
         }
 
+        // The view model is passed directly; the legacy $viewModel->toArray() form is still accepted.
         $data = $args[1]->value;
-        if (!$data instanceof MethodCall
-            || !$data->name instanceof Identifier
-            || $data->name->toString() !== 'toArray'
+        if ($data instanceof MethodCall
+            && $data->name instanceof Identifier
+            && $data->name->toString() === 'toArray'
         ) {
-            return [];
+            $data = $data->var;
         }
 
-        $classNames = $scope->getType($data->var)->getObjectClassNames();
+        $classNames = $scope->getType($data)->getObjectClassNames();
         $classReflection = $scope->getClassReflection();
         if (count($classNames) !== 1 || $classReflection === null) {
             return [];

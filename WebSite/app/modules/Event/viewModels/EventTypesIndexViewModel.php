@@ -16,7 +16,7 @@ final readonly class EventTypesIndexViewModel extends LayoutViewModel
 {
     /**
      * @param list<TableRow> $eventTypes
-     * @param array<string, mixed> $filterValues
+     * @param array<string, string> $filterValues
      * @param list<TableFilter> $filters
      * @param list<TableColumn> $columns
      * @param array<string, string> $i18n

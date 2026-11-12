@@ -101,10 +101,7 @@ final class UserPreferencesController extends AbstractController
 
                 $entry = [];
 
-                foreach (
-                    ['enabled', 'available', 'pollOnly', 'orderOnly', 'poll_or_order']
-                    as $key
-                ) {
+                foreach (['enabled', 'available', 'pollOnly', 'orderOnly', 'poll_or_order'] as $key) {
                     if (isset($values[$key])) {
                         $entry[$key] = (bool) $values[$key];
                     }

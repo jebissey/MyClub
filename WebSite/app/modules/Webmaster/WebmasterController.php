@@ -17,6 +17,7 @@ use app\models\ArticleDataHelper;
 use app\models\LogDataHelper;
 use app\modules\Common\TableController;
 use app\modules\Common\services\CredentialService;
+use app\modules\Webmaster\services\InstallationDisplayService;
 use app\modules\Webmaster\viewModels\AdminHomeViewModel;
 use app\modules\Webmaster\viewModels\ClubCustomizationViewModel;
 use app\modules\Webmaster\viewModels\EmailCredentialsViewModel;
@@ -34,7 +35,8 @@ final class WebmasterController extends TableController
         private readonly LogDataHelper $logDataHelper,
         private readonly ArticleDataHelper $articleDataHelper,
         private readonly NotificationSender $notificationSender,
-        private readonly CredentialService $credentials
+        private readonly CredentialService $credentials,
+        private readonly InstallationDisplayService $installationDisplayService
     ) {
         parent::__construct($application);
     }
@@ -339,11 +341,8 @@ final class WebmasterController extends TableController
             ['field' => 'status',         'label' => ($this->t)('webmaster.installations.label.status')],
         ];
 
-        /** @var array<int, stdClass> $items */
-        $items = $data['items'];
-
         $viewModel = new WebmasterInstallationsViewModel(
-            installations: array_values($this->logDataHelper->enrichInstallations($items, $this->t)),
+            installations: $this->installationDisplayService->enrich($data['items'], $this->t),
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
             filterValues: $filterValues,

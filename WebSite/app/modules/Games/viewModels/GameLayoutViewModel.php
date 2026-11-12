@@ -20,6 +20,11 @@ abstract readonly class GameLayoutViewModel extends LayoutViewModel
         public string $sidebarState = 'open',
         public string $category = '',
     ) {
-        parent::__construct(...self::baseArgsFrom($layoutParams));
+        parent::__construct(
+            ...self::baseArgsFrom($layoutParams),
+            btnPlus: false,
+            btnHistoryBack: true,
+            btnParent: '/',
+        );
     }
 }

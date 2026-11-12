@@ -33,6 +33,7 @@ final readonly class EmailCredentialsViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/webmaster',
+            btnPlus: false,
         );
     }
 }

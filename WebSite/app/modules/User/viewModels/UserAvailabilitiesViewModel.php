@@ -25,6 +25,7 @@ final readonly class UserAvailabilitiesViewModel extends LayoutViewModel
         parent::__construct(
             ...$baseArgs,
             btnHistoryBack: true,
+            btnPlus: false,
             btnParent: '/user',
         );
     }

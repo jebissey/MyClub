@@ -4,24 +4,26 @@ declare(strict_types=1);
 
 namespace app\modules\Games\MakeTheTarget\viewModels;
 
+use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Common\viewModels\LayoutViewModel;
 
 final readonly class MakeTheTargetViewModel extends LayoutViewModel
 {
     /**
-     * @param array<int, mixed> $navItems
+     * @param list<MenuItemRow> $navItems
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(
-        public readonly array $navItems,
-        public readonly array $i18n,
-        public readonly string $sessionId,
-        public readonly array $layoutParams,
+        public array $navItems,
+        public array $i18n,
+        public string $sessionId,
+        public array $layoutParams,
         public string $layout,
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
+            btnPlus: false,
             btnHistoryBack: true,
             btnParent: '/',
         );

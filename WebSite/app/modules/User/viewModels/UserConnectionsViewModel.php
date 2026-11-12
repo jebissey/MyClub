@@ -31,6 +31,7 @@ final readonly class UserConnectionsViewModel extends LayoutViewModel
         parent::__construct(
             ...$baseArgs,
             btnHistoryBack: true,
+            btnPlus: false,
             btnParent: '/user',
         );
     }

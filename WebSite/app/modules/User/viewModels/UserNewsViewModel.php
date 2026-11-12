@@ -36,6 +36,7 @@ final readonly class UserNewsViewModel extends LayoutViewModel
             ...$baseArgs,
             btnHistoryBack: true,
             btnParent: $btnParent,
+            btnPlus: false,
         );
     }
 }

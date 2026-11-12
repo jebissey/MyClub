@@ -114,6 +114,7 @@ use app\modules\Webmaster\ArwardsController;
 use app\modules\Webmaster\DbBrowserController;
 use app\modules\Webmaster\MaintenanceController;
 use app\modules\Webmaster\RssController;
+use app\modules\Webmaster\services\InstallationDisplayService;
 use app\modules\Webmaster\WebmasterController;
 
 final readonly class ControllerFactory
@@ -660,7 +661,8 @@ final readonly class ControllerFactory
             $this->logDataHelper,
             $this->articleDataHelper,
             $this->notificationSender,
-            CredentialService::getInstance()
+            CredentialService::getInstance(),
+            new InstallationDisplayService(),
         );
     }
 }

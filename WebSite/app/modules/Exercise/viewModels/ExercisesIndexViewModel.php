@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Exercise\viewModels;
 
 use app\modules\Common\valueObjects\DataTableTypes;
+use app\modules\Common\valueObjects\MenuItemRow;
 use app\modules\Common\valueObjects\Person;
 use app\modules\Common\valueObjects\TableRow;
 use app\modules\Common\viewModels\LayoutViewModel;
@@ -20,7 +21,7 @@ final readonly class ExercisesIndexViewModel extends LayoutViewModel
      * @param array<string, string> $filterValues
      * @param list<TableFilter> $filters
      * @param list<TableColumn> $columns
-     * @param list<object> $navItems
+     * @param list<MenuItemRow> $navItems
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(

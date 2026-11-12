@@ -121,10 +121,12 @@ final class MakeTheTargetController extends TableController
             currentPage: $data['currentPage'],
             totalPages: $data['totalPages'],
             filterValues: $filterValues,
+            extraParams: [],
             filters: $filterConfig,
             columns: $columns,
             resetUrl: '/games/makethetarget/statistics',
             title: $this->translate('makethetarget.statistics_title'),
+            category: 'makeTheTarget',
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),
             ]),

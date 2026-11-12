@@ -14,9 +14,9 @@ final class UserMessagesController extends AbstractShowController
 {
     /** @var array<string, array{label: string, icon: string, bg: string, url: string}> */
     private const GROUP_CONFIG = [
-        'event'   => ['label' => 'user.messages.group.events',   'icon' => 'bi-calendar-event', 'bg' => 'success', 'url' => '/event/chat/'],
-        'article' => ['label' => 'user.messages.group.articles', 'icon' => 'bi-file-text',      'bg' => 'primary', 'url' => '/article/chat/'],
-        'group'   => ['label' => 'user.messages.group.groups',   'icon' => 'bi-people',         'bg' => 'info',    'url' => '/group/chat/'],
+        'event'   => ['label' => 'user.messages.group.events', 'icon' => 'bi-calendar-event', 'bg' => 'success', 'url' => '/event/chat/'],
+        'article' => ['label' => 'user.messages.group.articles', 'icon' => 'bi-file-text', 'bg' => 'primary', 'url' => '/article/chat/'],
+        'group'   => ['label' => 'user.messages.group.groups',   'icon' => 'bi-people',    'bg' => 'info',    'url' => '/group/chat/'],
     ];
 
     public function __construct(

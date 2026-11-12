@@ -33,6 +33,7 @@ final readonly class VisitorsGrafViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/admin',
+            btnPlus: false,
         );
     }
 }

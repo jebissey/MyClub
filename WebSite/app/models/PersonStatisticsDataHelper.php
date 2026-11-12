@@ -8,7 +8,6 @@ use PDO;
 use app\helpers\Application;
 use app\modules\Common\valueObjects\Person;
 
-
 /**
  * @phpstan-type PercentageStat array{
  *     user: int,

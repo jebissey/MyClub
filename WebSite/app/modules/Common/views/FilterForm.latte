@@ -1,59 +1,54 @@
-{parameters
-    array  $filters      = [],
-    string $action,
-    string $resetUrl,
-    array  $filterValues = [],
-    array  $extraParams  = [],
-    int    $currentPage  = 1,
-    int    $totalPages   = 0,
-    string $pageParam    = 'page'
-}
+{varType list<string|array{name: string, label: string, type?: string, options?: array<mixed>, optionValue?: string, optionLabel?: string, placeholder?: string, autosubmit?: bool}> $filters}
+{varType string $action}
+{varType string $resetUrl}
+{varType array<string, string> $filterValues}
+{varType array<string, string> $extraParams}
+{varType int $currentPage}
+{varType int $totalPages}
+{varType string $pageParam}
 
-{var $normalizedFilters = array_map(
-    fn($f) => is_string($f) ? ['name' => $f, 'label' => $f] : $f,
-    $filters
-)}
+{var $normalizedFilters = $filters}
+{varType list<array{name: string, label: string, type?: string, options?: array<mixed>, optionValue?: string, optionLabel?: string, placeholder?: string, autosubmit?: bool}> $normalizedFilters}
 
 {var $urlParams = array_filter(
     array_merge($filterValues, $extraParams),
-    fn($v) => $v !== '' && $v !== null && !is_array($v) && trim((string) $v) !== ''
+    fn(string $v): bool => trim($v) !== ''
 )}
 
-{var $hasActiveFilters = !empty(array_filter(
+{var $activeFilterCount = count(array_filter(
     $filterValues,
-    fn($v) => $v !== '' && $v !== null && trim((string) $v) !== ''
+    fn(string $v): bool => trim($v) !== ''
 ))}
+{var $hasActiveFilters = $activeFilterCount > 0}
 
 <div class="accordion mb-3" id="filtersAccordion">
     <div class="accordion-item border">
 
         <h2 class="accordion-header" id="filtersHeading">
             <button class="accordion-button {if !$hasActiveFilters}collapsed{/if} gap-2"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#filtersCollapse"
-                    aria-expanded="{if $hasActiveFilters}true{else}false{/if}"
-                    aria-controls="filtersCollapse">
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#filtersCollapse"
+                aria-expanded="{if $hasActiveFilters}true{else}false{/if}"
+                aria-controls="filtersCollapse">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                     class="bi bi-search flex-shrink-0" viewBox="0 0 16 16">
+                    class="bi bi-search flex-shrink-0" viewBox="0 0 16 16">
                     <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.099zm-5.242 1.156a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11"/>
                 </svg>
                 {='filters'|translate}
                 {if $hasActiveFilters}
-                    <span class="badge text-bg-primary ms-1">
-                        {count(array_filter($filterValues, fn($v) => $v !== '' && $v !== null && trim((string) $v) !== ''))}
-                    </span>
+                    <span class="badge text-bg-primary ms-1">{$activeFilterCount}</span>
                 {/if}
             </button>
         </h2>
 
         <div id="filtersCollapse"
-             class="accordion-collapse collapse {if $hasActiveFilters}show{/if}"
-             aria-labelledby="filtersHeading">
+            class="accordion-collapse collapse {if $hasActiveFilters}show{/if}"
+            aria-labelledby="filtersHeading">
             <div class="accordion-body">
 
                 <form method="GET" action="{$action}" class="row g-3"
-                      onsubmit="this.querySelectorAll(':is(input,select,textarea)').forEach(el => { if (el.value.trim() === '') el.disabled = true })">
+                    onsubmit="this.querySelectorAll(':is(input,select,textarea)').forEach(el => { if (el.value.trim() === '') el.disabled = true })">
 
                     {foreach $normalizedFilters as $filter}
                         <div class="col-md-2">

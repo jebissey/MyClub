@@ -84,8 +84,8 @@
                                                     {foreach $eventType->attributes as $attribute}
                                                     <span 
                                                         class="attribute-badge" 
-                                                        style="background-color: {$attribute->Color|noescape};" 
-                                                        title="{$attribute->Name} - {$attribute->Detail}"
+                                                        style="background-color: {$attribute->color|noescape};" 
+                                                        title="{$attribute->name} - {$attribute->detail}"
                                                     ></span>
                                                     {/foreach}
                                                 {else}
@@ -199,8 +199,8 @@
                         {if count($eventType->attributes) > 0}
                             {foreach $eventType->attributes as $attribute}
                             <div class="attribute-detail-item">
-                                <div class="attribute-color-square" style="background-color: {$attribute->Color|noescape};"></div>
-                                <span>{$attribute->Detail}</span>
+                                <div class="attribute-color-square" style="background-color: {$attribute->color|noescape};"></div>
+                                <span>{$attribute->detail}</span>
                             </div>
                             {/foreach}
                         {else}

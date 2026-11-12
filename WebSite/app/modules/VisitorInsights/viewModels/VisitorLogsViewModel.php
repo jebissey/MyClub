@@ -16,7 +16,8 @@ final readonly class VisitorLogsViewModel extends LayoutViewModel
 {
     /**
      * @param list<TableRow> $logs
-     * @param array<string, mixed> $filterValues
+     * @param array<string, string> $filterValues
+     * @param array<string, string> $extraParams
      * @param list<TableFilter> $filters
      * @param list<TableColumn> $columns
      * @param array<string, mixed> $layoutParams
@@ -26,6 +27,7 @@ final readonly class VisitorLogsViewModel extends LayoutViewModel
         public int $currentPage,
         public int $totalPages,
         public array $filterValues,
+        public array $extraParams,
         public array $filters,
         public array $columns,
         public string $resetUrl,
@@ -35,6 +37,7 @@ final readonly class VisitorLogsViewModel extends LayoutViewModel
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
             btnParent: '/admin',
+            btnPlus: false,
         );
     }
 }

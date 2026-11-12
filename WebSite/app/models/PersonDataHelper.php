@@ -15,6 +15,7 @@ use app\modules\Common\valueObjects\RedactorRow;
 
 /**
  * @phpstan-import-type MemberExportRowShape from MemberExportRow
+ * @phpstan-import-type PersonOptionRowShape from PersonOptionRow
  *
  * @phpstan-type PersonGroupRow object{
  *     PersonId: int,
@@ -164,9 +165,9 @@ final class PersonDataHelper extends Data
         SELECT i.Id, i.FirstName || ' ' || i.LastName AS FullName
         " . self::MEMBER_INDIVIDUAL_JOIN . "
         ORDER BY i.LastName ASC, i.FirstName ASC
-    ";
+        ";
 
-        /** @var list<PersonOptionRowShape> $rows */
+        /** @var list<object{Id: int, FullName: string}> $rows */
         $rows = $this->fetchObjects($this->queryOrFail($sql));
 
         return array_map(
@@ -326,7 +327,7 @@ final class PersonDataHelper extends Data
 
         return array_map(
             static fn(object $row): RedactorRow => RedactorRow::fromStdClass($row),
-            array_values($this->fetchObjects($this->queryOrFail($sql)))
+            $this->fetchObjects($this->queryOrFail($sql))
         );
     }
 

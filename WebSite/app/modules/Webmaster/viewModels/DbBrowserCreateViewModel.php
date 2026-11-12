@@ -22,6 +22,8 @@ final readonly class DbBrowserCreateViewModel extends LayoutViewModel
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
             btnHistoryBack: true,
+            btnParent: '/dbbrowser',
+            btnPlus: false,
         );
     }
 }

@@ -14,6 +14,11 @@ final readonly class SitemapViewModel extends LayoutViewModel
     public function __construct(
         public array $urls,
     ) {
-        parent::__construct(...self::baseArgsFrom([]));
+        parent::__construct(
+            ...self::baseArgsFrom([]),
+            btnHistoryBack: true,
+            btnParent: null,
+            btnPlus: false,
+        );
     }
 }

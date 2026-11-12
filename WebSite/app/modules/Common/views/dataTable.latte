@@ -1,13 +1,21 @@
+{varType list<\app\modules\Common\valueObjects\TableRow> $items}
+{varType list<string|array{name: string, label: string, type?: string, options?: array<mixed>, optionValue?: string, optionLabel?: string, placeholder?: string, autosubmit?: bool}> $filters}
+{varType string $resetUrl}
+{varType array<string, string> $filterValues}
+{varType int $currentPage}
+{varType int $totalPages}
+{varType array<string, string> $extraParams}
+{varType list<array{field: string, label: string}> $columns}
+{varType string $table}
+{varType ?array{url: string, label: string, alignment?: string} $createButton}
+{varType ?array{id: string, title: string, contentId: string} $modal}
+{varType list<array{type: string, label: string, class: string, url?: string, confirm?: string, onClick?: string}> $actions}
+
 {default $actions = []}
 {default $createButton = null}
 {default $modal = null}
 {default $table = ''}
 {default $extraParams = []}
-
-{varType list<\app\modules\Common\valueObjects\TableRow> $items}
-{varType list<array{field: string, label: string}> $columns}
-{varType list<array{type: 'link', label: string, url: string, class: string, confirm?: string}|array{type: 'button', label: string, class: string, onClick: string}> $actions}
-{varType ?array{url: string, label: string, alignment?: string} $createButton}
 
 <div class="container-fluid">
     {include 'FilterForm.latte',
@@ -21,7 +29,8 @@
         pageParam:    'tablePage'}
 
     {if $createButton !== null}
-        {var $alignmentClass = isset($createButton['alignment']) ? 'd-flex justify-content-' . $createButton['alignment'] : ''}
+        {var $alignment = \app\helpers\To::str($createButton['alignment'] ?? '')}
+        {var $alignmentClass = $alignment !== '' ? 'd-flex justify-content-' . $alignment : ''}
         <div class="{$alignmentClass}">
             <a href="{$createButton['url']}" class="btn btn-primary mb-3 mt-3"><i class="{$createButton['label']}"></i></a>
         </div>
@@ -59,15 +68,19 @@
                             <td>
                                 {foreach $actions as $action}
                                     {if $action['type'] === 'link'}
-                                        <a href="{str_replace('{table}', $table, str_replace('{id}', (string)$item->id, $action['url']))}" class="btn btn-sm {$action['class']}"
-                                        {if isset($action['confirm'])}
-                                            onclick="return confirm({$action['confirm'] . ' ' . ($item->cells[$columns[0]['field']] ?? '')})"
+                                        {var $url = \app\helpers\To::str($action['url'] ?? '')}
+                                        {var $confirm = \app\helpers\To::str($action['confirm'] ?? '')}
+                                        {var $firstCell = \app\helpers\To::str($item->cells[$columns[0]['field']] ?? '')}
+                                        <a href="{str_replace('{table}', $table, str_replace('{id}', (string) $item->id, $url))}" class="btn btn-sm {$action['class']}"
+                                        {if $confirm !== ''}
+                                            onclick="return confirm({$confirm . ' ' . $firstCell})"
                                         {/if}>
                                             <i class="{$action['label']}"></i>
                                         </a>
                                     {elseif $action['type'] === 'button'}
+                                        {var $onClick = \app\helpers\To::str($action['onClick'] ?? '')}
                                         <button class="btn btn-sm {$action['class']}"
-                                                onclick="{str_replace('{table}', $table, str_replace('{id}', (string) $item->id, $action['onClick'])) | noescape}">
+                                                onclick="{str_replace('{table}', $table, str_replace('{id}', (string) $item->id, $onClick)) | noescape}">
                                             <i class="{$action['label']}"></i>
                                         </button>
                                     {/if}

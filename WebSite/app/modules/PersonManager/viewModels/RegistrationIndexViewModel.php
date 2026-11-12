@@ -6,11 +6,12 @@ namespace app\modules\PersonManager\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\TableRow;
 
 final readonly class RegistrationIndexViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $persons
+     * @param list<TableRow> $persons
      * @param array<string, string> $filterValues
      * @param list<array{name: string, label: string}> $filters
      * @param list<array{field: string, label: string}> $columns

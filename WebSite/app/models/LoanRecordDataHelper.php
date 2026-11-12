@@ -50,7 +50,7 @@ final class LoanRecordDataHelper extends Data
                 "$base ORDER BY lr.LoanDate DESC"
             );
         }
-        return array_values(array_map(LoanRecordRow::fromArray(...), $this->fetchAllOrFail($stmt)));
+        return array_map(LoanRecordRow::fromArray(...), $this->fetchAllOrFail($stmt));
     }
 
     /**
@@ -68,7 +68,7 @@ final class LoanRecordDataHelper extends Data
              ORDER BY lr.LoanDate ASC"
         );
         $stmt->execute([':start' => $start, ':end' => $end]);
-        return array_values(array_map(LoanRecordRow::fromArray(...), $this->fetchAllOrFail($stmt)));
+        return array_map(LoanRecordRow::fromArray(...), $this->fetchAllOrFail($stmt));
     }
 
     /** @return array<string, mixed>|null */

@@ -17,6 +17,9 @@ final readonly class AdminHomeViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
+            btnHistoryBack: true,
+            btnParent: '/admin',
+            btnPlus: false,
         );
     }
 }
