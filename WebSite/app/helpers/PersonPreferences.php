@@ -8,6 +8,7 @@ use DateTime;
 use app\enums\TimeOfDay;
 use app\models\DataHelper;
 use app\modules\Common\valueObjects\Person;
+use app\modules\Event\valueObjects\EventListRow;
 
 final readonly class PersonPreferences
 {
@@ -16,8 +17,8 @@ final readonly class PersonPreferences
     }
 
     /**
-     * @param array<int, array<string, mixed>> $events
-     * @return array<int, array<string, mixed>>
+     * @param list<EventListRow> $events
+     * @return list<EventListRow>
      */
     public function filterEventsByPreferences(array $events, ?Person $person): array
     {
@@ -39,25 +40,20 @@ final readonly class PersonPreferences
 
         $filteredEvents = [];
         foreach ($events as $event) {
-            $idEventType = $event['idEventType'] ?? null;
-            $idEventType = is_int($idEventType)
-                ? $idEventType
-                : (is_numeric($idEventType) ? (int)$idEventType : null);
-
-            $startTime = $event['startTime'] ?? null;
-            if (!is_string($startTime) || $startTime === '') {
+            // Events without a start time cannot be matched against availabilities.
+            if ($event->startTime === '') {
                 continue;
             }
 
-            $dayOfWeek = (int)(new DateTime($startTime))->format('N') - 1;
+            $dayOfWeek = (int) (new DateTime($event->startTime))->format('N') - 1;
 
             if (
                 $this->isPersonInterested(
                     $preferencesJson,
                     $availabilitiesJson,
-                    $idEventType,
+                    $event->idEventType,
                     $dayOfWeek,
-                    TimeOfDay::fromDateTime($startTime)->value
+                    TimeOfDay::fromDateTime($event->startTime)->value
                 )
             ) {
                 $filteredEvents[] = $event;

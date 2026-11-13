@@ -1632,6 +1632,145 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 'Enregistrer',
 'Zapisz');
 
+
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('design.index.title', 'Designs', 'Designs', 'Projekty'),
+('design.index.add', 'Add a design', 'Ajouter un design', 'Dodaj projekt'),
+('design.index.proposal_title', 
+'🎨 Suggest a new page for the site!', 
+'🎨 Proposez une nouvelle page pour le site !', 
+'🎨 Zaproponuj nową stronę dla serwisu!'),
+('design.index.proposal_intro', 
+'Want to enrich our site with a page? This is the place!', 
+'Envie d’enrichir notre site avec une page ? C’est par ici !', 
+'Chcesz wzbogacić naszą stronę o nową podstronę? Zapraszamy!'),
+('design.index.name_label', 'Design name:', 'Nom du design :', 'Nazwa projektu:'),
+('design.index.name_help', 
+'the name that will appear in the navigation bar. Be clear and concise!', 
+'le nom qui apparaîtra dans la barre de navigation. Soyez clair et concis !', 
+'nazwa, która pojawi się na pasku nawigacji. Bądź jasny i zwięzły!'),
+('design.index.detail_label', 'Details:', 'Détails :', 'Szczegóły:'),
+('design.index.detail_help', 
+'describe what this page will contain or allow people to do. This will help the team understand your idea.', 
+'décrivez ce que cette page contiendra ou permettra de faire. Cela aidera l’équipe à comprendre votre idée.', 
+'opisz, co ta strona będzie zawierać lub umożliwiać. Pomoże to zespołowi zrozumieć Twój pomysł.'),
+('design.index.audience_label', 'Who is it for?', 'Pour qui ?', 'Dla kogo?'),
+('design.index.audience_help', 
+'choose who can access this page: everyone, club members only, or a specific group.', 
+'choisissez qui pourra accéder à cette page. Visible pour tout le monde, uniquement les membres du club, ou un groupe spécifique.', 
+'wybierz, kto będzie miał dostęp do tej strony: wszyscy, tylko członkowie klubu lub wybrana grupa.'),
+('design.index.review_notice', 
+'Your proposal will be reviewed and, if approved, it will appear in the site navigation.', 
+'Votre proposition sera étudiée et, si elle est validée, elle apparaîtra dans la navigation du site.', 
+'Twoja propozycja zostanie rozpatrzona i, jeśli zostanie zatwierdzona, pojawi się w nawigacji serwisu.'),
+('design.index.thanks', 
+'Thank you for your creativity and involvement!', 
+'Merci pour votre créativité et votre implication !', 
+'Dziękujemy za Twoją kreatywność i zaangażowanie!'),
+('design.index.col_designer', 'Creator', 'Créateur', 'Autor'),
+('design.index.col_name', 'Design name', 'Nom du design', 'Nazwa projektu'),
+('design.index.col_navbar', 'NavBar', 'NavBar', 'Pasek nawigacji'),
+('design.index.col_status', 'Status', 'Statut', 'Status'),
+('design.index.col_votes', 'Votes', 'Votes', 'Głosy'),
+('design.index.col_all', 'Everyone', 'Tout le monde', 'Wszyscy'),
+('design.index.col_members', 'Members', 'Membres', 'Członkowie'),
+('design.index.vote_title', 'Vote for this design', 'Voter pour ce design', 'Zagłosuj na ten projekt'),
+('design.index.vote_for', 'For', 'Pour', 'Za'),
+('design.index.vote_against', 'Against', 'Contre', 'Przeciw'),
+('design.index.vote_neutral', 'Neutral', 'Neutre', 'Neutralnie'),
+('design.index.vote_submit', 'Vote', 'Voter', 'Głosuj'),
+('design.index.close', 'Close', 'Fermer', 'Zamknij');
+
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('article.index.title', 'Articles', 'Articles', 'Artykuły'),
+('article.index.rss_feed_title', 'Articles RSS feed', 'Flux RSS des articles', 'Kanał RSS artykułów'),
+('article.index.rss_subscribe', 'Subscribe to the RSS feed', 'S’abonner au flux RSS', 'Subskrybuj kanał RSS');
+
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('article.index.spotlight_date_required', 'You must choose a spotlight date if you check the option.', 
+'Il faut choisir une date de mise à la une si vous cochez l’option.', 
+'Musisz wybrać datę wyróżnienia, jeśli zaznaczysz tę opcję.');
+
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('event.guest.title', 'Invitation management', 'Gestion des invitations', 'Zarządzanie zaproszeniami'),
+('event.guest.card_title', 'Invite a participant', 'Inviter un participant', 'Zaproś uczestnika'),
+('event.guest.email_label', 'Email address *', 'Adresse e-mail *', 'Adres e-mail *'),
+('event.guest.email_invalid', 
+'Please enter a valid email address', 
+'Veuillez entrer une adresse e-mail valide', 
+'Podaj prawidłowy adres e-mail'),
+('event.guest.name_label', 'Guest name', 'Nom de l’invité', 'Imię gościa'),
+('event.guest.name_placeholder', 'Optional', 'Optionnel', 'Opcjonalnie'),
+('event.guest.event_label', 'Event *', 'Événement *', 'Wydarzenie *'),
+('event.guest.event_placeholder', 'Select an event', 'Sélectionnez un événement', 'Wybierz wydarzenie'),
+('event.guest.event_invalid', 'Please select an event', 'Veuillez sélectionner un événement', 'Wybierz wydarzenie'),
+('event.guest.send', 'Send the invitation', 'Envoyer l’invitation', 'Wyślij zaproszenie'),
+('common.close', 'Close', 'Fermer', 'Zamknij');
+
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('event.register.error.member_account', 
+'This address is already linked to a member account: please register while logged in', 
+'Cette adresse est déjà associée à un compte membre : merci de vous inscrire connecté(e)', 
+'Ten adres jest już powiązany z kontem członka: zarejestruj się po zalogowaniu'),
+('event.registration_success.title', 'Registration confirmed', 'Inscription confirmée', 'Rejestracja potwierdzona'),
+('event.registration_success.heading', 'Registration confirmed!', 'Inscription confirmée !', 'Rejestracja potwierdzona!'),
+('event.registration_success.congratulations', 'Congratulations!', 'Félicitations !', 'Gratulacje!'),
+('event.registration_success.message_before', 
+'Your registration for the event', 
+'Votre inscription à l’événement', 
+'Twoja rejestracja na wydarzenie'),
+('event.registration_success.message_after', 'has been confirmed.', 'a été confirmée.', 'została potwierdzona.'),
+('event.registration_success.your_info', 'Your information:', 'Vos informations :', 'Twoje dane:'),
+('event.registration_success.email_label', 'Email:', 'Email :', 'E-mail:'),
+('event.registration_success.name_label', 'Name:', 'Nom :', 'Imię i nazwisko:'),
+('event.registration_success.event_details', 'Event details:', 'Détails de l’événement :', 'Szczegóły wydarzenia:'),
+('event.registration_success.date_label', 'Date:', 'Date :', 'Data:'),
+('event.registration_success.location_label', 'Location:', 'Lieu :', 'Miejsce:'),
+('event.registration_success.important_label', 'Important:', 'Important :', 'Ważne:'),
+('event.registration_success.important_text', 
+'Keep this page or take a screenshot as confirmation of your registration. The organizer may contact you if needed at the address', 
+'Conservez cette page ou prenez une capture d’écran comme confirmation de votre inscription. 
+L’organisateur pourra vous contacter si nécessaire à l’adresse', 
+'Zachowaj tę stronę lub zrób zrzut ekranu jako potwierdzenie rejestracji. 
+Organizator może w razie potrzeby skontaktować się z Tobą pod adresem'),
+('event.registration_success.print', 'Print this confirmation', 'Imprimer cette confirmation', 'Wydrukuj to potwierdzenie');
+
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('event.next_events.week_from', 'Week of', 'Semaine du', 'Tydzień od'),
+('event.next_events.week_to', 'to', 'au', 'do');
+
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('person_manager.table.last_name', 'Last name', 'Nom', 'Nazwisko'),
+('person_manager.table.first_name', 'First name', 'Prénom', 'Imię'),
+('person_manager.table.nick_name', 'Nickname', 'Surnom', 'Pseudonim'),
+('person_manager.table.email', 'Email', 'Email', 'E-mail'),
+('person_manager.table.phone', 'Phone', 'Téléphone', 'Telefon'),
+('person_manager.table.alert', 'Alert', 'Alerte', 'Alert'),
+('person_manager.table.password', 'Password', 'Mot de passe', 'Hasło'),
+('person_manager.table.presentation', 'Presentation', 'Présentation', 'Prezentacja'),
+('person_manager.table.member_info', 'Member information', 'Informations sur le membre', 'Informacje o członku');
+
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('person_manager.index.title', 'People', 'Personnes', 'Osoby'),
+('person_manager.index.tab_active', 'Active', 'Actifs', 'Aktywni'),
+('person_manager.index.tab_deactivated', 'Deactivated', 'Désactivés', 'Dezaktywowani'),
+('person_manager.index.confirm_delete', 
+'Do you really want to delete this person?', 
+'Voulez-vous vraiment supprimer cette personne ?', 
+'Czy na pewno chcesz usunąć tę osobę?'),
+('person_manager.index.confirm_reactivate', 
+'Do you really want to reactivate this person?', 
+'Voulez-vous vraiment réactiver cette personne ?', 
+'Czy na pewno chcesz ponownie aktywować tę osobę?');
+
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('webmaster.installations.title', 'Installations', 'Installations', 'Instalacje'),
+('webmaster.installations.none_title', 'No installation detected', 'Aucune installation détectée', 'Nie wykryto żadnej instalacji'),
+('webmaster.installations.none_text', 
+'No installation of the webapp has checked for updates yet.', 
+'Aucune installation de la webapp n’a encore vérifié les mises à jour.', 
+'Żadna instalacja aplikacji nie sprawdziła jeszcze aktualizacji.');
+
 SQL);
 
         return 101;

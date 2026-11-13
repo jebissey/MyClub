@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace app\modules\Common\viewModels;
 
 use app\modules\Common\valueObjects\ContactFeedbackInfo;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 
 final readonly class ContactViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param object{Id: int, Summary: string, StartTime: string, Audience: string}|null $event
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */

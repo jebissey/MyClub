@@ -1,25 +1,25 @@
 {extends '../../PersonManager/views/personManager.latte'}
 
-{block title}Personnes{/block}
+{block title}{='person_manager.index.title'|translate}{/block}
 
 {block content}
-    <ul class="nav nav-tabs mb-3">
-        <li class="nav-item">
-            <a class="nav-link {if $status === 'active'}active{/if}"
-            href="/persons?status=active">
-                <i class="bi bi-people"></i>
-                Actifs
-            </a>
-        </li>
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link {if $status === 'active'}active{/if}"
+           href="/persons?status=active">
+            <i class="bi bi-people"></i>
+            {='person_manager.index.tab_active'|translate}
+        </a>
+    </li>
 
-        <li class="nav-item">
-            <a class="nav-link {if $status === 'desactivated'}active{/if}"
-            href="/persons?status=desactivated">
-                <i class="bi bi-archive"></i>
-                Désactivés
-            </a>
-        </li>
-    </ul>
+    <li class="nav-item">
+        <a class="nav-link {if $status === 'desactivated'}active{/if}"
+           href="/persons?status=desactivated">
+            <i class="bi bi-archive"></i>
+            {='person_manager.index.tab_deactivated'|translate}
+        </a>
+    </li>
+</ul>
 
 {if $status === 'active'}
     {include '../../Common/views/dataTable.latte',
@@ -40,11 +40,11 @@
                 'label' => 'bi bi-trash',
                 'url' => '/person/delete/{id}',
                 'class' => 'btn-danger',
-                'confirm' => 'Voulez-vous vraiment supprimer cette personne ?'
+                'confirm' => ('person_manager.index.confirm_delete'|translate)
             ],
         ]
     }
-{/if}    
+{/if}
 {if $status === 'desactivated'}
     {include '../../Common/views/dataTable.latte',
         'createButton' => [
@@ -64,10 +64,10 @@
                 'label' => 'bi bi-arrow-clockwise',
                 'url' => '/person/activate/{id}',
                 'class' => 'btn-secondary',
-                'confirm' => 'Voulez-vous vraiment réactiver cette personne ?'
+                'confirm' => ('person_manager.index.confirm_reactivate'|translate)
             ],
         ]
     }
-{/if} 
+{/if}
 
 {/block}

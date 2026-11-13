@@ -15,7 +15,8 @@ final readonly class MembershipRow extends AbstractValueObject
         public string $status,
         public int $amountCents,
         public ?string $paidAt,
-    ) {}
+    ) {
+    }
 
     public function paidAtForDisplay(): string
     {

@@ -68,5 +68,10 @@
 {/block}
 
 {block scripts}
-    <script src="{='/app/modules/Article/js/addRemoveLine.js'|version}"></script>
+<script>
+    Object.assign(window.i18n, {
+        spotlightDateRequired: {='article.index.spotlight_date_required'|translate}
+    });
+</script>
+<script src="{='/app/modules/Article/js/articles.js'|version}"></script>
 {/block}

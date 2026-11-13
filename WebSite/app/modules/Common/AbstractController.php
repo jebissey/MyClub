@@ -27,7 +27,7 @@ use app\modules\Common\services\ErrorRaiser;
 use app\modules\Common\services\ViewRenderer;
 use app\modules\Common\viewModels\InfoViewModel;
 use app\modules\Common\valueObjects\IdNameRow;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\valueObjects\NavbarColors;
 
 abstract class AbstractController
@@ -99,34 +99,34 @@ abstract class AbstractController
     }
 
     /**
-     * @return list<MenuItemRow>
+     * @return list<MenuItemWithParentRow>
      */
     protected function getNavItems(?string $email, bool $all = false): array
     {
         $userGroups = [];
-        if ($email != null) {
+
+        if ($email !== null) {
             $userGroups = $this->authorizationDataHelper->getUserGroups($email);
         }
-        $filter = !$all ? ['What' => 'navbar'] : [];
 
-        $navItems = array_map(
-            fn(object $row): MenuItemRow => MenuItemRow::fromStdClass($row),
-            $this->dataHelper->gets(
-                'MenuItem',
-                $filter,
-                'Id, Label AS Name, Url AS Route, IdGroup, ForMembers, ForContacts, ForAnonymous, What, Type, Label, Icon, Url',
-                'Position'
-            )
+        $navItems = $this->menuItemDataHelper->getMenuItemsWithParent(
+            !$all ? 'navbar' : null
         );
 
         $filteredNavItems = [];
+
         foreach ($navItems as $navItem) {
             if (
                 ($email === null && $navItem->forAnonymous === 1) ||
-                ($email !== null && $navItem->forMembers === 1 &&
+                (
+                    $email !== null &&
+                    $navItem->forMembers === 1 &&
                     (
                         $navItem->idGroup === null ||
-                        (!empty($userGroups) && in_array($navItem->idGroup, $userGroups, true))
+                        (
+                            !empty($userGroups) &&
+                            in_array($navItem->idGroup, $userGroups, true)
+                        )
                     )
                 ) ||
                 $all
@@ -136,13 +136,15 @@ abstract class AbstractController
         }
 
         $groups = $this->dataHelper->gets('Group', ['Inactivated' => 0], '*');
+
         $groupsById = [];
+
         foreach ($groups as $group) {
             $groupsById[To::int($group->Id)] = To::str($group->Name);
         }
 
         return array_map(
-            fn(MenuItemRow $navItem): MenuItemRow => $navItem->withGroupName(
+            fn(MenuItemWithParentRow $navItem): MenuItemWithParentRow => $navItem->withGroupName(
                 $navItem->idGroup !== null && isset($groupsById[$navItem->idGroup])
                     ? $groupsById[$navItem->idGroup]
                     : null

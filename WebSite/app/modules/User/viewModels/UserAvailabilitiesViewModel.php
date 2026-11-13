@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace app\modules\User\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 
 final readonly class UserAvailabilitiesViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array<int, array<string, mixed>>|null $currentAvailabilities
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */

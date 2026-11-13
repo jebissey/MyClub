@@ -6,16 +6,22 @@
     <h2>{='event.copy_emails.title'|translate} ({count($emails)}) {='event.copy_emails.title.with'|translate} {$filters}</h2>
     <ul>
         {foreach $emails as $email}
-            <li>{$email} (📞{$people[$email]->Phone} 👤{$people[$email]->FirstName} {$people[$email]->LastName}{if $people[$email]->NickName != ''}-><b>{$people[$email]->NickName}</b>{/if})</li>
+            {var $person = $people[$email] ?? null}
+            <li>
+                {$email}
+                {if $person !== null}
+                    (📞{$person->phone} 👤{$person->firstName} {$person->lastName}{if $person->nickName !== ''}-><b>{$person->nickName}</b>{/if})
+                {/if}
+            </li>
         {/foreach}
     </ul>
 </div>
 {/block}
 
 {block scripts}
-    <script>
-        window.emailsJson = {$emailsJson|noescape};
-        Object.assign(window.i18n, {=$i18n});
-    </script>
-    <script type="module" src="{='/app/modules/Event/js/copyToClipBoard.js'|version}"></script>
+<script>
+window.emailsJson = {$emailsJson|noescape};
+Object.assign(window.i18n, {=$i18n});
+</script>
+<script type="module" src="{='/app/modules/Event/js/copyToClipBoard.js'|version}"></script>
 {/block}

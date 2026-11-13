@@ -8,6 +8,7 @@ use PDOException;
 use stdClass;
 use app\helpers\Application;
 use app\helpers\To;
+use app\modules\Designer\valueObjects\DesignRow;
 
 final class DesignDataHelper extends Data
 {
@@ -49,7 +50,7 @@ final class DesignDataHelper extends Data
     }
 
     /**
-     * @return array{0: list<stdClass>, 1: array<int, string>}
+     * @return array{0: list<DesignRow>, 1: array<int, string>}
      */
     public function getUsersVotes(int $personId): array
     {
@@ -78,7 +79,11 @@ final class DesignDataHelper extends Data
         if ($stmt === false) {
             throw new PDOException('getUsersVotes query failed');
         }
-        $designs = $this->fetchObjects($stmt);
+
+        $designs = array_map(
+            static fn(stdClass $row): DesignRow => DesignRow::fromStdClass($row),
+            $this->fetchObjects($stmt),
+        );
 
         $userVotes = [];
         foreach ($this->gets('DesignVote', ['IdPerson' => $personId], '*') as $vote) {

@@ -1,6 +1,6 @@
 {layout '../../Common/views/layout.latte'}
 
-{block title}Inscription confirmée{/block}
+{block title}{='event.registration_success.title'|translate}{/block}
 
 {block navbar}
 {include 'navbar/home.latte'}
@@ -14,42 +14,41 @@
                 <div class="card-header bg-success text-white">
                     <h4 class="mb-0">
                         <i class="bi bi-check-circle"></i>
-                        Inscription confirmée !
+                        {='event.registration_success.heading'|translate}
                     </h4>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-success">
-                        <h5>Félicitations !</h5>
-                        <p class="mb-0">Votre inscription à l'événement "<strong>{$event->Summary}</strong>" a été confirmée.</p>
+                        <h5>{='event.registration_success.congratulations'|translate}</h5>
+                        <p class="mb-0">{='event.registration_success.message_before'|translate} "<strong>{$event->summary}</strong>" {='event.registration_success.message_after'|translate}</p>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
-                            <h6>Vos informations :</h6>
-                            <p><strong>Email :</strong> {$contact->Email}</p>
-                            {if $contact->NickName}
-                                <p><strong>Nom :</strong> {$contact->NickName}</p>
+                            <h6>{='event.registration_success.your_info'|translate}</h6>
+                            <p><strong>{='event.registration_success.email_label'|translate}</strong> {$contactEmail}</p>
+                            {if $contactNickName !== null && $contactNickName !== ''}
+                                <p><strong>{='event.registration_success.name_label'|translate}</strong> {$contactNickName}</p>
                             {/if}
                         </div>
                         <div class="col-md-6">
-                            <h6>Détails de l'événement :</h6>
-                                <p><strong>Date :</strong> {$event->StartTime|longDateTime}</p>
-                            {if $event->Location}
-                                <p><strong>Lieu :</strong> {$event->Location}</p>
+                            <h6>{='event.registration_success.event_details'|translate}</h6>
+                            <p><strong>{='event.registration_success.date_label'|translate}</strong> {$event->startTime|longDateTime}</p>
+                            {if $event->location !== ''}
+                                <p><strong>{='event.registration_success.location_label'|translate}</strong> {$event->location}</p>
                             {/if}
                         </div>
                     </div>
 
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
-                        <strong>Important :</strong> Conservez cette page ou prenez une capture d'écran comme confirmation de votre inscription.
-                        L'organisateur pourra vous contacter si nécessaire à l'adresse {$contact->Email}.
+                        <strong>{='event.registration_success.important_label'|translate}</strong> {='event.registration_success.important_text'|translate} {$contactEmail}.
                     </div>
 
                     <div class="text-center">
                         <button class="btn btn-primary" onclick="window.print()">
                             <i class="bi bi-printer"></i>
-                            Imprimer cette confirmation
+                            {='event.registration_success.print'|translate}
                         </button>
                     </div>
                 </div>

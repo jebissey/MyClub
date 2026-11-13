@@ -186,6 +186,4 @@ final class AttributeDataHelper extends Data
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
-
-
 }

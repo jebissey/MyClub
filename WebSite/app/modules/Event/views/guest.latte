@@ -1,48 +1,45 @@
 {extends $layout}
 
-{block title}Gestion des invitations{/block}
+{block title}{='event.guest.title'|translate}{/block}
 
 {block content}
-    {if isset($message) && $message !=''}
-    <div class="alert alert-{if $messageType === 'success'}success{else}danger{/if} alert-dismissible">
-        {$message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+    {if $message !== ''}
+        <div class="alert alert-{if $messageType === 'success'}success{else}danger{/if} alert-dismissible">
+            {$message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{='common.close'|translate}"></button>
+        </div>
     {/if}
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="mb-0">Inviter un participant</h4>
+                        <h4 class="mb-0">{='event.guest.card_title'|translate}</h4>
                     </div>
                     <div class="card-body">
                         <form id="invitationForm" method="POST" action="/events/guest">
                             <div class="mb-3">
-                                <label for="email" class="form-label">Adresse e-mail *</label>
+                                <label for="email" class="form-label">{='event.guest.email_label'|translate}</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
-                                <div class="invalid-feedback">Veuillez entrer une adresse e-mail valide</div>
+                                <div class="invalid-feedback">{='event.guest.email_invalid'|translate}</div>
                             </div>
-                            
                             <div class="mb-3">
-                                <label for="nickname" class="form-label">Nom de l'invité</label>
-                                <input type="text" class="form-control" id="nickname" name="nickname" placeholder="Optionnel">
+                                <label for="nickname" class="form-label">{='event.guest.name_label'|translate}</label>
+                                <input type="text" class="form-control" id="nickname" name="nickname" placeholder="{='event.guest.name_placeholder'|translate}">
                             </div>
-                            
                             <div class="mb-3">
-                                <label for="event" class="form-label">Événement *</label>
+                                <label for="event" class="form-label">{='event.guest.event_label'|translate}</label>
                                 <select class="form-select" id="event" name="eventId" required>
-                                    <option value="">Sélectionnez un événement</option>
+                                    <option value="">{='event.guest.event_placeholder'|translate}</option>
                                     {foreach $events as $event}
                                         <option value="{$event->id}">{$event->summary} - {$event->startTime|shortDateTime} - {$event->personName}</option>
                                     {/foreach}
                                 </select>
-                                <div class="invalid-feedback">Veuillez sélectionner un événement</div>
+                                <div class="invalid-feedback">{='event.guest.event_invalid'|translate}</div>
                             </div>
-                            
                             <div class="d-flex justify-content-center gap-2">
-                                <button type="submit" class="btn btn-primary">Envoyer l'invitation</button>
-                                <a href="/eventManager" class="btn btn-secondary">Annuler</a>
+                                <button type="submit" class="btn btn-primary">{='event.guest.send'|translate}</button>
+                                <a href="/eventManager" class="btn btn-secondary">{='cancel'|translate}</a>
                             </div>
                         </form>
                     </div>
@@ -53,5 +50,5 @@
 {/block}
 
 {block scripts}
-    <script src="{='/app/modules/Event/js/guest.js'|version}"></script>
+<script src="{='/app/modules/Event/js/guest.js'|version}"></script>
 {/block}

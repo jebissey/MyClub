@@ -81,7 +81,7 @@ final class InstallationDisplayService
         };
     }
 
-    
+
     private function getTimeAgo(string $datetime): string
     {
         $time = time() - strtotime($datetime);

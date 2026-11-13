@@ -152,6 +152,7 @@ use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Article\services\ArticleAlertService;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\AuthenticationService;
@@ -634,6 +635,7 @@ final class Routes
         );
         $this->application->setAuthenticationService($authenticationService);
 
+        /** @var list<NewsProviderInterface> $newsProviders */
         $newsProviders = [
             $dataHelpers->articleDataHelper,
             $dataHelpers->eventDataHelper,

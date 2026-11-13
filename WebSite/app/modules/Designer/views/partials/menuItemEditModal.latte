@@ -71,11 +71,11 @@
                     <label for="itemParent" class="form-label">{$i18n['field_parent']}</label>
                     <select class="form-select" id="itemParent">
                         <option value="">{$i18n['field_none']}</option>
-                        {foreach $sidebarItems as $parent}
-                            {if $parent->type === 'submenu'}
-                        <option value="{$parent->Id}">{$parent->Label}</option>
-                            {/if}
-                        {/foreach}
+                {foreach $sidebarItems as $parent}
+                    {if $parent->type === 'submenu'}
+                        <option value="{$parent->id}">{$parent->label}</option>
+                    {/if}
+                {/foreach}
                     </select>
                 </div>
             </div>

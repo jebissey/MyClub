@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use stdClass;
 use app\helpers\Application;
 use app\helpers\To;
+use app\modules\Membership\valueObjects\MembershipRow;
 
 final class MembershipDataHelper extends Data
 {
@@ -20,12 +21,43 @@ final class MembershipDataHelper extends Data
         );
     }
 
-    // ─── Season helpers ───────────────────────────────────────────────────────
+    public function attachCheckoutIntent(int $membershipId, string $intentId): void
+    {
+        $this->set(
+            'Membership',
+            [
+                'HelloAssoCheckoutIntentId' => $intentId,
+                'UpdatedAt'                 => date('Y-m-d H:i:s'),
+            ],
+            ['Id' => $membershipId]
+        );
+    }
 
-    /**
-     * Returns the current season string, e.g. '2024-2025'.
-     * Season starts on the month defined by the Membership_SeasonStart setting (default: 09).
-     */
+    public function cancel(int $membershipId): void
+    {
+        $this->set(
+            'Membership',
+            [
+                'Status'    => 'cancelled',
+                'UpdatedAt' => date('Y-m-d H:i:s'),
+            ],
+            ['Id' => $membershipId]
+        );
+    }
+
+    public function createPending(
+        int $personId,
+        string $season,
+        int $amountCents
+    ): int {
+        return (int)$this->set('Membership', [
+            'PersonId' => $personId,
+            'Season'   => $season,
+            'Amount'   => $amountCents,
+            'Status'   => 'pending',
+        ]);
+    }
+
     public function currentSeason(): string
     {
         $startMonth = (int)$this->getSetting('Membership_SeasonStart', '09');
@@ -40,44 +72,15 @@ final class MembershipDataHelper extends Data
         return ($year - 1) . '-' . $year;
     }
 
-    // ─── Read ─────────────────────────────────────────────────────────────────
-
-    /**
-     * @return object{
-     *     Id:int,
-     *     PersonId:int,
-     *     Season:string,
-     *     Status:string,
-     *     AmountCents:int
-     * }|false
-     */
-    public function getForPersonAndSeason(int $personId, string $season): object|false
-    {
-        /** @var object{
-         *     Id:int,
-         *     PersonId:int,
-         *     Season:string,
-         *     Status:string,
-         *     AmountCents:int
-         * }|false $membership
-         */
-        $membership = $this->get('Membership', [
-            'PersonId' => $personId,
-            'Season'   => $season,
-        ], '*');
-
-        return $membership;
-    }
-
     /**
      * Returns all memberships for a person, most recent first.
      *
-     * @return array<int, stdClass>
+     * @return list<MembershipRow>
      */
     public function getAllForPerson(int $personId): array
     {
         $rows = $this->query(
-            "SELECT * FROM Membership WHERE PersonId = ? ORDER BY Season DESC",
+            'SELECT * FROM Membership WHERE PersonId = ? ORDER BY Season DESC',
             [$personId]
         );
 
@@ -86,49 +89,48 @@ final class MembershipDataHelper extends Data
         }
 
         $result = [];
+
         foreach ($rows as $row) {
             if ($row instanceof stdClass) {
-                $result[] = $row;
+                $result[] = $this->toMembershipRow($row);
             }
         }
 
         return $result;
     }
 
-    // ─── Write ────────────────────────────────────────────────────────────────
-
-    /**
-     * Creates a new pending membership row and returns its Id.
-     */
-    public function createPending(int $personId, string $season, int $amountCents): int
+    public function getAmountCents(): int
     {
-        return (int)$this->set('Membership', [
+        return To::int($this->getSetting('Membership_Amount', '1234567'));
+    }
+
+    public function getForPersonAndSeason(
+        int $personId,
+        string $season
+    ): MembershipRow|false {
+        $membership = $this->get('Membership', [
             'PersonId' => $personId,
             'Season'   => $season,
-            'Amount'   => $amountCents,
-            'Status'   => 'pending',
-        ]);
+        ], '*');
+
+        if (!$membership instanceof stdClass) {
+            return false;
+        }
+
+        return $this->toMembershipRow($membership);
     }
 
     /**
-     * Stores the HelloAsso checkout intent id on a pending row.
+     * @return array{orgSlug:string, formSlug:string}
      */
-    public function attachCheckoutIntent(int $membershipId, string $intentId): void
+    public function getHelloAssoConfig(): array
     {
-        $this->set(
-            'Membership',
-            [
-                'HelloAssoCheckoutIntentId' => $intentId,
-                'UpdatedAt'                 => date('Y-m-d H:i:s'),
-            ],
-            ['Id' => $membershipId]
-        );
+        return [
+            'orgSlug'  => $this->getSetting('HelloAsso_OrgSlug', ''),
+            'formSlug' => $this->getSetting('HelloAsso_FormSlug', ''),
+        ];
     }
 
-    /**
-     * Marks a membership as paid via the HelloAsso webhook.
-     * Matches by HelloAsso checkout intent id.
-     */
     public function markPaidByIntentId(string $intentId, string $orderId): bool
     {
         $rows = $this->query(
@@ -136,7 +138,12 @@ final class MembershipDataHelper extends Data
             [$intentId]
         );
 
-        if (!is_array($rows) || !isset($rows[0]) || !($rows[0] instanceof stdClass) || !isset($rows[0]->Id)) {
+        if (
+            !is_array($rows)
+            || !isset($rows[0])
+            || !($rows[0] instanceof stdClass)
+            || !isset($rows[0]->Id)
+        ) {
             return false;
         }
 
@@ -156,36 +163,18 @@ final class MembershipDataHelper extends Data
         return true;
     }
 
-    /**
-     * Cancels a membership row.
-     */
-    public function cancel(int $membershipId): void
+
+    private function toMembershipRow(stdClass $row): MembershipRow
     {
-        $this->set(
-            'Membership',
-            [
-                'Status'    => 'cancelled',
-                'UpdatedAt' => date('Y-m-d H:i:s'),
-            ],
-            ['Id' => $membershipId]
+        $paidAt = $row->PaidAt ?? null;
+
+        return new MembershipRow(
+            id: To::int($row->Id),
+            personId: To::int($row->PersonId),
+            season: To::str($row->Season ?? ''),
+            status: To::str($row->Status ?? ''),
+            amountCents: To::int($row->Amount),
+            paidAt: is_string($paidAt) ? $paidAt : null,
         );
-    }
-
-    // ─── Settings shortcuts ───────────────────────────────────────────────────
-
-    public function getAmountCents(): int
-    {
-        return (int)$this->getSetting('Membership_Amount', '1234567');
-    }
-
-    /**
-     * @return array{orgSlug: string, formSlug: string}
-     */
-    public function getHelloAssoConfig(): array
-    {
-        return [
-            'orgSlug'  => $this->getSetting('HelloAsso_OrgSlug', ''),
-            'formSlug' => $this->getSetting('HelloAsso_FormSlug', ''),
-        ];
     }
 }

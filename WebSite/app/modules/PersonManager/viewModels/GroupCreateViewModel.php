@@ -6,13 +6,13 @@ namespace app\modules\PersonManager\viewModels;
 
 use stdClass;
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 
 final readonly class GroupCreateViewModel extends LayoutViewModel
 {
     /**
      * @param list<stdClass> $availableAuthorizations
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\User\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\valueObjects\Person;
 
 /**
@@ -14,7 +14,7 @@ use app\modules\Common\valueObjects\Person;
 final readonly class UserNewsViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param list<NewsFeedItem> $news
      * @param array<string, array{label: string, icon: string, bg: string}> $groupConfig
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().

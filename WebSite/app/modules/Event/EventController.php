@@ -40,6 +40,7 @@ use app\modules\Event\viewModels\EventWeekEventsViewModel;
 use app\modules\Event\viewModels\RegistrationSuccessViewModel;
 use app\modules\Event\valueObjects\EventAudienceRow;
 use app\modules\Event\valueObjects\NeedTypeRow;
+use app\modules\Event\valueObjects\RegistrationEventInfo;
 
 final class EventController extends AbstractController
 {
@@ -105,14 +106,14 @@ final class EventController extends AbstractController
         $connectedUser = $this->application->getConnectedUser();
 
         $viewModel = new EventNextEventsViewModel(
-            events: array_values($this->eventListDataHelper->getEvents(
+            events: $this->eventListDataHelper->getEvents(
                 $connectedUser->person,
                 $mode,
                 $offset,
                 $filterByPreferences,
                 $registeredOnly,
                 $eventTypeId
-            )),
+            ),
             person: $connectedUser->person,
             eventTypes: array_map(
                 static fn(stdClass $row): EventTypeRow => EventTypeRow::fromStdClass($row),
@@ -296,7 +297,7 @@ final class EventController extends AbstractController
             }
             $person = $this->application->getConnectedUser()->person;
             if ($person !== null) {
-                // Membre connecté : inscription/désinscription directe, sans passer par une Invitation.
+                // Logged-in member: direct (un)registration, without going through an Invitation.
                 $userId = $person->id;
                 if ($set) {
                     if ($eventId > 0 && !$this->eventParticipationDataHelper->isAlreadyRegistered($userId, $eventId)) {
@@ -307,14 +308,15 @@ final class EventController extends AbstractController
                 }
             } elseif ($token !== null) {
                 // External contact using an invitation link.
-                $eventData = $this->dataHelper->get('Event', ['Id' => $eventId], 'Id, Audience');
+                $eventData = $this->dataHelper->get('Event', ['Id' => $eventId], 'Summary, StartTime, Location');
 
                 if ($eventData === false) {
                     $this->show($eventId, $this->translate('event.register.error.unknown_event'), 'error');
                     return;
                 }
 
-                $event = EventAudienceRow::fromStdClass($eventData);
+                /** @var object{Summary: mixed, StartTime: mixed, Location: mixed} $eventData */
+                $event = RegistrationEventInfo::fromStdClass($eventData);
                 $invitation = $this->eventInvitationDataHelper->findInvitationByToken($token);
 
                 if ($invitation === null || $invitation->idEvent !== $eventId) {
@@ -333,11 +335,7 @@ final class EventController extends AbstractController
                 $individual = $this->eventInvitationDataHelper->findIndividualByEmail($invitation->email);
 
                 if ($individual !== null && $individual->type === 'Member') {
-                    $this->show(
-                        $eventId,
-                        'Cette adresse est déjà associée à un compte membre : merci de vous inscrire connecté(e)',
-                        'error'
-                    );
+                    $this->show($eventId, $this->translate('event.register.error.member_account'), 'error');
                     return;
                 }
 

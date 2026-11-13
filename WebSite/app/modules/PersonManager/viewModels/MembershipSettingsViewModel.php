@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace app\modules\PersonManager\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 
 final readonly class MembershipSettingsViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array{amount: int|float, seasonStart: string, seasonEnd: string} $settings
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */

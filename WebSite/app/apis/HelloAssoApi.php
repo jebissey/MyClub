@@ -45,14 +45,14 @@ final class HelloAssoApi extends AbstractApi
 
         // Guard: already paid this season
         $existing = $this->membershipDataHelper->getForPersonAndSeason(To::int($person?->id), $season);
-        if ($existing && $existing->Status === 'paid') {
+        if ($existing && $existing->status === 'paid') {
             $this->renderJsonBadRequest('Membership already paid for this season.', __FILE__, __LINE__);
             return;
         }
 
         // Cancel any stale pending row before creating a fresh one
-        if ($existing && $existing->Status === 'pending') {
-            $this->membershipDataHelper->cancel(To::int($existing->Id));
+        if ($existing && $existing->status === 'pending') {
+            $this->membershipDataHelper->cancel(To::int($existing->id));
         }
 
         $amountCents  = $this->membershipDataHelper->getAmountCents();

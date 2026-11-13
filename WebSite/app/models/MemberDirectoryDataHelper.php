@@ -6,11 +6,14 @@ namespace app\models;
 
 use PDO;
 use RuntimeException;
+use stdClass;
 use app\helpers\Application;
 use app\helpers\GravatarHandler;
+use app\helpers\To;
 use app\helpers\WebApp;
 use app\modules\Common\valueObjects\DirectoryPersonRow;
 use app\modules\Common\valueObjects\LocatedMemberRow;
+use app\modules\Common\valueObjects\MemberContactRow;
 
 /**
  * @phpstan-import-type DirectoryPersonRowShape from DirectoryPersonRow
@@ -38,26 +41,26 @@ final class MemberDirectoryDataHelper extends Data
      * Contact details of every active member, indexed by email. Used by the clipboard
      * copy of the contacts of a filtered group/event type (EventEmailController::copyEmails()).
      *
-     * @return array<string, MemberContactInfoShape>
+     * @return array<string, MemberContactRow>
      */
     public function getActiveMembersContactInfoByEmail(): array
     {
         $sql = '
-        SELECT i.Email, i.Phone, i.FirstName, i.LastName, i.NickName
-        ' . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN . '
-        WHERE m.Inactivated = 0
-    ';
+            SELECT i.Email, i.Phone, i.FirstName, i.LastName, i.NickName
+            ' . PersonDataHelper::MEMBER_INDIVIDUAL_JOIN . '
+            WHERE m.Inactivated = 0
+        ';
         $stmt = $this->pdo->query($sql);
         if ($stmt === false) {
             return [];
         }
 
-        /** @var list<MemberContactInfoShape> $rows */
+        /** @var list<stdClass> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $result = [];
         foreach ($rows as $row) {
-            $result[$row->Email] = $row;
+            $result[To::str($row->Email)] = MemberContactRow::fromStdClass($row);
         }
 
         return $result;

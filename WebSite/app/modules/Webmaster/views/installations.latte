@@ -1,13 +1,13 @@
 {extends 'webmaster.latte'}
 
-{block title}Installations{/block}
+{block title}{='webmaster.installations.title'|translate}{/block}
 
 {block content}
-    {if count($installations) === 0}
+    {if $installations === []}
         <div class="text-center mt-5">
             <div class="alert alert-info">
-                <h5>Aucune installation détectée</h5>
-                <p>Aucune installation de la webapp n'a encore vérifié les mises à jour.</p>
+                <h5>{='webmaster.installations.none_title'|translate}</h5>
+                <p>{='webmaster.installations.none_text'|translate}</p>
             </div>
         </div>
     {else}

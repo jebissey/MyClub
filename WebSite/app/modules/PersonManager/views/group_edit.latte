@@ -1,89 +1,90 @@
 {extends $layout}
 
-{block title}Modifier le groupe{/block}
+{block title}{='person_manager.group.edit_title'|translate}{/block}
 
 {block content}
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title h5 m-0">Modifier le groupe</h2>
-                </div>
-                <div class="card-body">
-                    {if isset($error)}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title h5 m-0">{='person_manager.group.edit_title'|translate}</h2>
+            </div>
+            <div class="card-body">
+                {if $error !== null}
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {$error}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{='common.close'|translate}"></button>
                     </div>
-                    {/if}
+                {/if}
 
-                    <form method="POST">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">{='person_manager.group.col_name'|translate}</label>
+                        <input type="text" class="form-control {if $error !== null}is-invalid{/if}"
+                               id="name" name="name" value="{$group->name}" required>
+                        <div class="invalid-feedback">{='person_manager.group.name_required'|translate}</div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="selfRegistration"
+                               name="selfRegistration" value="1" {if $group->selfRegistration}checked{/if}>
+                        <label class="form-check-label" for="selfRegistration">{='person_manager.group.self_registration_allowed'|translate}</label>
+                    </div>
+                    {if $isWebmaster}
                         <div class="mb-3">
-                            <label for="name" class="form-label">Nom</label>
-                            <input type="text" class="form-control {if isset($error)}is-invalid{/if}"
-                                id="name" name="name" value="{$group->Name}" required>
-                            <div class="invalid-feedback">Le nom du groupe est requis</div>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="selfRegistration"
-                                name="selfRegistration" value="1" {if $group->SelfRegistration}checked{/if}>
-                            <label class="form-check-label" for="selfRegistration">Auto-inscription autorisée</label>
-                        </div>
-                        {if $isWebmaster}
-                        <div class="mb-3">
-                            <label class="form-label">Autorisations</label>
+                            <label class="form-label">{='person_manager.group.col_authorizations'|translate}</label>
                             {foreach $availableAuthorizations as $authorization}
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" 
-                                    id="auth_{$authorization->Id}" 
-                                    name="authorizations[]" 
-                                    value="{$authorization->Id}"
-                                {if isset($currentAuthorizations) && in_array($authorization->Id, $currentAuthorizations)}checked{/if}>
-                                <label class="form-check-label" for="auth_{$authorization->Id}">
-                                    {$authorization->Name}
-                                </label>
-                            </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           id="auth_{$authorization->id}"
+                                           name="authorizations[]"
+                                           value="{$authorization->id}"
+                                           {if in_array($authorization->id, $currentAuthorizations, true)}checked{/if}>
+                                    <label class="form-check-label" for="auth_{$authorization->id}">
+                                        {$authorization->name}
+                                    </label>
+                                </div>
                             {/foreach}
                         </div>
-                        {/if}
-                        <div class="d-flex justify-content-between">
-                            <a href="/groups" class="btn btn-secondary">Annuler</a>
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
-                        </div>
-                    </form>
-                </div>
+                    {/if}
+                    <div class="d-flex justify-content-between">
+                        <a href="/groups" class="btn btn-secondary">{='cancel'|translate}</a>
+                        <button type="submit" class="btn btn-primary">{='save'|translate}</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 {/block}
 {block scripts}
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const nameInput = document.getElementById("name");
+document.addEventListener("DOMContentLoaded", function () {
+    const nameInput = document.getElementById("name");
+    const nameRequired = {='person_manager.group.name_required'|translate};
 
-        nameInput.addEventListener("invalid", function () {
-            this.setCustomValidity("Le nom du groupe est requis");
-        });
-
-        nameInput.addEventListener("input", function () {
-            this.setCustomValidity("");
-        });
-
-        const selfRegistrationCheckbox = document.getElementById('selfRegistration');
-        const authorizationCheckboxes = document.querySelectorAll('input[name="authorizations[]"]');
-
-        selfRegistrationCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                authorizationCheckboxes.forEach(function(checkbox) {
-                    checkbox.checked = false;
-                    checkbox.disabled = true;
-                });
-            } else {
-                authorizationCheckboxes.forEach(function(checkbox) {
-                    checkbox.disabled = false;
-                });
-            }
-        });
+    nameInput.addEventListener("invalid", function () {
+        this.setCustomValidity(nameRequired);
     });
+
+    nameInput.addEventListener("input", function () {
+        this.setCustomValidity("");
+    });
+
+    const selfRegistrationCheckbox = document.getElementById('selfRegistration');
+    const authorizationCheckboxes = document.querySelectorAll('input[name="authorizations[]"]');
+
+    selfRegistrationCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            authorizationCheckboxes.forEach(function(checkbox) {
+                checkbox.checked = false;
+                checkbox.disabled = true;
+            });
+        } else {
+            authorizationCheckboxes.forEach(function(checkbox) {
+                checkbox.disabled = false;
+            });
+        }
+    });
+});
 </script>
 {/block}

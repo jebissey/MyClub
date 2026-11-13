@@ -3,14 +3,8 @@
 {block title}{='person_manager.registration.title'|translate}{/block}
 
 {block content}
-    <h2>{='person_manager.registration.page_title'|translate}</h2>
+<h2>{='person_manager.registration.page_title'|translate}</h2>
     {include '../../Common/views/dataTable.latte',
-        'columns' => [
-            ['field' => 'LastName', 'label' => ('person_manager.registration.column.last_name'|translate)],
-            ['field' => 'FirstName', 'label' => ('person_manager.registration.column.first_name'|translate)],
-            ['field' => 'NickName', 'label' => ('person_manager.registration.column.nickname'|translate)],
-            ['field' => 'Email', 'label' => ('account.form.email.label'|translate)],
-        ],
         'items' => $persons,
         'actions' => [
             [
@@ -29,8 +23,8 @@
 {/block}
 
 {block scripts}
-    <script>
-    Object.assign(window.i18n, {=$i18n});
-    </script>
-    <script type="module" src="{='/app/modules/PersonManager/js/registrationIndex.js'|version}"></script>
+<script>
+Object.assign(window.i18n, {=$i18n});
+</script>
+<script type="module" src="{='/app/modules/PersonManager/js/registrationIndex.js'|version}"></script>
 {/block}

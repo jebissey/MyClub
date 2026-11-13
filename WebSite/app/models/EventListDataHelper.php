@@ -63,7 +63,7 @@ final class EventListDataHelper extends Data
         );
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /** @return list<EventListRow> */
     public function getEvents(
         ?Person $person,
         string $mode,
@@ -109,7 +109,7 @@ final class EventListDataHelper extends Data
         return array_map(static fn(object $row): GuestEventRow => GuestEventRow::fromStdClass($row), $rows);
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /** @return list<EventListRow> */
     public function getNextEvents(
         ?Person $person,
         bool $filterByPreferences = false,
@@ -240,7 +240,7 @@ final class EventListDataHelper extends Data
         return $weeks;
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /** @return list<EventListRow> */
     public function getPassedEvents(
         ?Person $person,
         int $offset,

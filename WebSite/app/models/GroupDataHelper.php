@@ -13,6 +13,7 @@ use app\helpers\Application;
 use app\helpers\To;
 use app\helpers\ConnectedUser;
 use app\modules\Common\valueObjects\DirectoryGroupRow;
+use app\modules\PersonManager\valueObjects\GroupRow;
 
 /**
  * @phpstan-import-type DirectoryGroupRowShape from DirectoryGroupRow
@@ -209,9 +210,9 @@ final class GroupDataHelper extends Data
     }
 
     /**
-     * @return list<stdClass>|false
+     * @return list<GroupRow>
      */
-    public function getGroupsWithAuthorizations(ConnectedUser $connectedUser): array|false
+    public function getGroupsWithAuthorizations(ConnectedUser $connectedUser): array
     {
         $having = $this->getAuthorizationHavingClause($connectedUser);
 
@@ -250,13 +251,13 @@ final class GroupDataHelper extends Data
         $statement = $this->pdo->query($sql);
 
         if ($statement === false) {
-            return false;
+            return [];
         }
 
-        /** @var list<stdClass> $groups */
-        $groups = $statement->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<object{Id: mixed, Name: mixed, SelfRegistration: mixed, Authorizations: mixed}> $rows */
+        $rows = $statement->fetchAll(PDO::FETCH_OBJ);
 
-        return $groups;
+        return array_map(static fn(object $row): GroupRow => GroupRow::fromStdClass($row), $rows);
     }
 
     /**

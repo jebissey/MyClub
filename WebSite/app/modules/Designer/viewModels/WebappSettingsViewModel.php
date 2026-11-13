@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace app\modules\Designer\viewModels;
 
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\viewModels\LayoutViewModel;
 
 final readonly class WebappSettingsViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, string> $htmlSettingsKeys Setting name => translated label
      * @param array<string, array{label?: string, default: int, min?: int, max?: int|null}> $numericSettingsKeys
      * @param array<string, int|string> $settings

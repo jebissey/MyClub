@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\User\viewModels;
 
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\valueObjects\Person;
 use app\modules\Common\viewModels\LayoutViewModel;
 
@@ -60,7 +60,7 @@ final readonly class UserStatisticsViewModel extends LayoutViewModel
      * @param UserStatistics $stats
      * @param list<array{label: string, start: string, end: string}> $seasons
      * @param array{start: string, end: string} $currentSeason
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param list<array{tranche: string, count: int, isHighlighted: bool}> $chartData
      * @param list<array{tranche: string, count: int, isHighlighted: bool}> $participationChartData
      * @param list<array{tranche: string, count: int, isHighlighted: bool}> $messageChartData

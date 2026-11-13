@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace app\modules\Common\viewModels;
 
 use app\modules\Common\valueObjects\ArticleRow;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\User\valueObjects\SidebarMenuItem;
 
 final readonly class HomeViewModel extends LayoutViewModel
 {
     /**
      * @param list<object{id: int, title: string, lastUpdate: string}> $latestArticles
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param list<SidebarMenuItem> $sidebarMenu
      * @param list<object{articleTitle: string, closingDate: string, surveyQuestion: string, articleId: int}> $pendingSurveys
      * @param list<object{designName: string, designDetail: string}> $pendingDesigns

@@ -61,7 +61,8 @@ abstract readonly class LayoutViewModel
         public string $flag = '',
         public bool $isMyclubWebSite = false,
         public array $allParams = []
-    ) {}
+    ) {
+    }
 
     /**
      * Extracts the LayoutViewModel constructor arguments from the raw

@@ -6,13 +6,13 @@ namespace app\modules\User\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\MemberMapMarker;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 
 final readonly class UsersMapViewModel extends LayoutViewModel
 {
     /**
      * @param list<MemberMapMarker> $locationData
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(

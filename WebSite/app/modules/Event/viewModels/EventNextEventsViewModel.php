@@ -8,12 +8,13 @@ use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\EventAttributeRow;
 use app\modules\Common\valueObjects\EventTypeRow;
 use app\modules\Common\valueObjects\Person;
+use app\modules\Event\valueObjects\EventListRow;
 use app\modules\Event\valueObjects\NeedTypeRow;
 
 final readonly class EventNextEventsViewModel extends LayoutViewModel
 {
     /**
-     * @param list<mixed> $events
+     * @param list<EventListRow> $events
      * @param list<EventTypeRow> $eventTypes
      * @param list<NeedTypeRow> $needTypes
      * @param list<EventAttributeRow> $eventAttributes

@@ -6,10 +6,12 @@ namespace app\models;
 
 use InvalidArgumentException;
 use PDO;
+use stdClass;
 use Throwable;
 use app\helpers\Application;
 use app\helpers\To;
 use app\modules\Common\valueObjects\MenuItemAuthorizationRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\valueObjects\Person;
 
 final class MenuItemDataHelper extends Data
@@ -76,6 +78,53 @@ final class MenuItemDataHelper extends Data
             $this->pdo->rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Returns menu items with their parent label.
+     *
+     * @return list<MenuItemWithParentRow>
+     */
+    public function getMenuItemsWithParent(?string $what = null): array
+    {
+        $sql = '
+            SELECT
+                m.Id,
+                m.Label AS Name,
+                m.Url AS Route,
+                m.IdGroup,
+                m.ForMembers,
+                m.ForContacts,
+                m.ForAnonymous,
+                m.What,
+                m.Type,
+                m.Label,
+                m.Icon,
+                m.Url,
+                m.ParentId,
+                p.Label AS ParentLabel
+            FROM MenuItem m
+            LEFT JOIN MenuItem p ON p.Id = m.ParentId';
+
+        $params = [];
+
+        if ($what !== null) {
+            $sql .= ' WHERE m.What = :what';
+            $params[':what'] = $what;
+        }
+
+        $sql .= ' ORDER BY m.Position';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        /** @var list<stdClass> $rawRows */
+        $rawRows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        return array_map(
+            fn(stdClass $row): MenuItemWithParentRow => MenuItemWithParentRow::fromStdClass($row),
+            $rawRows
+        );
     }
 
     /**

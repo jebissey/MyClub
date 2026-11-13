@@ -5,21 +5,26 @@
         <h2>{='import.title'|translate}</h2>
 
         {if $results}
+            {var $errors = $results['errors'] ?? 0}
+            {var $created = $results['created'] ?? 0}
+            {var $updated = $results['updated'] ?? 0}
+            {var $deactivated = $results['deactivated'] ?? 0}
+            {var $messages = $results['messages'] ?? []}
             <div class="container-fluid">
-                {if $results['errors'] > 0}
+                {if $errors > 0}
                     <div class="alert alert-danger alert-dismissible">
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{='common.close'|translate}"></button>
                         <div class="alert alert-warning">
                             <h4>{='import.result.title'|translate}</h4>
                             <ul>
-                                <li>{='import.result.created'|translate} {$results['created']}</li>
-                                <li>{='import.result.updated'|translate} {$results['updated']}</li>
-                                <li>{='import.result.deactivated'|translate} {$results['deactivated']}</li>
-                                <li>{='import.result.errors'|translate} {$results['errors']}</li>
+                                <li>{='import.result.created'|translate} {$created}</li>
+                                <li>{='import.result.updated'|translate} {$updated}</li>
+                                <li>{='import.result.deactivated'|translate} {$deactivated}</li>
+                                <li>{='import.result.errors'|translate} {$errors}</li>
                             </ul>
                             <h4>{='import.result.errors_detail'|translate}</h4>
                             <ul>
-                                {foreach $results['messages'] as $message}
+                                {foreach $messages as $message}
                                     <li>{$message}</li>
                                 {/foreach}
                             </ul>
@@ -27,18 +32,18 @@
                     </div>
                 {else}
                     <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{='common.close'|translate}"></button>
                         <h4>{='import.result.success'|translate}</h4>
                         <ul>
-                            <li>{='import.result.created'|translate} {$results['created']}</li>
-                            <li>{='import.result.updated'|translate} {$results['updated']}</li>
-                            <li>{='import.result.deactivated'|translate} {$results['deactivated']}</li>
+                            <li>{='import.result.created'|translate} {$created}</li>
+                            <li>{='import.result.updated'|translate} {$updated}</li>
+                            <li>{='import.result.deactivated'|translate} {$deactivated}</li>
                         </ul>
-                        {if $results['messages']}
+                        {if $messages !== []}
                             <hr>
                             <h5>{='import.result.details'|translate}</h5>
                             <ul>
-                                {foreach $results['messages'] as $message}
+                                {foreach $messages as $message}
                                     <li>{$message}</li>
                                 {/foreach}
                             </ul>

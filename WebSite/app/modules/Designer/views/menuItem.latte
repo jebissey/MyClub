@@ -153,12 +153,11 @@
                                     </thead>
                                     <tbody id="sidebarList">
                                         {foreach $sidebarItems as $item}
-                                        <tr data-id="{$item->id}" data-parent="{$item->parentId ?? ''}">
+                                        <tr data-id="{$item->id}">
                                             <td><span class="badge bg-secondary">{$item->type}</span></td>
                                             <td>{if $item->icon}<i class="bi {$item->icon}"></i>{/if}</td>
-                                            <td>{$item->label ?? '<em class="text-muted">—</em>'|noescape}</td>
-                                            <td>{$item->url ?? ''}</td>
-                                            <td>{$item->parentLabel ?? ''}</td>
+                                            <td>{$item->label}</td>
+                                            <td>{$item->url}</td>
                                             <td>{$item->groupName ?? ''}</td>
                                             <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->forMembers}checked{/if} disabled></td>
                                             <td class="text-center"><input type="checkbox" class="form-check-input" {if $item->forContacts}checked{/if} disabled></td>

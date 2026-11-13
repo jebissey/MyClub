@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace app\modules\Games\Karaoke\viewModels;
 
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\viewModels\LayoutViewModel;
 
 final readonly class KaraokeViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, string> $metadata
      * @param list<array{time: float, text: string, words: list<array{time: float, text: string}>}> $lines
      * @param array<string, string> $i18n

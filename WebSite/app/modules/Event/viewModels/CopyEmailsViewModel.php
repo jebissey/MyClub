@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace app\modules\Event\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Common\valueObjects\MemberContactRow;
 
 final readonly class CopyEmailsViewModel extends LayoutViewModel
 {
     /**
      * @param list<string> $emails
-     * @param array<string, mixed> $people Replace with the return type of MemberDirectoryDataHelper::getActiveMembersContactInfoByEmail()
+     * @param array<string, MemberContactRow> $people Active members indexed by email
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams
      */

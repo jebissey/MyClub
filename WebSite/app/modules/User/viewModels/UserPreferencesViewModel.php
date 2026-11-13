@@ -6,7 +6,7 @@ namespace app\modules\User\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
 use app\modules\Common\valueObjects\EventTypeRow;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 
 /**
  * @phpstan-type PreferenceEntry array{
@@ -25,7 +25,7 @@ use app\modules\Common\valueObjects\MenuItemRow;
 final readonly class UserPreferencesViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param UserPreferences $currentPreferences
      * @param list<EventTypeRow> $eventTypes
      * @param array<string, mixed> $layoutParams

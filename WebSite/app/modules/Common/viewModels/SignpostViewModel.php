@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace app\modules\Common\viewModels;
 
 use app\helpers\ConnectedUser;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 
 final readonly class SignpostViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(

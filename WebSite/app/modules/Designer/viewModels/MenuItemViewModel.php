@@ -6,14 +6,14 @@ namespace app\modules\Designer\viewModels;
 
 use app\enums\MenuItemTab;
 use app\modules\Common\valueObjects\IdNameRow;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\viewModels\LayoutViewModel;
 
 final readonly class MenuItemViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navbarItems
-     * @param list<MenuItemRow> $sidebarItems
+     * @param list<MenuItemWithParentRow> $navbarItems
+     * @param list<MenuItemWithParentRow> $sidebarItems
      * @param list<IdNameRow> $groups
      * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams

@@ -175,7 +175,8 @@ final readonly class ControllerFactory
         private SharedFileDataHelper $sharedFileDataHelper,
         private SurveyDataHelper $surveyDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
-    ) {}
+    ) {
+    }
 
     public function makeArticleController(): ArticleController
     {

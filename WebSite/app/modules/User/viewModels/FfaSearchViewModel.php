@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\User\viewModels;
 
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\viewModels\LayoutViewModel;
 
 /**
@@ -16,7 +16,7 @@ final readonly class FfaSearchViewModel extends LayoutViewModel
     /**
      * @param FfaRankRow|null $rank Ranking line, null when nothing was found
      * @param list<FfaResultRow> $results Results lines (empty for a ranking search)
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(

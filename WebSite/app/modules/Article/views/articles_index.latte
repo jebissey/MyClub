@@ -4,10 +4,10 @@
     {include '../../Common/views/navbar/_userLeft.latte'}
 {/block}
 
-{block title}Articles{/block}
+{block title}{='article.index.title'|translate}{/block}
 
 {block head}
-<link rel="alternate" type="application/rss+xml" title="Flux RSS des articles" href="/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="{='article.index.rss_feed_title'|translate}" href="/rss.xml" />
 {/block}
 
 {block content}
@@ -106,9 +106,9 @@
             ]
         }
     {/if}
-    
+        
     <a href="/articles-rss.xml" class="rss-link">
-        <img src="/Feed-icon.svg" alt="RSS" width="16" height="16"> S'abonner au flux RSS
+        <img src="/Feed-icon.svg" alt="RSS" width="16" height="16"> {='article.index.rss_subscribe'|translate}
     </a>
 
     {include 'partials/publishModal.latte'}

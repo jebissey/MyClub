@@ -39,16 +39,16 @@ final class RegistrationController extends TableController
                 WebApp::filterInput($schema, $this->flight->request()->query->getData())
             );
             $filterConfig = [
-                ['name' => 'lastName', 'label' => 'Nom'],
-                ['name' => 'firstName', 'label' => 'Prénom'],
-                ['name' => 'nickName', 'label' => 'Surnom'],
-                ['name' => 'email', 'label' => 'Email'],
+                ['name' => 'lastName', 'label' => $this->translate('person_manager.registration.column.last_name')],
+                ['name' => 'firstName', 'label' => $this->translate('person_manager.registration.column.first_name')],
+                ['name' => 'nickName', 'label' => $this->translate('person_manager.registration.column.nickname')],
+                ['name' => 'email', 'label' => $this->translate('account.form.email.label')],
             ];
             $columns = [
-                ['field' => 'LastName', 'label' => 'Nom'],
-                ['field' => 'FirstName', 'label' => 'Prénom'],
-                ['field' => 'NickName', 'label' => 'Surnom'],
-                ['field' => 'Email', 'label' => 'Email'],
+                ['field' => 'LastName', 'label' => $this->translate('person_manager.registration.column.last_name')],
+                ['field' => 'FirstName', 'label' => $this->translate('person_manager.registration.column.first_name')],
+                ['field' => 'NickName', 'label' => $this->translate('person_manager.registration.column.nickname')],
+                ['field' => 'Email', 'label' => $this->translate('account.form.email.label')],
             ];
             $data = $this->prepareTableData($this->tableControllerDataHelper->getActivePersonsQuery(), $filterValues);
 

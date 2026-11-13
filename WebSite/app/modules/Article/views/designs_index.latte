@@ -2,37 +2,37 @@
 
 {block content}
     <div class="container-fluid mt-4 mb-3 d-flex justify-content-between align-items-center">
-        <h1>Designs</h1>
+        <h1>{='design.index.title'|translate}</h1>
         <a href="/design/create" class="btn btn-primary">
-            <i class="bi bi-plus"></i> Ajouter un design
+            <i class="bi bi-plus"></i> {='design.index.add'|translate}
         </a>
     </div>
 
     <div class="container-fluid mb-4">
         <div class="card shadow-sm w-100">
             <div class="card-header bg-info">
-                🎨 Proposez une nouvelle page pour le site !
+                {='design.index.proposal_title'|translate}
             </div>
             <div class="card-body">
                 <p class="card-text">
-                    Envie d’enrichir notre site avec une page ? C’est par ici !
+                    {='design.index.proposal_intro'|translate}
                 </p>
                 <ul class="list-group list-group-flush mb-3">
                     <li class="list-group-item">
-                        <strong>Nom du design :</strong> le nom qui apparaîtra dans la barre de navigation. Soyez clair et concis !
+                        <strong>{='design.index.name_label'|translate}</strong> {='design.index.name_help'|translate}
                     </li>
                     <li class="list-group-item">
-                        <strong>Détails :</strong> décrivez ce que cette page contiendra ou permettra de faire. Cela aidera l’équipe à comprendre votre idée.
+                        <strong>{='design.index.detail_label'|translate}</strong> {='design.index.detail_help'|translate}
                     </li>
                     <li class="list-group-item">
-                        <strong>Pour qui ?</strong> choisissez qui pourra accéder à cette page. Visible pour tout le monde, uniquement les membres du club, ou un groupe spécifique.
+                        <strong>{='design.index.audience_label'|translate}</strong> {='design.index.audience_help'|translate}
                     </li>
                 </ul>
                 <p class="card-text">
-                    Votre proposition sera étudiée et, si elle est validée, elle apparaîtra dans la navigation du site.
+                    {='design.index.review_notice'|translate}
                 </p>
                 <p class="mb-0">
-                    Merci pour votre créativité et votre implication !
+                    {='design.index.thanks'|translate}
                 </p>
             </div>
         </div>
@@ -43,13 +43,13 @@
             <table class="table table-hover w-100">
                 <thead>
                     <tr>
-                        <th>Créateur</th>
-                        <th>Nom du design</th>
-                        <th>NavBar</th>
-                        <th>Statut</th>
-                        <th>Votes</th>
-                        <th>All</th>
-                        <th>Members</th>
+                        <th>{='design.index.col_designer'|translate}</th>
+                        <th>{='design.index.col_name'|translate}</th>
+                        <th>{='design.index.col_navbar'|translate}</th>
+                        <th>{='design.index.col_status'|translate}</th>
+                        <th>{='design.index.col_votes'|translate}</th>
+                        <th>{='design.index.col_all'|translate}</th>
+                        <th>{='design.index.col_members'|translate}</th>
                         {foreach $groups as $group}
                             <th>{$group->name}</th>
                         {/foreach}
@@ -57,39 +57,39 @@
                 </thead>
                 <tbody>
                     {foreach $designs as $design}
-                        <tr class="design-row" 
-                            data-id="{$design->Id}" 
-                            data-name="{$design->Name}" 
-                            data-detail="{$design->Detail}">
+                        <tr class="design-row"
+                            data-id="{$design->id}"
+                            data-name="{$design->name}"
+                            data-detail="{$design->detail}">
 
-                            <td>{$design->NameOfDesigner}</td>
-                            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{$design->Detail}">
-                                {$design->Name}
+                            <td>{$design->nameOfDesigner}</td>
+                            <td data-bs-toggle="tooltip" data-bs-placement="top" title="{$design->detail}">
+                                {$design->name}
                             </td>
-                            <td>{$design->NavBar}</td>
+                            <td>{$design->navBar}</td>
                             <td>
-                                {if $design->Status === 'UnderReview'}
+                                {if $design->status === 'UnderReview'}
                                     <h4>⏳</h4>
-                                {elseif $design->Status === 'Approved'}
+                                {elseif $design->status === 'Approved'}
                                     <h4>✅</h4>
-                                {elseif $design->Status === 'Rejected'}
+                                {elseif $design->status === 'Rejected'}
                                     <h4>❌</h4>
                                 {/if}
                             </td>
-                            <td>{$design->Votes}</td>
+                            <td>{$design->votes}</td>
                             <td class="text-center">
-                                {if $design->IdGroup == '' && $design->OnlyForMembers == 0}
+                                {if $design->idGroup === null && $design->onlyForMembers === 0}
                                     <h4>✅</h4>
                                 {/if}
                             </td>
                             <td class="text-center">
-                                {if $design->IdGroup == '' && $design->OnlyForMembers == 1}
+                                {if $design->idGroup === null && $design->onlyForMembers === 1}
                                     <h4>✅</h4>
                                 {/if}
                             </td>
                             {foreach $groups as $group}
                                 <td class="text-center">
-                                    {if $design->IdGroup == $group->id}
+                                    {if $design->idGroup === $group->id}
                                         <h4>✅</h4>
                                     {/if}
                                 </td>
@@ -105,8 +105,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="voteModalLabel">Voter pour ce design</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="voteModalLabel">{='design.index.vote_title'|translate}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{='design.index.close'|translate}"></button>
                 </div>
                 <div class="modal-body">
                     <h4 id="design-name"></h4>
@@ -114,20 +114,20 @@
 
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="voteOption" id="voteUp" value="voteUp">
-                        <label class="form-check-label" for="voteUp">👍 Pour</label>
+                        <label class="form-check-label" for="voteUp">👍 {='design.index.vote_for'|translate}</label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="voteOption" id="voteDown" value="voteDown">
-                        <label class="form-check-label" for="voteDown">👎 Contre</label>
+                        <label class="form-check-label" for="voteDown">👎 {='design.index.vote_against'|translate}</label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="voteOption" id="voteNeutral" value="voteNeutral">
-                        <label class="form-check-label" for="voteNeutral">🤔 Neutre</label>
+                        <label class="form-check-label" for="voteNeutral">🤔 {='design.index.vote_neutral'|translate}</label>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary" id="submit-vote">Voter</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{='cancel'|translate}</button>
+                    <button type="button" class="btn btn-primary" id="submit-vote">{='design.index.vote_submit'|translate}</button>
                 </div>
             </div>
         </div>

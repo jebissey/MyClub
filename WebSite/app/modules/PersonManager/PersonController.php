@@ -11,7 +11,6 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\MemberCustomFields;
 use app\helpers\MyClubDateTime;
-use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
@@ -278,24 +277,24 @@ final class PersonController extends TableController
         /** @var array<string, string> $filterValues */
         $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
         $filterConfig = [
-            ['name' => 'firstName', 'label' => 'Prénom'],
-            ['name' => 'lastName', 'label' => 'Nom'],
-            ['name' => 'nickName', 'label' => 'Surnom'],
-            ['name' => 'email', 'label' => 'Email'],
-            ['name' => 'alert', 'label' => 'Alerte'],
-            ['name' => 'passwordCreated', 'label' => 'Mot de passe'],
-            ['name' => 'presentInDirectory', 'label' => 'Présentation'],
-            ['name' => 'memberInfo', 'label' => 'Informations sur le membre'],
+            ['name' => 'firstName', 'label' => $this->translate('person_manager.table.first_name')],
+            ['name' => 'lastName', 'label' => $this->translate('person_manager.table.last_name')],
+            ['name' => 'nickName', 'label' => $this->translate('person_manager.table.nick_name')],
+            ['name' => 'email', 'label' => $this->translate('person_manager.table.email')],
+            ['name' => 'alert', 'label' => $this->translate('person_manager.table.alert')],
+            ['name' => 'passwordCreated', 'label' => $this->translate('person_manager.table.password')],
+            ['name' => 'presentInDirectory', 'label' => $this->translate('person_manager.table.presentation')],
+            ['name' => 'memberInfo', 'label' => $this->translate('person_manager.table.member_info')],
         ];
         $columns = [
-            ['field' => 'LastName', 'label' => 'Nom'],
-            ['field' => 'FirstName', 'label' => 'Prénom'],
-            ['field' => 'Email', 'label' => 'Email'],
-            ['field' => 'Phone', 'label' => 'Téléphone'],
-            ['field' => 'Alert', 'label' => 'Alerte'],
-            ['field' => 'PasswordCreated', 'label' => 'Mot de passe'],
-            ['field' => 'PresentInDirectory', 'label' => 'Présentation'],
-            ['field' => 'MemberInfo', 'label' => 'Informations sur le membre'],
+            ['field' => 'LastName', 'label' => $this->translate('person_manager.table.last_name')],
+            ['field' => 'FirstName', 'label' => $this->translate('person_manager.table.first_name')],
+            ['field' => 'Email', 'label' => $this->translate('person_manager.table.email')],
+            ['field' => 'Phone', 'label' => $this->translate('person_manager.table.phone')],
+            ['field' => 'Alert', 'label' => $this->translate('person_manager.table.alert')],
+            ['field' => 'PasswordCreated', 'label' => $this->translate('person_manager.table.password')],
+            ['field' => 'PresentInDirectory', 'label' => $this->translate('person_manager.table.presentation')],
+            ['field' => 'MemberInfo', 'label' => $this->translate('person_manager.table.member_info')],
         ];
 
         /** @var list<string> $statusValues */

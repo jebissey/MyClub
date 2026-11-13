@@ -6,7 +6,7 @@ namespace app\modules\Article\viewModels;
 
 use stdClass;
 use app\modules\Common\valueObjects\ArticleRow;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\valueObjects\CarouselItemRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 use app\modules\Common\viewModels\LayoutViewModel;
@@ -17,7 +17,7 @@ final readonly class ArticleShowViewModel extends LayoutViewModel
      * @param ArticleRow $article
      * @param list<stdClass> $groups
      * @param list<CarouselItemRow> $carouselItems
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(

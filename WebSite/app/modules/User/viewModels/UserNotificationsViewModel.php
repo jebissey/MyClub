@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace app\modules\User\viewModels;
 
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 
 final readonly class UserNotificationsViewModel extends LayoutViewModel
 {
     /**
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, mixed> $currentNotifications
      * @param array<int, true> $subscribedGroupIds
      * @param array<int, true> $joinedGroupIds

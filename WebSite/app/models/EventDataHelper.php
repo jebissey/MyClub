@@ -193,7 +193,7 @@ final class EventDataHelper extends Data
         }
         throw new QueryException("Event ({$eventId}) doesn't exist");
     }
-    
+
     /** @return array<int, mixed> */
     public function removeParticipant(int $id, int $personId): array
     {

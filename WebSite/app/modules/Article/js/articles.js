@@ -32,7 +32,7 @@ function initializeModalFeatures() {
         form.addEventListener('submit', function (e) {
             if (spotlightCheckbox.checked && !spotlightedUntilInput.value) {
                 e.preventDefault();
-                alert("Il faut choisir une date de mise à la une si vous cochez l'option.");
+                alert(window.i18n.spotlightDateRequired);
             }
         });
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Common\viewModels;
 
 use app\modules\Common\valueObjects\DataTableTypes;
-use app\modules\Common\valueObjects\MenuItemRow;
+use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\valueObjects\Person;
 use app\modules\Common\valueObjects\TableRow;
 
@@ -20,7 +20,8 @@ final readonly class TableIndexViewModel extends LayoutViewModel
      * @param array<string, string> $filterValues
      * @param list<TableFilter> $filters
      * @param list<TableColumn> $columns
-     * @param list<MenuItemRow> $navItems
+     * @param list<MenuItemWithParentRow> $navItems
+     * @param array<string, string> $extraParams
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(
@@ -33,7 +34,8 @@ final readonly class TableIndexViewModel extends LayoutViewModel
         public string $resetUrl,
         public Person|false $userConnected,
         public array $navItems,
-        array $layoutParams = []
+        public array $extraParams = [],
+        array $layoutParams = [],
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),

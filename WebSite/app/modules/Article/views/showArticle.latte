@@ -5,12 +5,12 @@
 {/block}
 
 {block head}
-    <link href="/app/modules/Common/css/carousel.css" rel="stylesheet">
+<link href="/app/modules/Common/css/carousel.css" rel="stylesheet">
 {/block}
 
 {block content}
 <div id="content-display">
-    {$chosenArticle->Content|noescape}
+    {$content|noescape}
 </div>
 
 {include 'partials/carousel.latte', carouselItems => $carouselItems}

@@ -15,7 +15,9 @@ use app\models\MessageDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\valueObjects\GroupChatRow;
+use app\modules\Common\valueObjects\IdNameRow;
 use app\modules\Common\viewModels\ChatViewModel;
+use app\modules\PersonManager\valueObjects\GroupEditRow;
 use app\modules\PersonManager\viewModels\GroupCreateViewModel;
 use app\modules\PersonManager\viewModels\GroupEditViewModel;
 use app\modules\PersonManager\viewModels\GroupIndexViewModel;
@@ -102,19 +104,21 @@ final class GroupController extends AbstractController
         }
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
-            if (!$group) {
-                $this->errors->badRequest("Unknwon group $id", __FILE__, __LINE__);
-            } else {
-                $viewModel = new GroupEditViewModel(
-                    group: $group,
-                    availableAuthorizations: array_values($this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name')),
-                    currentAuthorizations: $this->getGroupAuthorizationIds($id),
-                    layout: $this->getLayout(),
-                    layoutParams: $this->getAllParams([]),
-                );
-
-                $this->views->render('PersonManager/views/group_edit.latte', $viewModel);
+            if ($group === false) {
+                $this->errors->badRequest("Unknown group {$id}", __FILE__, __LINE__);
+                return;
             }
+            /** @var object{Name: mixed, SelfRegistration: mixed} $group */
+
+            $viewModel = new GroupEditViewModel(
+                group: GroupEditRow::fromStdClass($group),
+                availableAuthorizations: $this->getAvailableAuthorizations(),
+                currentAuthorizations: $this->getGroupAuthorizationIds($id),
+                layout: $this->getLayout(),
+                layoutParams: $this->getAllParams([]),
+            );
+
+            $this->views->render('PersonManager/views/group_edit.latte', $viewModel);
         }
     }
 
@@ -125,8 +129,6 @@ final class GroupController extends AbstractController
                 $this->errors->badRequest("Group {$id} can't be updated", __FILE__, __LINE__);
                 return;
             }
-            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name');
-            $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
             $schema = [
                 'name' => FilterInputRule::HtmlSafeName->value,
                 'selfRegistration' => FilterInputRule::Int->value,
@@ -137,17 +139,21 @@ final class GroupController extends AbstractController
             $name = $input['name'] ?? '???';
             $selfRegistration = $input['selfRegistration'] ?? 0;
             $selectedAuthorizations = $input['authorizations'] ?? [];
+
             if (empty($name)) {
+                $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
                 if ($group === false) {
-                    $this->errors->badRequest("Unknwon group $id", __FILE__, __LINE__);
+                    $this->errors->badRequest("Unknown group {$id}", __FILE__, __LINE__);
                     return;
                 }
+                /** @var object{Name: mixed, SelfRegistration: mixed} $group */
+
                 $viewModel = new GroupEditViewModel(
-                    group: $group,
-                    availableAuthorizations: array_values($availableAuthorizations),
+                    group: GroupEditRow::fromStdClass($group),
+                    availableAuthorizations: $this->getAvailableAuthorizations(),
                     currentAuthorizations: $this->getGroupAuthorizationIds($id),
                     layout: $this->getLayout(),
-                    error: 'Le nom du groupe est requis',
+                    error: $this->translate('person_manager.group.name_required'),
                     layoutParams: $this->getAllParams([]),
                 );
 
@@ -200,7 +206,7 @@ final class GroupController extends AbstractController
         $viewModel = new ChatViewModel(
             article: null,
             event: null,
-            group:  GroupChatRow::fromRow($group),
+            group: GroupChatRow::fromRow($group),
             messages: $this->messageDataHelper->getGroupMessages($groupId),
             person: $person,
             navItems: $this->getNavItems($person->email),
@@ -213,6 +219,19 @@ final class GroupController extends AbstractController
     }
 
     #region Privates functions
+    /**
+     * Authorizations a group can be given (the first one is reserved).
+     *
+     * @return list<IdNameRow>
+     */
+    private function getAvailableAuthorizations(): array
+    {
+        return array_values(array_map(
+            static fn(object $row): IdNameRow => IdNameRow::fromStdClass($row),
+            $this->dataHelper->gets('Authorization', ['Id <> 1' => null], 'Id, Name', 'Name')
+        ));
+    }
+
     /**
      * @return list<int>
      */
