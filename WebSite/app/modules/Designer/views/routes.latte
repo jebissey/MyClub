@@ -1,0 +1,9 @@
+{extends 'designer.latte'}
+
+{block title}Routes{/block}
+
+{block content}
+    {include '../../Common/views/dataTable.latte',
+        'items' => $routes,
+    }
+{/block}
