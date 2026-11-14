@@ -99,8 +99,7 @@ final class DbBrowserController extends TableController
                 ],
                 $filterConfig
             );
-            $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-            /** @var array<string, string> $filterValues */
+            $filterValues = $this->readFilterValues($schema);
             $data = $this->prepareTableData($this->dbBrowserDataHelper->getQuery($table), $filterValues);
 
             $viewModel = new DbBrowserTableViewModel(

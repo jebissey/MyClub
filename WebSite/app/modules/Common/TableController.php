@@ -6,6 +6,7 @@ namespace app\modules\Common;
 
 use Envms\FluentPDO\Queries\Select;
 use stdClass;
+use app\helpers\WebApp;
 use app\modules\Common\valueObjects\TableRow;
 
 abstract class TableController extends AbstractController
@@ -125,5 +126,26 @@ abstract class TableController extends AbstractController
             'totalPages' => $totalPages,
             'filters' => $filters,
         ];
+    }
+
+    /**
+     * Reads and sanitizes the filters from the query string.
+     * Every key of the schema is always present and is a string ('' when absent or rejected),
+     * as FilterForm.latte requires.
+     *
+     * @param array<string, list<string>|string> $schema
+     * @return array<string, string>
+     */
+    protected function readFilterValues(array $schema): array
+    {
+        $raw = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+
+        $filterValues = [];
+        foreach (array_keys($schema) as $field) {
+            $value = $raw[$field] ?? null;
+            $filterValues[$field] = is_scalar($value) ? (string) $value : '';
+        }
+
+        return $filterValues;
     }
 }

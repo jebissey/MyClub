@@ -274,8 +274,7 @@ final class PersonController extends TableController
             'presentInDirectory' => ['oui', 'non'],
             'memberInfo' => FilterInputRule::Text->value,
         ];
-        /** @var array<string, string> $filterValues */
-        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        $filterValues = $this->readFilterValues($schema);
         $filterConfig = [
             ['name' => 'firstName', 'label' => $this->translate('person_manager.table.first_name')],
             ['name' => 'lastName', 'label' => $this->translate('person_manager.table.last_name')],

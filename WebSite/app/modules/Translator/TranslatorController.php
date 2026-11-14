@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Translator;
 
 use app\enums\FilterInputRule;
-use app\helpers\Application;
 use app\helpers\TranslationManager;
 use app\helpers\To;
 use app\helpers\WebApp;
@@ -14,11 +13,6 @@ use app\modules\Translator\viewModels\TranslatorViewModel;
 
 final class TranslatorController extends AbstractController
 {
-    public function __construct(
-        Application $application,
-    ) {
-        parent::__construct($application);
-    }
 
     public function index(): void
     {

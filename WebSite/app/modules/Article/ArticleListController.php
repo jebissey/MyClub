@@ -107,17 +107,6 @@ final class ArticleListController extends TableController
     }
 
     /**
-     * @param array<string, list<string>|string> $schema
-     * @return array<string, string>
-     */
-    private function readFilterValues(array $schema): array
-    {
-        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-        /** @var array<string, string> $filterValues */
-        return $filterValues;
-    }
-
-    /**
      * @return array{name: string, label: string}
      */
     private function filter(string $name, string $labelKey): array

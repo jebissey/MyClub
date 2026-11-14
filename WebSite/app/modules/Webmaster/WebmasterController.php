@@ -300,8 +300,7 @@ final class WebmasterController extends TableController
             'lastCheck'      => FilterInputRule::DateTime->value,
             'status'         => FilterInputRule::String->value,
         ];
-        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-        /** @var array<string, string> $filterValues */
+        $filterValues = $this->readFilterValues($schema);
 
         $filterConfig = [
             ['name' => 'Host',           'label' => ($this->t)('webmaster.installations.label.host')],

@@ -76,7 +76,7 @@ final class ExerciseController extends TableController
             'Content'    => FilterInputRule::Content->value,
             'Id'         => FilterInputRule::Int->value,
         ];
-        $filterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
+        $filterValues = $this->readFilterValues($schema);
         $filterConfig = [
             ['name' => 'PersonName', 'label' => $this->translate('article.label.created_by')],
             ['name' => 'title', 'label' => $this->translate('article.label.title')],

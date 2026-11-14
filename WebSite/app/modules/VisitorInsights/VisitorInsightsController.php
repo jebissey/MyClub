@@ -90,11 +90,7 @@ final class VisitorInsightsController extends TableController
             'Code'      => FilterInputRule::String->value,
             'Message'   => FilterInputRule::Content->value,
         ];
-        $filterValues = array_map(
-            static fn(mixed $value): string => is_string($value) ? $value : '',
-            WebApp::filterInput($schema, $this->flight->request()->query->getData())
-        );
-        /** @var array<string, string> $filterValues */
+        $filterValues = $this->readFilterValues($schema);
 
         $filterConfig = [
             ['name' => 'Type',    'label' => 'Type'],

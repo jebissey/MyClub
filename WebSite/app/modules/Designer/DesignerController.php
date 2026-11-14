@@ -51,14 +51,7 @@ final class DesignerController extends TableController
             'module'   => FilterInputRule::Text->value,
             'function' => FilterInputRule::Text->value,
         ];
-        $rawFilterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
-
-        /** @var array<string, string> $filterValues */
-        $filterValues = [];
-        foreach (array_keys($schema) as $field) {
-            $value = $rawFilterValues[$field] ?? null;
-            $filterValues[$field] = is_string($value) ? $value : '';
-        }
+        $filterValues = $this->readFilterValues($schema);
 
         $labels = [
             'method'   => ($this->t)('designer.routes.label.method'),
