@@ -70,7 +70,7 @@ jobs:
 
       - name: Run PHPStan
         working-directory: WebSite
-        run: vendor/bin/phpstan analyse -c ../dev/phpstan.neon --memory-limit=1G
+        run: vendor/bin/phpstan analyse -c ../dev/phpstan.neon --memory-limit=3G
 
   tests:
     name: Tests unitaires / métier
