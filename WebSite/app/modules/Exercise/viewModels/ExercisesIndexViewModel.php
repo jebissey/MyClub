@@ -22,6 +22,7 @@ final readonly class ExercisesIndexViewModel extends LayoutViewModel
      * @param list<TableFilter> $filters
      * @param list<TableColumn> $columns
      * @param list<MenuItemWithParentRow> $navItems
+     * @param array<string, string> $extraParams
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(
@@ -35,6 +36,7 @@ final readonly class ExercisesIndexViewModel extends LayoutViewModel
         public Person|false $userConnected,
         public string $layout,
         public array $navItems,
+        public array $extraParams,
         array $layoutParams,
     ) {
         parent::__construct(

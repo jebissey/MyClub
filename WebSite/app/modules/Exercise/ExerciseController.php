@@ -17,6 +17,9 @@ use app\modules\Exercise\viewModels\ExercisesIndexViewModel;
 
 final class ExerciseController extends TableController
 {
+    private const EXERCISE_COLUMNS = 'Content, Title, CreatedBy';
+    private const EXERCISE_EDIT_URL = '/exercise/edit/';
+
     public function __construct(
         Application $application,
         private readonly ExerciseTableDataHelper $exerciseTableDataHelper,
@@ -33,7 +36,7 @@ final class ExerciseController extends TableController
                 'Content' => '[]',
                 'CreatedBy' => $this->application->getConnectedUser()->person->id ?? 0,
             ]);
-            $this->redirect('/exercise/edit/' . $exerciseId);
+            $this->redirect(self::EXERCISE_EDIT_URL . $exerciseId);
         }
     }
 
@@ -41,7 +44,7 @@ final class ExerciseController extends TableController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isExerciseDesigner(), __FILE__, __LINE__)) {
             /** @var object{Content: string|null, Title: string|null, CreatedBy: int}|false $exercise */
-            $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
+            $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], self::EXERCISE_COLUMNS);
             if (!$exercise) {
                 $this->errors->forbidden(__FILE__, __LINE__);
                 return;
@@ -106,6 +109,7 @@ final class ExerciseController extends TableController
             userConnected: $connectedUser->person ?? false,
             layout: $this->getLayout(),
             navItems: $this->getNavItems($connectedUser->person?->email),
+            extraParams: [],
             layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
         );
 
@@ -119,7 +123,7 @@ final class ExerciseController extends TableController
         }
 
         /** @var object{Content: string|null, Title: string|null, CreatedBy: int}|false $exercise */
-        $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
+        $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], self::EXERCISE_COLUMNS);
         if (!$exercise) {
             $this->errors->badRequest("Exercise ({$id}) not found", __FILE__, __LINE__);
             return;
@@ -143,7 +147,7 @@ final class ExerciseController extends TableController
         }
 
         /** @var object{Content: string, Title: string, CreatedBy: int}|false $exercise */
-        $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], 'Content, Title, CreatedBy');
+        $exercise = $this->dataHelper->get('Exercise', ['Id' => $id], self::EXERCISE_COLUMNS);
         if (!$exercise || ($this->application->getConnectedUser()->person->id ?? 0) != $exercise->CreatedBy) {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,
@@ -158,7 +162,7 @@ final class ExerciseController extends TableController
 
         if (!is_array($exercises)) {
             $_SESSION['error'] = $this->translate('exercise.msg.invalid_json');
-            $this->redirect('/exercise/edit/' . $id);
+            $this->redirect(self::EXERCISE_EDIT_URL . $id);
             return;
         }
 
@@ -172,7 +176,7 @@ final class ExerciseController extends TableController
         ], ['Id' => $id]);
 
         $_SESSION['success'] = $this->translate('exercise.msg.saved');
-        $this->redirect('/exercise/edit/' . $id);
+        $this->redirect(self::EXERCISE_EDIT_URL . $id);
     }
 
     #region Private functions

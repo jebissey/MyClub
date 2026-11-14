@@ -1,3 +1,9 @@
+{default $actions = []}
+{default $createButton = null}
+{default $modal = null}
+{default $table = ''}
+{default $extraParams = []}
+
 {varType list<\app\modules\Common\valueObjects\TableRow> $items}
 {varType list<string|array{name: string, label: string, type?: string, options?: array<mixed>, optionValue?: string, optionLabel?: string, placeholder?: string, autosubmit?: bool}> $filters}
 {varType string $resetUrl}
@@ -10,12 +16,6 @@
 {varType ?array{url: string, label: string, alignment?: string} $createButton}
 {varType ?array{id: string, title: string, contentId: string} $modal}
 {varType list<array{type: string, label: string, class: string, url?: string, confirm?: string, onClick?: string}> $actions}
-
-{default $actions = []}
-{default $createButton = null}
-{default $modal = null}
-{default $table = ''}
-{default $extraParams = []}
 
 <div class="container-fluid">
     {include 'FilterForm.latte',
