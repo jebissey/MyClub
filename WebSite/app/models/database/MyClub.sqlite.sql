@@ -7405,7 +7405,13 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1879,'person_manager.group.self_registration_allowed','Self-registration allowed','Auto-inscription autorisée','Samodzielna rejestracja dozwolona'),
  (1880,'webmaster.installations.title','Installations','Installations','Instalacje'),
  (1881,'webmaster.installations.none_title','No installation detected','Aucune installation détectée','Nie wykryto żadnej instalacji'),
- (1882,'webmaster.installations.none_text','No installation of the webapp has checked for updates yet.','Aucune installation de la webapp n’a encore vérifié les mises à jour.','Żadna instalacja aplikacji nie sprawdziła jeszcze aktualizacji.');
+ (1882,'webmaster.installations.none_text','No installation of the webapp has checked for updates yet.','Aucune installation de la webapp n’a encore vérifié les mises à jour.','Żadna instalacja aplikacji nie sprawdziła jeszcze aktualizacji.'),
+ (1883,'designer.routes.title','Routes','Routes','Trasy'),
+ (1884,'designer.routes.label.method','Method','Méthode','Metoda'),
+ (1885,'designer.routes.label.uri','URI','URI','URI'),
+ (1886,'designer.routes.label.module','Module','Module','Moduł'),
+ (1887,'designer.routes.label.function','Function','Fonction','Funkcja'),
+ (1888,'navbar.designer.routes','Routes','Les routes','Trasy');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
 INSERT INTO "Metadata" VALUES (1,'MyClub',101,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);

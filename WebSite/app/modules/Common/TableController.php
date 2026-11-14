@@ -6,16 +6,27 @@ namespace app\modules\Common;
 
 use Envms\FluentPDO\Queries\Select;
 use stdClass;
-use app\helpers\Application;
 use app\modules\Common\valueObjects\TableRow;
 
 abstract class TableController extends AbstractController
 {
     private int $itemsPerPage = 10;
 
-    public function __construct(Application $application)
+    /**
+     * @param array<string,string> $filters
+     * @return array<string,string>
+     */
+    protected function buildPaginationParams(array $filters): array
     {
-        parent::__construct($application);
+        $params = [];
+
+        foreach ($filters as $key => $value) {
+            if ($value !== '') {
+                $params[$key] = urlencode($value);
+            }
+        }
+
+        return $params;
     }
 
     /**
@@ -65,20 +76,54 @@ abstract class TableController extends AbstractController
         ];
     }
 
-    /**
-     * @param array<string,string> $filters
-     * @return array<string,string>
-     */
-    protected function buildPaginationParams(array $filters): array
-    {
-        $params = [];
 
-        foreach ($filters as $key => $value) {
-            if ($value !== '') {
-                $params[$key] = urlencode($value);
+    /**
+     * In-memory equivalent of prepareTableData(), for data that does not come from a SQL query.
+     * Filters use a case-insensitive "contains" match, like the LIKE filters of the SQL version.
+     *
+     * @param list<array<string, string>> $rows
+     * @param array<string, string|null> $filters
+     * @return array{
+     *     items: list<TableRow>,
+     *     currentPage: int,
+     *     totalPages: int,
+     *     filters: array<string, string|null>
+     * }
+     */
+    protected function prepareTableDataFromArray(array $rows, array $filters = []): array
+    {
+        $tablePage = $this->flight->request()->query['tablePage'] ?? null;
+        $page = is_numeric($tablePage) ? (int) $tablePage : 1;
+
+        $rows = array_values(array_filter(
+            $rows,
+            static function (array $row) use ($filters): bool {
+                foreach ($filters as $key => $value) {
+                    if ($value === null || $value === '') {
+                        continue;
+                    }
+                    if (mb_stripos($row[$key] ?? '', $value) === false) {
+                        return false;
+                    }
+                }
+                return true;
             }
+        ));
+
+        $totalPages = (int) ceil(count($rows) / $this->itemsPerPage);
+        $currentPage = max(1, min($page, $totalPages));
+        $offset = ($currentPage - 1) * $this->itemsPerPage;
+
+        $items = [];
+        foreach (array_slice($rows, $offset, $this->itemsPerPage) as $index => $row) {
+            $items[] = new TableRow((string) ($offset + $index), $row);
         }
 
-        return $params;
+        return [
+            'items' => $items,
+            'currentPage' => $currentPage,
+            'totalPages' => $totalPages,
+            'filters' => $filters,
+        ];
     }
 }

@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace app\modules\Designer;
 
-use Closure;
-use app\modules\Common\AbstractController;
-use app\modules\Common\valueObjects\TableRow;
+use app\enums\FilterInputRule;
+use app\helpers\WebApp;
+use app\modules\Common\TableController;
+use app\modules\Common\valueObjects\Route;
 use app\modules\Designer\viewModels\DesignerHomeViewModel;
 use app\modules\Designer\viewModels\DesignerRoutesViewModel;
 
 /**
  * @phpstan-type RouteRow array{method: string, uri: string, module: string, function: string}
  */
-final class DesignerController extends AbstractController
+final class DesignerController extends TableController
 {
     public function help(): void
     {
@@ -44,46 +45,45 @@ final class DesignerController extends AbstractController
 
         $connectedUser = $this->application->getConnectedUser();
 
-        /** @var list<RouteRow> $rawRoutes */
-        $rawRoutes = [];
-        foreach ($this->flight->router()->getRoutes() as $route) {
-            [$module, $function] = $this->resolveCallback($route->callback);
+        $schema = [
+            'method'   => FilterInputRule::Text->value,
+            'uri'      => FilterInputRule::Text->value,
+            'module'   => FilterInputRule::Text->value,
+            'function' => FilterInputRule::Text->value,
+        ];
+        $rawFilterValues = WebApp::filterInput($schema, $this->flight->request()->query->getData());
 
-            $rawRoutes[] = [
-                'method'   => implode(' | ', $route->methods),
-                'uri'      => $route->pattern,
-                'module'   => $module,
-                'function' => $function,
-            ];
+        /** @var array<string, string> $filterValues */
+        $filterValues = [];
+        foreach (array_keys($schema) as $field) {
+            $value = $rawFilterValues[$field] ?? null;
+            $filterValues[$field] = is_string($value) ? $value : '';
         }
 
-        // Sort by URI first, then by HTTP method
-        usort(
-            $rawRoutes,
-            fn(array $a, array $b): int => [$a['uri'], $a['method']] <=> [$b['uri'], $b['method']]
-        );
-
-        /** @var list<TableRow> $routes */
-        $routes = [];
-        foreach ($rawRoutes as $index => $row) {
-            $routes[] = new TableRow(id: (string) $index, cells: $row);
-        }
-
-        $columns = [
-            ['field' => 'method',   'label' => ($this->t)('designer.routes.label.method')],
-            ['field' => 'uri',      'label' => ($this->t)('designer.routes.label.uri')],
-            ['field' => 'module',   'label' => ($this->t)('designer.routes.label.module')],
-            ['field' => 'function', 'label' => ($this->t)('designer.routes.label.function')],
+        $labels = [
+            'method'   => ($this->t)('designer.routes.label.method'),
+            'uri'      => ($this->t)('designer.routes.label.uri'),
+            'module'   => ($this->t)('designer.routes.label.module'),
+            'function' => ($this->t)('designer.routes.label.function'),
         ];
 
+        $filterConfig = [];
+        $columns = [];
+        foreach ($labels as $field => $label) {
+            $filterConfig[] = ['name' => $field, 'label' => $label];
+            $columns[] = ['field' => $field, 'label' => $label];
+        }
+
+        $data = $this->prepareTableDataFromArray($this->collectConfiguredRoutes(), $filterValues);
+
         $viewModel = new DesignerRoutesViewModel(
-            routes: $routes,
-            currentPage: 1,
-            totalPages: 1,
-            filterValues: [],
-            filters: [],
+            routes: $data['items'],
+            currentPage: $data['currentPage'],
+            totalPages: $data['totalPages'],
+            filterValues: $filterValues,
+            filters: $filterConfig,
             columns: $columns,
-            resetUrl: '/designer/routes',
+            resetUrl: '/routes',
             layoutParams: $this->getAllParams([
                 'page' => $connectedUser->getPage(),
             ]),
@@ -93,40 +93,83 @@ final class DesignerController extends AbstractController
     }
 
     /**
-     * Extracts the module name and the method name from a route callback.
+     * Builds one row per route declared in app/config/routes, sorted by URI then method.
      *
-     * @return array{0: string, 1: string} [module, function]
+     * @return list<RouteRow>
      */
-    private function resolveCallback(mixed $callback): array
+    private function collectConfiguredRoutes(): array
     {
-        $class = '';
-        $function = '';
-
-        if (is_array($callback) && count($callback) === 2) {
-            $target = $callback[0] ?? null;
-            $method = $callback[1] ?? null;
-
-            if (is_object($target)) {
-                $class = $target::class;
-            } elseif (is_string($target)) {
-                $class = $target;
-            }
-            if (is_string($method)) {
-                $function = $method;
-            }
-        } elseif (is_string($callback) && str_contains($callback, '::')) {
-            [$class, $function] = explode('::', $callback, 2);
-        } elseif ($callback instanceof Closure) {
-            return ['', 'Closure'];
-        } elseif (is_string($callback)) {
-            return ['', $callback];
+        $rows = [];
+        foreach ($this->getConfiguredRoutes() as $route) {
+            $rows[] = $this->toRow($route);
         }
 
-        // app\modules\Designer\DesignerController => Designer
-        $module = preg_match('/^app\\\\modules\\\\([^\\\\]+)\\\\/', $class, $matches) === 1
-            ? $matches[1]
-            : '';
+        usort(
+            $rows,
+            static fn(array $a, array $b): int => [$a['uri'], $a['method']] <=> [$b['uri'], $b['method']]
+        );
 
-        return [$module, $function];
+        return $rows;
+    }
+
+    /**
+     * Routes registered by Routes::add(), shared through the Flight engine.
+     *
+     * @return list<Route>
+     */
+    private function getConfiguredRoutes(): array
+    {
+        $stored = $this->flight->get('configuredRoutes');
+        if (!is_array($stored)) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            $stored,
+            static fn(mixed $route): bool => $route instanceof Route
+        ));
+    }
+
+    /**
+     * @return RouteRow
+     */
+    private function toRow(Route $route): array
+    {
+        // 'GET|POST  /admin' => methods 'GET|POST', uri '/admin'
+        $parts = preg_split('/\s+/', trim($route->methodAndPath), 2) ?: [];
+        $method = str_replace('|', ' | ', $parts[0] ?? '');
+        $uri = $parts[1] ?? '/';
+
+        // The route holds a factory closure: calling it gives the controller instance
+        $controller = ($route->controllerFactory)();
+        $class = is_object($controller) ? $controller::class : '';
+
+        $module = $this->resolveModule($class);
+
+        $shortClass = $class === '' ? '' : (new \ReflectionClass($class))->getShortName();
+
+        return [
+            'method'   => $method,
+            'uri'      => $uri,
+            'module'   => $module,
+            'function' => $shortClass === '' ? $route->function : $shortClass . '::' . $route->function,
+        ];
+    }
+
+    /**
+     * app\modules\Webmaster\WebmasterController => Webmaster
+     * app\apis\EventAttributeApi                => Api
+     */
+    private function resolveModule(string $class): string
+    {
+        if (preg_match('/^app\\\\modules\\\\([^\\\\]+)\\\\/', $class, $matches) === 1) {
+            return $matches[1];
+        }
+
+        if (str_starts_with($class, 'app\\apis\\')) {
+            return 'Api';
+        }
+
+        return '';
     }
 }

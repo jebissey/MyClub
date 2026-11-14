@@ -21,6 +21,7 @@ use app\models\EventDataHelper;
 use app\models\EventInvitationDataHelper;
 use app\models\EventListDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\EventNewsDataHelper;
 use app\models\EventParticipationDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\ExerciseTableDataHelper;
@@ -75,6 +76,7 @@ final readonly class DataHelpers
         public EventInvitationDataHelper $eventInvitationDataHelper,
         public EventListDataHelper $eventListDataHelper,
         public EventNeedDataHelper $eventNeedDataHelper,
+        public EventNewsDataHelper $eventNewsDataHelper,
         public EventParticipationDataHelper $eventParticipationDataHelper,
         public EventTypeDataHelper $eventTypeDataHelper,
         public ExerciseTableDataHelper $exerciseTableDataHelper,

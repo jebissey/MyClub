@@ -120,6 +120,7 @@ use app\models\EventDataHelper;
 use app\models\EventInvitationDataHelper;
 use app\models\EventListDataHelper;
 use app\models\EventNeedDataHelper;
+use app\models\EventNewsDataHelper;
 use app\models\EventParticipationDataHelper;
 use app\models\EventTypeDataHelper;
 use app\models\ExerciseTableDataHelper;
@@ -219,6 +220,7 @@ final class Routes
     public function add(ErrorManager $errorManager): void
     {
         $routes = $this->get();
+        $this->flight->set('configuredRoutes', $routes); // used by DesignerController::showRoutes()
         $methodsByPath = [];
 
         foreach ($routes as $route) {
@@ -591,6 +593,7 @@ final class Routes
             eventDataHelper: $eventDataHelper,
             eventInvitationDataHelper: new EventInvitationDataHelper($this->application),
             eventNeedDataHelper: new EventNeedDataHelper($this->application),
+            eventNewsDataHelper: new EventNewsDataHelper($this->application),
             eventParticipationDataHelper: new EventParticipationDataHelper($this->application),
             eventTypeDataHelper: new EventTypeDataHelper($this->application),
             exerciseTableDataHelper: new ExerciseTableDataHelper($this->application),
@@ -638,7 +641,7 @@ final class Routes
         /** @var list<NewsProviderInterface> $newsProviders */
         $newsProviders = [
             $dataHelpers->articleDataHelper,
-            $dataHelpers->eventDataHelper,
+            $dataHelpers->eventNewsDataHelper,
             $dataHelpers->messageDataHelper,
             $dataHelpers->presentationNewsDataHelper,
             $dataHelpers->surveyDataHelper,

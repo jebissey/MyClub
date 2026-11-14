@@ -6,7 +6,6 @@ namespace app\modules\Webmaster;
 
 use DateTime;
 use Exception;
-use stdClass;
 use Minishlink\WebPush\VAPID;
 use app\enums\FilterInputRule;
 use app\helpers\Application;

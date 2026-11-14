@@ -43,7 +43,7 @@ final class Event implements RouteInterface
         $this->routes[] = new Route('GET  /nextEvents/help', $eventController, 'nextEventsHelp');
 
         $this->routes[] = new Route('GET  /weekEvents', $eventController, 'weekEvents');
-        $this->routes[] = new Route('GET  /weekEvents/help', $eventController, 'nextEventsHelp');
+        $this->routes[] = new Route('GET  /weekEvents/help', $eventController, 'weekEventsHelp');
 
 
 

@@ -8,7 +8,6 @@ use Throwable;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\helpers\WebApp;
 use app\models\AttributeDataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;

@@ -1768,8 +1768,35 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 ('webmaster.installations.none_title', 'No installation detected', 'Aucune installation détectée', 'Nie wykryto żadnej instalacji'),
 ('webmaster.installations.none_text', 
 'No installation of the webapp has checked for updates yet.', 
-'Aucune installation de la webapp n’a encore vérifié les mises à jour.', 
+'Aucune installation de la webapp n’a encore vérifié les mises à jour.',
 'Żadna instalacja aplikacji nie sprawdziła jeszcze aktualizacji.');
+
+-- Designer routes page: list of the routes declared in app/config/routes
+INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
+('designer.routes.title',
+'Routes',
+'Routes',
+'Trasy'),
+
+('designer.routes.label.method',
+'Method',
+'Méthode',
+'Metoda'),
+
+('designer.routes.label.uri',
+'URI',
+'URI',
+'URI'),
+
+('designer.routes.label.module',
+'Module',
+'Module',
+'Moduł'),
+
+('designer.routes.label.function',
+'Function',
+'Fonction',
+'Funkcja');
 
 SQL);
 
