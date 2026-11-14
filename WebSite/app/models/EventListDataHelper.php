@@ -14,10 +14,10 @@ use app\helpers\Application;
 use app\helpers\PersonPreferences;
 use app\helpers\To;
 use app\helpers\TranslationManager;
+use app\modules\Common\valueObjects\CalendarEventRow;
+use app\modules\Common\valueObjects\CalendarWeekRow;
 use app\modules\Common\valueObjects\EventAttributeRow;
 use app\modules\Common\valueObjects\Person;
-use app\modules\Event\valueObjects\CalendarEventRow;
-use app\modules\Event\valueObjects\CalendarWeekRow;
 use app\modules\Event\valueObjects\EventListRow;
 use app\modules\Event\valueObjects\GuestEventRow;
 
@@ -37,7 +37,7 @@ final class EventListDataHelper extends Data
     /** @return list<EventAttributeRow> */
     public function getAttributesForNextWeekEvents(): array
     {
-        [$startOfCurrentWeek, $endOfThirdWeek] = $this->getDatesOfThreeWeeks();
+        $this->getDatesOfThreeWeeks();
         $sql = "
             SELECT DISTINCT
                 a.Id,

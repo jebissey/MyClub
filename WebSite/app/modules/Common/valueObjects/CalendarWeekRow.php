@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Event\valueObjects;
-
-use app\modules\Common\valueObjects\AbstractValueObject;
+namespace app\modules\Common\valueObjects;
 
 final readonly class CalendarWeekRow extends AbstractValueObject
 {

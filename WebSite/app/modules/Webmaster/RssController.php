@@ -12,8 +12,8 @@ use app\models\ArticleDataHelper;
 use app\models\EventListDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\valueObjects\ArticleRssRow;
-use app\modules\Event\valueObjects\CalendarEventRow;
-use app\modules\Event\valueObjects\CalendarWeekRow;
+use app\modules\Common\valueObjects\CalendarEventRow;
+use app\modules\Common\valueObjects\CalendarWeekRow;
 
 final class RssController extends AbstractController
 {

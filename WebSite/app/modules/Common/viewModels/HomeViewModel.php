@@ -6,7 +6,7 @@ namespace app\modules\Common\viewModels;
 
 use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\MenuItemWithParentRow;
-use app\modules\User\valueObjects\SidebarMenuItem;
+use app\modules\Common\valueObjects\SidebarMenuItem;
 
 final readonly class HomeViewModel extends LayoutViewModel
 {

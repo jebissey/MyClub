@@ -20,8 +20,8 @@ use app\modules\Common\AbstractController;
 use app\modules\Common\valueObjects\Person;
 use app\modules\Common\viewModels\HomeViewModel;
 use app\modules\Common\viewModels\SignpostViewModel;
-use app\modules\User\valueObjects\SidebarMenuChild;
-use app\modules\User\valueObjects\SidebarMenuItem;
+use app\modules\Common\valueObjects\SidebarMenuChild;
+use app\modules\Common\valueObjects\SidebarMenuItem;
 
 final class HomeController extends AbstractController
 {

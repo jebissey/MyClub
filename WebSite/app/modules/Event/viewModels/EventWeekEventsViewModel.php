@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace app\modules\Event\viewModels;
 
+use app\modules\Common\valueObjects\CalendarWeekRow;
 use app\modules\Common\valueObjects\EventAttributeRow;
 use app\modules\Common\valueObjects\EventTypeRow;
 use app\modules\Common\viewModels\LayoutViewModel;
-use app\modules\Event\valueObjects\CalendarWeekRow;
 
 final readonly class EventWeekEventsViewModel extends LayoutViewModel
 {

@@ -38,6 +38,7 @@ class LogDataHelperTest extends DataHelperTestCase
             'Avatar',
             'FirstName',
             'LastName',
+            'NickName',
         ]);
 
         $this->assertColumnsExist($mainPdo, 'Member', [
