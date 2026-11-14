@@ -11,6 +11,7 @@ dev/test/Database/lastMyClubTest.sqlite
 dev/FullInstall.zip
 dev/depends.txt
 dev/.phpunit.cache/
-WebSite/.scannerwork/.sonar_lock
-WebSite/.scannerwork/report-task.txt
-WebSite/phpstan-report.json
+dev/.scannerwork/
+dev/phpstan-report.json
+dev/coverage.xml
+dev/junit.xml
