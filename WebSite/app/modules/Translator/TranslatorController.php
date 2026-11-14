@@ -13,7 +13,6 @@ use app\modules\Translator\viewModels\TranslatorViewModel;
 
 final class TranslatorController extends AbstractController
 {
-
     public function index(): void
     {
         $user = $this->application->getConnectedUser();

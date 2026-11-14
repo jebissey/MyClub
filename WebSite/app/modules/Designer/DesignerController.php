@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace app\modules\Designer;
 
+use ReflectionClass;
 use app\enums\FilterInputRule;
-use app\helpers\WebApp;
 use app\modules\Common\TableController;
 use app\modules\Common\valueObjects\Route;
 use app\modules\Designer\viewModels\DesignerHomeViewModel;
@@ -139,7 +139,7 @@ final class DesignerController extends TableController
 
         $module = $this->resolveModule($class);
 
-        $shortClass = $class === '' ? '' : (new \ReflectionClass($class))->getShortName();
+        $shortClass = $class === '' ? '' : (new ReflectionClass($class))->getShortName();
 
         return [
             'method'   => $method,
