@@ -8,6 +8,7 @@ use PDO;
 use RuntimeException;
 use app\helpers\Application;
 use app\helpers\To;
+use app\modules\PersonManager\valueObjects\MemberIdentity;
 
 final class MemberImportDataHelper extends Data
 {
@@ -64,10 +65,7 @@ final class MemberImportDataHelper extends Data
      * Creates the Individual and its Member record; returns the new Id.
      */
     public function insertMember(
-        string $email,
-        string $firstName,
-        string $lastName,
-        string $phone,
+        MemberIdentity $identity,
         bool $inactivated,
         ?string $customFields
     ): int {
@@ -75,10 +73,10 @@ final class MemberImportDataHelper extends Data
             INSERT INTO Individual (Type, Email, FirstName, LastName, Phone)
             VALUES ('Member', :email, :firstName, :lastName, :phone)
         ")->execute([
-            ':email' => $email,
-            ':firstName' => $firstName,
-            ':lastName' => $lastName,
-            ':phone' => $phone,
+            ':email' => $identity->email,
+            ':firstName' => $identity->firstName,
+            ':lastName' => $identity->lastName,
+            ':phone' => $identity->phone,
         ]);
         $id = (int)$this->pdo->lastInsertId();
 

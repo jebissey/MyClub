@@ -19,7 +19,7 @@
     {var $buildQuery = fn(int $p): string => '?' . http_build_query([$pageParam => $p] + $urlParams)}
 
     <nav aria-label="{='common.pagination.nav'|translate}">
-        <ul class="pagination mb-0">
+        <ul class="pagination flex-wrap mb-0">
             <li class="page-item {if $currentPage <= 1}disabled{/if}">
                 <a class="page-link" href="{$buildQuery(1)}" aria-label="{='common.pagination.first'|translate}">««</a>
             </li>

@@ -9,6 +9,7 @@ use RuntimeException;
 use Throwable;
 use app\helpers\MemberCustomFields;
 use app\models\MemberImportDataHelper;
+use app\modules\PersonManager\valueObjects\CsvImportSource;
 use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
 
 /**
@@ -40,20 +41,21 @@ final class MemberCsvImporter
      *
      * A row without a valid email is still imported, with a deterministic fictive address.
      *
-     * @param CsvColumnMapping $mapping
      * @param array<string, int> $existingPersons Member ids indexed by lower-cased email
      * @param list<CustomFieldDefinition> $definitions
      * @param callable(string): string $t Translator used for user-facing messages
      * @return CsvImportResults
      */
     public function import(
-        string $filePath,
-        int $headerRow,
-        array $mapping,
+        CsvImportSource $source,
         array $existingPersons,
         array $definitions,
         callable $t
     ): array {
+        $filePath = $source->filePath;
+        $headerRow = $source->headerRow;
+        $mapping = $source->mapping;
+
         foreach (['email', 'firstName', 'lastName', 'phone'] as $key) {
             if (!array_key_exists($key, $mapping)) {
                 throw new InvalidArgumentException("Missing mapping key: {$key}");

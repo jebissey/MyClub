@@ -8,6 +8,7 @@ use DateTime;
 use app\helpers\Application;
 use app\modules\Event\valueObjects\IndividualRow;
 use app\modules\Event\valueObjects\InvitationRow;
+use app\modules\Event\valueObjects\NewInvitation;
 use app\modules\Event\valueObjects\PendingInvitationRow;
 
 final class EventInvitationDataHelper extends Data
@@ -38,21 +39,15 @@ final class EventInvitationDataHelper extends Data
      * Creates a pending invitation for an external email address.
      * The Individual record is created only when the invitation is confirmed.
      */
-    public function createInvitation(
-        string $email,
-        string $nickname,
-        int $eventId,
-        string $token,
-        int $invitedBy,
-        string $invitedAt
-    ): void {
+    public function createInvitation(NewInvitation $invitation): void
+    {
         $this->set('Invitation', [
-            'Email'     => $email,
-            'NickName'  => $nickname,
-            'IdEvent'   => $eventId,
-            'Token'     => $token,
-            'InvitedBy' => $invitedBy,
-            'InvitedAt' => $invitedAt,
+            'Email'     => $invitation->email,
+            'NickName'  => $invitation->nickname,
+            'IdEvent'   => $invitation->eventId,
+            'Token'     => $invitation->token,
+            'InvitedBy' => $invitation->invitedBy,
+            'InvitedAt' => $invitation->invitedAt,
         ]);
     }
 

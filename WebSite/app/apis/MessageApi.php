@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\apis;
 
 use PDOException;
-use RuntimeException;
 use Throwable;
 use finfo;
 use app\enums\ApplicationError;
@@ -78,6 +77,12 @@ final class MessageApi extends AbstractApi
             $eventId   = isset($data['eventId'])   && $data['eventId']   !== '' ? To::int($data['eventId'])   : null;
             $groupId   = isset($data['groupId'])   && $data['groupId']   !== '' ? To::int($data['groupId'])   : null;
 
+            $target = MessageTarget::fromIds($articleId, $eventId, $groupId);
+            if ($target === null) {
+                $this->renderJsonBadRequest('Exactly one target is required', __FILE__, __LINE__);
+                return;
+            }
+
             $imagePath = null;
             if (!empty($data['imageBase64'])) {
                 $imagePath = $this->handleMessageImageBase64(
@@ -91,9 +96,7 @@ final class MessageApi extends AbstractApi
             }
 
             $apiResponse = $this->doAddMessage(
-                $articleId,
-                $eventId,
-                $groupId,
+                $target,
                 $this->application->getConnectedUser(true)->person->id,
                 To::str($data['text']),
                 $imagePath !== null ? WebApp::getBaseUrl() . $imagePath : null,
@@ -198,20 +201,13 @@ final class MessageApi extends AbstractApi
 
     #region Private functions
     private function doAddMessage(
-        ?int $articleId,
-        ?int $eventId,
-        ?int $groupId,
+        MessageTarget $target,
         int $personId,
         string $text,
         ?string $imagePath = null
     ): ApiResponse {
         try {
-            $messageId = $this->messageDataHelper->addMessage(
-                MessageTarget::fromIds($articleId, $eventId, $groupId) ?? throw new RuntimeException("Exactly 1 Id not null"),
-                $personId,
-                $text,
-                $imagePath
-            );
+            $messageId = $this->messageDataHelper->addMessage($target, $personId, $text, $imagePath);
             return new ApiResponse(
                 $messageId !== false,
                 $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value,

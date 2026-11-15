@@ -69,7 +69,7 @@ final class EmailService
         $sent = match ($config?->method) {
             'smtp'    => $this->sendWithPHPMailer($message, $config),
             'mailjet' => $this->sendWithMailjet($message, $config),
-            'brevo'   => $this->sendWithBrevoApi($message, $config),
+            'brevo'   => $this->sendWithBrevoApi($message, $config->brevoApikey, $config->brevoSenderEmail),
             default   => $this->sendWithNativeMail($message),
         };
 
@@ -251,17 +251,17 @@ final class EmailService
         return true;
     }
 
-    private function sendWithBrevoApi(EmailMessage $message, SmtpConfig $config): bool
+    private function sendWithBrevoApi(EmailMessage $message, string $apiKey, string $senderEmail): bool
     {
-        if ($config->brevoApikey === '') {
+        if ($apiKey === '') {
             throw new InvalidArgumentException('Brevo credentials are not configured (brevoApikey is empty).');
         }
-        $senderEmail = $config->brevoSenderEmail !== '' ? $config->brevoSenderEmail : $message->from;
+        $sender = $senderEmail !== '' ? $senderEmail : $message->from;
         $params = [
             'subject' => $message->subject,
             'sender'  => new SendTransacEmailRequestSender([
                 'name'  => 'MyClub',
-                'email' => $senderEmail,
+                'email' => $sender,
             ]),
             'to' => [new SendTransacEmailRequestToItem(['email' => $message->to])],
             'trackClicks'  => false,
@@ -289,7 +289,7 @@ final class EmailService
             );
         }
         try {
-            (new Brevo($config->brevoApikey))
+            (new Brevo($apiKey))
                 ->transactionalEmails
                 ->sendTransacEmail(new SendTransacEmailRequest($params));
             return true;

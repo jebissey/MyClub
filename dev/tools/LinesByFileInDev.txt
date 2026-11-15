@@ -111,7 +111,9 @@
 125 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/DesignDataHelperTest.php
 293 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventDataHelperTest.php
 37 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventInvitationDataHelperTest.php
+107 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventListDataHelperTest.php
 67 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventNeedDataHelperTest.php
+65 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventNewsDataHelperTest.php
 34 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventParticipationDataHelperTest.php
 102 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/EventTypeDataHelperTest.php
 56 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/ExerciseTableDataHelperTest.php
@@ -120,9 +122,12 @@
 292 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/KaraokeDataHelperTest.php
 147 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LanguagesDataHelperTest.php
 639 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LoanDataHelperTest.php
+63 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LoanItemDataHelperTest.php
+101 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LoanRecordDataHelperTest.php
+100 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LoanReservationDataHelperTest.php
 172 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LogAnalyticsDataHelperTest.php
 183 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LogCompactDataHelperTest.php
-494 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LogDataHelperTest.php
+495 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LogDataHelperTest.php
 159 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LogStatisticsDataHelperTest.php
 114 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/LogWriterDataHelperTest.php
 80 /home/jeb/Clones/GitHub/MyClub/dev/tools/../tests/models/MemberDataHelperTest.php
@@ -198,7 +203,7 @@
 
 === Total by file type ===
 PHP files:
-22994
+23431
 Latte files:
 
 JavaScript files:
@@ -207,4 +212,4 @@ TypeScript files:
 
 
 === Grand total ===
- 22994 Total all files
+ 23431 Total all files

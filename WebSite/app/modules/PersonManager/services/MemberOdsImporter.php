@@ -10,7 +10,10 @@ use app\helpers\OdsReader;
 use app\helpers\OdsWriter;
 use app\models\LanguagesDataHelper;
 use app\models\MemberImportDataHelper;
+use app\modules\PersonManager\valueObjects\CustomFieldColumns;
 use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
+use app\modules\PersonManager\valueObjects\ImportedRow;
+use app\modules\PersonManager\valueObjects\MemberIdentity;
 
 final class MemberOdsImporter
 {
@@ -84,6 +87,7 @@ final class MemberOdsImporter
                 $customMapping[$definition->key] = $column;
             }
         }
+        $customColumns = new CustomFieldColumns($definitions, $customMapping);
 
         // Current state of the database
         /** @var array<int, array{email: string, firstName: string, lastName: string, phone: string, imported: bool, inactivated: bool, customFields: string|null}> $members */
@@ -200,11 +204,9 @@ final class MemberOdsImporter
 
                     $currentCustom = MemberCustomFields::decodeValues($current['customFields']);
                     $newCustom = $this->applyCustomFields(
-                        $definitions,
-                        $customMapping,
-                        $cells,
+                        $customColumns,
+                        new ImportedRow($line, $cells),
                         $currentCustom,
-                        $line,
                         $results['messages'],
                         $t
                     );
@@ -256,19 +258,14 @@ final class MemberOdsImporter
                     continue;
                 }
                 $newCustom = $this->applyCustomFields(
-                    $definitions,
-                    $customMapping,
-                    $cells,
+                    $customColumns,
+                    new ImportedRow($line, $cells),
                     [],
-                    $line,
                     $results['messages'],
                     $t
                 );
                 $newId = $this->data->insertMember(
-                    $validEmail,
-                    $firstName ?? '',
-                    $lastName ?? '',
-                    $phone ?? '',
+                    new MemberIdentity($validEmail, $firstName ?? '', $lastName ?? '', $phone ?? ''),
                     // a new member is active, unless the box is explicitly unchecked (☐)
                     $activeCell === OdsWriter::UNCHECKED,
                     MemberCustomFields::encodeValues($newCustom)
@@ -314,31 +311,26 @@ final class MemberOdsImporter
      * Applies the custom fields of a row: empty cell = value cleared,
      * invalid value = reported and current value kept, missing column = field untouched.
      *
-     * @param list<CustomFieldDefinition> $definitions
-     * @param array<string, int> $customMapping
-     * @param array<int, string> $cells
      * @param array<string, string|int|float> $current
      * @param list<string> $messages
      * @param callable(string): string $t
      * @return array<string, string|int|float>
      */
     private function applyCustomFields(
-        array $definitions,
-        array $customMapping,
-        array $cells,
+        CustomFieldColumns $columns,
+        ImportedRow $row,
         array $current,
-        int $line,
         array &$messages,
         callable $t
     ): array {
-        if ($customMapping === []) {
+        if ($columns->mapping === []) {
             return $current;
         }
-        $extracted = MemberCustomFields::extractFromRow($definitions, $customMapping, $cells);
+        $extracted = MemberCustomFields::extractFromRow($columns->definitions, $columns->mapping, $row->cells);
         $applicable = [];
         $input = [];
-        foreach ($definitions as $definition) {
-            if (!isset($customMapping[$definition->key])) {
+        foreach ($columns->definitions as $definition) {
+            if (!isset($columns->mapping[$definition->key])) {
                 continue;
             }
             if (isset($extracted[$definition->key])) {
@@ -346,7 +338,7 @@ final class MemberOdsImporter
                 if (MemberCustomFields::normalizeValue($definition->type, $raw) === null) {
                     $messages[] = str_replace(
                         ['{line}', '{value}', '{field}'],
-                        [(string)$line, $raw, $definition->label],
+                        [(string)$row->line, $raw, $definition->label],
                         $t('import.error.invalid_custom_value')
                     );
                     continue;

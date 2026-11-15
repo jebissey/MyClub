@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use DateTimeImmutable;
+use app\modules\Common\valueObjects\OdsSheetOptions;
 
 final class OdsWriter
 {
@@ -21,24 +22,26 @@ final class OdsWriter
     /**
      * @param list<string> $header
      * @param list<list<string|int|float|bool|DateTimeImmutable|null>> $rows
-     * @param int $hiddenLeadingColumns Nombre de colonnes de tête masquées (aucune protection)
-     * @param bool $freezeHeader Fige la première ligne (titres) en haut de la feuille
      */
     public static function build(
         array $header,
         array $rows,
         string $sheetName,
-        int $hiddenLeadingColumns = 0,
-        bool $autoFilter = true,
-        bool $freezeHeader = true
+        OdsSheetOptions $options = new OdsSheetOptions(),
     ): string {
         $files = [
-            // mimetype doit être la première entrée de l'archive, non compressée
+            // mimetype must be the first entry of the archive, uncompressed
             'mimetype' => self::MIMETYPE,
-            'META-INF/manifest.xml' => self::manifest($freezeHeader),
-            'content.xml' => self::content($header, $rows, $sheetName, max(0, $hiddenLeadingColumns), $autoFilter),
+            'META-INF/manifest.xml' => self::manifest($options->freezeHeader),
+            'content.xml' => self::content(
+                $header,
+                $rows,
+                $sheetName,
+                max(0, $options->hiddenLeadingColumns),
+                $options->autoFilter,
+            ),
         ];
-        if ($freezeHeader) {
+        if ($options->freezeHeader) {
             $files['settings.xml'] = self::settings($sheetName);
         }
 

@@ -16,6 +16,7 @@ use app\models\EventListDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\valueObjects\EmailMessage;
+use app\modules\Event\valueObjects\NewInvitation;
 use app\modules\Event\viewModels\EventGuestViewModel;
 
 final class EventGuestController extends AbstractController
@@ -89,12 +90,14 @@ final class EventGuestController extends AbstractController
 
                 $token = bin2hex(random_bytes(32));
                 $this->eventInvitationDataHelper->createInvitation(
-                    $email,
-                    $nickname,
-                    $eventId,
-                    $token,
-                    $this->application->getConnectedUser()->person->id ?? 0,
-                    (new DateTime())->format('Y-m-d H:i:s')
+                    new NewInvitation(
+                        email: $email,
+                        nickname: $nickname,
+                        eventId: $eventId,
+                        token: $token,
+                        invitedBy: $this->application->getConnectedUser()->person->id ?? 0,
+                        invitedAt: (new DateTime())->format('Y-m-d H:i:s')
+                    ),
                 );
 
                 $invitationLink = Application::$root . "/event/$eventId?t=$token";

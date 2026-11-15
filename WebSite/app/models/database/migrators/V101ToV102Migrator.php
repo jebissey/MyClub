@@ -46,7 +46,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <span class="badge bg-success">lecture seule</span>
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), le menu latéral (sidebar) et la liste des articles.</p>
+      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), 
+      le menu latéral (sidebar) et la liste des articles.</p>
     </div>
   </div>
 </div>',
@@ -7890,7 +7891,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <span class="badge bg-success">lecture seule</span>
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), le menu latéral (sidebar) et la liste des articles.</p>
+      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), 
+      le menu latéral (sidebar) et la liste des articles.</p>
     </div>
   </div>
 </div>',
@@ -12183,7 +12185,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <span class="badge bg-success">lecture seule</span>
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), le menu latéral (sidebar) et la liste des articles.</p>
+      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), 
+      le menu latéral (sidebar) et la liste des articles.</p>
     </div>
   </div>
 </div>',
@@ -12378,7 +12381,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <span class="badge bg-success">read-only</span>
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Home page. Content depends on the visitor''s authorizations, especially for the navbar, sidebar and article list.</p>
+      <p class="mb-0">Home page. Content depends on the visitor''s authorizations,
+      especially for the navbar, sidebar and article list.</p>
     </div>
   </div>
 </div>',
@@ -12395,7 +12399,8 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
         <span class="badge bg-success">lecture seule</span>
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), le menu latéral (sidebar) et la liste des articles.</p>
+      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar),
+      le menu latéral (sidebar) et la liste des articles.</p>
     </div>
   </div>
 </div>',

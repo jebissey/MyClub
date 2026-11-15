@@ -18,6 +18,7 @@ use app\modules\Common\valueObjects\CalendarEventRow;
 use app\modules\Common\valueObjects\CalendarWeekRow;
 use app\modules\Common\valueObjects\EventAttributeRow;
 use app\modules\Common\valueObjects\Person;
+use app\modules\Event\valueObjects\EventListFilter;
 use app\modules\Event\valueObjects\EventListRow;
 use app\modules\Event\valueObjects\GuestEventRow;
 
@@ -68,14 +69,22 @@ final class EventListDataHelper extends Data
         ?Person $person,
         string $mode,
         int $offset,
-        bool $filterByPreferences = false,
-        bool $registeredOnly = false,
-        ?int $eventTypeId = null
+        EventListFilter $filter = new EventListFilter(),
     ): array {
         if ($mode === EventSearchMode::Next->value) {
-            return $this->getNextEvents($person, $filterByPreferences, $registeredOnly, $eventTypeId);
+            return $this->getNextEvents(
+                $person,
+                $filter->filterByPreferences,
+                $filter->registeredOnly,
+                $filter->eventTypeId,
+            );
         } elseif ($mode === EventSearchMode::Past->value) {
-            return $this->getPassedEvents($person, $offset, $registeredOnly, $eventTypeId);
+            return $this->getPassedEvents(
+                $person,
+                $offset,
+                $filter->registeredOnly,
+                $filter->eventTypeId,
+            );
         } else {
             Application::unreachable("Invalide mode ({$mode})");
         }

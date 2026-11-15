@@ -39,6 +39,7 @@ use app\modules\Event\viewModels\EventNextEventsViewModel;
 use app\modules\Event\viewModels\EventWeekEventsViewModel;
 use app\modules\Event\viewModels\RegistrationSuccessViewModel;
 use app\modules\Event\valueObjects\EventAudienceRow;
+use app\modules\Event\valueObjects\EventListFilter;
 use app\modules\Event\valueObjects\NeedTypeRow;
 use app\modules\Event\valueObjects\RegistrationEventInfo;
 
@@ -110,9 +111,11 @@ final class EventController extends AbstractController
                 $connectedUser->person,
                 $mode,
                 $offset,
-                $filterByPreferences,
-                $registeredOnly,
-                $eventTypeId
+                new EventListFilter(
+                    filterByPreferences: $filterByPreferences,
+                    registeredOnly: $registeredOnly,
+                    eventTypeId: $eventTypeId,
+                ),
             ),
             person: $connectedUser->person,
             eventTypes: array_map(

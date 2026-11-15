@@ -1796,7 +1796,12 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
 ('designer.routes.label.function',
 'Function',
 'Fonction',
-'Funkcja');
+'Funkcja'),
+
+('navbar.designer.routes',
+'Routes',
+'Les routes',
+'Trasy');
 
 SQL);
 

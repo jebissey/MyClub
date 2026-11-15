@@ -192,7 +192,7 @@ final class ArticleController extends ArticleAccessController
             hasOrder: $this->dataHelper->get('Order', ['IdArticle' => $id], 'ClosingDate') ?: null,
             userConnected: $connectedUser->person ?? false,
             navItems: $this->getNavItems($connectedUser->person->email),
-            publishedBy: $this->publisherName($article),
+            publishedBy: $this->publisherName($article->publishedBy, $article->createdBy),
             carouselItems: $this->carouselDataHelper->getCarouselItems($id),
             i18n: [
                 'editorNotReady' => ($this->t)('article.edit.error.editor_not_ready'),
@@ -345,7 +345,7 @@ final class ArticleController extends ArticleAccessController
                 hasOrder: $this->toClosingVisibility($order),
                 userConnected: $connectedUser->person !== null,
                 navItems: $this->getNavItems($connectedUser->person?->email),
-                publishedBy: $this->publisherName($article),
+                publishedBy: $this->publisherName($article->publishedBy, $article->createdBy),
                 canReadPool: $this->authorizationService->canReadSurveyResults(
                     $this->toClosingVisibility($survey),
                     $article,
@@ -472,13 +472,13 @@ final class ArticleController extends ArticleAccessController
     }
 
     #region Private functions
-    private function publisherName(ArticleRow $article): string
+    private function publisherName(?int $publishedBy, int $createdBy): string
     {
-        if ($article->publishedBy === null || $article->publishedBy === $article->createdBy) {
+        if ($publishedBy === null || $publishedBy === $createdBy) {
             return '';
         }
 
-        return $this->personDataHelper->getPublisher($article->publishedBy) ?? '';
+        return $this->personDataHelper->getPublisher($publishedBy) ?? '';
     }
 
     private function toClosingVisibility(object|false $row): ?ClosingVisibilityRow

@@ -30,8 +30,16 @@ final class InstallationDisplayService
             $cells = $row->cells;
 
             $cells['Host']           = $this->resolveHost(To::str($cells['Host'] ?? ''), $dnsCache);
-            $cells['webappVersions'] ??= $unknownVersion;
-            $cells['phpVersions']    ??= $unknownVersion;
+            $cells['webappVersions'] = str_replace(
+                ',',
+                ', ',
+                To::str($cells['webappVersions'] ?? $unknownVersion)
+            );
+            $cells['phpVersions'] = str_replace(
+                ',',
+                ', ',
+                To::str($cells['phpVersions'] ?? $unknownVersion)
+            );
 
             $lastCheck         = To::str($cells['lastCheck'] ?? '');
             $cells['timeAgo']  = $this->getTimeAgo($lastCheck);

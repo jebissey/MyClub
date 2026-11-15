@@ -31,7 +31,7 @@
     {/if}
     {if $isMember}
         <a href="/article/chat/{$article->id}" class="btn btn-warning ms-2">
-            {='messages'|translate}{if $countOfMessages > 0} ({$countOfMessages}){/if}
+            {='article.label.messages'|translate}{if $countOfMessages > 0} ({$countOfMessages}){/if}
         </a>
     {/if}
     {if $canReadPool}

@@ -9,6 +9,7 @@ use app\helpers\MemberCustomFields;
 use app\helpers\OdsWriter;
 use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Common\valueObjects\OdsSheetOptions;
 use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
 use app\modules\PersonManager\viewModels\UsersExportViewModel;
 
@@ -53,7 +54,12 @@ final class ExportController extends AbstractController
             ];
         }
 
-        $content = OdsWriter::build($header, $rows, ($this->t)('export.sheet_name'), hiddenLeadingColumns: 1);
+        $content = OdsWriter::build(
+            $header,
+            $rows,
+            ($this->t)('export.sheet_name'),
+            new OdsSheetOptions(hiddenLeadingColumns: 1, freezeHeader: false),
+        );
         $this->downloads->ods($content, $this->defaultFileName() . '.ods');
     }
 

@@ -8,6 +8,7 @@ use ReflectionClass;
 use app\enums\FilterInputRule;
 use app\modules\Common\TableController;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Common\valueObjects\TableRow;
 use app\modules\Designer\viewModels\DesignerHomeViewModel;
 use app\modules\Designer\viewModels\DesignerRoutesViewModel;
 
@@ -72,7 +73,7 @@ final class DesignerController extends TableController
             $rawRows,
             static function (array $row) use ($filterValues): bool {
                 foreach ($filterValues as $key => $value) {
-                    if ($value === null || $value === '') {
+                    if ($value === '') {
                         continue;
                     }
                     if (mb_stripos($row[$key] ?? '', $value) === false) {
@@ -92,7 +93,7 @@ final class DesignerController extends TableController
 
         $items = [];
         foreach (array_slice($filtered, $offset, $itemsPerPage) as $row) {
-            $items[] = new \app\modules\Common\valueObjects\TableRow($row['function'], $row);
+            $items[] = new TableRow($row['function'], $row);
         }
 
         $viewModel = new DesignerRoutesViewModel(

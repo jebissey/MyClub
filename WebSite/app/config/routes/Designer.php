@@ -15,7 +15,9 @@ final class Designer implements RouteInterface
      */
     private array $routes = [];
 
-    public function __construct(private readonly ControllerFactory $controllerFactory) {}
+    public function __construct(private readonly ControllerFactory $controllerFactory)
+    {
+    }
 
     /**
      * @return array<int, Route>

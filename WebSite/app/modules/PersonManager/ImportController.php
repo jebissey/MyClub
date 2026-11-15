@@ -12,6 +12,7 @@ use app\models\PersonDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\PersonManager\services\MemberCsvImporter;
 use app\modules\PersonManager\viewModels\UsersImportViewModel;
+use app\modules\PersonManager\valueObjects\CsvImportSource;
 use app\modules\PersonManager\valueObjects\CustomFieldDefinition;
 
 /**
@@ -109,9 +110,7 @@ final class ImportController extends AbstractController
 
         $this->renderImportForm(
             $this->csvImporter->import(
-                $path,
-                $headerRow,
-                $mapping,
+                new CsvImportSource($path, $headerRow, $mapping),
                 $this->personDataHelper->getAllPersons(),
                 $definitions,
                 $this->t
