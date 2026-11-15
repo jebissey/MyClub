@@ -15,9 +15,7 @@ final class Designer implements RouteInterface
      */
     private array $routes = [];
 
-    public function __construct(private readonly ControllerFactory $controllerFactory)
-    {
-    }
+    public function __construct(private readonly ControllerFactory $controllerFactory) {}
 
     /**
      * @return array<int, Route>
@@ -30,6 +28,7 @@ final class Designer implements RouteInterface
         $this->routes[] = new Route('GET  /designer/help', $designerController, 'help');
 
         $this->routes[] = new Route('GET  /routes', $designerController, 'showRoutes');
+        $this->routes[] = new Route('GET  /routes/help/@function', $designerController, 'showRouteHelp');
 
         return $this->routes;
     }

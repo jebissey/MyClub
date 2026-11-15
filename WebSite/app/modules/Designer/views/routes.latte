@@ -5,5 +5,13 @@
 {block content}
     {include '../../Common/views/dataTable.latte',
         'items' => $routes,
+        'actions' => [
+            [
+                'type'  => 'link',
+                'label' => 'bi bi-eye',
+                'url'   => '/routes/help/{id}',
+                'class' => 'btn-success'
+            ]
+        ]
     }
 {/block}

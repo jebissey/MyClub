@@ -7411,10 +7411,110 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (1885,'designer.routes.label.uri','URI','URI','URI'),
  (1886,'designer.routes.label.module','Module','Module','Moduł'),
  (1887,'designer.routes.label.function','Function','Fonction','Funkcja'),
- (1888,'navbar.designer.routes','Routes','Les routes','Trasy');
+ (1888,'navbar.designer.routes','Routes','Les routes','Trasy'),
+ (1889,'designer.routes.help.HomeController.home','Type: HTML
+Authorizations: none (isAnybody)
+Database: read-only
+Description: Home page. Content depends on the visitor''s authorizations, especially for the navigation bar (navbar), the side menu (sidebar) and the list of articles.','Type: HTML
+Autorisations: aucune (isAnybody)
+Base de données: lecture seule
+Description: Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), le menu latéral (sidebar) et la liste des articles.','Type: HTML
+Uprawnienia: brak (isAnybody)
+Baza danych: tylko odczyt
+Opis: Strona główna. Zawartość zależy od uprawnień odwiedzającego, w szczególności pasek nawigacji (navbar), menu boczne (sidebar) oraz lista artykułów.'),
+ (1890,'designer.routes.help.WebmasterController.homeAdmin','Type: HTML
+Authorizations: Webmaster
+Database: read-only
+Description: Administration home page for webmasters. Entry point to technical administration tools.','Type: HTML
+Autorisations: Webmaster
+Base de données: lecture seule
+Description: Page d''accueil de l''administration pour les webmasters. Point d''entrée vers les outils d''administration technique.','Type: HTML
+Uprawnienia: Webmaster
+Baza danych: tylko odczyt
+Opis: Strona główna administracji dla webmasterów. Punkt wejścia do narzędzi administracji technicznej.'),
+ (1891,'designer.routes.help.WebmasterController.helpAdmin','Type: HTML
+Authorizations: Webmaster
+Database: read-only
+Description: Contextual help page for the administration zone.','Type: HTML
+Autorisations: Webmaster
+Base de données: lecture seule
+Description: Page d''aide contextuelle pour la zone d''administration.','Type: HTML
+Uprawnienia: Webmaster
+Baza danych: tylko odczyt
+Opis: Strona pomocy kontekstowej dla strefy administracyjnej.'),
+ (1892,'designer.routes.help.WebmasterController.helpWebmaster','Type: HTML
+Authorizations: Webmaster
+Database: read-only
+Description: Specific help page dedicated to the Webmaster role.','Type: HTML
+Autorisations: Webmaster
+Base de données: lecture seule
+Description: Page d''aide spécifique dédiée au rôle Webmaster.','Type: HTML
+Uprawnienia: Webmaster
+Baza danych: tylko odczyt
+Opis: Specjalna strona pomocy dedykowana roli Webmaster.'),
+ (1893,'designer.routes.help.VisitorInsightsController.analytics','Type: HTML
+Authorizations: VisitorInsights
+Database: read-only
+Description: Visitor analytics dashboard (traffic, referrers, page performance, pivot tables).','Type: HTML
+Autorisations: VisitorInsights
+Base de données: lecture seule
+Description: Tableau de bord des statistiques visiteurs (trafic, référents, performance des pages, tableaux croisés).','Type: HTML
+Uprawnienia: VisitorInsights
+Baza danych: tylko odczyt
+Opis: Panel analityki odwiedzających (ruch, referrerzy, wydajność stron, tabele przestawne).'),
+ (1894,'designer.routes.help.VisitorInsightsController.helpPage','Type: HTML
+Authorizations: VisitorInsights
+Database: read-only
+Description: Contextual help for the Visitor Insights module.','Type: HTML
+Autorisations: VisitorInsights
+Base de données: lecture seule
+Description: Aide contextuelle pour le module Visitor Insights.','Type: HTML
+Uprawnienia: VisitorInsights
+Baza danych: tylko odczyt
+Opis: Pomoc kontekstowa dla modułu Visitor Insights.'),
+ (1895,'designer.routes.help.EventAttributeApi.createAttribute','Type: JSON
+Authorizations: EventDesigner (or higher)
+Database: update
+Description: Creates a new event attribute. Returns JSON.','Type: JSON
+Autorisations: EventDesigner (ou supérieur)
+Base de données: mise à jour
+Description: Crée un nouvel attribut d''événement. Retourne du JSON.','Type: JSON
+Uprawnienia: EventDesigner (lub wyższe)
+Baza danych: aktualizacja
+Opis: Tworzy nowy atrybut wydarzenia. Zwraca JSON.'),
+ (1896,'designer.routes.help.EventAttributeApi.deleteAttribute','Type: JSON
+Authorizations: EventDesigner (or higher)
+Database: update
+Description: Deletes an event attribute by numeric id. Returns JSON.','Type: JSON
+Autorisations: EventDesigner (ou supérieur)
+Base de données: mise à jour
+Description: Supprime un attribut d''événement par identifiant numérique. Retourne du JSON.','Type: JSON
+Uprawnienia: EventDesigner (lub wyższe)
+Baza danych: aktualizacja
+Opis: Usuwa atrybut wydarzenia według identyfikatora numerycznego. Zwraca JSON.'),
+ (1897,'designer.routes.help.EventAttributeApi.updateAttribute','Type: JSON
+Authorizations: EventDesigner (or higher)
+Database: update
+Description: Updates an existing event attribute. Returns JSON.','Type: JSON
+Autorisations: EventDesigner (ou supérieur)
+Base de données: mise à jour
+Description: Met à jour un attribut d''événement existant. Retourne du JSON.','Type: JSON
+Uprawnienia: EventDesigner (lub wyższe)
+Baza danych: aktualizacja
+Opis: Aktualizuje istniejący atrybut wydarzenia. Zwraca JSON.'),
+ (1898,'designer.routes.help.EventAttributeApi.getAttributesByEventType','Type: JSON
+Authorizations: EventDesigner (or higher) / depends
+Database: read-only
+Description: Returns the list of attributes for a given event type (numeric id). JSON response.','Type: JSON
+Autorisations: EventDesigner (ou supérieur) / dépend
+Base de données: lecture seule
+Description: Retourne la liste des attributs pour un type d''événement donné (identifiant numérique). Réponse JSON.','Type: JSON
+Uprawnienia: EventDesigner (lub wyższe) / zależne
+Baza danych: tylko odczyt
+Opis: Zwraca listę atrybutów dla danego typu wydarzenia (identyfikator numeryczny). Odpowiedź JSON.');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',101,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',102,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

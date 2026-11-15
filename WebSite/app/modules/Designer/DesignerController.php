@@ -67,12 +67,38 @@ final class DesignerController extends TableController
             $columns[] = ['field' => $field, 'label' => $label];
         }
 
-        $data = $this->prepareTableDataFromArray($this->collectConfiguredRoutes(), $filterValues);
+        $rawRows = $this->collectConfiguredRoutes();
+        $filtered = array_values(array_filter(
+            $rawRows,
+            static function (array $row) use ($filterValues): bool {
+                foreach ($filterValues as $key => $value) {
+                    if ($value === null || $value === '') {
+                        continue;
+                    }
+                    if (mb_stripos($row[$key] ?? '', $value) === false) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        ));
+
+        $itemsPerPage = 10;
+        $tablePage = $this->flight->request()->query['tablePage'] ?? null;
+        $page = is_numeric($tablePage) ? (int) $tablePage : 1;
+        $totalPages = (int) ceil(count($filtered) / $itemsPerPage);
+        $currentPage = max(1, min($page, $totalPages));
+        $offset = ($currentPage - 1) * $itemsPerPage;
+
+        $items = [];
+        foreach (array_slice($filtered, $offset, $itemsPerPage) as $row) {
+            $items[] = new \app\modules\Common\valueObjects\TableRow($row['function'], $row);
+        }
 
         $viewModel = new DesignerRoutesViewModel(
-            routes: $data['items'],
-            currentPage: $data['currentPage'],
-            totalPages: $data['totalPages'],
+            routes: $items,
+            currentPage: $currentPage,
+            totalPages: $totalPages,
             filterValues: $filterValues,
             filters: $filterConfig,
             columns: $columns,
@@ -84,6 +110,18 @@ final class DesignerController extends TableController
 
         $this->views->render('Designer/views/routes.latte', $viewModel);
     }
+
+    public function showRouteHelp(string $function): void
+    {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
+            return;
+        }
+
+        $key = 'designer.routes.help.' . str_replace('::', '.', $function);
+
+        $this->renderHelp($key, fn($u) => $u->isAnybody(), __FILE__, __LINE__);
+    }
+
 
     /**
      * Builds one row per route declared in app/config/routes, sorted by URI then method.
