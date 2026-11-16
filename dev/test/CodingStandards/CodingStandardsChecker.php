@@ -53,8 +53,8 @@ final readonly class CodingStandardsChecker
                 new ValueObjectModuleBoundaryRule($paths, $valueObjectReferences),
                 new CommonValueObjectUsageRule($paths, $valueObjectReferences),
                 new ImportsRule($paths),
-                //new UnusedPublicMembersRule($paths), // _TODO_(unused-members): re-enable once false positives are fixed
-                new MethodParametersRule($paths, new MethodSignatureAnalyzer(), new PropertyAnalyzer()), //_TODO_
+                new UnusedPublicMembersRule($paths),
+                new MethodParametersRule($paths, new MethodSignatureAnalyzer(), new PropertyAnalyzer()),
             ],
             (new ClassScanner())->scan($appDir),
         );

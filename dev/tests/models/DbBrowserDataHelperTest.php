@@ -9,7 +9,6 @@ use PDO;
 use PDOStatement;
 use RuntimeException;
 use app\enums\FilterInputRule;
-use app\exceptions\SqliteTableException;
 use app\models\DbBrowserDataHelper;
 
 class DbBrowserDataHelperTest extends DataHelperTestCase
@@ -23,101 +22,6 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $this->setProperty($helper, 'fluent', new Query($pdo));
 
         return $helper;
-    }
-
-    // -------------------------------------------------------------------------
-    // validateTableName()
-    // -------------------------------------------------------------------------
-
-    public function testRejectsTableNameLongerThan64Characters(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        $this->expectException(SqliteTableException::class);
-        $helper->getTableColumns(str_repeat('a', 65));
-    }
-
-    public function testRejectsTableNameWithInvalidCharacters(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        $this->expectException(SqliteTableException::class);
-        $helper->getTableColumns('Individual; DROP TABLE Individual;--');
-    }
-
-    public function testRejectsTableNameNotInSchema(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        $this->expectException(SqliteTableException::class);
-        $helper->getTableColumns('TableThatDoesNotExist');
-    }
-
-    public function testAcceptsARealTableName(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        $columns = $helper->getTableColumns('Individual');
-
-        $this->assertContains('Id', $columns);
-    }
-
-    // -------------------------------------------------------------------------
-    // Introspection: getTableColumns / getTableColumnsDetails / getColumnTypes
-    // / getPrimaryKey / showCreateForm
-    // -------------------------------------------------------------------------
-
-    public function testGetTableColumnsReturnsRealSchemaColumns(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        $columns = $helper->getTableColumns('Individual');
-
-        $this->assertContains('Id', $columns);
-        $this->assertContains('FirstName', $columns);
-        $this->assertContains('LastName', $columns);
-        $this->assertContains('Email', $columns);
-    }
-
-    public function testGetTableColumnsDetailsExposesNotNullFlag(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        $details = $helper->getTableColumnsDetails('Individual');
-        $names = array_column($details, 'name');
-
-        $this->assertContains('Id', $names);
-        foreach ($details as $detail) {
-            $this->assertArrayHasKey('name', $detail);
-            $this->assertArrayHasKey('notnull', $detail);
-        }
-    }
-
-    public function testGetColumnTypesReturnsTypeAndPrimaryKeyFlagForId(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        $types = $helper->getColumnTypes('Individual');
-
-        $this->assertArrayHasKey('Id', $types);
-        $this->assertArrayHasKey('type', $types['Id']);
-        $this->assertArrayHasKey('dflt_value', $types['Id']);
-        $this->assertSame(1, $types['Id']['pk']);
-    }
-
-    public function testGetPrimaryKeyReturnsIdForIndividualTable(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        $this->assertSame('Id', $helper->getPrimaryKey('Individual'));
     }
 
     public function testShowCreateFormReturnsColumnsAndTypesTogether(): void
@@ -287,49 +191,6 @@ class DbBrowserDataHelperTest extends DataHelperTestCase
         $schema = $helper->generateFilterSchema('Individual');
 
         $this->assertSame(FilterInputRule::Content->value, $schema['FirstName']);
-    }
-
-    // -------------------------------------------------------------------------
-    // showTable()
-    // -------------------------------------------------------------------------
-
-    public function testShowTableReturnsOnePageOfRowsWithoutFilters(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'A', 'Un', 'a.un@test.local')");
-        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'B', 'Deux', 'b.deux@test.local')");
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        [$rows, $columns, $page, $totalPages, $filters] = $helper->showTable(
-            'Individual',
-            1,
-            [],
-            1,
-        );
-
-        $this->assertCount(1, $rows);
-        $this->assertContains('FirstName', $columns);
-        $this->assertSame(1, $page);
-        $this->assertGreaterThanOrEqual(2, $totalPages);
-        $this->assertSame([], $filters);
-    }
-
-    public function testShowTableAppliesColumnFilter(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Zoe', 'UniqueFilteredLastName', 'zoe.filtered@test.local')");
-        $pdo->exec("INSERT INTO Individual (Type, FirstName, LastName, Email) VALUES ('Member', 'Zoe', 'SomeoneElse', 'zoe.other@test.local')");
-        $helper = $this->makeDbBrowserHelper($pdo);
-
-        [$rows] = $helper->showTable(
-            'Individual',
-            10,
-            ['LastName' => 'UniqueFilteredLastName'],
-            1,
-        );
-
-        $this->assertCount(1, $rows);
-        $this->assertSame('UniqueFilteredLastName', $rows[0]->LastName);
     }
 
     // -------------------------------------------------------------------------

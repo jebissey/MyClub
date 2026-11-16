@@ -22,7 +22,6 @@ final readonly class ArticleRssRow
         public string $title,
         public string $content,
         public string $lastUpdate,
-        public string $creationDate,
     ) {
     }
 
@@ -36,7 +35,6 @@ final readonly class ArticleRssRow
             title: $row->Title,
             content: $row->Content,
             lastUpdate: $row->LastUpdate,
-            creationDate: $row->CreationDate,
         );
     }
 }

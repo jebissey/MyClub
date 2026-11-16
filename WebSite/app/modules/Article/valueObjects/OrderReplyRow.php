@@ -20,7 +20,6 @@ final readonly class OrderReplyRow extends AbstractValueObject
     public function __construct(
         public int $id,
         public int $idPerson,
-        public int $idOrder,
         public string $answers,
         public string $lastUpdate,
     ) {
@@ -32,7 +31,6 @@ final readonly class OrderReplyRow extends AbstractValueObject
         return new self(
             id: (int) $row->Id,
             idPerson: (int) $row->IdPerson,
-            idOrder: (int) $row->IdOrder,
             answers: $row->Answers,
             lastUpdate: $row->LastUpdate,
         );

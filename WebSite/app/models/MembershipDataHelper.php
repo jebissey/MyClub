@@ -120,17 +120,6 @@ final class MembershipDataHelper extends Data
         return $this->toMembershipRow($membership);
     }
 
-    /**
-     * @return array{orgSlug:string, formSlug:string}
-     */
-    public function getHelloAssoConfig(): array
-    {
-        return [
-            'orgSlug'  => $this->getSetting('HelloAsso_OrgSlug', ''),
-            'formSlug' => $this->getSetting('HelloAsso_FormSlug', ''),
-        ];
-    }
-
     public function markPaidByIntentId(string $intentId, string $orderId): bool
     {
         $rows = $this->query(

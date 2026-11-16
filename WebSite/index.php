@@ -55,7 +55,7 @@ $dataHelper = new DataHelper(
 $maintenanceService = new MaintenanceService($dataHelper);
 $flight->before('start', function () use ($maintenanceService, $connectedUser, $errorManager) {
     if (!isset($_SESSION['token'])) $_SESSION['token'] = bin2hex(random_bytes(32));
-    $connectedUser->get();    
+    $connectedUser->get();
     if ($maintenanceService->checkIfSiteIsUnderMaintenance()) {
         $errorManager->raise(
             ApplicationError::ServiceUnavailable,
@@ -106,12 +106,14 @@ $flight->map('error', function (Throwable $ex) use ($logWriterDataHelper, $error
 });
 
 $flight->after('start', function () use ($logWriterDataHelper, $startTime) {
-    if (Flight::get('_error_already_logged')) return;
+    if (Flight::get('_error_already_logged')) {
+        return;
+    }
 
     $duration = round((microtime(true) - $startTime) * 1000, 2);
     $logMessage = LogMessage::getInstance(null);
     $logWriterDataHelper->add(
-        $logMessage->getCode() ?? (string)Flight::get('code') ?? '',
+        $logMessage->getCode() ?? (string) Flight::get('code'),
         $logMessage->getCode() !== null
             ? $logMessage->getMessage()
             : (Flight::get('message') ?? ''),

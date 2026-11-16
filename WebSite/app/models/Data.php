@@ -336,7 +336,7 @@ abstract class Data
      *
      * @param array<string, mixed> $where
      */
-    public function getValue(string $table, array $where, string $field): mixed
+    private function getValue(string $table, array $where, string $field): mixed
     {
         $row = $this->get($table, $where, $field);
         if ($row === false) {

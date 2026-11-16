@@ -11,7 +11,6 @@ use app\helpers\WebApp;
 use app\models\DesignDataHelper;
 use app\modules\Common\AbstractController;
 use app\modules\Designer\viewModels\DesignCreateViewModel;
-use app\modules\Designer\viewModels\DesignerHomeViewModel;
 use app\modules\Designer\viewModels\DesignsIndexViewModel;
 
 final class DesignController extends AbstractController
@@ -94,21 +93,5 @@ final class DesignController extends AbstractController
     public function help(): void
     {
         $this->renderHelp('Help_Designer', fn($u) => $u->isDesigner(), __FILE__, __LINE__);
-    }
-
-    public function homeDesigner(): void
-    {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
-            $_SESSION['navbar'] = 'designer';
-
-            $viewModel = new DesignerHomeViewModel(
-                content: '',
-                layoutParams: $this->getAllParams([
-                    'page' => $this->application->getConnectedUser()->getPage(),
-                ]),
-            );
-
-            $this->views->render('Designer/views/designer.latte', $viewModel);
-        }
     }
 }

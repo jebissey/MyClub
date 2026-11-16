@@ -12,7 +12,6 @@ final readonly class ArticleSitemapRow extends AbstractValueObject
         public int $id,
         public string $lastUpdate,
         public string $title,
-        public string $referenceSource,
     ) {
     }
 
@@ -25,7 +24,6 @@ final readonly class ArticleSitemapRow extends AbstractValueObject
             id: (int) $row->Id,
             lastUpdate: (string) $row->LastUpdate,
             title: (string) $row->Title,
-            referenceSource: (string) $row->ReferenceSource,
         );
     }
 }

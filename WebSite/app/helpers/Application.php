@@ -166,11 +166,6 @@ final class Application
         return $this->pdoForLog;
     }
 
-    public function getPdoForCredential(): PDO
-    {
-        return Database::getInstance()->getPdoForCredential();
-    }
-
     public function getRequestInput(): RequestInput
     {
         return $this->requestInput ??= new RequestInput($this->getFlight()->request());

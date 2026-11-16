@@ -22,8 +22,6 @@ final readonly class MenuItemWithParentRow
         public string $label,
         public ?string $icon,
         public ?string $url,
-        public ?int $parentId,
-        public ?string $parentLabel,
         public ?string $groupName = null,
     ) {
     }
@@ -43,8 +41,6 @@ final readonly class MenuItemWithParentRow
             label: To::requireStr($row->Label),
             icon: $row->Icon !== null ? To::requireStr($row->Icon) : null,
             url: $row->Url !== null ? To::requireStr($row->Url) : null,
-            parentId: $row->ParentId !== null ? To::requireInt($row->ParentId) : null,
-            parentLabel: $row->ParentLabel !== null ? To::requireStr($row->ParentLabel) : null,
         );
     }
 
@@ -64,8 +60,6 @@ final readonly class MenuItemWithParentRow
             $this->label,
             $this->icon,
             $this->url,
-            $this->parentId,
-            $this->parentLabel,
             $groupName,
         );
     }

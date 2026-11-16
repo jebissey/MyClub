@@ -18,7 +18,6 @@ final readonly class PendingDesignRow
     public function __construct(
         public int $personId,
         public string $email,
-        public int $designId,
         public string $designName,
         public string $designDetail,
     ) {
@@ -32,7 +31,6 @@ final readonly class PendingDesignRow
         return new self(
             personId: (int) $row->PersonId,
             email: (string) $row->Email,
-            designId: (int) $row->DesignId,
             designName: (string) $row->DesignName,
             designDetail: (string) ($row->DesignDetail ?? ''),
         );

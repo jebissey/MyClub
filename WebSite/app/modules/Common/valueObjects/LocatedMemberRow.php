@@ -42,29 +42,6 @@ final readonly class LocatedMemberRow
     }
 
     /**
-     * Returns a copy of this row with the computed user image set.
-     */
-    public function withUserImg(string $userImg): self
-    {
-        return new self(
-            $this->id,
-            $this->firstName,
-            $this->lastName,
-            $this->nickName,
-            $this->avatar,
-            $this->useGravatar,
-            $this->email,
-            $this->phone,
-            $this->location,
-            $this->myPublicDataInPresentationDirectory,
-            $this->inPresentationDirectory,
-            $this->showPhoneInPresentationDirectory,
-            $this->showEmailInPresentationDirectory,
-            $userImg,
-        );
-    }
-
-    /**
      * @param LocatedMemberRowShape $row
      */
     public static function fromStdClass(object $row): self

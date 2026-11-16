@@ -10,7 +10,6 @@ use app\helpers\To;
 final readonly class CompactSettingsRow
 {
     public function __construct(
-        public int $compactEveryXdays,
         public int $removeOlderThanXmonths,
         public int $compactOlderThanXmonths,
     ) {
@@ -19,7 +18,6 @@ final readonly class CompactSettingsRow
     public static function fromStdClass(stdClass $row): self
     {
         return new self(
-            compactEveryXdays: To::int($row->Compact_everyXdays),
             removeOlderThanXmonths: To::int($row->Compact_removeOlderThanXmonths),
             compactOlderThanXmonths: To::int($row->Compact_compactOlderThanXmonths),
         );

@@ -119,7 +119,7 @@ final class EventListDataHelper extends Data
     }
 
     /** @return list<EventListRow> */
-    public function getNextEvents(
+    private function getNextEvents(
         ?Person $person,
         bool $filterByPreferences = false,
         bool $registeredOnly = false,
@@ -250,7 +250,7 @@ final class EventListDataHelper extends Data
     }
 
     /** @return list<EventListRow> */
-    public function getPassedEvents(
+    private function getPassedEvents(
         ?Person $person,
         int $offset,
         bool $registeredOnly = false,

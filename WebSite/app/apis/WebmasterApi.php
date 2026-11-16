@@ -97,37 +97,4 @@ final class WebmasterApi extends AbstractApi
         }
         $this->renderJsonOk(['sent' => $sent]);
     }
-
-    public function subscribePush(): void
-    {
-        if (WebApp::getRequestMethod() !== 'POST') {
-            $this->renderJsonMethodNotAllowed(__FILE__, __LINE__);
-            return;
-        }
-        $data        = $this->getJsonInput();
-        $endpointRaw = $data['endpoint'] ?? null;
-        $p256dhRaw   = $data['p256dh']   ?? null;
-        $authRaw     = $data['auth']     ?? null;
-
-        $endpoint = is_string($endpointRaw) ? trim($endpointRaw) : '';
-        $p256dh   = is_string($p256dhRaw)   ? trim($p256dhRaw)   : '';
-        $auth     = is_string($authRaw)     ? trim($authRaw)     : '';
-        $idPerson = $this->connectedUser->person?->id;
-
-        if ($endpoint === '' || $p256dh === '' || $auth === '') {
-            $this->renderJsonBadRequest('Requête incomplète.', __FILE__, __LINE__);
-            return;
-        }
-        if ($this->dataHelper->get('PushSubscription', ['EndPoint' => $endpoint], 'Id')) {
-            $this->renderJsonOk([], 'Déjà abonné.');
-            return;
-        }
-        $this->dataHelper->set('PushSubscription', [
-            'IdPerson' => $idPerson,
-            'EndPoint' => $endpoint,
-            'P256dh'   => $p256dh,
-            'Auth'     => $auth,
-        ]);
-        $this->renderJsonOk([], 'Abonnement enregistré.');
-    }
 }

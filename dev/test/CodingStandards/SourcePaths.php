@@ -60,4 +60,28 @@ final readonly class SourcePaths
 
         return $files;
     }
+
+    /**
+     * Template files that may read members of objects passed to them
+     * (view models, value objects). Only the app directory is scanned.
+     *
+     * @param list<string> $extensions
+     * @return list<string> absolute paths
+     */
+    public function templateFiles(array $extensions = ['latte', 'phtml', 'html', 'twig']): array
+    {
+        $files = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($this->appDir, \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file instanceof \SplFileInfo && in_array($file->getExtension(), $extensions, true)) {
+                $files[] = $file->getPathname();
+            }
+        }
+
+        return $files;
+    }
 }

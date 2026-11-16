@@ -13,7 +13,6 @@ use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\OrderWithCreatorRow;
 use app\modules\Article\valueObjects\OrderNewsRow;
-use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 
 /**
@@ -53,22 +52,6 @@ final class OrderDataHelper extends Data implements NewsProviderInterface
         );
     }
 
-    public function articleHasOrderNotClosed(int $articleId): object|bool
-    {
-        $sql = "
-            SELECT \"Order\".*
-            FROM \"Order\"
-            JOIN Article ON \"Order\".IdArticle = Article.Id
-            WHERE \"Order\".IdArticle = :articleId
-            AND \"Order\".ClosingDate >= datetime('now')
-            LIMIT 1
-        ";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':articleId' => $articleId]);
-        $order = $stmt->fetch(PDO::FETCH_OBJ);
-        return is_object($order) ? $order : false;
-    }
-
     public function getWithCreator(int $articleId): OrderWithCreatorRow|false
     {
         $article = $this->get('Article', ['Id' => $articleId], 'Id');
@@ -90,45 +73,6 @@ final class OrderDataHelper extends Data implements NewsProviderInterface
             return false;
         }
         return OrderWithCreatorRow::fromStdClass($result);
-    }
-
-    /**
-     * @return array<int, PendingOrderResponse>
-     */
-    public function getPendingOrderResponses(): array
-    {
-        $query = "
-        SELECT 
-            i.Id AS PersonId, 
-            i.Email, 
-            a.Id AS ArticleId, 
-            a.Title AS ArticleTitle, 
-            o.Id AS OrderId, 
-            o.Question AS OrderQuestion, 
-            o.ClosingDate
-        FROM Individual i
-        INNER JOIN Member m ON m.Id = i.Id
-        CROSS JOIN \"Order\" o
-        JOIN Article a ON o.IdArticle = a.Id
-        LEFT JOIN OrderReply r ON r.IdOrder = o.Id AND r.IdPerson = i.Id
-        LEFT JOIN MemberGroup mg ON mg.IdMember = i.Id AND mg.IdGroup = a.IdGroup
-        WHERE 
-            a.PublishedBy IS NOT NULL
-            AND m.Inactivated = 0
-            AND o.ClosingDate > date('now')
-            AND (
-                a.IdGroup IS NULL
-                OR mg.IdGroup IS NOT NULL 
-            )
-            AND r.Id IS NULL
-        ORDER BY o.ClosingDate, i.LastName, i.FirstName";
-        $stmt = $this->pdo->query($query);
-        if ($stmt === false) {
-            throw new QueryException("Failed to execute query in getPendingOrderResponses");
-        }
-        /** @var array<int, PendingOrderResponse> $result */
-        $result = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return $result;
     }
 
     /**

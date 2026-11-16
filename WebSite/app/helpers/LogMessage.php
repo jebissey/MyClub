@@ -7,16 +7,15 @@ namespace app\helpers;
 final class LogMessage
 {
     private static ?self $instance = null;
-    private ?string $code;
 
     /** @var array<int, string> */
     private array $messages = [];
-    private readonly string $separator;
 
-    private function __construct(?string $code, string $message, string $separator)
-    {
-        $this->code = $code;
-        $this->separator = $separator;
+    private function __construct(
+        private readonly ?string $code,
+        string $message,
+        private readonly string $separator,
+    ) {
         if ($message !== '') {
             $this->messages[] = $message;
         }
@@ -38,12 +37,6 @@ final class LogMessage
     public function getMessage(): string
     {
         return implode($this->separator, $this->messages);
-    }
-
-    public function setCode(string $code): self
-    {
-        $this->code = $code;
-        return $this;
     }
 
     public function setMessage(string $message): self

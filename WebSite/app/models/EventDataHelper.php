@@ -90,38 +90,6 @@ final class EventDataHelper extends Data
         return $stmt->fetch(PDO::FETCH_OBJ) !== false;
     }
 
-    /** @return array<int, stdClass> */
-    public function getEventsForDay(string $date, string $userEmail): array
-    {
-        $query = $this->pdo->prepare("
-            SELECT DISTINCT e.*, et.Name as EventTypeName
-            FROM Event e
-            JOIN EventType et ON e.IdEventType = et.Id
-            LEFT JOIN Individual i ON i.Email COLLATE NOCASE = :userEmail
-            LEFT JOIN Member m ON m.Id = i.Id
-            LEFT JOIN MemberGroup mg ON mg.IdMember = m.Id
-            WHERE DATE(e.StartTime) = :date
-              AND (
-                  et.IdGroup IS NULL
-                  OR et.IdGroup IN (
-                      SELECT mg2.IdGroup
-                      FROM MemberGroup mg2
-                      INNER JOIN Member m2 ON m2.Id = mg2.IdMember
-                      INNER JOIN Individual i2 ON i2.Id = m2.Id
-                      WHERE i2.Email COLLATE NOCASE = :userEmail
-                  )
-              )
-            ORDER BY e.StartTime
-        ");
-        $query->execute([
-            ':date'      => $date,
-            ':userEmail' => $userEmail,
-        ]);
-        /** @var array<int, stdClass> $rows */
-        $rows = $query->fetchAll(PDO::FETCH_OBJ);
-        return $rows;
-    }
-
     public function getEvent(int $eventId): EventDetailRow
     {
         if ($this->eventExists($eventId)) {

@@ -348,36 +348,4 @@ final class PersonDataHelper extends Data
         }
         return $email;
     }
-
-    public function updateActivity(string $email): void
-    {
-        $stmt = $this->pdoForLog->prepare("
-            SELECT CreatedAt 
-            FROM Log 
-            WHERE Who = :email COLLATE NOCASE
-            ORDER BY Id DESC 
-            LIMIT 1
-        ");
-        $stmt->execute([':email' => $email]);
-        $lastActivity = $stmt->fetchColumn();
-
-        $setClauses = ['LastSignIn = :now'];
-        $params = [
-            ':now'   => date('Y-m-d H:i:s'),
-            ':email' => $email,
-        ];
-        if ($lastActivity) {
-            $setClauses[] = 'LastSignOut = :lastActivity';
-            $params[':lastActivity'] = $lastActivity;
-        }
-
-        $stmt = $this->pdo->prepare("
-            UPDATE Member
-            SET " . implode(', ', $setClauses) . "
-            WHERE Id = (
-                SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE
-            )
-        ");
-        $stmt->execute($params);
-    }
 }

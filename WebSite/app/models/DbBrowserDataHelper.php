@@ -14,8 +14,6 @@ use app\helpers\To;
 
 final class DbBrowserDataHelper extends Data
 {
-    private const COL_MAX_SIZE = 100;
-
     public function __construct(Application $application)
     {
         parent::__construct(
@@ -60,7 +58,7 @@ final class DbBrowserDataHelper extends Data
         $stmt->execute();
     }
 
-    public function getPrimaryKey(string $table): string
+    private function getPrimaryKey(string $table): string
     {
         $this->validateTableName($table);
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
@@ -83,7 +81,7 @@ final class DbBrowserDataHelper extends Data
     }
 
     /** @return array<int, string> */
-    public function getTableColumns(string $table): array
+    private function getTableColumns(string $table): array
     {
         $this->validateTableName($table);
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
@@ -97,7 +95,7 @@ final class DbBrowserDataHelper extends Data
     }
 
     /** @return array<int, array{name: string, notnull: int}> */
-    public function getTableColumnsDetails(string $table): array
+    private function getTableColumnsDetails(string $table): array
     {
         $this->validateTableName($table);
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
@@ -114,7 +112,7 @@ final class DbBrowserDataHelper extends Data
     }
 
     /** @return array<string, array{type: string, notnull: int, dflt_value: mixed, pk: int}> */
-    public function getColumnTypes(string $table): array
+    private function getColumnTypes(string $table): array
     {
         $this->validateTableName($table);
         $stmt = $this->pdo->prepare("PRAGMA table_info(" . $this->quoteName($table) . ")");
@@ -154,71 +152,6 @@ final class DbBrowserDataHelper extends Data
         }
         /** @var stdClass $record */
         return [$this->getTableColumns($table), $record, $primaryKey, $this->getColumnTypes($table)];
-    }
-
-    /**
-     * @param array<string, string> $filters
-     * @return array{0: array<int, stdClass>, 1: array<int, string>, 2: int, 3: int, 4: array<string, string>}
-     */
-    public function showTable(string $table, int $itemsPerPage, array $filters, int $dbbPage): array
-    {
-        $this->validateTableName($table);
-        $offset = ($dbbPage - 1) * $itemsPerPage;
-        $query = "SELECT * FROM " . $this->quoteName($table);
-        $params = [];
-
-        $whereConditions = [];
-        foreach ($filters as $column => $value) {
-            if ($value === '') {
-                continue;
-            }
-            $whereConditions[] = $this->quoteName($column) . " LIKE :filter_" . $column;
-            $params["filter_" . $column] = '%' . $value . '%';
-        }
-        if ($whereConditions !== []) {
-            $query .= " WHERE " . implode(' AND ', $whereConditions);
-        }
-
-        $countQuery = "SELECT COUNT(*) FROM (" . $query . ")";
-        $stmt = $this->pdo->prepare($countQuery);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue(':' . $key, $value);
-        }
-        $stmt->execute();
-        $totalRecords = (int)$stmt->fetchColumn();
-        $totalPages = max(1, (int)ceil($totalRecords / $itemsPerPage));
-
-        $query .= " LIMIT :limit OFFSET :offset";
-        $stmt = $this->pdo->prepare($query);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue(':' . $key, $value);
-        }
-        $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-
-        $rows = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $row) {
-            if (!$row instanceof stdClass) {
-                continue;
-            }
-            foreach (get_object_vars($row) as $col => $val) {
-                if (!is_string($val)) {
-                    continue;
-                }
-                $imgPos = stripos($val, '<img');
-                if ($imgPos !== false) {
-                    $val = mb_substr($val, 0, $imgPos, 'UTF-8') . '[image]';
-                }
-                if (mb_strlen($val, 'UTF-8') > self::COL_MAX_SIZE) {
-                    $val = mb_substr($val, 0, self::COL_MAX_SIZE, 'UTF-8') . '…';
-                }
-                $row->$col = $val;
-            }
-            $rows[] = $row;
-        }
-
-        return [$rows, $this->getTableColumns($table), $dbbPage, $totalPages, $filters];
     }
 
     /** @param array<string, mixed> $input Form data of the request */
@@ -317,6 +250,7 @@ final class DbBrowserDataHelper extends Data
 
     public function getQuery(string $table): Select
     {
+        $this->validateTableName($table);
         return $this->fluent->from("`{$table}`");
     }
 

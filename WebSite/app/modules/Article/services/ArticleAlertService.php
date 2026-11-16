@@ -40,7 +40,7 @@ final readonly class ArticleAlertService
      * @param list<string> $recipients
      * @param callable(string): string $t translator
      */
-    public function compose(int $articleId, string $authorEmail, array $recipients, callable $t): ArticleAlertInfo
+    private function compose(int $articleId, string $authorEmail, array $recipients, callable $t): ArticleAlertInfo
     {
         $body =
             $t('article.email.body_intro') . "\n\n" .

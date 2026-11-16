@@ -213,31 +213,6 @@ class PersonDataHelperTest extends DataHelperTestCase
         $this->assertInstanceOf(PDOStatement::class, $stmt);
     }
 
-    public function testUpdateActivitySqlIsValidAgainstTemplateSchema(): void
-    {
-        $pdo = $this->openDatabaseCopyOrSkip();
-
-        $sqlBoth = "
-            UPDATE Member
-            SET LastSignIn = :now, LastSignOut = :lastActivity
-            WHERE Id = (
-                SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE
-            )
-        ";
-        $stmtBoth = $pdo->prepare($sqlBoth);
-        $this->assertInstanceOf(PDOStatement::class, $stmtBoth);
-
-        $sqlSignInOnly = "
-            UPDATE Member
-            SET LastSignIn = :now
-            WHERE Id = (
-                SELECT Id FROM Individual WHERE Email = :email COLLATE NOCASE
-            )
-        ";
-        $stmtSignInOnly = $pdo->prepare($sqlSignInOnly);
-        $this->assertInstanceOf(PDOStatement::class, $stmtSignInOnly);
-    }
-
     private function memberIndividualJoin(): string
     {
         return 'FROM Member m INNER JOIN Individual i ON i.Id = m.Id';

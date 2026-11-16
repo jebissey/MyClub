@@ -13,8 +13,13 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
      * Methods called implicitly by PHP through built-in interfaces.
      */
     private const IMPLICIT_METHODS = [
-        'jsonserialize', 'getiterator', 'count',
-        'offsetexists', 'offsetget', 'offsetset', 'offsetunset',
+        'jsonserialize',
+        'getiterator',
+        'count',
+        'offsetexists',
+        'offsetget',
+        'offsetset',
+        'offsetunset',
     ];
 
     /**
@@ -36,9 +41,7 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
         T_AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG,
     ];
 
-    public function __construct(private SourcePaths $paths)
-    {
-    }
+    public function __construct(private SourcePaths $paths) {}
 
     public function label(): string
     {
@@ -53,10 +56,19 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
     {
         /** @var array<string, array<string, true>> $usedBy member name => files using it */
         $usedBy = $this->usedByScripts();
+        foreach ($this->usedByTemplates() as $name => $files) {
+            foreach (array_keys($files) as $path) {
+                $usedBy[$name][$path] = true;
+            }
+        }
+
         /** @var array<string, true> $routed "ClassName::method" pairs declared in a route */
         $routed = [];
+
         /** @var array<string, true> $contractNames names declared by interfaces, traits, enums... */
         $contractNames = [];
+
+        $templateVariables = $this->templateVariables();
 
         // Factory method => class it returns (makeFfaController => FFAController).
         $factoryMap = [];
@@ -95,6 +107,8 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
             $routedClasses[explode('::', $key)[0]] = true;
         }
 
+        $descendants = $this->descendants($classes);
+
         $issues = [];
 
         foreach ($classes as $class) {
@@ -108,6 +122,8 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
             // A class exporting its own properties with get_object_vars($this)
             // feeds them to a consumer outside the analysed code (template engine).
             $exportsProperties = str_contains($class->sourceCode, 'get_object_vars($this)');
+
+            $isViewModel = $this->paths->inSubpath($class, SourcePaths::VIEW_MODELS);
 
             foreach ($this->publicMembers(token_get_all($class->sourceCode)) as $member) {
                 $name = $member['name'];
@@ -124,9 +140,15 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
                     continue;
                 }
 
+                // View model properties reach the template as bare variables ({$name}).
+                if ($isViewModel && $member['type'] === 'property' && isset($templateVariables[$name])) {
+                    continue;
+                }
+
                 // Routed members are matched per class, so two controllers
                 // sharing a method name no longer hide each other.
-                if (isset($routed["{$class->className}::{$name}"])) {
+                // A method inherited by a routed controller is routed through the child class.
+                if ($this->isRouted($class->className, $name, $routed, $descendants)) {
                     continue;
                 }
 
@@ -150,6 +172,57 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
         }
 
         return $issues;
+    }
+
+    /**
+     * Tells whether a member is declared in a route, either on the class itself
+     * or on one of its descendants (the member is then inherited by a routed class).
+     *
+     * @param array<string, true> $routed
+     * @param array<string, list<string>> $descendants
+     */
+    private function isRouted(string $className, string $name, array $routed, array $descendants): bool
+    {
+        if (isset($routed["{$className}::{$name}"])) {
+            return true;
+        }
+
+        foreach ($descendants[$className] ?? [] as $child) {
+            if (isset($routed["{$child}::{$name}"])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Maps each class short name to the short names of all its descendants.
+     *
+     * @param list<ClassInfo> $classes
+     * @return array<string, list<string>>
+     */
+    private function descendants(array $classes): array
+    {
+        $parentOf = [];
+        foreach ($classes as $class) {
+            $pattern = '/\bclass\s+\w+\s+extends\s+\\\\?(?:[\w\\\\]*\\\\)?(\w+)/';
+            if (preg_match($pattern, $class->sourceCode, $match) === 1) {
+                $parentOf[$class->className] = $match[1];
+            }
+        }
+
+        $descendants = [];
+        foreach ($parentOf as $child => $parent) {
+            $seen = [];
+            while ($parent !== null && !isset($seen[$parent])) {
+                $descendants[$parent][] = $child;
+                $seen[$parent] = true;
+                $parent = $parentOf[$parent] ?? null;
+            }
+        }
+
+        return $descendants;
     }
 
     /**
@@ -263,7 +336,8 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
 
             // Named argument: "(name: ..." or ", name: ...".
             // A ternary or a case label never has "(" or "," before the identifier.
-            if ($token[0] === T_STRING
+            if (
+                $token[0] === T_STRING
                 && $this->neighbour($tokens, $i, 1) === ':'
                 && in_array($this->neighbour($tokens, $i, -1), ['(', ','], true)
             ) {
@@ -415,5 +489,60 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
         }
 
         return $routed;
+    }
+
+    /**
+     * Collects member names accessed in template files:
+     * ->name, ?->name, ::name and ::$name.
+     *
+     * The pattern is deliberately broad: in a template, a missed usage
+     * produces a false positive, which costs more than an extra match.
+     *
+     * @return array<string, array<string, true>> member name => files using it
+     */
+    private function usedByTemplates(): array
+    {
+        $usedBy = [];
+
+        foreach ($this->paths->templateFiles() as $path) {
+            $source = file_get_contents($path);
+            if ($source === false) {
+                continue;
+            }
+
+            if (preg_match_all('/(?:->|::)\$?(\w+)/', $source, $matches) > 0) {
+                foreach ($matches[1] as $name) {
+                    $usedBy[$name][$path] = true;
+                }
+            }
+        }
+
+        return $usedBy;
+    }
+
+    /**
+     * Collects variable names read in templates ({$name}, {if $name}, {foreach $name as ...}).
+     * Latte exposes the public properties of a view model as template variables.
+     *
+     * @return array<string, true>
+     */
+    private function templateVariables(): array
+    {
+        $variables = [];
+
+        foreach ($this->paths->templateFiles(['latte']) as $path) {
+            $source = file_get_contents($path);
+            if ($source === false) {
+                continue;
+            }
+
+            if (preg_match_all('/\$(\w+)/', $source, $matches) > 0) {
+                foreach ($matches[1] as $name) {
+                    $variables[$name] = true;
+                }
+            }
+        }
+
+        return $variables;
     }
 }

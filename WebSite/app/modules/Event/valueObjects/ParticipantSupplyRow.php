@@ -14,8 +14,6 @@ final readonly class ParticipantSupplyRow extends AbstractValueObject
         public ?string $firstName,
         public ?string $lastName,
         public ?string $nickName,
-        public string $needLabel,
-        public string $needName,
         public int $supply,
     ) {
     }
@@ -26,8 +24,6 @@ final readonly class ParticipantSupplyRow extends AbstractValueObject
             firstName: To::nullableStr($row->FirstName ?? null),
             lastName: To::nullableStr($row->LastName ?? null),
             nickName: To::nullableStr($row->NickName ?? null),
-            needLabel: To::requireStr($row->NeedLabel ?? null),
-            needName: To::requireStr($row->NeedName ?? null),
             supply: To::requireInt($row->Supply ?? null),
         );
     }

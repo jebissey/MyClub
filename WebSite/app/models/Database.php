@@ -25,7 +25,6 @@ final class Database
     private const SQLITE_DEST_PATH = __DIR__ . '/../../data/';
     private const SQLITE_FILE = 'MyClub.sqlite';
     private const SQLITE_LOG_FILE = 'LogMyClub.sqlite';
-    private const SQLITE_CREDENTIAL_FILE = 'Credential.db';
     private const MIGRATORS_DIR = __DIR__ . '/database/migrators';
     private const APPLICATION = 'MyClub';
     private const DB_VERSION = 102;              //Don't forget to update here and in Metadata when database structure is modified
@@ -33,7 +32,6 @@ final class Database
     private static ?Database $instance = null;
     private static ?PDO $pdo = null;
     private static ?PDO $pdoForLog = null;
-    private static ?PDO $pdoForCredential = null;
 
     private function __construct()
     {
@@ -67,21 +65,6 @@ final class Database
     public function getPdoForLog(): PDO
     {
         return self::$pdoForLog ?? Application::unreachable('Fatal error with null pdoforLog in file ');
-    }
-
-    public function getPdoForCredential(): PDO
-    {
-        if (self::$pdoForCredential === null) {
-            $credentialFile = self::SQLITE_DEST_PATH . self::SQLITE_CREDENTIAL_FILE;
-            if (!is_file($credentialFile)) {
-                File::copy(__DIR__ . '/database/' . self::SQLITE_CREDENTIAL_FILE, self::SQLITE_DEST_PATH);
-            }
-            self::$pdoForCredential = new PDO('sqlite:' . $credentialFile);
-            self::$pdoForCredential->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            self::$pdoForCredential->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
-        }
-
-        return self::$pdoForCredential;
     }
 
     #region Private functions
