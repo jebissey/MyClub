@@ -30,6 +30,7 @@ final class Designer implements RouteInterface
         $this->routes[] = new Route('GET  /designer/help', $designerController, 'help');
 
         $this->routes[] = new Route('GET  /routes', $designerController, 'showRoutes');
+        $this->routes[] = new Route('GET  /routes/help', $designerController, 'routesHelp');
         $this->routes[] = new Route('GET  /routes/help/@function', $designerController, 'showRouteHelp');
 
         return $this->routes;

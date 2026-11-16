@@ -124,7 +124,7 @@ final class MakeTheTargetController extends TableController
             extraParams: [],
             filters: $filterConfig,
             columns: $columns,
-            resetUrl: '/games/makethetarget/statistics',
+            resetUrl: '/game/makethetarget',
             title: $this->translate('makethetarget.statistics_title'),
             category: 'makeTheTarget',
             layoutParams: $this->getAllParams([

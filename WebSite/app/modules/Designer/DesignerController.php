@@ -38,6 +38,11 @@ final class DesignerController extends TableController
         }
     }
 
+    public function routesHelp(): void
+    {
+        $this->renderHelp('Help_Routes', fn($u) => $u->isAnybody(), __FILE__, __LINE__);
+    }
+
     public function showRoutes(): void
     {
         if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {

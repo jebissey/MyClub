@@ -34,6 +34,7 @@ use app\modules\Common\valueObjects\ClosingVisibilityRow;
  *     date: string,
  *     url: string
  * }
+ * @phpstan-import-type OrderWithCreatorRowShape from OrderWithCreatorRow
  * @phpstan-import-type OrderNewsRowShape from OrderNewsRow
  * @phpstan-import-type ClosingVisibilityRowShape from ClosingVisibilityRow
  * @phpstan-import-type NewsFeedItem from NewsProviderInterface
@@ -67,7 +68,7 @@ final class OrderDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
-        /** @var object{Id: int|string, Question: string, Options: string, IdArticle: int|string, ClosingDate: string, Visibility: string, CreatedBy: int|string}|false $result */
+        /** @var OrderWithCreatorRowShape|false $result */
         $result = $stmt->fetch(PDO::FETCH_OBJ);
         if ($result === false) {
             return false;

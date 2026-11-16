@@ -12,6 +12,7 @@ use stdClass;
 use app\helpers\Application;
 use app\helpers\MyClubDateTime;
 use app\helpers\To;
+use app\modules\Common\valueObjects\PeriodVisitCountsRow;
 
 /**
  * @phpstan-type ReferentNavigation array{first: string, prev: string, current: string, next: string, last: string}
@@ -29,6 +30,7 @@ use app\helpers\To;
  *     avgDailyVisitors?: int|float,
  *     maxDailyVisitors?: int
  * }
+ * @phpstan-import-type PeriodVisitCountsRowShape from PeriodVisitCountsRow
  */
 final class LogAnalyticsDataHelper extends Data
 {
@@ -68,18 +70,22 @@ final class LogAnalyticsDataHelper extends Data
                 ':endDate'   => $period['end'],
             ]);
             $data = $query->fetch(PDO::FETCH_OBJ);
-            /** @var object{uniqueVisitors: int, pageViews: int, views2xx: int, views3xx: int, views4xx: int, views5xx: int} $data */
+            /** @var PeriodVisitCountsRowShape|false $data */
+            if ($data === false) {
+                throw new RuntimeException('Visit statistics query returned no row.');
+            }
+            $counts = PeriodVisitCountsRow::fromStdClass($data);
 
             $item = [
                 'label'          => $this->formatPeriodLabel($period, $periodType),
                 'start'          => $period['start'],
                 'end'            => $period['end'],
-                'uniqueVisitors' => $data->uniqueVisitors ?? 0,
-                'pageViews'      => $data->pageViews ?? 0,
-                'views2xx'       => $data->views2xx ?? 0,
-                'views3xx'       => $data->views3xx ?? 0,
-                'views4xx'       => $data->views4xx ?? 0,
-                'views5xx'       => $data->views5xx ?? 0,
+                'uniqueVisitors' => $counts->uniqueVisitors,
+                'pageViews'      => $counts->pageViews,
+                'views2xx'       => $counts->views2xx,
+                'views3xx'       => $counts->views3xx,
+                'views4xx'       => $counts->views4xx,
+                'views5xx'       => $counts->views5xx,
             ];
 
             if ($periodType !== 'day') {
