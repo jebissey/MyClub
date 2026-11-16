@@ -20,7 +20,7 @@ use test\Infrastructure\RouteTestFactory;
  */
 final class FlightRouteTester
 {
-    private const DEFAULT_BASE_URL = 'http://localhost:8000';
+    private const DEFAULT_BASE_URL = 'http://localhost';
     private const DEFAULT_TIMEOUT = 10;
 
     public function run(): int
@@ -286,7 +286,7 @@ final class FlightRouteTester
         echo <<<EOT
 Usage: php FlightRouteTester.php [options]
 Options:
-  --base-url=URL      Base URL (default: http://localhost:8000)
+  --base-url=URL      Base URL (default: http://localhost)
   --timeout=SECONDS   Request timeout in seconds (default: 10)
   --routes-file=FILE  File containing routes (default: WebSite/app/config/Routes.php)
   --export-json       Export results as JSON

@@ -18,7 +18,7 @@ print_step "2/8 : phpcs"
 vendor/bin/phpcs --standard=../dev/phpcs.xml app
 
 print_step "3/8 : naming conventions"
-php ../dev/test/CheckNaming.php --level=2
+php ../dev/test/CheckNaming.php --level=4
 
 print_step "4/8 : phpstan"
 vendor/bin/phpstan analyse -c ../dev/phpstan.neon
