@@ -57,6 +57,7 @@ use app\models\MemberDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
+use app\models\MessageWriteDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
 use app\models\ParticipantDataHelper;
@@ -108,6 +109,7 @@ final readonly class ApiFactory
         private MenuItemDataHelper $menuItemDataHelper,
         private MessageDataHelper $messageDataHelper,
         private MessageRecipientService $messageRecipientService,
+        private MessageWriteDataHelper $messageWriteDataHelper,
         private NeedDataHelper $needDataHelper,
         private NeedTypeDataHelper $needTypeDataHelper,
         private NotificationSender $notificationSender,
@@ -174,7 +176,7 @@ final readonly class ApiFactory
             $this->eventDataHelper,
             $this->eventService,
             $this->participantDataHelper,
-            $this->messageDataHelper,
+            $this->messageWriteDataHelper,
             $this->emailService,
             $this->alertRecipientDataHelper,
             $this->connectedUser,
@@ -364,7 +366,8 @@ final readonly class ApiFactory
             $this->messageDataHelper,
             $this->messageRecipientService,
             $this->notificationSender,
-            $this->mediaManager
+            $this->mediaManager,
+            $this->messageWriteDataHelper,
         );
     }
 

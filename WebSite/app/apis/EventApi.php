@@ -20,7 +20,7 @@ use app\models\AlertRecipientDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\EventDataHelper;
 use app\models\LanguagesDataHelper;
-use app\models\MessageDataHelper;
+use app\models\MessageWriteDataHelper;
 use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
@@ -40,7 +40,7 @@ final class EventApi extends AbstractApi
         private readonly EventDataHelper $eventDataHelper,
         private readonly EventServiceInterface $eventService,
         private readonly ParticipantDataHelper $participantDataHelper,
-        private readonly MessageDataHelper $messageDataHelper,
+        private readonly MessageWriteDataHelper $messageWriteDataHelper,
         private readonly EmailService $emailService,
         private readonly AlertRecipientDataHelper $alertRecipientDataHelper,
         ConnectedUser $connectedUser,
@@ -190,7 +190,7 @@ final class EventApi extends AbstractApi
                     'Invalid Email in file ' . __FILE__ . ' at line ' . __LINE__
                 );
             }
-            $ccList = $this->messageDataHelper->addWebAppMessages($event->id, $participants, $title . "\n\n" . $body);
+            $ccList = $this->messageWriteDataHelper->addWebAppMessages($event->id, $participants, $title . "\n\n" . $body);
             $link = htmlspecialchars($eventLink, ENT_QUOTES, 'UTF-8');
             $htmlBody = nl2br(htmlspecialchars($body, ENT_QUOTES, 'UTF-8')) . "<br>" .
                 '<a href="' . $link . '">' . $link . '</a><br><br>' .

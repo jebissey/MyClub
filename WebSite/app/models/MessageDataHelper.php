@@ -5,21 +5,15 @@ declare(strict_types=1);
 namespace app\models;
 
 use PDO;
-use RuntimeException;
 use stdClass;
 use Throwable;
-use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\GravatarHandler;
-use app\helpers\MyClubDateTime;
 use app\helpers\To;
 use app\helpers\TranslationManager;
 use app\helpers\WebApp;
 use app\modules\Common\interfaces\NewsProviderInterface;
-use app\modules\Common\valueObjects\ChatMessage;
-use app\modules\Common\valueObjects\MessageTarget;
-use app\modules\Event\valueObjects\EventParticipant;
 
 /**
  * @phpstan-import-type NewsFeedItem from NewsProviderInterface
@@ -34,8 +28,11 @@ use app\modules\Event\valueObjects\EventParticipant;
  */
 final class MessageDataHelper extends Data implements NewsProviderInterface
 {
-    public function __construct(Application $application, private readonly LanguagesDataHelper $languagesDataHelper)
-    {
+    public function __construct(
+        Application $application,
+        private readonly MessageImageDataHelper $imageDataHelper,
+        private readonly MessageStatisticsDataHelper $statisticsDataHelper,
+    ) {
         parent::__construct(
             $application->getPdo(),
             $application->getErrorManager(),
@@ -43,144 +40,50 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         );
     }
 
-    public function addMessage(
-        MessageTarget $target,
-        int $personId,
-        string $text,
-        ?string $imagePath = null,
-    ): int|false {
-        [$table, $id] = $target->reference();
-        if ($this->get($table, ['Id' => $id], 'Id') === false) {
-            return false;
-        }
-
-        $messageId = $this->set('Message', [
-            'ArticleId' => $target->articleId,
-            'EventId'   => $target->eventId,
-            'GroupId'   => $target->groupId,
-            'PersonId'  => $personId,
-            'Text'      => $text,
-            'From'      => 'User',
-            'ImagePath' => $imagePath,
-        ]);
-
-        return is_int($messageId) ? $messageId : false;
-    }
-
-    /**
-     * @param list<EventParticipant> $participants
-     * @return array<int, string>
-     */
-    public function addWebAppMessages(int $eventId, array $participants, string $text): array
+    /** @deprecated Use MessageImageDataHelper::getImageInfo() */
+    /** @return array{0: int, 1: int, 2: string} */
+    public function getImageInfoFromMessage(int $messageId): array
     {
-        $bccList = [];
-        foreach ($participants as $participant) {
-            $bccList[] = $participant->email;
-            $this->set('Message', [
-                'EventId'  => $eventId,
-                'PersonId' => $participant->personId,
-                'Text'     => $text,
-                'From'     => 'Webapp'
-            ]);
-        }
-        return $bccList;
+        return $this->imageDataHelper->getImageInfo($messageId);
     }
 
+    /** @deprecated Use MessageImageDataHelper::getUses() */
+    /**
+     * @return array{
+     *     events: list<object{Id: int, Title: string, StartTime: string}>,
+     *     articles: list<object{Id: int, Title: string}>,
+     *     groups: list<object{Id: int, Title: string}>
+     * }
+     */
+    public function getMessageUses(string $path): array
+    {
+        return $this->imageDataHelper->getUses($path);
+    }
+
+    /** @deprecated Use MessageImageDataHelper::getUsedPaths() */
+    /**
+     * @param array<int, string> $paths
+     * @return array<string, bool>
+     */
+    public function getPathsUsedInMessages(array $paths): array
+    {
+        return $this->imageDataHelper->getUsedPaths($paths);
+    }
+
+    /** @deprecated Use MessageStatisticsDataHelper::countUserMessagesForArticle() */
     public function countUserMessagesForArticle(int $articleId): int
     {
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Message WHERE "From" = :from AND ArticleId = :articleId');
-        $stmt->execute([':from' => 'User', ':articleId' => $articleId]);
-
-        return To::requireInt($stmt->fetchColumn());
+        return $this->statisticsDataHelper->countUserMessagesForArticle($articleId);
     }
 
-    /** @return list<ChatMessage> */
-    public function getArticleMessages(int $articleId): array
+    /** @deprecated Use MessageStatisticsDataHelper::countByEmailForSeason() */
+    /**
+     * @param array{start: string, end: string} $season
+     * @return array<string, int>
+     */
+    public function getMessages(array $season): array
     {
-        $sql = "
-            SELECT
-                Message.*,
-                Individual.FirstName,
-                Individual.LastName,
-                Individual.NickName,
-                Individual.Avatar,
-                Member.UseGravatar,
-                Individual.Email
-            FROM Message
-            LEFT JOIN Member     ON Message.PersonId = Member.Id
-            LEFT JOIN Individual ON Member.Id = Individual.Id
-            WHERE Message.ArticleId = :articleId
-            ORDER BY Message.Id ASC
-        ";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':articleId' => $articleId]);
-
-        /** @var list<stdClass> $rows */
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        return $this->mapChatMessages($rows);
-    }
-
-    /** @return list<ChatMessage> */
-    public function getEventMessages(int $eventId): array
-    {
-        $sql = "
-            SELECT
-                Message.*,
-                Individual.FirstName,
-                Individual.LastName,
-                Individual.NickName,
-                Individual.Avatar,
-                Member.UseGravatar,
-                Individual.Email
-            FROM Message
-            LEFT JOIN Member     ON Message.PersonId = Member.Id
-            LEFT JOIN Individual ON Member.Id = Individual.Id
-            WHERE Message.EventId = :eventId
-              AND Message.\"From\" = 'User'
-            ORDER BY Message.Id ASC
-        ";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':eventId' => $eventId]);
-
-        /** @var list<stdClass> $rows */
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        return $this->mapChatMessages($rows);
-    }
-
-    /** @return list<ChatMessage> */
-    public function getGroupMessages(int $groupId): array
-    {
-        $sql = "
-            SELECT
-                Message.Id,
-                Message.PersonId,
-                Message.Text,
-                Message.ImagePath,
-                Message.LastUpdate,
-                Individual.FirstName,
-                Individual.LastName,
-                Individual.NickName,
-                Individual.Avatar,
-                Member.UseGravatar,
-                Individual.Email
-            FROM Message
-            LEFT JOIN Member     ON Message.PersonId = Member.Id
-            LEFT JOIN Individual ON Member.Id = Individual.Id
-            WHERE Message.GroupId = :groupId
-            ORDER BY Message.Id ASC
-        ";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':groupId' => $groupId]);
-
-        /** @var list<stdClass> $rows */
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        return $this->mapChatMessages($rows);
+        return $this->statisticsDataHelper->countByEmailForSeason($season);
     }
 
     /** @return list<MessageGroupItem> */
@@ -208,126 +111,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
             },
             $rows
         ));
-    }
-
-    /** @return array{0: int, 1: int, 2: string} */
-    public function getImageInfoFromMessage(int $messageId): array
-    {
-        $message = $this->get('Message', ['Id' => $messageId], 'ImagePath');
-        if (!$message) {
-            throw new RuntimeException(
-                $this->languagesDataHelper->translate('message.image_not_found')
-            );
-        }
-        if (empty($message->ImagePath)) {
-            throw new RuntimeException(
-                $this->languagesDataHelper->translate('message.image_not_attached')
-            );
-        }
-        $path = is_string($message->ImagePath)
-            ? parse_url($message->ImagePath, PHP_URL_PATH)
-            : false;
-
-        if (!is_string($path) || $path === '') {
-            throw new RuntimeException(
-                $this->languagesDataHelper->translate('message.image_invalid_path')
-            );
-        }
-        $filename = basename($path);
-        $month = basename(dirname($path));
-        $year = basename(dirname(dirname($path)));
-        if (!is_numeric($year) || !is_numeric($month) || empty($filename)) {
-            throw new RuntimeException(
-                $this->languagesDataHelper->translate('message.image_invalid_structure')
-            );
-        }
-        return [
-            To::requireInt($year),
-            To::requireInt($month),
-            $filename,
-        ];
-    }
-
-    /**
-     * @param array{start: string, end: string} $season
-     * @return array<string, int>
-     */
-    public function getMessages(array $season): array
-    {
-        $query = $this->pdo->prepare("
-            SELECT LOWER(i.Email) AS Email, COUNT(m.Id) AS MessageCount
-            FROM Message m
-            JOIN Member     mb ON mb.Id = m.PersonId
-            JOIN Individual i  ON i.Id  = mb.Id
-            WHERE m.LastUpdate BETWEEN :start AND :end
-            GROUP BY i.Email
-        ");
-        $query->execute([
-            ':start' => $season['start'],
-            ':end'   => $season['end'],
-        ]);
-
-        /** @var array<string, int> $result */
-        $result = $query->fetchAll(PDO::FETCH_KEY_PAIR);
-
-        return $result;
-    }
-
-    /**
-     * @return array{
-     *     events: list<object{Id: int, Title: string, StartTime: string}>,
-     *     articles: list<object{Id: int, Title: string}>,
-     *     groups: list<object{Id: int, Title: string}>
-     * }
-     */
-    public function getMessageUses(string $path): array
-    {
-        $like = '%' . $path . '%';
-
-        $events = $this->pdo->prepare("
-            SELECT DISTINCT e.Id, e.Summary AS Title, e.StartTime
-            FROM Message m
-            JOIN Event e ON e.Id = m.EventId
-            WHERE m.EventId IS NOT NULL
-              AND m.ImagePath LIKE :path
-            ORDER BY e.StartTime DESC
-        ");
-        $events->execute([':path' => $like]);
-
-        $articles = $this->pdo->prepare("
-            SELECT DISTINCT a.Id, a.Title
-            FROM Message m
-            JOIN Article a ON a.Id = m.ArticleId
-            WHERE m.ArticleId IS NOT NULL
-              AND m.ImagePath LIKE :path
-            ORDER BY a.Title ASC
-        ");
-        $articles->execute([':path' => $like]);
-
-        $groups = $this->pdo->prepare("
-            SELECT DISTINCT g.Id, g.Name AS Title
-            FROM Message m
-            JOIN `Group` g ON g.Id = m.GroupId
-            WHERE m.GroupId IS NOT NULL
-              AND m.ImagePath LIKE :path
-            ORDER BY g.Name ASC
-        ");
-        $groups->execute([':path' => $like]);
-
-        /** @var list<object{Id: int, Title: string, StartTime: string}> $eventsResult */
-        $eventsResult = $events->fetchAll(PDO::FETCH_OBJ);
-
-        /** @var list<object{Id: int, Title: string}> $articlesResult */
-        $articlesResult = $articles->fetchAll(PDO::FETCH_OBJ);
-
-        /** @var list<object{Id: int, Title: string}> $groupsResult */
-        $groupsResult = $groups->fetchAll(PDO::FETCH_OBJ);
-
-        return [
-            'events'   => $eventsResult,
-            'articles' => $articlesResult,
-            'groups'   => $groupsResult,
-        ];
     }
 
     /**
@@ -390,34 +173,6 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         return $news;
     }
 
-    /**
-     * @param array<int, string> $paths
-     * @return array<string, bool>
-     */
-    public function getPathsUsedInMessages(array $paths): array
-    {
-        if (empty($paths)) {
-            return [];
-        }
-
-        $stmt = $this->pdo->query("SELECT ImagePath FROM Message WHERE ImagePath IS NOT NULL");
-        if ($stmt === false) {
-            return [];
-        }
-        $imagePaths = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-        $used = [];
-        foreach ($paths as $path) {
-            foreach ($imagePaths as $imagePath) {
-                if (is_string($imagePath) && str_contains($imagePath, $path)) {
-                    $used[$path] = true;
-                    break;
-                }
-            }
-        }
-        return $used;
-    }
-
     public function hasNewMessages(int $personId, int $lastLogId): bool
     {
         try {
@@ -438,74 +193,7 @@ final class MessageDataHelper extends Data implements NewsProviderInterface
         }
     }
 
-    public function updateMessage(int $messageId, int $personId, string $text): true
-    {
-        /** @var object{PersonId: int}|false $message */
-        $message = $this->get('Message', ['Id' => $messageId], 'PersonId');
-        if (!$message || $message->PersonId != $personId) {
-            throw new UnauthorizedAccessException("Vous n'êtes pas autorisé à modifier ce message");
-        }
-        $this->set('Message', ['Text' => $text, 'LastUpdate' => date('Y-m-d H:i:s')], ['Id' => $messageId]);
-        return true;
-    }
-
-
     #region Private functions
-    /**
-     * @param list<stdClass> $rows
-     * @return list<ChatMessage>
-     */
-    private function mapChatMessages(array $rows): array
-    {
-        static $gravatarHandler = null;
-
-        if (!$gravatarHandler instanceof GravatarHandler) {
-            $gravatarHandler = new GravatarHandler();
-        }
-
-        return array_map(
-            fn(stdClass $row): ChatMessage => $this->mapChatMessage($row, $gravatarHandler),
-            $rows
-        );
-    }
-
-    private function mapChatMessage(
-        stdClass $row,
-        GravatarHandler $gravatarHandler
-    ): ChatMessage {
-        $id = To::requireInt($row->Id ?? null);
-        $personId = To::requireInt($row->PersonId ?? null);
-        $text = To::requireStr($row->Text ?? null);
-        $lastUpdate = To::requireStr($row->LastUpdate ?? null);
-
-        $email = To::nullableStr($row->Email ?? null);
-        $avatar = To::nullableStr($row->Avatar ?? null);
-
-        // La colonne UseGravatar utilise les valeurs 'yes' et 'no'.
-        $useGravatar = To::bool($row->UseGravatar ?? null);
-
-        return new ChatMessage(
-            id: $id,
-            personId: $personId,
-            text: $text,
-            lastUpdate: $lastUpdate,
-            imagePath: To::nullableStr($row->ImagePath ?? null),
-            email: $email,
-            avatar: $avatar,
-            useGravatar: $useGravatar,
-            nickName: To::nullableStr($row->NickName ?? null),
-            firstName: To::nullableStr($row->FirstName ?? null),
-            lastName: To::nullableStr($row->LastName ?? null),
-            userImg: WebApp::computeUserImg(
-                $useGravatar,
-                $email,
-                $avatar,
-                $gravatarHandler
-            ),
-            timeAgo: MyClubDateTime::calculateTimeAgo($lastUpdate),
-        );
-    }
-
     /** @return array<int, stdClass> */
     private function doGetGroupedMessages(int $personId, string $searchFrom): array
     {

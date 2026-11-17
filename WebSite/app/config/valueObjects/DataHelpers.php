@@ -12,6 +12,7 @@ use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\AvailabilityDataHelper;
 use app\models\CarouselDataHelper;
+use app\models\ChatMessageDataHelper;
 use app\models\ContactDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\DataHelper;
@@ -40,6 +41,9 @@ use app\models\MemberImportDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
+use app\models\MessageImageDataHelper;
+use app\models\MessageStatisticsDataHelper;
+use app\models\MessageWriteDataHelper;
 use app\models\MetadataDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
@@ -67,6 +71,7 @@ final readonly class DataHelpers
         public AuthorizationDataHelper $authorizationDataHelper,
         public AvailabilityDataHelper $availabilityDataHelper,
         public CarouselDataHelper $carouselDataHelper,
+        public ChatMessageDataHelper $chatMessageDataHelper,
         public ContactDataHelper $contactDataHelper,
         public CrosstabDataHelper $crosstabDataHelper,
         public DataHelper $dataHelper,
@@ -95,6 +100,9 @@ final readonly class DataHelpers
         public MembershipDataHelper $membershipDataHelper,
         public MenuItemDataHelper $menuItemDataHelper,
         public MessageDataHelper $messageDataHelper,
+        public MessageImageDataHelper $messageImageDataHelper,
+        public MessageStatisticsDataHelper $messageStatisticsDataHelper,
+        public MessageWriteDataHelper $messageWriteDataHelper,
         public MetadataDataHelper $metadataDataHelper,
         public NeedDataHelper $needDataHelper,
         public NeedTypeDataHelper $needTypeDataHelper,

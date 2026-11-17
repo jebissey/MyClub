@@ -17,9 +17,12 @@ use app\modules\Article\services\MediaFileStreamer;
 use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
+use app\modules\Common\services\EventService;
+use app\modules\Common\services\MessageRecipientService;
 use app\modules\Loan\services\LoanAvailabilityService;
 use app\modules\Loan\services\LoanCalendarService;
 use app\modules\PersonManager\services\MemberCsvImporter;
+use app\modules\PersonManager\services\MemberOdsImporter;
 use app\modules\Webmaster\services\InstallationDisplayService;
 
 /**
@@ -33,6 +36,7 @@ final readonly class Services
         public ArticleAuthorizationService $articleAuthorizationService,
         public AuthenticationService $authenticationService,
         public EmailService $emailService,
+        public EventService $eventService,
         public InstallationDisplayService $installationDisplayService,
         public LoanAvailabilityService $loanAvailabilityService,
         public LoanCalendarService $loanCalendarService,
@@ -41,6 +45,8 @@ final readonly class Services
         public MediaFileListBuilder $mediaFileListBuilder,
         public MediaFileStreamer $mediaFileStreamer,
         public MemberCsvImporter $memberCsvImporter,
+        public MemberOdsImporter $memberOdsImporter,
+        public MessageRecipientService $messageRecipientService,
         public News $news,
         public NotificationSender $notificationSender,
         public PersonDataHelper $personDataHelper,

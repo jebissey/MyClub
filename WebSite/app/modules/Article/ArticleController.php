@@ -14,6 +14,7 @@ use app\helpers\GravatarHandler;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
 use app\models\CarouselDataHelper;
+use app\models\ChatMessageDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAlertService;
@@ -49,6 +50,7 @@ final class ArticleController extends ArticleAccessController
         private readonly ArticleService $articleService,
         private readonly CarouselDataHelper $carouselDataHelper,
         private readonly ArticleAlertService $articleAlertService,
+        private readonly ChatMessageDataHelper $chatMessageDataHelper,
     ) {
         parent::__construct(
             $application,
@@ -401,7 +403,7 @@ final class ArticleController extends ArticleAccessController
             article: $article,
             event: null,
             group: null,
-            messages: $this->messageDataHelper->getArticleMessages($articleId),
+            messages: $this->chatMessageDataHelper->getArticleMessages($articleId),
             person: $person,
             navItems: $this->getNavItems($person->email),
             newMessages: $this->messageDataHelper->hasNewMessages($person->id, $lastLogId),

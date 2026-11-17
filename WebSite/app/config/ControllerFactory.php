@@ -18,6 +18,7 @@ use app\models\ArticleTableDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\AvailabilityDataHelper;
 use app\models\CarouselDataHelper;
+use app\models\ChatMessageDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\DbBrowserDataHelper;
 use app\models\DesignDataHelper;
@@ -140,6 +141,7 @@ final readonly class ControllerFactory
         private AuthenticationService $authenticationService,
         private Backup $backup,
         private CarouselDataHelper $carouselDataHelper,
+        private ChatMessageDataHelper $chatMessageDataHelper,
         private CrosstabDataHelper $crosstabDataHelper,
         private DbBrowserDataHelper $dbBrowserDataHelper,
         private DesignDataHelper $designDataHelper,
@@ -197,6 +199,7 @@ final readonly class ControllerFactory
             $this->articleService,
             $this->carouselDataHelper,
             $this->articleAlertService,
+            $this->chatMessageDataHelper,
         );
     }
 
@@ -277,6 +280,7 @@ final readonly class ControllerFactory
         return new EventController(
             $this->application,
             $this->attributeDataHelper,
+            $this->chatMessageDataHelper,
             $this->crosstabDataHelper,
             $this->eventDataHelper,
             $this->eventInvitationDataHelper,
@@ -368,7 +372,8 @@ final readonly class ControllerFactory
             $this->application,
             $this->groupDataHelper,
             $this->personGroupDataHelper,
-            $this->messageDataHelper
+            $this->messageDataHelper,
+            $this->chatMessageDataHelper,
         );
     }
 

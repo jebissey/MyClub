@@ -10,6 +10,7 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\To;
 use app\helpers\WebApp;
+use app\models\ChatMessageDataHelper;
 use app\models\GroupDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonGroupDataHelper;
@@ -29,6 +30,7 @@ final class GroupController extends AbstractController
         private readonly GroupDataHelper $groupDataHelper,
         private readonly PersonGroupDataHelper $personGroupDataHelper,
         private readonly MessageDataHelper $messageDataHelper,
+        private readonly ChatMessageDataHelper $chatMessageDataHelper,
     ) {
         parent::__construct($application);
     }
@@ -207,7 +209,7 @@ final class GroupController extends AbstractController
             article: null,
             event: null,
             group: GroupChatRow::fromRow($group),
-            messages: $this->messageDataHelper->getGroupMessages($groupId),
+            messages: $this->chatMessageDataHelper->getGroupMessages($groupId),
             person: $person,
             navItems: $this->getNavItems($person->email),
             newMessages: $this->messageDataHelper->hasNewMessages($person->id, $lastLogId),

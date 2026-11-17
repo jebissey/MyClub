@@ -17,6 +17,7 @@ use app\helpers\Application;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\AttributeDataHelper;
+use app\models\ChatMessageDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\EventDataHelper;
 use app\models\EventInvitationDataHelper;
@@ -48,6 +49,7 @@ final class EventController extends AbstractController
     public function __construct(
         Application $application,
         private readonly AttributeDataHelper $attributeDataHelper,
+        private readonly ChatMessageDataHelper $chatMessageDataHelper,
         private readonly CrosstabDataHelper $crosstabDataHelper,
         private readonly EventDataHelper $eventDataHelper,
         private readonly EventInvitationDataHelper $eventInvitationDataHelper,
@@ -443,7 +445,7 @@ final class EventController extends AbstractController
             article: null,
             event: $eventChatRow,
             group: null,
-            messages: $this->messageDataHelper->getEventMessages($eventId),
+            messages: $this->chatMessageDataHelper->getEventMessages($eventId),
             person: $person,
             navItems: [],
             newMessages: $this->messageDataHelper->hasNewMessages($person->id, $lastLogId),

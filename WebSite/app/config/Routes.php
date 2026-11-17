@@ -95,6 +95,7 @@ use app\config\valueObjects\Services;
 use app\enums\ApplicationError;
 use app\helpers\Application;
 use app\helpers\Backup;
+use app\helpers\ChatMessageMapper;
 use app\helpers\ErrorManager;
 use app\helpers\GravatarHandler;
 use app\helpers\MediaManager;
@@ -112,6 +113,7 @@ use app\models\AttributeDataHelper;
 use app\models\AuthorizationDataHelper;
 use app\models\AvailabilityDataHelper;
 use app\models\CarouselDataHelper;
+use app\models\ChatMessageDataHelper;
 use app\models\ContactDataHelper;
 use app\models\CrosstabDataHelper;
 use app\models\DataHelper;
@@ -139,6 +141,9 @@ use app\models\MemberImportDataHelper;
 use app\models\MembershipDataHelper;
 use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
+use app\models\MessageImageDataHelper;
+use app\models\MessageStatisticsDataHelper;
+use app\models\MessageWriteDataHelper;
 use app\models\MetadataDataHelper;
 use app\models\NeedDataHelper;
 use app\models\NeedTypeDataHelper;
@@ -577,6 +582,7 @@ final class Routes
         $languagesDataHelper = new LanguagesDataHelper($this->application, $this->application->getErrorManager());
         $personDataHelper = new PersonDataHelper($this->application);
         $eventDataHelper = new EventDataHelper($this->application);
+        $chatMessageMapper = new ChatMessageMapper();
 
         return new DataHelpers(
             alertRecipientDataHelper: new AlertRecipientDataHelper($this->application, $personDataHelper, $this->personPreferences),
@@ -587,6 +593,7 @@ final class Routes
             authorizationDataHelper: $authorizationDataHelper,
             availabilityDataHelper: new AvailabilityDataHelper($this->application),
             carouselDataHelper: new CarouselDataHelper($this->application),
+            chatMessageDataHelper: new ChatMessageDataHelper($this->application, $chatMessageMapper),
             contactDataHelper: new ContactDataHelper($this->application),
             crosstabDataHelper: $crosstabDataHelper,
             dataHelper: $this->dataHelper,
@@ -614,7 +621,14 @@ final class Routes
             memberImportDataHelper: new MemberImportDataHelper($this->application),
             membershipDataHelper: new MembershipDataHelper($this->application),
             menuItemDataHelper: new MenuItemDataHelper($this->application, $authorizationDataHelper),
-            messageDataHelper: new MessageDataHelper($this->application, $languagesDataHelper),
+            messageDataHelper: new MessageDataHelper(
+                $this->application,
+                new MessageImageDataHelper($this->application, $languagesDataHelper),
+                new MessageStatisticsDataHelper($this->application),
+            ),
+            messageImageDataHelper: new MessageImageDataHelper($this->application, $languagesDataHelper),
+            messageStatisticsDataHelper: new MessageStatisticsDataHelper($this->application),
+            messageWriteDataHelper: new MessageWriteDataHelper($this->application),
             metadataDataHelper: new MetadataDataHelper($this->application),
             needDataHelper: new NeedDataHelper($this->application),
             needTypeDataHelper: new NeedTypeDataHelper($this->application),
@@ -661,6 +675,7 @@ final class Routes
                 new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
                 $this->quotaTracker
             ),
+            eventService:new EventService($dataHelpers->eventDataHelper),
             installationDisplayService: new InstallationDisplayService(),
             loanAvailabilityService: new LoanAvailabilityService(
                 $dataHelpers->loanItemDataHelper,
@@ -686,6 +701,8 @@ final class Routes
                 $dataHelpers->languagesDataHelper
             ),
             memberCsvImporter: new MemberCsvImporter($dataHelpers->memberImportDataHelper),
+            memberOdsImporter: new MemberOdsImporter($dataHelpers->memberImportDataHelper, $dataHelpers->languagesDataHelper),
+            messageRecipientService: new MessageRecipientService($this->dataHelper),
             news: new News($newsProviders),
             notificationSender: new NotificationSender($this->dataHelper, CredentialService::getInstance()),
             personDataHelper: $dataHelpers->personDataHelper,
@@ -712,6 +729,7 @@ final class Routes
             $services->authenticationService,
             new Backup(),
             $dataHelpers->carouselDataHelper,
+            $dataHelpers->chatMessageDataHelper,
             $dataHelpers->crosstabDataHelper,
             $dataHelpers->dbBrowserDataHelper,
             $dataHelpers->designDataHelper,
@@ -768,7 +786,7 @@ final class Routes
             $dataHelpers->eventDataHelper,
             $dataHelpers->eventNeedDataHelper,
             $dataHelpers->eventParticipationDataHelper,
-            new EventService($dataHelpers->eventDataHelper),
+            $services->eventService,
             new GravatarHandler(),
             $this->quotaTracker,
             $dataHelpers->kanbanDataHelper,
@@ -784,11 +802,12 @@ final class Routes
             $services->mediaManager,
             new MemberCustomFields($dataHelpers->dataHelper),
             $dataHelpers->memberDataHelper,
-            new MemberOdsImporter($dataHelpers->memberImportDataHelper, $dataHelpers->languagesDataHelper),
+            $services->memberOdsImporter,
             $dataHelpers->membershipDataHelper,
             $dataHelpers->menuItemDataHelper,
             $dataHelpers->messageDataHelper,
-            new MessageRecipientService($this->dataHelper),
+            $services->messageRecipientService,
+            $dataHelpers->messageWriteDataHelper,
             $dataHelpers->needDataHelper,
             $dataHelpers->needTypeDataHelper,
             $services->notificationSender,

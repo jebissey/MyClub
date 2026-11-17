@@ -17,6 +17,7 @@ use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\LanguagesDataHelper;
 use app\models\MessageDataHelper;
+use app\models\MessageWriteDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\MessageRecipientService;
 use app\modules\Common\valueObjects\ApiResponse;
@@ -52,7 +53,8 @@ final class MessageApi extends AbstractApi
         private readonly MessageDataHelper $messageDataHelper,
         private readonly MessageRecipientService $messageRecipientService,
         private readonly NotificationSender $notificationSender,
-        private readonly MediaManager $mediaManager
+        private readonly MediaManager $mediaManager,
+        private readonly MessageWriteDataHelper $messageWriteDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
@@ -207,7 +209,7 @@ final class MessageApi extends AbstractApi
         ?string $imagePath = null
     ): ApiResponse {
         try {
-            $messageId = $this->messageDataHelper->addMessage($target, $personId, $text, $imagePath);
+            $messageId = $this->messageWriteDataHelper->addMessage($target, $personId, $text, $imagePath);
             return new ApiResponse(
                 $messageId !== false,
                 $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value,
@@ -252,7 +254,7 @@ final class MessageApi extends AbstractApi
     private function doUpdateMessage(int $messageId, int $personId, string $text): ApiResponse
     {
         try {
-            $this->messageDataHelper->updateMessage($messageId, $personId, $text);
+            $this->messageWriteDataHelper->updateMessage($messageId, $personId, $text);
             return new ApiResponse(
                 true,
                 ApplicationError::Ok->value,
