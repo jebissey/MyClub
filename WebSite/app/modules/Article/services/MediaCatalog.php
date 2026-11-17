@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\Article\services;
 
+use Generator;
 use app\helpers\MediaManager;
 use app\modules\Article\valueObjects\MediaListCriteria;
 
@@ -137,7 +138,7 @@ final class MediaCatalog
     /**
      * @return \Generator<int, string> Full path of every file located at <year>/<month>/<file>.
      */
-    private function allFiles(): \Generator
+    private function allFiles(): Generator
     {
         $basePath = MediaManager::getMediaPath();
 

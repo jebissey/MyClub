@@ -85,18 +85,18 @@ final class MediaController extends AbstractController
 
         $sharedFile = SharedFileRow::fromStdClass($row);
 
-        if (!$this->canAccessSharedFile($sharedFile, $this->application->getConnectedUser()->person)) {
+        if (
+            !$this->canAccessSharedFile(
+                $sharedFile->onlyForMembers !== 0,
+                $sharedFile->idGroup,
+                $this->application->getConnectedUser()->person
+            )
+        ) {
             $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
 
-        $realPath = $this->fileStreamer->locate($sharedFile->item);
-        if ($realPath === null) {
-            $this->errors->badRequest('File unknown', __FILE__, __LINE__);
-            return;
-        }
-
-        $this->fileStreamer->send($realPath, true);
+        $this->download($sharedFile->item);
     }
 
     public function gpxViewer(): void
@@ -274,17 +274,27 @@ final class MediaController extends AbstractController
      * A shared file is accessible when the visitor satisfies both restrictions that apply to it:
      * being a member (if required) and belonging to the target group (if any).
      */
-    private function canAccessSharedFile(SharedFileRow $sharedFile, ?Person $person): bool
+    private function canAccessSharedFile(bool $membersOnly, ?int $idGroup, ?Person $person): bool
     {
-        if ($sharedFile->onlyForMembers !== 0 && $person === null) {
+        if ($membersOnly && $person === null) {
             return false;
         }
 
-        if ($sharedFile->idGroup === null) {
+        if ($idGroup === null) {
             return true;
         }
 
         return $person !== null
-            && $this->personGroupDataHelper->isPersonInGroup($person->id, $sharedFile->idGroup);
+            && $this->personGroupDataHelper->isPersonInGroup($person->id, $idGroup);
+    }
+
+    private function download(string $file): void
+    {
+        $realPath = $this->fileStreamer->locate($file);
+        if ($realPath === null) {
+            $this->errors->badRequest('File unknown', __FILE__, __LINE__);
+            return;
+        }
+        $this->fileStreamer->send($realPath, true);
     }
 }

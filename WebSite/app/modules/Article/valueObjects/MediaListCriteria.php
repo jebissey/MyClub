@@ -12,7 +12,8 @@ final readonly class MediaListCriteria
         public string $fileExtension,
         public string $search,
         public bool $unusedOnly,
-    ) {}
+    ) {
+    }
 
     /**
      * Builds the criteria from raw query parameters, ignoring invalid values.
