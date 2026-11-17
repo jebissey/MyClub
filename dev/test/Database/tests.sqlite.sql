@@ -5538,7 +5538,7 @@ ORDER BY i.Id','[{"Id":1,"Email":"webmaster@myclub.foo","Password":"e427c26faca9
  (6546,1,NULL,'GET','/contact/event/1',NULL,NULL,NULL,'200',NULL,NULL),
  (6547,1,NULL,'GET','/crossTab',NULL,NULL,NULL,'403',NULL,NULL),
  (6548,1,NULL,'GET','/crossTab/help',NULL,NULL,NULL,'403',NULL,NULL),
- (6549,1,NULL,'GET','/data/media/2026/11/zz',NULL,NULL,NULL,'200',NULL,NULL),
+ (6549,1,NULL,'GET','/data/media/2026/11/zz',NULL,NULL,NULL,'403',NULL,NULL),
  (6550,1,NULL,'GET','/dbbrowser',NULL,NULL,NULL,'403',NULL,NULL),
  (6551,1,NULL,'GET','/dbbrowser/zz',NULL,NULL,NULL,'403',NULL,NULL),
  (6552,1,NULL,'GET','/dbbrowser/zz/create',NULL,NULL,NULL,'403',NULL,NULL),
