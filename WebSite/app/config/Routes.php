@@ -153,6 +153,9 @@ use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Article\services\ArticleAlertService;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\services\MediaCatalog;
+use app\modules\Article\services\MediaFileListBuilder;
+use app\modules\Article\services\MediaFileStreamer;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\ArticleService;
@@ -647,6 +650,8 @@ final class Routes
             $dataHelpers->surveyDataHelper,
         ];
 
+        $mediaCatalog = new MediaCatalog();
+
         return new Services(
             anonymousAccessService: new AnonymousAccessService($authenticationService, $this->application->getConnectedUser()),
             articleAlertService: new ArticleAlertService($dataHelpers->alertRecipientDataHelper, Application::$root),
@@ -666,6 +671,15 @@ final class Routes
                 $dataHelpers->loanRecordDataHelper,
                 $dataHelpers->loanReservationDataHelper,
             ),
+            mediaCatalog: $mediaCatalog,
+            mediaFileListBuilder: new MediaFileListBuilder(
+                $mediaCatalog,
+                $dataHelpers->articleDataHelper,
+                $dataHelpers->carouselDataHelper,
+                $dataHelpers->sharedFileDataHelper,
+                $dataHelpers->messageDataHelper
+            ),
+            mediaFileStreamer: new MediaFileStreamer(),
             mediaManager: new MediaManager(
                 $this->dataHelper,
                 $dataHelpers->sharedFileDataHelper,
@@ -716,6 +730,9 @@ final class Routes
             $dataHelpers->loanRecordDataHelper,
             $dataHelpers->loanReservationDataHelper,
             $dataHelpers->logDataHelper,
+            $services->mediaCatalog,
+            $services->mediaFileListBuilder,
+            $services->mediaFileStreamer,
             new MemberCsvImporter($dataHelpers->memberImportDataHelper),
             new MemberCustomFields($dataHelpers->dataHelper),
             $dataHelpers->memberDataHelper,
@@ -733,7 +750,6 @@ final class Routes
             $dataHelpers->personGroupDataHelper,
             $dataHelpers->personStatisticsDataHelper,
             new RegistrationLinkService($dataHelpers->contactDataHelper, $services->emailService),
-            $dataHelpers->sharedFileDataHelper,
             $dataHelpers->surveyDataHelper,
             $dataHelpers->tableControllerDataHelper,
         );

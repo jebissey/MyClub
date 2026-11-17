@@ -4,31 +4,55 @@ declare(strict_types=1);
 
 namespace app\modules\Article;
 
-use RuntimeException;
 use app\helpers\Application;
-use app\helpers\MediaManager;
 use app\helpers\WebApp;
 use app\models\ArticleDataHelper;
-use app\models\CarouselDataHelper;
 use app\models\MessageDataHelper;
 use app\models\PersonGroupDataHelper;
-use app\models\SharedFileDataHelper;
 use app\modules\Common\AbstractController;
+use app\modules\Article\services\MediaCatalog;
+use app\modules\Article\services\MediaFileListBuilder;
+use app\modules\Article\services\MediaFileStreamer;
+use app\modules\Article\valueObjects\MediaListCriteria;
 use app\modules\Article\valueObjects\SharedFileRow;
 use app\modules\Article\viewModels\MediaListViewModel;
 use app\modules\Article\viewModels\MediaUploadViewModel;
 use app\modules\Article\viewModels\MediaUsesInArticlesViewModel;
 use app\modules\Article\viewModels\MediaUsesInMessagesViewModel;
+use app\modules\Common\valueObjects\Person;
 use app\modules\Common\viewModels\PageViewModel;
 
+/**
+ * @phpstan-import-type Candidate from MediaCatalog
+ * @phpstan-type UsageMap array{
+ *     article: array<string, bool>,
+ *     gallery: array<string, bool>,
+ *     shared: array<string, bool>,
+ *     message: array<string, bool>
+ * }
+ * @phpstan-type FileRow array{
+ *     name: string,
+ *     path: string,
+ *     url: string,
+ *     urlRedactor: string,
+ *     size: int,
+ *     date: string,
+ *     month: string,
+ *     inGalery: bool,
+ *     inArticle: bool,
+ *     shared: bool,
+ *     inMessage: bool
+ * }
+ */
 final class MediaController extends AbstractController
 {
     public function __construct(
         Application $application,
+        private readonly MediaCatalog $catalog,
+        private readonly MediaFileListBuilder $fileListBuilder,
+        private readonly MediaFileStreamer $fileStreamer,
         private readonly ArticleDataHelper $articleDataHelper,
-        private readonly CarouselDataHelper $carouselDataHelper,
         private readonly PersonGroupDataHelper $personGroupDataHelper,
-        private readonly SharedFileDataHelper $sharedFileDataHelper,
         private readonly MessageDataHelper $messageDataHelper,
     ) {
         parent::__construct($application);
@@ -55,24 +79,24 @@ final class MediaController extends AbstractController
         );
 
         if (!$row) {
-            $this->errors->badRequest("Token unknown", __FILE__, __LINE__);
+            $this->errors->badRequest('Token unknown', __FILE__, __LINE__);
             return;
         }
+
         $sharedFile = SharedFileRow::fromStdClass($row);
-        $connectedUser = $this->application->getConnectedUser();
-        if ($sharedFile->onlyForMembers !== 0) {
-            if ($connectedUser->person === null) {
-                $this->errors->forbidden(__FILE__, __LINE__);
-                return;
-            }
+
+        if (!$this->canAccessSharedFile($sharedFile, $this->application->getConnectedUser()->person)) {
+            $this->errors->forbidden(__FILE__, __LINE__);
+            return;
         }
-        if ($sharedFile->idGroup !== null) {
-            if (!$this->personGroupDataHelper->isPersonInGroup($connectedUser->person->id ?? 0, $sharedFile->idGroup)) {
-                $this->errors->forbidden(__FILE__, __LINE__);
-                return;
-            }
+
+        $realPath = $this->fileStreamer->locate($sharedFile->item);
+        if ($realPath === null) {
+            $this->errors->badRequest('File unknown', __FILE__, __LINE__);
+            return;
         }
-        $this->download($sharedFile->item);
+
+        $this->fileStreamer->send($realPath, true);
     }
 
     public function gpxViewer(): void
@@ -96,72 +120,56 @@ final class MediaController extends AbstractController
 
     public function listFiles(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $query = $this->flight->request()->query;
-
-            $year = isset($query->year) && is_numeric($query->year)
-                ? (int) $query->year
-                : (int) date('Y');
-
-            $month = isset($query->month) && is_string($query->month)
-                ? $query->month
-                : '';
-
-            $fileExtension = isset($query->fileExtension) && is_string($query->fileExtension)
-                ? $query->fileExtension
-                : '';
-
-            $search = isset($query->search) && is_string($query->search)
-                ? trim($query->search)
-                : '';
-
-            $unusedOnly = isset($query->unusedOnly) && $query->unusedOnly === '1';
-            $years = $this->getAvailableYears();
-            if ($month !== '' && !in_array($month, $this->getMonths($year), true)) {
-                $month = '';
-            }
-
-            $filteredFiles = $this->getFiles($year, $month, $fileExtension, $search, $unusedOnly);
-            $totalFiles    = $this->getFiles($year, $month, '', '', false);
-            $connectedUser = $this->application->getConnectedUser();
-            $groups = $this->getActiveGroups();
-
-            $viewModel = new MediaListViewModel(
-                files: array_values($filteredFiles),
-                filteredCount: count($filteredFiles),
-                totalCount: count($totalFiles),
-                years: $years,
-                currentYear: $year,
-                months: array_values($this->getMonths($year)),
-                currentMonth: $month,
-                fileExtensions: array_values($this->getFileExtensions()),
-                currentFileExtension: $fileExtension,
-                search: $search,
-                unusedOnly: $unusedOnly,
-                baseUrl: WebApp::getBaseUrl(),
-                groups: $groups,
-                i18n: [
-                    // mediaShare.js
-                    'urlCopied'     => ($this->t)('media.manager.share.url_copied'),
-                    'linkCopied'    => ($this->t)('media.manager.share.link_copied'),
-                    'shareCreated'  => ($this->t)('media.manager.share.created'),
-                    'shareDeleted'  => ($this->t)('media.manager.share.deleted'),
-                    'shareError'    => ($this->t)('media.manager.share.error'),
-                    'deleteConfirm' => ($this->t)('media.manager.delete.confirm'),
-                    'deleteSuccess' => ($this->t)('media.manager.delete.success'),
-                    'deleteError'   => ($this->t)('media.manager.delete.error'),
-                    // mediaEdit.js
-                    'editSaved'     => ($this->t)('media.manager.edit.saved'),
-                    'editError'     => ($this->t)('media.manager.edit.error'),
-                    'saving'        => ($this->t)('media.manager.edit.saving'),
-                ],
-                layoutParams: $this->getAllParams([
-                    'page' => $connectedUser->getPage(),
-                    'isEditor' => $connectedUser->isEditor(),
-                ]),
-            );
-            $this->views->render('Article/views/media_index.latte', $viewModel);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
+            return;
         }
+
+        $criteria = MediaListCriteria::fromQuery($this->flight->request()->query);
+
+        $months = $this->catalog->months($criteria->year);
+        if (!in_array($criteria->month, $months, true)) {
+            $criteria = $criteria->withMonth('');
+        }
+
+        $filteredFiles = $this->fileListBuilder->build($criteria);
+        $totalCount = count($this->catalog->findCandidates($criteria->withoutFilters()));
+        $connectedUser = $this->application->getConnectedUser();
+
+        $viewModel = new MediaListViewModel(
+            files: $filteredFiles,
+            filteredCount: count($filteredFiles),
+            totalCount: $totalCount,
+            years: $this->catalog->years(),
+            currentYear: $criteria->year,
+            months: $months,
+            currentMonth: $criteria->month,
+            fileExtensions: $this->catalog->extensions(),
+            currentFileExtension: $criteria->fileExtension,
+            search: $criteria->search,
+            unusedOnly: $criteria->unusedOnly,
+            baseUrl: WebApp::getBaseUrl(),
+            groups: $this->getActiveGroups(),
+            i18n: [
+                // mediaShare.js
+                'urlCopied'     => ($this->t)('media.manager.share.url_copied'),
+                'linkCopied'    => ($this->t)('media.manager.share.link_copied'),
+                'shareCreated'  => ($this->t)('media.manager.share.created'),
+                'shareDeleted'  => ($this->t)('media.manager.share.deleted'),
+                'shareError'    => ($this->t)('media.manager.share.error'),
+                'deleteConfirm' => ($this->t)('media.manager.delete.confirm'),
+                'deleteSuccess' => ($this->t)('media.manager.delete.success'),
+                'deleteError'   => ($this->t)('media.manager.delete.error'),
+                // mediaEdit.js
+                'editSaved'     => ($this->t)('media.manager.edit.saved'),
+                'editError'     => ($this->t)('media.manager.edit.error'),
+                'saving'        => ($this->t)('media.manager.edit.saving'),
+            ],
+            layoutParams: $this->getAllParams([
+                'page' => $connectedUser->getPage(),
+                'isEditor' => $connectedUser->isEditor(),
+            ]),
+        );
+        $this->views->render('Article/views/media_index.latte', $viewModel);
     }
 
     public function serveFile(string $year, string $month, string $filename): void
@@ -170,20 +178,21 @@ final class MediaController extends AbstractController
             return;
         }
 
-        $connectedUser = $this->application->getConnectedUser(true);
-        if (
-            $this->authorizationDataHelper->personCanReadMediaFile(
-                (int)$year,
-                (int)$month,
-                $filename,
-                $connectedUser,
-                $this->getNavItems($connectedUser->person->email)
-            )
-        ) {
-            $this->viewFile((int)$year, (int)$month, $filename);
-        } else {
+        $connectedUser = $this->application->getConnectedUser();
+        $canRead = $this->authorizationDataHelper->personCanReadMediaFile(
+            (int)$year,
+            (int)$month,
+            $filename,
+            $connectedUser,
+            $this->getNavItems($connectedUser->person?->email)
+        );
+
+        if (!$canRead) {
             $this->errors->forbidden(__FILE__, __LINE__);
+            return;
         }
+
+        $this->viewFile((int)$year, (int)$month, $filename);
     }
 
     public function showUploadForm(): void
@@ -251,258 +260,31 @@ final class MediaController extends AbstractController
     }
 
     #region Private functions
-    private function download(string $file): void
-    {
-        $fullPath = MediaManager::getMediaPath() . $file;
-        $realPath = realpath($fullPath);
-        if (!$realPath || !file_exists($realPath) || !is_readable($realPath)) {
-            $this->errors->badRequest("File {$realPath} ({$fullPath}) unknown", __FILE__, __LINE__);
-            return;
-        }
-        $filename = basename($file);
-
-        header("Content-Description: File Transfer");
-        header("Content-Type: application/octet-stream");
-        header("Content-Disposition: attachment; filename=\"" . $filename . "\"");
-        header("Expires: 0");
-        header("Cache-Control: must-revalidate");
-        header("Pragma: public");
-        header("Content-Length: " . filesize($realPath));
-        flush();
-        readfile($realPath);
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function getAvailableYears(): array
-    {
-        $years = [];
-        $basePath = MediaManager::getMediaPath();
-
-        if (file_exists($basePath) && is_dir($basePath)) {
-            $dirs = scandir($basePath);
-            if ($dirs === false) {
-                return [];
-            }
-
-            foreach ($dirs as $dir) {
-                if ($dir !== '.' && $dir !== '..' && is_dir($basePath . $dir) && is_numeric($dir)) {
-                    $years[] = $dir;
-                }
-            }
-            rsort($years);
-        }
-
-        return $years;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function getFileExtensions(): array
-    {
-        $fileExtensions = [];
-        $basePath = MediaManager::getMediaPath();
-        if (file_exists($basePath) && is_dir($basePath)) {
-            $dirs = scandir($basePath);
-            foreach ($dirs as $year) {
-                if ($year !== '.' && $year !== '..' && is_dir($basePath . $year)) {
-                    $months = scandir($basePath . $year);
-                    foreach ($months as $month) {
-                        if ($month !== '.' && $month !== '..' && is_dir($basePath . $year . DIRECTORY_SEPARATOR . $month)) {
-                            $files = scandir($basePath . $year . DIRECTORY_SEPARATOR . $month);
-                            foreach ($files as $file) {
-                                if (is_file($basePath . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file)) {
-                                    $ext = pathinfo($file, PATHINFO_EXTENSION);
-                                    if ($ext !== '') {
-                                        $fileExtensions[] = strtolower($ext);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            $fileExtensions = array_unique($fileExtensions);
-            sort($fileExtensions);
-        }
-        array_unshift($fileExtensions, "");
-        return $fileExtensions;
-    }
-
-    /**
-     * @return array<int, array{
-     *     name: string,
-     *     path: string,
-     *     url: string,
-     *     urlRedactor: string,
-     *     size: int,
-     *     date: string,
-     *     month: string,
-     *     inGalery: bool,
-     *     inArticle: bool,
-     *     shared: bool,
-     *     inMessage: bool
-     * }>
-     */
-    private function getFiles(int $year, string $monthFiltered, string $fileExtension, string $search = '', bool $unusedOnly = false): array
-    {
-        $yearPath = MediaManager::getMediaPath() . $year . '/';
-
-        if (!file_exists($yearPath) || !is_dir($yearPath)) {
-            return [];
-        }
-
-        $candidates = [];
-        foreach (scandir($yearPath) as $month) {
-            if ($month === '.' || $month === '..' || !is_dir($yearPath . $month)) {
-                continue;
-            }
-            if ($monthFiltered !== '' && $monthFiltered !== $month) {
-                continue;
-            }
-
-            $monthPath = $yearPath . $month . '/';
-            $fileExtension = strtolower($fileExtension);
-            foreach (scandir($monthPath) as $file) {
-                $testedFile = $monthPath . $file;
-                $ext = strtolower(pathinfo($testedFile, PATHINFO_EXTENSION));
-
-                if (
-                    !is_file($testedFile)
-                    || ($fileExtension !== '' && $ext !== $fileExtension)
-                    || ($search !== '' && stripos($file, $search) === false)
-                ) {
-                    continue;
-                }
-
-                $path = $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file;
-                $candidates[] = [
-                    'name'      => $file,
-                    'path'      => $path,
-                    'monthPath' => $monthPath,
-                    'month'     => $month,
-                ];
-            }
-        }
-
-        if (empty($candidates)) {
-            return [];
-        }
-
-        $allPaths  = array_column($candidates, 'path');
-        $inArticle = $this->articleDataHelper->getPathsUsedInArticles($allPaths);
-        $inGalery  = $this->carouselDataHelper->getPathsUsedInGalery($allPaths);
-        $shared    = $this->sharedFileDataHelper->getPathsShared($allPaths);
-        $inMessage = $this->messageDataHelper->getPathsUsedInMessages($allPaths);
-
-        $files = [];
-        foreach ($candidates as $c) {
-            $path      = $c['path'];
-            $usedInArt = $inArticle[$path] ?? false;
-            $usedInGal = $inGalery[$path]  ?? false;
-            $isShared  = $shared[$path]    ?? false;
-            $usedInMsg = $inMessage[$path] ?? false;
-
-            if ($unusedOnly && ($usedInGal || $usedInArt || $isShared || $usedInMsg)) {
-                continue;
-            }
-
-            $fullPath = $c['monthPath'] . $c['name'];
-
-            $size = filesize($fullPath);
-            $size = $size !== false ? $size : 0;
-
-            $mtime = filemtime($fullPath);
-            $mtime = $mtime !== false ? $mtime : time();
-
-            $files[] = [
-                'name'        => $c['name'],
-                'path'        => $path,
-                'url'         => WebApp::getBaseUrl() . 'data/media/' . $path,
-                'urlRedactor' => WebApp::getBaseUrl() . 'media/' . $path,
-                'size'        => $size,
-                'date'        => date('Y-m-d H:i:s', $mtime),
-                'month'       => $c['month'],
-                'inGalery'    => $usedInGal,
-                'inArticle'   => $usedInArt,
-                'shared'      => $isShared,
-                'inMessage'   => $usedInMsg,
-            ];
-        }
-
-        usort($files, fn($a, $b) => strtotime($b['date']) - strtotime($a['date']));
-        return $files;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function getMonths(int $yearRequested): array
-    {
-        $foundMonths = [];
-        $basePath = MediaManager::getMediaPath();
-        if (file_exists($basePath) && is_dir($basePath)) {
-            $dirs = scandir($basePath);
-            foreach ($dirs as $year) {
-                if ($year !== '.' && $year !== '..' && is_dir($basePath . $year)) {
-                    if (!(is_numeric($year) && (int)$year === $yearRequested)) {
-                        continue;
-                    }
-                    $months = scandir($basePath . $year);
-                    foreach ($months as $month) {
-                        if ($month !== '.' && $month !== '..' && is_dir($basePath . $year . DIRECTORY_SEPARATOR . $month)) {
-                            $files = scandir($basePath . $year . DIRECTORY_SEPARATOR . $month);
-                            foreach ($files as $file) {
-                                if (is_file($basePath . $year . DIRECTORY_SEPARATOR . $month . DIRECTORY_SEPARATOR . $file)) {
-                                    $foundMonths[] = $month;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            $foundMonths = array_unique($foundMonths);
-            sort($foundMonths);
-        }
-        array_unshift($foundMonths, "");
-        return $foundMonths;
-    }
-
     private function viewFile(int $year, int $month, string $filename): void
     {
-        $filename = basename($filename);
-        $filePath = sprintf('%s/%04d/%02d/%s', realpath(MediaManager::getMediaPath()), $year, $month, basename($filename));
-        if (!file_exists($filePath)) {
-            $this->errors->badRequest("File $filePath not found", __FILE__, __LINE__);
+        $realPath = $this->fileStreamer->locateByDate($year, $month, $filename);
+        if ($realPath === null) {
+            $this->errors->badRequest('File not found', __FILE__, __LINE__);
             return;
         }
-        $this->streamFile($filePath, $filename);
+        $this->fileStreamer->send($realPath, false);
     }
 
-    private function streamFile(string $filePath, string $filename): void
+    /**
+     * A shared file is accessible when the visitor satisfies both restrictions that apply to it:
+     * being a member (if required) and belonging to the target group (if any).
+     */
+    private function canAccessSharedFile(SharedFileRow $sharedFile, ?Person $person): bool
     {
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        if ($finfo === false) {
-            throw new RuntimeException('Unable to initialize fileinfo.');
+        if ($sharedFile->onlyForMembers !== 0 && $person === null) {
+            return false;
         }
 
-        $mime = finfo_file($finfo, $filePath);
-
-        if ($mime === false) {
-            throw new RuntimeException("Unable to determine MIME type for {$filePath}.");
+        if ($sharedFile->idGroup === null) {
+            return true;
         }
 
-        $size = filesize($filePath);
-        if ($size === false) {
-            throw new RuntimeException("Unable to determine file size for {$filePath}.");
-        }
-
-        header('Content-Type: ' . $mime);
-        header('Content-Length: ' . $size);
-        header('Content-Disposition: inline; filename="' . $filename . '"');
-
-        readfile($filePath);
+        return $person !== null
+            && $this->personGroupDataHelper->isPersonInGroup($person->id, $sharedFile->idGroup);
     }
 }

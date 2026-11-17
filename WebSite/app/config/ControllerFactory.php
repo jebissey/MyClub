@@ -57,6 +57,9 @@ use app\modules\Article\MediaController;
 use app\modules\Article\OrderController;
 use app\modules\Article\services\ArticleAlertService;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\services\MediaCatalog;
+use app\modules\Article\services\MediaFileListBuilder;
+use app\modules\Article\services\MediaFileStreamer;
 use app\modules\Article\SurveyController;
 use app\modules\Astronomy\AstronomyController;
 use app\modules\Backup\BackupController;
@@ -155,6 +158,9 @@ final readonly class ControllerFactory
         private LoanRecordDataHelper $loanRecordDataHelper,
         private LoanReservationDataHelper $loanReservationDataHelper,
         private LogDataHelper $logDataHelper,
+        private MediaCatalog $mediaCatalog,
+        private MediaFileListBuilder $mediaFileListBuilder,
+        private MediaFileStreamer $mediaFileStreamer,
         private MemberCsvImporter $memberCsvImporter,
         private MemberCustomFields $memberCustomFields,
         private MemberDataHelper $memberDataHelper,
@@ -172,7 +178,6 @@ final readonly class ControllerFactory
         private PersonGroupDataHelper $personGroupDataHelper,
         private PersonStatisticsDataHelper $personStatisticsDataHelper,
         private RegistrationLinkService $registrationLinkService,
-        private SharedFileDataHelper $sharedFileDataHelper,
         private SurveyDataHelper $surveyDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
     ) {
@@ -435,10 +440,11 @@ final readonly class ControllerFactory
     {
         return new MediaController(
             $this->application,
+            $this->mediaCatalog,
+            $this->mediaFileListBuilder,
+            $this->mediaFileStreamer,
             $this->articleDataHelper,
-            $this->carouselDataHelper,
             $this->personGroupDataHelper,
-            $this->sharedFileDataHelper,
             $this->messageDataHelper,
         );
     }

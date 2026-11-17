@@ -11,6 +11,9 @@ use app\helpers\PersonPreferences;
 use app\models\PersonDataHelper;
 use app\modules\Article\services\ArticleAlertService;
 use app\modules\Article\services\ArticleAuthorizationService;
+use app\modules\Article\services\MediaCatalog;
+use app\modules\Article\services\MediaFileListBuilder;
+use app\modules\Article\services\MediaFileStreamer;
 use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\EmailService;
@@ -34,6 +37,9 @@ final readonly class Services
         public LoanAvailabilityService $loanAvailabilityService,
         public LoanCalendarService $loanCalendarService,
         public MediaManager $mediaManager,
+        public MediaCatalog $mediaCatalog,
+        public MediaFileListBuilder $mediaFileListBuilder,
+        public MediaFileStreamer $mediaFileStreamer,
         public MemberCsvImporter $memberCsvImporter,
         public News $news,
         public NotificationSender $notificationSender,
