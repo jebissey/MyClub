@@ -4,21 +4,13 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use FilesystemIterator;
 use PDO;
 use PDOStatement;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RuntimeException;
-use SplFileInfo;
-use Throwable;
-use app\enums\ApplicationError;
-use app\exceptions\DatabaseException;
 use app\helpers\Application;
 use app\helpers\File;
-use app\helpers\LogMessage;
 use app\helpers\To;
-use app\modules\Common\interfaces\DatabaseMigratorInterface;
+use app\models\database\DatabaseUpgrader;
+use app\models\database\MigratorsDirectoryCleaner;
 
 final class Database
 {
@@ -36,7 +28,7 @@ final class Database
     private function __construct()
     {
         if (self::$pdo === null) {
-            self::check();
+            $this->check();
         }
     }
 
@@ -70,24 +62,49 @@ final class Database
     #region Private functions
     private function check(): void
     {
-        $sqliteLogFile = self::SQLITE_DEST_PATH . self::SQLITE_LOG_FILE;
-        if (!is_file($sqliteLogFile)) {
-            File::copy(__DIR__ . '/database/' . self::SQLITE_LOG_FILE, self::SQLITE_DEST_PATH);
-        }
-        self::$pdoForLog = new PDO('sqlite:' . $sqliteLogFile);
-        self::$pdoForLog->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        self::$pdoForLog->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+        self::$pdoForLog = $this->openConnection(self::SQLITE_LOG_FILE);
+        self::$pdo = $this->openConnection(self::SQLITE_FILE);
 
-        $sqliteFile = self::SQLITE_DEST_PATH . self::SQLITE_FILE;
-        if (!is_file($sqliteFile)) {
-            File::copy(__DIR__ . '/database/' . self::SQLITE_FILE, self::SQLITE_DEST_PATH);
+        $metadata = $this->readMetadata(self::$pdo);
+        if ($metadata->ApplicationName !== self::APPLICATION) {
+            Application::unreachable('Non-compliant database');
         }
-        self::$pdo = new PDO('sqlite:' . $sqliteFile);
-        self::$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
-        self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $query = "SELECT ApplicationName, DatabaseVersion FROM Metadata LIMIT 1";
-        $stmt = self::$pdo->query($query);
+        $currentVersion = To::int($metadata->DatabaseVersion);
+        if ($currentVersion > self::DB_VERSION) {
+            Application::unreachable('The database requires a more recent version of the application');
+        }
+        if ($currentVersion < self::DB_VERSION) {
+            (new DatabaseUpgrader())->upgrade(self::$pdo, $currentVersion, self::DB_VERSION, self::$pdoForLog);
+        }
+
+        // Reached only when the database is at the current version: either it has just been
+        // upgraded successfully (a failure ends the request in Application::unreachable above),
+        // or it was created from the template (new installation) or was already up to date.
+        (new MigratorsDirectoryCleaner(self::MIGRATORS_DIR, dirname(__DIR__, 3) . '/.git'))->clean();
+    }
+
+    /**
+     * Opens a SQLite file stored in the data directory, copying the template first when it is missing.
+     */
+    private function openConnection(string $fileName): PDO
+    {
+        $path = self::SQLITE_DEST_PATH . $fileName;
+        if (!is_file($path)) {
+            File::copy(__DIR__ . '/database/' . $fileName, self::SQLITE_DEST_PATH);
+        }
+        $pdo = new PDO('sqlite:' . $path);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+        return $pdo;
+    }
+
+    /**
+     * @return object{ApplicationName: string, DatabaseVersion: int}
+     */
+    private function readMetadata(PDO $pdo): object
+    {
+        $stmt = $pdo->query('SELECT ApplicationName, DatabaseVersion FROM Metadata LIMIT 1');
         if (!$stmt instanceof PDOStatement) {
             Application::unreachable('Failed to query Metadata table');
         }
@@ -95,176 +112,7 @@ final class Database
         $row = $stmt->fetch(PDO::FETCH_OBJ);
         $stmt = null;
 
-        if ($row) {
-            if ($row->ApplicationName != self::APPLICATION) {
-                Application::unreachable('Non-compliant database');
-            }
-            if ($row->DatabaseVersion != self::DB_VERSION) {
-                if ($row->DatabaseVersion > self::DB_VERSION) {
-                    Application::unreachable('The database requires a more recent version of the application');
-                }
-                self::upgradeDatabase(self::$pdo, $row->DatabaseVersion, self::DB_VERSION, self::$pdoForLog);
-            }
-            // Reached only when the database is at the current version: either it has just been
-            // upgraded successfully (a failure ends the request in Application::unreachable above),
-            // or it was created from the template (new installation) or was already up to date.
-            $this->deleteMigratorsDirectory();
-        } else {
-            Application::unreachable('Empty Metadata table');
-        }
+        return $row ?: Application::unreachable('Empty Metadata table');
     }
-
-    /**
-     * The migrators are useless once the database is at the current version: remove them
-     * (they are shipped in FullInstall.zip). Skipped in a git working copy (development),
-     * where they are tracked source files.
-     */
-    private function deleteMigratorsDirectory(): void
-    {
-        if (!is_dir(self::MIGRATORS_DIR) || @file_exists(dirname(__DIR__, 3) . '/.git')) {
-            return;
-        }
-        $items = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(self::MIGRATORS_DIR, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-        /** @var SplFileInfo $item */
-        foreach ($items as $item) {
-            if ($item->isDir()) {
-                @rmdir($item->getPathname());
-            } else {
-                @unlink($item->getPathname());
-            }
-        }
-        @rmdir(self::MIGRATORS_DIR);
-    }
-
-    private function upgradeDatabase(PDO $pdo, int $from, int $to, PDO $pdoForLog): void
-    {
-        $logMessage = LogMessage::getInstance((string)ApplicationError::Ok->value);
-        $pdo->exec('PRAGMA foreign_keys = OFF');
-
-        $this->deleteOrphans($pdo, $logMessage);
-
-        $pdo->beginTransaction();
-        try {
-            $currentVersion = $from;
-            while ($currentVersion < $to) {
-                $nextVersion = $currentVersion + 1;
-                $className = "app\\models\\database\\migrators\\V{$currentVersion}ToV{$nextVersion}Migrator";
-                if (!class_exists($className)) {
-                    throw new RuntimeException("Migration class not found: $className");
-                }
-                $migrator = new $className();
-                if (!($migrator instanceof DatabaseMigratorInterface)) {
-                    throw new RuntimeException("$className must implement DatabaseMigratorInterface");
-                }
-                $newVersion = $migrator->upgrade($pdo, $currentVersion, $pdoForLog);
-                unset($migrator);
-                gc_collect_cycles();
-                $logMessage->setMessage("Database migrated from version {$currentVersion} to version {$newVersion} using {$className}");
-                if ($newVersion !== $nextVersion) {
-                    throw new RuntimeException("$className returned invalid version: $newVersion (expected $nextVersion)");
-                }
-                $currentVersion = $newVersion;
-            }
-            if ($currentVersion !== $to) {
-                Application::unreachable('Fatal program error: wrong final version');
-            }
-            $stmt = $pdo->prepare("UPDATE Metadata SET DatabaseVersion = ? WHERE Id = 1");
-            $stmt->execute([$to]);
-            $pdo->commit();
-        } catch (Throwable $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            throw new DatabaseException(
-                'Fatal program error during migration: ' . $e->getMessage(),
-                previous: $e
-            );
-        } finally {
-            $pdo->exec('PRAGMA foreign_keys = ON');
-        }
-
-        $this->checkOrphans($pdo);
-        $pdo->exec('VACUUM');
-    }
-
-    private function deleteOrphans(PDO $pdo, LogMessage $logMessage): void
-    {
-        $stmtTables = $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'");
-        if (!$stmtTables instanceof PDOStatement) {
-            return;
-        }
-        $tables = $stmtTables->fetchAll(PDO::FETCH_COLUMN);
-
-        foreach ($tables as $tableName) {
-            $table = To::str($tableName);
-            if ($table === '') {
-                continue;
-            }
-
-            $stmtFk = $pdo->query("PRAGMA foreign_key_list(" . $pdo->quote($table) . ")");
-            if (!$stmtFk instanceof PDOStatement) {
-                continue;
-            }
-            $foreignKeys = $stmtFk->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($foreignKeys as $fk) {
-                if (!is_array($fk)) {
-                    continue;
-                }
-
-                $from = To::str($fk['from'] ?? null);
-                $to = To::str($fk['to'] ?? null);
-                $parentTable = To::str($fk['table'] ?? null);
-
-                // 'to' is NULL in SQLite when the foreign key implicitly references the parent
-                // primary key. An empty identifier would make the DELETE below wrong, so skip it.
-                if ($from === '' || $to === '' || $parentTable === '') {
-                    continue;
-                }
-
-                $sql = sprintf(
-                    'DELETE FROM "%s" WHERE "%s" IS NOT NULL AND "%s" NOT IN (SELECT "%s" FROM "%s")',
-                    $table,
-                    $from,
-                    $from,
-                    $to,
-                    $parentTable
-                );
-                $deleted = $pdo->exec($sql);
-                if ($deleted !== false && $deleted > 0) {
-                    $logMessage->setMessage(
-                        "Orphans deleted in {$table}.{$from} referencing {$parentTable}.{$to}: {$deleted} row(s)"
-                    );
-                }
-            }
-        }
-    }
-
-    private function checkOrphans(PDO $pdo): void
-    {
-        $stmt = $pdo->query('PRAGMA foreign_key_check');
-        if (!$stmt instanceof PDOStatement) {
-            return;
-        }
-        $violations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (!empty($violations)) {
-            $details = implode('; ', array_map(
-                static function (mixed $v): string {
-                    if (!is_array($v)) {
-                        return 'unknown violation';
-                    }
-                    return 'table=' . To::str($v['table'] ?? null)
-                        . ' rowid=' . To::str($v['rowid'] ?? null)
-                        . ' parent=' . To::str($v['parent'] ?? null)
-                        . ' fkid=' . To::str($v['fkid'] ?? null);
-                },
-                $violations
-            ));
-            Application::unreachable("Orphaned records found after migration: {$details}");
-        }
-    }
+    #endregion
 }
