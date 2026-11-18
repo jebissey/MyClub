@@ -7511,10 +7511,14 @@ Base de données: lecture seule
 Description: Retourne la liste des attributs pour un type d''événement donné (identifiant numérique). Réponse JSON.','Type: JSON
 Uprawnienia: EventDesigner (lub wyższe) / zależne
 Baza danych: tylko odczyt
-Opis: Zwraca listę atrybutów dla danego typu wydarzenia (identyfikator numeryczny). Odpowiedź JSON.');
+Opis: Zwraca listę atrybutów dla danego typu wydarzenia (identyfikator numeryczny). Odpowiedź JSON.'),
+ (1899,'article.label.carousel','Gallery','Galerie','Galeria'),
+ (1900,'table.value.yes','yes','oui','tak'),
+ (1901,'table.value.no','no','non','nie'),
+ (1902,'table.value.all','All','Tous','Wszystkie');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',102,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',103,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),
@@ -7539,6 +7543,10 @@ CREATE VIEW article_list_view AS
             FROM Message
             WHERE Message.ArticleId = Article.Id
         ) AS Messages,
+        CASE
+            WHEN COALESCE(CarouselTotal.Total, 0) = 0 THEN 'non'
+            ELSE 'oui (' || CarouselTotal.Total || ')'
+        END AS Carousel,
         CASE
             WHEN Article.PublishedBy IS NULL THEN 'non'
             ELSE 'oui'
@@ -7586,7 +7594,12 @@ CREATE VIEW article_list_view AS
     INNER JOIN Member ON Article.CreatedBy = Member.Id
     INNER JOIN Individual ON Member.Id = Individual.Id
     LEFT JOIN Survey ON Article.Id = Survey.IdArticle
-    LEFT JOIN "Group" ON "Group".Id = Article.IdGroup;
+    LEFT JOIN "Group" ON "Group".Id = Article.IdGroup
+    LEFT JOIN (
+        SELECT IdArticle, COUNT(*) AS Total
+        FROM Carousel
+        GROUP BY IdArticle
+    ) AS CarouselTotal ON CarouselTotal.IdArticle = Article.Id;
 CREATE VIEW exercise_list_view AS
     SELECT
         Exercise.Id,

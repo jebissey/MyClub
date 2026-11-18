@@ -11,6 +11,8 @@
 {/block}
 
 {block content}
+    {var $yesNoFields = ['Pool', 'ForMembers', 'Menu', 'Published', 'Carousel']}
+
     {if $isEditor && $isRedactor}
         {include '../../Common/views/dataTable.latte',
             'createButton' => [
@@ -19,6 +21,7 @@
                 'alignment' => 'end',
             ],
             'items' => $articles,
+            'yesNoFields' => $yesNoFields,
             'actions' => [
                 [
                     'type' => 'link',
@@ -54,6 +57,7 @@
                 'alignment' => 'end',
             ],
             'items' => $articles,
+            'yesNoFields' => $yesNoFields,
             'actions' => [
                 [
                     'type' => 'link',
@@ -72,6 +76,7 @@
     {elseif $isEditor}
         {include '../../Common/views/dataTable.latte',
             'items' => $articles,
+            'yesNoFields' => $yesNoFields,
             'actions' => [
                 [
                     'type' => 'link',
@@ -96,6 +101,7 @@
     {else}
         {include '../../Common/views/dataTable.latte',
             'items' => $articles,
+            'yesNoFields' => $yesNoFields,
             'actions' => [
                 [
                     'type' => 'link',
@@ -106,7 +112,6 @@
             ]
         }
     {/if}
-        
     <a href="/articles-rss.xml" class="rss-link">
         <img src="/Feed-icon.svg" alt="RSS" width="16" height="16"> {='article.index.rss_subscribe'|translate}
     </a>

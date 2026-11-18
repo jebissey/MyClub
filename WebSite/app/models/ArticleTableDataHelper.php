@@ -24,7 +24,7 @@ final class ArticleTableDataHelper extends Data
     {
         $query = $this->fluent->from('article_list_view')
             ->select(null)
-            ->select('Id, CreatedBy, Title, LastUpdate, PersonName, GroupName, Pool, PoolDetail, ForMembers, Messages, Menu')
+            ->select('Id, CreatedBy, Title, LastUpdate, PersonName, GroupName, Pool, PoolDetail, ForMembers, Messages, Carousel, Menu')
             ->select('CASE 
                 WHEN PublishedBy IS NULL THEN "non" 
                 ELSE 

@@ -2,9 +2,10 @@
 
 {block title}Exercises{/block}
 
-
-
 {block content}
+    {* Columns computed as 'oui'/'non' by exercise_list_view (hard-coded literals), translated at display time *}
+    {var $yesNoFields = ['ForMembers']}
+
     {if $isEditor && $isExerciseDesigner}
         {include '../../Common/views/dataTable.latte',
             'createButton' => [
@@ -13,6 +14,7 @@
                 'alignment' => 'end',
             ],
             'items' => $exercises,
+            'yesNoFields' => $yesNoFields,
             'actions' => [
                 [
                     'type' => 'link',
@@ -48,6 +50,7 @@
                 'alignment' => 'end',
             ],
             'items' => $exercises,
+            'yesNoFields' => $yesNoFields,
             'actions' => [
                 [
                     'type' => 'link',
@@ -66,6 +69,7 @@
     {elseif $isEditor}
         {include '../../Common/views/dataTable.latte',
             'items' => $exercises,
+            'yesNoFields' => $yesNoFields,
             'actions' => [
                 [
                     'type' => 'link',
@@ -90,6 +94,7 @@
     {else}
         {include '../../Common/views/dataTable.latte',
             'items' => $exercises,
+            'yesNoFields' => $yesNoFields,
             'actions' => [
                 [
                     'type' => 'link',
@@ -100,7 +105,7 @@
             ]
         }
     {/if}
-    
+
     <div class="modal fade" id="publishModal" tabindex="-1" aria-labelledby="publishModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

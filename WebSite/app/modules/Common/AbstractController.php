@@ -346,4 +346,25 @@ abstract class AbstractController
             array_values($this->dataHelper->gets('Group', ['Inactivated' => 0], 'Id, Name', 'Name'))
         );
     }
+
+    /**
+     * Builds a yes/no <select> filter.
+     * The submitted values stay 'oui'/'non' (the SQL views return those literals),
+     * only the labels are translated.
+     *
+     * @return array{name: string, label: string, type: string, options: array<string, string>, placeholder: string}
+     */
+    protected function yesNoFilter(string $name, string $labelKey): array
+    {
+        return [
+            'name'        => $name,
+            'label'       => $this->translate($labelKey),
+            'type'        => 'select',
+            'options'     => [
+                'oui' => $this->translate('table.value.yes'),
+                'non' => $this->translate('table.value.no'),
+            ],
+            'placeholder' => $this->translate('table.value.all'),
+        ];
+    }
 }

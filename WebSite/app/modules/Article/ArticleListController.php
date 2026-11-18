@@ -34,6 +34,7 @@ final class ArticleListController extends TableController
             'lastUpdate' => FilterInputRule::DateTime->value,
             'published'  => ['oui', 'non'],
             'pool'       => ['oui', 'non'],
+            'carousel'   => ['oui', 'non'],
             'menu'       => ['oui', 'non'],
             'GroupName'  => FilterInputRule::HtmlSafeName->value,
             'Content'    => FilterInputRule::Content->value,
@@ -44,7 +45,8 @@ final class ArticleListController extends TableController
             $this->filter('PersonName', 'article.label.created_by'),
             $this->filter('title', 'article.label.title'),
             $this->filter('lastUpdate', 'article.label.last_update'),
-            $this->filter('pool', 'article.label.pool'),
+            $this->yesNoFilter('pool', 'article.label.pool'),
+            $this->yesNoFilter('carousel', 'article.label.carousel'),
             $this->filter('GroupName', 'article.label.group'),
             $this->filter('Content', 'article.label.content'),
             ['name' => 'Id', 'label' => 'ID'],
@@ -56,12 +58,13 @@ final class ArticleListController extends TableController
             $this->column('Pool', 'article.label.pool'),
             $this->column('PoolDetail', 'article.label.pool_detail'),
             $this->column('Messages', 'article.label.messages'),
+            $this->column('Carousel', 'article.label.carousel'),
             $this->column('GroupName', 'article.label.group'),
             $this->column('ForMembers', 'article.label.for_members'),
         ];
         if ($isEditor) {
-            $filters[] = $this->filter('published', 'article.label.published');
-            $filters[] = $this->filter('menu', 'article.label.menu');
+            $filters[] = $this->yesNoFilter('published', 'article.label.published');
+            $filters[] = $this->yesNoFilter('menu', 'article.label.menu');
             $columns[] = $this->column('Menu', 'article.label.menu');
             $columns[] = $this->column('Published', 'article.label.published');
         }

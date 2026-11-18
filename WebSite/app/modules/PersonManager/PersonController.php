@@ -281,8 +281,8 @@ final class PersonController extends TableController
             ['name' => 'nickName', 'label' => $this->translate('person_manager.table.nick_name')],
             ['name' => 'email', 'label' => $this->translate('person_manager.table.email')],
             ['name' => 'alert', 'label' => $this->translate('person_manager.table.alert')],
-            ['name' => 'passwordCreated', 'label' => $this->translate('person_manager.table.password')],
-            ['name' => 'presentInDirectory', 'label' => $this->translate('person_manager.table.presentation')],
+            $this->yesNoFilter('passwordCreated', 'person_manager.table.password'),
+            $this->yesNoFilter('presentInDirectory', 'person_manager.table.presentation'),
             ['name' => 'memberInfo', 'label' => $this->translate('person_manager.table.member_info')],
         ];
         $columns = [

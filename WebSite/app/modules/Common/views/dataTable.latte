@@ -3,6 +3,7 @@
 {default $modal = null}
 {default $table = ''}
 {default $extraParams = []}
+{default $yesNoFields = []}
 
 {varType list<\app\modules\Common\valueObjects\TableRow> $items}
 {varType list<string|array{name: string, label: string, type?: string, options?: array<mixed>, optionValue?: string, optionLabel?: string, placeholder?: string, autosubmit?: bool}> $filters}
@@ -16,6 +17,7 @@
 {varType ?array{url: string, label: string, alignment?: string} $createButton}
 {varType ?array{id: string, title: string, contentId: string} $modal}
 {varType list<array{type: string, label: string, class: string, url?: string, confirm?: string, onClick?: string}> $actions}
+{varType list<string> $yesNoFields}
 
 <div class="container-fluid">
     {include 'FilterForm.latte',
@@ -53,10 +55,18 @@
                     <tr>
                         {foreach $columns as $column}
                             {var $v = $item->cells[$column['field']] ?? null}
-                            <td title="{$v}">
+                            {var $isYesNo = in_array($column['field'], $yesNoFields, true)}
+                            {* Yes/no cells are short, so the raw tooltip is skipped (it would show the untranslated value) *}
+                            <td{if !$isYesNo} title="{$v}"{/if}>
                                 {if $v !== null}
                                     {var $s = (string) $v}
-                                    {if mb_strlen($s) > 400}
+                                    {if $isYesNo}
+                                        {* The views return 'oui'/'non' literals (the filters rely on them); only the display is translated *}
+                                        {if $s === 'oui'}{='table.value.yes'|translate}
+                                        {elseif $s === 'non'}{='table.value.no'|translate}
+                                        {elseif str_starts_with($s, 'oui ')}{='table.value.yes'|translate}{substr($s, 3)}
+                                        {else}{$s}{/if}
+                                    {elseif mb_strlen($s) > 400}
                                         {$s|truncate:50}
                                     {else}
                                         {$s}
