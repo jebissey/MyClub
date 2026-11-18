@@ -9,6 +9,7 @@ use Exception;
 use Minishlink\WebPush\VAPID;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
+use app\helpers\ConnectedUser;
 use app\helpers\NotificationSender;
 use app\helpers\To;
 use app\helpers\WebApp;
@@ -91,44 +92,30 @@ final class WebmasterController extends TableController
 
     public function homeAdmin(): void
     {
+        if (WebApp::getRequestMethod() !== 'GET') {
+            $this->errors->methodNotAllowed(__FILE__, __LINE__);
+            return;
+        }
+
         $connectedUser = $this->application->getConnectedUser();
+
         if (!$connectedUser->isAdministrator()) {
             $this->errors->forbidden(__FILE__, __LINE__);
             return;
         }
-        if ($connectedUser->hasOnlyOneAutorization()) {
-            if (
-                $connectedUser->isEventDesigner()
-                || $connectedUser->isExerciseDesigner()
-                || $connectedUser->isHomeDesigner()
-                || $connectedUser->isKanbanDesigner()
-                || $connectedUser->isMenuDesigner()
-            ) {
-                $this->redirect('/designer');
-            } elseif ($connectedUser->isEventManager()) {
-                $this->redirect('/eventManager');
-            } elseif ($connectedUser->isPersonManager()) {
-                $this->redirect('/personManager');
-            } elseif ($connectedUser->isRedactor()) {
-                $_SESSION['navbar'] = 'redactor';
-                $this->redirect('/articles');
-            } elseif ($connectedUser->isVisitorInsights()) {
-                $this->redirect('/visitorInsights');
-            } elseif ($connectedUser->isWebmaster()) {
-                $this->redirect('/webmaster');
-            }
-        } else {
-            if (WebApp::getRequestMethod() !== 'GET') {
-                $this->errors->methodNotAllowed(__FILE__, __LINE__);
-                return;
-            }
 
-            $viewModel = new AdminHomeViewModel(
+        if ($connectedUser->hasOnlyOneAutorization()) {
+            $this->redirectToSingleAuthorizationHome($connectedUser);
+            return;
+        }
+
+        $this->views->render(
+            'Webmaster/views/admin.latte',
+            new AdminHomeViewModel(
                 content: '',
                 layoutParams: $this->getAllParams([]),
-            );
-            $this->views->render('Webmaster/views/admin.latte', $viewModel);
-        }
+            )
+        );
     }
 
     public function homeWebmaster(): void
@@ -145,7 +132,6 @@ final class WebmasterController extends TableController
             $this->views->render('Webmaster/views/webmaster.latte', $viewModel);
         }
     }
-
 
     public function notifications(): void
     {
@@ -194,7 +180,6 @@ final class WebmasterController extends TableController
             $this->views->render('Webmaster/views/notifications.latte', $viewModel);
         }
     }
-
 
     public function sendEmailCredentialsEdit(): void
     {
@@ -504,5 +489,27 @@ final class WebmasterController extends TableController
         }
         $lastVersion = $data['data']['lastVersion'];
         return $lastVersion === Application::VERSION ? null : "A new version is available (V{$lastVersion})";
+    }
+
+    private function redirectToSingleAuthorizationHome(ConnectedUser $user): void
+    {
+        if ($user->isRedactor()) {
+            $_SESSION['navbar'] = 'redactor';
+            $this->redirect('/articles');
+            return;
+        }
+
+        $route = match (true) {
+            $user->isDesigner()        => '/designer',
+            $user->isEventManager()    => '/eventManager',
+            $user->isPersonManager()   => '/personManager',
+            $user->isVisitorInsights() => '/visitorInsights',
+            $user->isWebmaster()       => '/webmaster',
+            default                    => null,
+        };
+
+        if ($route !== null) {
+            $this->redirect($route);
+        }
     }
 }
