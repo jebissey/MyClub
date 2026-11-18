@@ -103,4 +103,16 @@ final class To
     {
         return $value === null ? null : self::requireStr($value);
     }
+
+    /**
+     * Strict in_array() for templates: PHPStan cannot narrow a call to a
+     * method, whereas a literal default like {default $x = []} makes it
+     * report in_array() as always false in every template that omits $x.
+     *
+     * @param list<string> $list
+     */
+    public static function inList(string $value, array $list): bool
+    {
+        return in_array($value, $list, true);
+    }
 }

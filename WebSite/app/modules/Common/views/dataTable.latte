@@ -55,7 +55,7 @@
                     <tr>
                         {foreach $columns as $column}
                             {var $v = $item->cells[$column['field']] ?? null}
-                            {var $isYesNo = in_array($column['field'], $yesNoFields, true)}
+                            {var $isYesNo = \app\helpers\To::inList($column['field'], $yesNoFields)}
                             {* Yes/no cells are short, so the raw tooltip is skipped (it would show the untranslated value) *}
                             <td{if !$isYesNo} title="{$v}"{/if}>
                                 {if $v !== null}
