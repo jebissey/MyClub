@@ -29,7 +29,6 @@ use app\modules\Common\services\AnonymousAccessService;
 use app\modules\Common\services\ArticleService;
 use app\modules\Common\services\EmailService;
 use app\modules\Common\services\MessageService;
-use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
 use app\modules\Common\viewModels\ChatViewModel;
 
