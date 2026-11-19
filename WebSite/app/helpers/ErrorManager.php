@@ -11,8 +11,7 @@ use app\models\LogWriterDataHelper;
 use app\modules\Common\EmptyController;
 use app\modules\Common\viewModels\InfoViewModel;
 
-//not final because of tests
-readonly class ErrorManager
+final readonly class ErrorManager
 {
     private DataHelper $dataHelper;
     private LanguagesDataHelper $languagesDataHelper;

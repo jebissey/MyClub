@@ -165,7 +165,7 @@ final class MediaApi extends AbstractApi
             $idGroupRaw = $data['idGroup'] ?? null;
             $idGroup    = is_scalar($idGroupRaw) ? (int)$idGroupRaw : null;
 
-            $response = $this->mediaManager->sharefile(
+            $response = $this->mediaManager->shareFile(
                 (int)$year,
                 (int)$month,
                 $filename,

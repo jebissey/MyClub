@@ -1816,11 +1816,20 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
  ('person_manager.index.title','People','Personnes','Osoby'),
  ('person_manager.index.tab_active','Active','Actifs','Aktywni'),
  ('person_manager.index.tab_deactivated','Deactivated','Désactivés','Dezaktywowani'),
- ('person_manager.index.confirm_delete','Do you really want to delete this person?','Voulez-vous vraiment supprimer cette personne ?','Czy na pewno chcesz usunąć tę osobę?'),
- ('person_manager.index.confirm_reactivate','Do you really want to reactivate this person?','Voulez-vous vraiment réactiver cette personne ?','Czy na pewno chcesz ponownie aktywować tę osobę?'),
+ ('person_manager.index.confirm_delete',
+ 'Do you really want to delete this person?',
+ 'Voulez-vous vraiment supprimer cette personne ?',
+ 'Czy na pewno chcesz usunąć tę osobę?'),
+ ('person_manager.index.confirm_reactivate',
+ 'Do you really want to reactivate this person?',
+ 'Voulez-vous vraiment réactiver cette personne ?',
+ 'Czy na pewno chcesz ponownie aktywować tę osobę?'),
  ('person_manager.group.list_title','Group list','Liste des groupes','Lista grup'),
  ('person_manager.group.edit_title','Edit group','Modifier le groupe','Edytuj grupę'),
- ('person_manager.group.none','No group has been created yet.','Aucun groupe n’a été créé pour le moment.','Nie utworzono jeszcze żadnej grupy.'),
+ ('person_manager.group.none',
+ 'No group has been created yet.',
+ 'Aucun groupe n’a été créé pour le moment.',
+ 'Nie utworzono jeszcze żadnej grupy.'),
  ('person_manager.group.col_name','Name','Nom','Nazwa'),
  ('person_manager.group.col_self_registration','Self-registration','Auto-inscription','Samodzielna rejestracja'),
  ('person_manager.group.col_authorizations','Permissions','Autorisations','Uprawnienia'),
@@ -1828,9 +1837,15 @@ INSERT OR REPLACE INTO Languages (Name, en_US, fr_FR, pl_PL) VALUES
  ('person_manager.group.no','No','Non','Nie'),
  ('person_manager.group.loading','Loading...','Chargement...','Ładowanie...'),
  ('person_manager.group.delete_confirm_title','Delete confirmation','Confirmation de suppression','Potwierdzenie usunięcia'),
- ('person_manager.group.delete_confirm_text','Are you sure you want to delete this group?','Êtes-vous sûr de vouloir supprimer ce groupe ?','Czy na pewno chcesz usunąć tę grupę?'),
+ ('person_manager.group.delete_confirm_text',
+ 'Are you sure you want to delete this group?',
+ 'Êtes-vous sûr de vouloir supprimer ce groupe ?',
+ 'Czy na pewno chcesz usunąć tę grupę?'),
  ('person_manager.group.name_required','Group name is required','Le nom du groupe est requis','Nazwa grupy jest wymagana'),
- ('person_manager.group.self_registration_allowed','Self-registration allowed','Auto-inscription autorisée','Samodzielna rejestracja dozwolona');
+ ('person_manager.group.self_registration_allowed',
+ 'Self-registration allowed','
+ Auto-inscription autorisée',
+ 'Samodzielna rejestracja dozwolona');
 
 SQL);
 

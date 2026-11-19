@@ -10,14 +10,12 @@ use app\models\DataHelper;
 use app\models\LanguagesDataHelper;
 use app\models\SharedFileDataHelper;
 use app\modules\Common\valueObjects\MediaOperationResult;
-use app\modules\Common\valueObjects\ShareFileInfo;
 use app\modules\Common\valueObjects\ShareStatus;
 use app\modules\Common\valueObjects\UploadedFileInput;
 use app\modules\Common\valueObjects\UploadedMedia;
 use app\modules\Common\valueObjects\UploadMediaResult;
 
-//not final because of tests
-readonly class MediaManager
+final readonly class MediaManager
 {
     private const MEDIA_PATH = __DIR__ . '/../../data/media/';
 
@@ -85,31 +83,6 @@ readonly class MediaManager
                 size: $file->size,
                 type: $file->type
             )
-        );
-    }
-
-    public function getShareFile(int $year, int $month, string $filename): ShareFileInfo
-    {
-        $filePath = $this->buildFilePath($year, $month, $filename);
-
-        if ($filePath === null) {
-            return new ShareFileInfo(
-                success: false,
-                data: false,
-                message: $this->languagesDataHelper->translate('media_manager.file_not_exists')
-            );
-        }
-
-        $sharedFile = $this->dataHelper->get(
-            'SharedFile',
-            ['Item' => $filePath],
-            'IdGroup, OnlyForMembers'
-        );
-        assert($sharedFile === false || $sharedFile instanceof stdClass);
-
-        return new ShareFileInfo(
-            success: $sharedFile !== false,
-            data: $sharedFile
         );
     }
 
