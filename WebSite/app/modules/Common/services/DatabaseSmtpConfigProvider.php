@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace app\modules\Common\services;
 
-use app\modules\Common\interfaces\SmtpConfigProviderInterface;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\valueObjects\SmtpConfig;
 
-final class DatabaseSmtpConfigProvider implements SmtpConfigProviderInterface
+final class DatabaseSmtpConfigProvider
 {
     private const SERVICE = 'smtp';
 

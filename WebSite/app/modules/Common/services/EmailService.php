@@ -16,8 +16,8 @@ use Mailjet\Client as MailjetClient;
 use Mailjet\Resources as MailjetResources;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
-use app\modules\Common\interfaces\SmtpConfigProviderInterface;
-use app\modules\Common\interfaces\EmailQuotaTrackerInterface;
+use app\modules\Common\services\DatabaseSmtpConfigProvider;
+use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\modules\Common\valueObjects\EmailMessage;
 use app\modules\Common\valueObjects\SmtpConfig;
 use app\exceptions\EmailException;
@@ -28,8 +28,8 @@ final class EmailService
     private const MAILJET_BATCH_SIZE = 50;
 
     public function __construct(
-        private readonly ?SmtpConfigProviderInterface $configProvider,
-        private readonly ?EmailQuotaTrackerInterface $quotaTracker,
+        private readonly ?DatabaseSmtpConfigProvider $configProvider,
+        private readonly ?JsonEmailQuotaTracker $quotaTracker,
     ) {
     }
 

@@ -10,7 +10,7 @@ use app\exceptions\EmailException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
-use app\modules\Common\interfaces\EmailQuotaTrackerInterface;
+use app\modules\Common\services\JsonEmailQuotaTracker;
 use app\models\LanguagesDataHelper;
 use app\models\PersonDataHelper;
 use app\modules\Common\services\EmailService;
@@ -23,7 +23,7 @@ final class CommunicationApi extends AbstractApi
         ConnectedUser $connectedUser,
         PersonDataHelper $personDataHelper,
         private readonly EmailService $emailService,
-        private readonly ?EmailQuotaTrackerInterface $quotaTracker,
+        private readonly ?JsonEmailQuotaTracker $quotaTracker,
         protected LanguagesDataHelper $languagesDataHelper,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);

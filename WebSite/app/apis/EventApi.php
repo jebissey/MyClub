@@ -15,7 +15,7 @@ use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\To;
 use app\helpers\WebApp;
-use app\modules\Common\interfaces\EventServiceInterface;
+use app\modules\Common\services\EventService;
 use app\models\AlertRecipientDataHelper;
 use app\models\AttributeDataHelper;
 use app\models\EventDataHelper;
@@ -38,7 +38,7 @@ final class EventApi extends AbstractApi
         Application $application,
         private readonly AttributeDataHelper $attributeDataHelper,
         private readonly EventDataHelper $eventDataHelper,
-        private readonly EventServiceInterface $eventService,
+        private readonly EventService $eventService,
         private readonly ParticipantDataHelper $participantDataHelper,
         private readonly MessageWriteDataHelper $messageWriteDataHelper,
         private readonly EmailService $emailService,

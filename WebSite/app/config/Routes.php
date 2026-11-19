@@ -263,7 +263,7 @@ final class Routes
             new Article($this->controllerFactory),
             new ArticleApi($this->apiFactory),
             new ArticleList($this->controllerFactory),
-            new ArticleStatistics($this->controllerFactory),            
+            new ArticleStatistics($this->controllerFactory),
             new Arward($this->controllerFactory),
             new Astronomy($this->controllerFactory),
             new BackupAllData($this->controllerFactory),

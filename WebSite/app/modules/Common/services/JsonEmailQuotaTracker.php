@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace app\modules\Common\services;
 
 use RuntimeException;
-use app\modules\Common\interfaces\EmailQuotaTrackerInterface;
 
-final class JsonEmailQuotaTracker implements EmailQuotaTrackerInterface
+final class JsonEmailQuotaTracker
 {
     private readonly string $today;
     private readonly string $thisMonth;

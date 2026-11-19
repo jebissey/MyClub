@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace app\modules\Common\services;
 
 use app\enums\Period;
-use app\modules\Common\interfaces\EventServiceInterface;
 use app\models\EventDataHelper;
 use app\modules\Common\valueObjects\ApiResponse;
 
-final readonly class EventService implements EventServiceInterface
+final readonly class EventService
 {
     public function __construct(private EventDataHelper $eventDataHelper)
     {
