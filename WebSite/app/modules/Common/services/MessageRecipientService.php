@@ -6,7 +6,7 @@ namespace app\modules\Common\services;
 
 use app\helpers\To;
 use app\modules\Common\interfaces\RecipientResolverInterface;
-use app\models\Data;
+use app\models\DataHelper;
 use app\modules\Notifications\services\ArticleRecipientResolver;
 use app\modules\Notifications\services\EventRecipientResolver;
 use app\modules\Notifications\services\GroupRecipientResolver;
@@ -17,7 +17,7 @@ final readonly class MessageRecipientService
     /** @var RecipientResolverInterface[] */
     private array $resolvers;
 
-    public function __construct(private Data $dataHelper)
+    public function __construct(private DataHelper $dataHelper)
     {
         $this->resolvers = [
             new ArticleRecipientResolver(),

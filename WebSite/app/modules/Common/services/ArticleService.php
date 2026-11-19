@@ -7,7 +7,7 @@ namespace app\modules\Common\services;
 use RuntimeException;
 use app\helpers\MediaManager;
 use app\models\CarouselDataHelper;
-use app\models\Data;
+use app\models\DataHelper;
 use app\modules\Common\valueObjects\UploadedFilesInput;
 
 final readonly class ArticleService
@@ -15,7 +15,7 @@ final readonly class ArticleService
     public function __construct(
         private CarouselDataHelper $carouselDataHelper,
         private MediaManager $media,
-        private Data $dataHelper
+        private DataHelper $dataHelper
     ) {
     }
 
