@@ -33,6 +33,8 @@ use app\models\LanguagesDataHelper;
 use app\models\LoanItemDataHelper;
 use app\models\LoanRecordDataHelper;
 use app\models\LoanReservationDataHelper;
+use app\models\LogAnalyticsDataHelper;
+use app\models\LogStatisticsDataHelper;
 use app\models\LogDataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\MemberDataHelper;
@@ -92,6 +94,8 @@ final readonly class DataHelpers
         public LoanItemDataHelper $loanItemDataHelper,
         public LoanRecordDataHelper $loanRecordDataHelper,
         public LoanReservationDataHelper $loanReservationDataHelper,
+        public LogAnalyticsDataHelper $logAnalyticsDataHelper,
+        public LogStatisticsDataHelper $logStatisticsDataHelper,
         public LogDataHelper $logDataHelper,
         public LogWriterDataHelper $logWriterDataHelper,
         public MemberDataHelper $memberDataHelper,

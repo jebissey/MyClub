@@ -24,6 +24,10 @@ use app\modules\Loan\services\LoanCalendarService;
 use app\modules\PersonManager\services\MemberCsvImporter;
 use app\modules\PersonManager\services\MemberOdsImporter;
 use app\modules\Webmaster\services\InstallationDisplayService;
+use app\modules\Webmaster\services\InstallationStatusFilter;
+use app\modules\Webmaster\services\SitemapBuilder;
+use app\modules\Webmaster\services\VapidKeyService;
+use app\modules\Webmaster\services\VersionChecker;
 
 /**
  * Services shared by several factories, built once by Routes::buildServices().
@@ -38,6 +42,7 @@ final readonly class Services
         public EmailService $emailService,
         public EventService $eventService,
         public InstallationDisplayService $installationDisplayService,
+        public InstallationStatusFilter $installationStatusFilter,
         public LoanAvailabilityService $loanAvailabilityService,
         public LoanCalendarService $loanCalendarService,
         public MediaManager $mediaManager,
@@ -51,6 +56,9 @@ final readonly class Services
         public NotificationSender $notificationSender,
         public PersonDataHelper $personDataHelper,
         public PersonPreferences $personPreferences,
+        public SitemapBuilder $sitemapBuilder,
+        public VapidKeyService $vapidKeyService,
+        public VersionChecker $versionChecker,
     ) {
     }
 }

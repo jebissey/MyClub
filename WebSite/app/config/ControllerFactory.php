@@ -48,7 +48,6 @@ use app\models\ParticipantDataHelper;
 use app\models\PersonDataHelper;
 use app\models\PersonGroupDataHelper;
 use app\models\PersonStatisticsDataHelper;
-use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
 use app\models\TableControllerDataHelper;
 use app\modules\Article\ArticleController;
@@ -119,10 +118,16 @@ use app\modules\User\UserPresentationController;
 use app\modules\User\UserStatisticsController;
 use app\modules\VisitorInsights\VisitorInsightsController;
 use app\modules\Webmaster\ArwardsController;
+use app\modules\Webmaster\CredentialsController;
 use app\modules\Webmaster\DbBrowserController;
 use app\modules\Webmaster\MaintenanceController;
 use app\modules\Webmaster\RssController;
+use app\modules\Webmaster\services\EmailCredentialsSaver;
 use app\modules\Webmaster\services\InstallationDisplayService;
+use app\modules\Webmaster\services\InstallationStatusFilter;
+use app\modules\Webmaster\services\SitemapBuilder;
+use app\modules\Webmaster\services\VapidKeyService;
+use app\modules\Webmaster\services\VersionChecker;
 use app\modules\Webmaster\WebmasterController;
 
 final readonly class ControllerFactory
@@ -142,6 +147,7 @@ final readonly class ControllerFactory
         private Backup $backup,
         private CarouselDataHelper $carouselDataHelper,
         private ChatMessageDataHelper $chatMessageDataHelper,
+        private CredentialService $credentialService,
         private CrosstabDataHelper $crosstabDataHelper,
         private DbBrowserDataHelper $dbBrowserDataHelper,
         private DesignDataHelper $designDataHelper,
@@ -155,10 +161,14 @@ final readonly class ControllerFactory
         private EventTypeDataHelper $eventTypeDataHelper,
         private ExerciseTableDataHelper $exerciseTableDataHelper,
         private GroupDataHelper $groupDataHelper,
+        private InstallationDisplayService $installationDisplayService,
+        private InstallationStatusFilter $installationStatusFilter,
         private KanbanDataHelper $kanbanDataHelper,
         private LoanItemDataHelper $loanItemDataHelper,
         private LoanRecordDataHelper $loanRecordDataHelper,
         private LoanReservationDataHelper $loanReservationDataHelper,
+        private LogAnalyticsDataHelper $logAnalyticsDataHelper,
+        private LogStatisticsDataHelper $logStatisticsDataHelper,
         private LogDataHelper $logDataHelper,
         private MediaCatalog $mediaCatalog,
         private MediaFileListBuilder $mediaFileListBuilder,
@@ -180,8 +190,11 @@ final readonly class ControllerFactory
         private PersonGroupDataHelper $personGroupDataHelper,
         private PersonStatisticsDataHelper $personStatisticsDataHelper,
         private RegistrationLinkService $registrationLinkService,
+        private SitemapBuilder $sitemapBuilder,
         private SurveyDataHelper $surveyDataHelper,
         private TableControllerDataHelper $tableControllerDataHelper,
+        private VapidKeyService $vapidKeyService,
+        private VersionChecker $versionChecker,
     ) {
     }
 
@@ -262,6 +275,15 @@ final readonly class ControllerFactory
             $this->personDataHelper,
             $this->registrationLinkService,
             CredentialService::getInstance()
+        );
+    }
+
+    public function makeCredentialsController(): CredentialsController
+    {
+        return new CredentialsController(
+            $this->application,
+            $this->credentialService,
+            new EmailCredentialsSaver($this->credentialService),
         );
     }
 
@@ -675,8 +697,8 @@ final readonly class ControllerFactory
             $this->personDataHelper,
             $this->logDataHelper,
             $this->crosstabDataHelper,
-            new LogAnalyticsDataHelper($this->application),
-            new LogStatisticsDataHelper($this->application),
+            $this->logAnalyticsDataHelper,
+            $this->logStatisticsDataHelper,
             $this->memberDataHelper,
             $this->groupDataHelper,
         );
@@ -687,10 +709,12 @@ final readonly class ControllerFactory
         return new WebmasterController(
             $this->application,
             $this->logDataHelper,
-            $this->articleDataHelper,
             $this->notificationSender,
-            CredentialService::getInstance(),
-            new InstallationDisplayService(),
+            $this->installationDisplayService,
+            $this->installationStatusFilter,
+            $this->versionChecker,
+            $this->vapidKeyService,
+            $this->sitemapBuilder,
         );
     }
 }

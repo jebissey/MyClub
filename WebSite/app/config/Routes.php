@@ -17,6 +17,7 @@ use app\config\routes\ChatApi;
 use app\config\routes\Communication;
 use app\config\routes\CommunicationApi;
 use app\config\routes\Contact;
+use app\config\routes\Credential;
 use app\config\routes\DbBrowser;
 use app\config\routes\Design;
 use app\config\routes\Designer;
@@ -134,6 +135,8 @@ use app\models\LoanItemDataHelper;
 use app\models\LoanRecordDataHelper;
 use app\models\LoanReservationDataHelper;
 use app\models\LogDataHelper;
+use app\models\LogAnalyticsDataHelper;
+use app\models\LogStatisticsDataHelper;
 use app\models\LogWriterDataHelper;
 use app\models\MemberDataHelper;
 use app\models\MemberDirectoryDataHelper;
@@ -179,6 +182,10 @@ use app\modules\PersonManager\services\MemberCsvImporter;
 use app\modules\PersonManager\services\MemberOdsImporter;
 use app\modules\Common\valueObjects\Route;
 use app\modules\Webmaster\services\InstallationDisplayService;
+use app\modules\Webmaster\services\InstallationStatusFilter;
+use app\modules\Webmaster\services\SitemapBuilder;
+use app\modules\Webmaster\services\VapidKeyService;
+use app\modules\Webmaster\services\VersionChecker;
 
 final class Routes
 {
@@ -299,6 +306,7 @@ final class Routes
         $this->routes = array_merge($this->routes, (new Communication($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new CommunicationApi($this->apiFactory))->get());
         $this->routes = array_merge($this->routes, (new Contact($this->controllerFactory))->get());
+        $this->routes = array_merge($this->routes, (new Credential($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new DbBrowser($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Design($this->controllerFactory))->get());
         $this->routes = array_merge($this->routes, (new Designer($this->controllerFactory))->get());
@@ -614,6 +622,8 @@ final class Routes
             loanItemDataHelper: new LoanItemDataHelper($this->application),
             loanRecordDataHelper: new LoanRecordDataHelper($this->application),
             loanReservationDataHelper: new LoanReservationDataHelper($this->application),
+            logAnalyticsDataHelper: new LogAnalyticsDataHelper($this->application),
+            logStatisticsDataHelper: new LogStatisticsDataHelper($this->application),
             logDataHelper: new LogDataHelper($this->application, $this->dataHelper),
             logWriterDataHelper: new LogWriterDataHelper($this->application, $this->application->getErrorManager()),
             memberDataHelper: new MemberDataHelper($this->application),
@@ -675,8 +685,9 @@ final class Routes
                 new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
                 $this->quotaTracker
             ),
-            eventService:new EventService($dataHelpers->eventDataHelper),
+            eventService: new EventService($dataHelpers->eventDataHelper),
             installationDisplayService: new InstallationDisplayService(),
+            installationStatusFilter: new InstallationStatusFilter(),
             loanAvailabilityService: new LoanAvailabilityService(
                 $dataHelpers->loanItemDataHelper,
                 $dataHelpers->loanRecordDataHelper,
@@ -707,6 +718,9 @@ final class Routes
             notificationSender: new NotificationSender($this->dataHelper, CredentialService::getInstance()),
             personDataHelper: $dataHelpers->personDataHelper,
             personPreferences: $this->personPreferences,
+            sitemapBuilder: new SitemapBuilder($dataHelpers->articleDataHelper),
+            vapidKeyService: new VapidKeyService(CredentialService::getInstance()),
+            versionChecker: new VersionChecker(),
         );
     }
 
@@ -730,6 +744,7 @@ final class Routes
             new Backup(),
             $dataHelpers->carouselDataHelper,
             $dataHelpers->chatMessageDataHelper,
+            CredentialService::getInstance(),
             $dataHelpers->crosstabDataHelper,
             $dataHelpers->dbBrowserDataHelper,
             $dataHelpers->designDataHelper,
@@ -743,10 +758,14 @@ final class Routes
             $dataHelpers->eventTypeDataHelper,
             $dataHelpers->exerciseTableDataHelper,
             $dataHelpers->groupDataHelper,
+            $services->installationDisplayService,
+            $services->installationStatusFilter,
             $dataHelpers->kanbanDataHelper,
             $dataHelpers->loanItemDataHelper,
             $dataHelpers->loanRecordDataHelper,
             $dataHelpers->loanReservationDataHelper,
+            $dataHelpers->logAnalyticsDataHelper,
+            $dataHelpers->logStatisticsDataHelper,
             $dataHelpers->logDataHelper,
             $services->mediaCatalog,
             $services->mediaFileListBuilder,
@@ -768,8 +787,11 @@ final class Routes
             $dataHelpers->personGroupDataHelper,
             $dataHelpers->personStatisticsDataHelper,
             new RegistrationLinkService($dataHelpers->contactDataHelper, $services->emailService),
+            $services->sitemapBuilder,
             $dataHelpers->surveyDataHelper,
             $dataHelpers->tableControllerDataHelper,
+            $services->vapidKeyService,
+            $services->versionChecker,
         );
 
         $this->apiFactory = new ApiFactory(
