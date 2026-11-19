@@ -9,6 +9,8 @@ use Flight;
 use flight\Engine;
 use app\config\routes\Article;
 use app\config\routes\ArticleApi;
+use app\config\routes\ArticleList;
+use app\config\routes\ArticleStatistics;
 use app\config\routes\Arward;
 use app\config\routes\Astronomy;
 use app\config\routes\Backup as BackupAllData;
@@ -260,6 +262,8 @@ final class Routes
         $providers = [
             new Article($this->controllerFactory),
             new ArticleApi($this->apiFactory),
+            new ArticleList($this->controllerFactory),
+            new ArticleStatistics($this->controllerFactory),            
             new Arward($this->controllerFactory),
             new Astronomy($this->controllerFactory),
             new BackupAllData($this->controllerFactory),

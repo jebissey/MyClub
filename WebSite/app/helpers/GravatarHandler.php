@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
-use app\helpers\interfaces\GravatarHandlerInterface;
-
-final class GravatarHandler implements GravatarHandlerInterface
+final class GravatarHandler
 {
     private string $defaultImage = 'mp';
     private int $size = 48;

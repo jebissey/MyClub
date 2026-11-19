@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use app\enums\ApplicationError;
-use app\helpers\interfaces\ErrorManagerInterface;
-use app\helpers\interfaces\GravatarHandlerInterface;
+use app\helpers\ErrorManager;
+use app\helpers\GravatarHandler;
 use app\helpers\Params;
 use app\helpers\TranslationManager;
 use app\models\AuthorizationDataHelper;
@@ -21,11 +21,11 @@ final class ConnectedUser
     public ?Person $person = null;
 
     public function __construct(
-        private readonly ErrorManagerInterface $errorManager,
+        private readonly ErrorManager $errorManager,
         private readonly DataHelper $dataHelper,
         private readonly AuthorizationDataHelper $authorizationDataHelper,
         private readonly MetadataDataHelper $metadataDataHelper,
-        private readonly GravatarHandlerInterface $gravatarHandler = new GravatarHandler(),
+        private readonly GravatarHandler $gravatarHandler = new GravatarHandler(),
     ) {
     }
 

@@ -10,8 +10,7 @@ use ReflectionProperty;
 use app\enums\ApplicationError;
 use app\enums\Authorization;
 use app\helpers\ConnectedUser;
-use app\helpers\interfaces\ErrorManagerInterface;
-use app\helpers\interfaces\GravatarHandlerInterface;
+use app\helpers\ErrorManager;
 use app\models\AuthorizationDataHelper;
 use app\models\Data;
 use app\models\DataHelper;
@@ -90,7 +89,7 @@ final class ConnectedUserTest extends DataHelperTestCase
 
         return new DataHelper(
             $pdo,
-            $this->createStub(ErrorManagerInterface::class)
+            $this->createStub(ErrorManager::class)
         );
     }
 
@@ -214,15 +213,13 @@ final class ConnectedUserTest extends DataHelperTestCase
         ?DataHelper $dataHelper = null,
         ?AuthorizationDataHelper $authorizationDataHelper = null,
         ?MetadataDataHelper $metadataDataHelper = null,
-        ?GravatarHandlerInterface $gravatarHandler = null,
-        ?ErrorManagerInterface $errorManager = null,
+        ?ErrorManager $errorManager = null,
     ): ConnectedUser {
         return new ConnectedUser(
-            $errorManager            ?? $this->createStub(ErrorManagerInterface::class),
+            $errorManager            ?? $this->createStub(ErrorManager::class),
             $dataHelper              ?? $this->makeRealDataHelper(),
             $authorizationDataHelper ?? $this->makeAuthorizationDataHelper(),
             $metadataDataHelper      ?? $this->makeMetadataDataHelper(),
-            $gravatarHandler         ?? $this->createStub(GravatarHandlerInterface::class),
         );
     }
 
@@ -439,7 +436,7 @@ final class ConnectedUserTest extends DataHelperTestCase
     {
         $_SESSION['user'] = 'unknown@example.com';
 
-        $errorManager = $this->createMock(ErrorManagerInterface::class);
+        $errorManager = $this->createMock(ErrorManager::class);
         $errorManager->expects($this->once())
             ->method('raise')
             ->with(

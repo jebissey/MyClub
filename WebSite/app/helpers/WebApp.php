@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\helpers;
 
 use app\enums\FilterInputRule;
-use app\helpers\interfaces\GravatarHandlerInterface;
+use app\helpers\GravatarHandler;
 
 final class WebApp
 {
@@ -68,7 +68,7 @@ final class WebApp
         bool $useGravatar,
         ?string $email,
         ?string $avatar,
-        GravatarHandlerInterface $gravatarHandler
+        GravatarHandler $gravatarHandler
     ): string {
         if ($useGravatar) {
             return $gravatarHandler->getGravatar($email ?? '', true);

@@ -7,7 +7,7 @@ namespace tests\models;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
-use app\helpers\interfaces\ErrorManagerInterface;
+use app\helpers\ErrorManager;
 use app\models\DataHelper;
 
 class DataTest extends DataHelperTestCase
@@ -16,7 +16,7 @@ class DataTest extends DataHelperTestCase
     {
         return new DataHelper(
             $pdo,
-            $this->createStub(ErrorManagerInterface::class),
+            $this->createStub(ErrorManager::class),
         );
     }
 

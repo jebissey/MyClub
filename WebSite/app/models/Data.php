@@ -14,7 +14,7 @@ use stdClass;
 use UnexpectedValueException;
 use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
-use app\helpers\interfaces\ErrorManagerInterface;
+use app\helpers\ErrorManager;
 use app\modules\Common\valueObjects\NavbarColors;
 
 abstract class Data
@@ -29,7 +29,7 @@ abstract class Data
 
     public function __construct(
         PDO $pdo,
-        protected ErrorManagerInterface $errorManager,
+        protected ErrorManager $errorManager,
         ?PDO $pdoForLog = null,
     ) {
         $this->pdo = $pdo;

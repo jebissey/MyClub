@@ -9,11 +9,11 @@ use RuntimeException;
 use Throwable;
 use app\helpers\Application;
 use app\helpers\Client;
-use app\helpers\interfaces\ErrorManagerInterface;
+use app\helpers\ErrorManager;
 
 final class LogWriterDataHelper extends Data
 {
-    public function __construct(private readonly Application $application, ErrorManagerInterface $errorManager)
+    public function __construct(private readonly Application $application, ErrorManager $errorManager)
     {
         parent::__construct($application->getPdo(), $errorManager, $application->getPdoForLog());
     }

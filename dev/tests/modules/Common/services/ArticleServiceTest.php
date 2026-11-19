@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
-use app\helpers\interfaces\MediaManagerInterface;
+use app\helpers\MediaManager;
 use app\models\CarouselDataHelper;
 use app\models\Data;
 use app\modules\Common\services\ArticleService;
@@ -94,12 +94,12 @@ final class ArticleServiceTest extends TestCase
 
     private function makeService(
         ?CarouselDataHelper $carouselDataHelper = null,
-        ?MediaManagerInterface $media = null,
+        ?MediaManager $media = null,
         ?Data $dataHelper = null
     ): ArticleService {
         return new ArticleService(
             $carouselDataHelper ?? $this->makeCarouselHelper(),
-            $media ?? $this->createStub(MediaManagerInterface::class),
+            $media ?? $this->createStub(MediaManager::class),
             $dataHelper ?? $this->makeDataHelperStub(false)
         );
     }
@@ -145,7 +145,7 @@ final class ArticleServiceTest extends TestCase
     {
         $dataHelper = $this->makeDataHelperStub(123);
 
-        $media = $this->createMock(MediaManagerInterface::class);
+        $media = $this->createMock(MediaManager::class);
         $media->expects($this->never())->method('uploadFile');
 
         $articleId = $this->makeService(null, $media, $dataHelper)
@@ -237,7 +237,7 @@ final class ArticleServiceTest extends TestCase
             ),
         );
 
-        $media = $this->createMock(MediaManagerInterface::class);
+        $media = $this->createMock(MediaManager::class);
         $media->expects($this->once())
             ->method('uploadFile')
             ->with($this->callback(function (UploadedFileInput $file): bool {
@@ -271,7 +271,7 @@ final class ArticleServiceTest extends TestCase
     {
         $dataHelper = $this->makeDataHelperStub(20);
 
-        $media = $this->createMock(MediaManagerInterface::class);
+        $media = $this->createMock(MediaManager::class);
         $media->expects($this->never())->method('uploadFile');
 
         $files = $this->makeFiles([
@@ -313,7 +313,7 @@ final class ArticleServiceTest extends TestCase
             ),
         );
 
-        $media = $this->createMock(MediaManagerInterface::class);
+        $media = $this->createMock(MediaManager::class);
         $media->expects($this->exactly(2))
             ->method('uploadFile')
             ->willReturnOnConsecutiveCalls($uploadResult1, $uploadResult2);
@@ -354,7 +354,7 @@ final class ArticleServiceTest extends TestCase
     {
         $dataHelper = $this->makeDataHelperStub(30);
 
-        $media = $this->createMock(MediaManagerInterface::class);
+        $media = $this->createMock(MediaManager::class);
         $media->expects($this->never())->method('uploadFile');
 
         $files = UploadedFilesInput::fromPhpFiles([
