@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Games\Leapfrog\LeapfrogController;
 
 final class Leapfrog implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Leapfrog implements RouteInterface
      */
     public function get(): array
     {
-        $leapfrogController = fn() => $this->controllerFactory->makeLeapfrogController();
+        $leapfrogController = fn() => $this->controllerFactory->make(LeapfrogController::class);
 
         $this->routes[] = new Route('GET /game/leapfrog', $leapfrogController, 'play');
         $this->routes[] = new Route('GET /game/leapfrog/statistics', $leapfrogController, 'statistics');

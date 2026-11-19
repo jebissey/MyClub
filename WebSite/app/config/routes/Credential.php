@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Webmaster\CredentialsController;
 
 final class Credential implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Credential implements RouteInterface
      */
     public function get(): array
     {
-        $credentialsController = fn() => $this->controllerFactory->makeCredentialsController();
+        $credentialsController = fn() => $this->controllerFactory->make(CredentialsController::class);
 
         $this->routes[] = new Route('GET  /sendEmails', $credentialsController, 'sendEmailCredentialsEdit');
         $this->routes[] = new Route('POST /sendEmails/saveCredentials', $credentialsController, 'sendEmailCredentialsSave');

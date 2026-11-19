@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Loan\LoanController;
 
 final class Loan implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Loan implements RouteInterface
      */
     public function get(): array
     {
-        $loanController = fn() => $this->controllerFactory->makeLoanController();
+        $loanController = fn() => $this->controllerFactory->make(LoanController::class);
 
         $this->routes[] = new Route('GET /loan/calendar', $loanController, 'calendar');
         $this->routes[] = new Route('GET /loan', $loanController, 'designer');

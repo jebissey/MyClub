@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\config\routes;
 
 use app\config\ControllerFactory;
+use app\modules\Article\MediaController;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
@@ -24,7 +25,7 @@ final class Media implements RouteInterface
      */
     public function get(): array
     {
-        $mediaController = fn() => $this->controllerFactory->makeMediaController();
+        $mediaController = fn() => $this->controllerFactory->make(MediaController::class);
 
         $this->routes[] = new Route('GET /data/media/@year:[0-9]{4}/@month:[0-9]{2}/@filename', $mediaController, 'serveFile');
         $this->routes[] = new Route('GET /media/@year:[0-9]{4}/@month:[0-9]{2}/@filename', $mediaController, 'viewFileForRedactor');

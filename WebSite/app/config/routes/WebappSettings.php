@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Designer\WebappSettingsController;
 
 final class WebappSettings implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class WebappSettings implements RouteInterface
      */
     public function get(): array
     {
-        $webappSettingsController = fn() => $this->controllerFactory->makeWebappSettingsController();
+        $webappSettingsController = fn() => $this->controllerFactory->make(WebappSettingsController::class);
 
         $this->routes[] = new Route('GET  /settings', $webappSettingsController, 'editSettings');
         $this->routes[] = new Route('POST /settings', $webappSettingsController, 'saveSettings');

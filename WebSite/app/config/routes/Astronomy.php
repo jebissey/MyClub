@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Astronomy\AstronomyController;
 
 final class Astronomy implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Astronomy implements RouteInterface
      */
     public function get(): array
     {
-        $astronomyController = fn() => $this->controllerFactory->makeAstronomyController();
+        $astronomyController = fn() => $this->controllerFactory->make(AstronomyController::class);
 
         $this->routes[] = new Route('GET  /astronomy', $astronomyController, 'show');
         $this->routes[] = new Route('POST /astronomy/save', $astronomyController, 'saveLocation');

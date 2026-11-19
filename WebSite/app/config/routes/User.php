@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserController;
 
 final class User implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class User implements RouteInterface
      */
     public function get(): array
     {
-        $userController = fn() => $this->controllerFactory->makeUserController();
+        $userController = fn() => $this->controllerFactory->make(UserController::class);
 
         $this->routes[] = new Route('GET  /user/forgotPassword/@encodedEmail', $userController, 'forgotPassword');
         $this->routes[] = new Route('GET  /user/setPassword/@token:[a-f0-9]+', $userController, 'setPassword');

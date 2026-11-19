@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\MessageApi as MessageApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class MessageApi implements RouteInterface
      */
     public function get(): array
     {
-        $messageApi = fn() => $this->apiFactory->makeMessageApi();
+        $messageApi = fn() => $this->apiFactory->make(MessageApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/message/add', $messageApi, 'addMessage');
         $this->routes[] = new Route('POST /api/message/update', $messageApi, 'updateMessage');

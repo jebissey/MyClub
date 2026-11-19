@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\MakeTheTargetApi as MakeTheTargetApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class MakeTheTargetApi implements RouteInterface
      */
     public function get(): array
     {
-        $makeTheTargetApi = fn() => $this->apiFactory->makeMakeTheTargetApi();
+        $makeTheTargetApi = fn() => $this->apiFactory->make(MakeTheTargetApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/makethetarget', $makeTheTargetApi, 'logMovement');
 

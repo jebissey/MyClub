@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\FFAController;
 
 final class Ffa implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Ffa implements RouteInterface
      */
     public function get(): array
     {
-        $ffaController = fn() => $this->controllerFactory->makeFfaController();
+        $ffaController = fn() => $this->controllerFactory->make(FFAController::class);
 
         $this->routes[] = new Route('GET /ffa/search', $ffaController, 'searchMember');
 

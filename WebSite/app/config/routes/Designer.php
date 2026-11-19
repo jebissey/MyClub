@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Designer\DesignerController;
 
 final class Designer implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Designer implements RouteInterface
      */
     public function get(): array
     {
-        $designerController = fn() => $this->controllerFactory->makeDesignerController();
+        $designerController = fn() => $this->controllerFactory->make(DesignerController::class);
 
         $this->routes[] = new Route('GET  /designer', $designerController, 'homeDesigner');
         $this->routes[] = new Route('GET  /designer/help', $designerController, 'help');

@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Event\EventAvailabilitiesController;
 
 final class EventAvailabilities implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class EventAvailabilities implements RouteInterface
      */
     public function get(): array
     {
-        $eventAvailabilityController = fn() => $this->controllerFactory->makeEventAvailabilitiesController();
+        $eventAvailabilityController = fn() => $this->controllerFactory->make(EventAvailabilitiesController::class);
 
         $this->routes[] = new Route('GET  /availabilities', $eventAvailabilityController, 'showAvailabilityStats');
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\ImportApi as ImportApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class ImportApi implements RouteInterface
      */
     public function get(): array
     {
-        $importApi = fn() => $this->apiFactory->makeImportApi();
+        $importApi = fn() => $this->apiFactory->make(ImportApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/import/headers', $importApi, 'getHeadersFromCSV');
         $this->routes[] = new Route('POST /api/import/ods', $importApi, 'importOds');

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\VisitorInsightsApi as VisitorInsightsApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class VisitorInsightsApi implements RouteInterface
      */
     public function get(): array
     {
-        $api = fn() => $this->apiFactory->makeVisitorInsightsApi();
+        $api = fn() => $this->apiFactory->make(VisitorInsightsApiEndpoint::class);
 
         $this->routes[] = new Route('GET /api/visitor-insights/creation-time-distribution', $api, 'getCreationTimeDistribution');
         $this->routes[] = new Route('GET /api/visitor-insights/creation-time-trend', $api, 'getCreationTimeTrend');

@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\ContactController;
 
 final class Contact implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Contact implements RouteInterface
      */
     public function get(): array
     {
-        $contactController = fn() => $this->controllerFactory->makeContactController();
+        $contactController = fn() => $this->controllerFactory->make(ContactController::class);
 
         $this->routes[] = new Route('GET  /contact/event/@id:[0-9]+', $contactController, 'contact');
         $this->routes[] = new Route('GET  /contact', $contactController, 'contact');

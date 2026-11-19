@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserDirectoryController;
 
 final class UserDirectory implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserDirectory implements RouteInterface
      */
     public function get(): array
     {
-        $userDirectoryController = fn() => $this->controllerFactory->makeUserDirectoryController();
+        $userDirectoryController = fn() => $this->controllerFactory->make(UserDirectoryController::class);
 
         $this->routes[] = new Route('GET /user/directory', $userDirectoryController, 'showDirectory');
         $this->routes[] = new Route('GET /user/directory/map', $userDirectoryController, 'showMap');

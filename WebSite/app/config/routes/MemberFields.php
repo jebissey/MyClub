@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\PersonManager\MemberFieldController;
 
 final class MemberFields implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class MemberFields implements RouteInterface
      */
     public function get(): array
     {
-        $memberFieldController = fn() => $this->controllerFactory->makeMemberFieldController();
+        $memberFieldController = fn() => $this->controllerFactory->make(MemberFieldController::class);
 
         $this->routes[] = new Route('GET /memberFields-settings', $memberFieldController, 'edit');
         $this->routes[] = new Route('POST /memberFields-settings', $memberFieldController, 'save');

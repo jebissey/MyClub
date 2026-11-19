@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Event\EventNeedController;
 
 final class EventNeed implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class EventNeed implements RouteInterface
      */
     public function get(): array
     {
-        $eventNeedController = fn() => $this->controllerFactory->makeEventNeedController();
+        $eventNeedController = fn() => $this->controllerFactory->make(EventNeedController::class);
 
         $this->routes[] = new Route('GET /needs', $eventNeedController, 'needs');
 

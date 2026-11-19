@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\TranslatorApi as TranslatorApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class TranslatorApi implements RouteInterface
      */
     public function get(): array
     {
-        $translatorApi = fn() => $this->apiFactory->makeTranslatorApi();
+        $translatorApi = fn() => $this->apiFactory->make(TranslatorApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/translator/save', $translatorApi, 'save');
 

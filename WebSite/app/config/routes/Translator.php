@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Translator\TranslatorController;
 
 final class Translator implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Translator implements RouteInterface
      */
     public function get(): array
     {
-        $translatorController = fn() => $this->controllerFactory->makeTranslatorController();
+        $translatorController = fn() => $this->controllerFactory->make(TranslatorController::class);
 
         $this->routes[] = new Route('GET /translator', $translatorController, 'index');
 

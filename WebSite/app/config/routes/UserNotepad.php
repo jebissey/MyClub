@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserNotepadController;
 
 final class UserNotepad implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserNotepad implements RouteInterface
      */
     public function get(): array
     {
-        $userNotepadController = fn() => $this->controllerFactory->makeUserNotepadController();
+        $userNotepadController = fn() => $this->controllerFactory->make(UserNotepadController::class);
 
         $this->routes[] = new Route('GET  /user/notepad', $userNotepadController, 'editNotepad');
         $this->routes[] = new Route('POST /user/notepad', $userNotepadController, 'saveNotepad');

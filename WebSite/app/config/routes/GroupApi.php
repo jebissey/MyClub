@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\GroupApi as GroupApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class GroupApi implements RouteInterface
      */
     public function get(): array
     {
-        $groupApi = fn() => $this->apiFactory->makeGroupApi();
+        $groupApi = fn() => $this->apiFactory->make(GroupApiEndpoint::class);
 
         $this->routes[] = new Route('GET  /api/personsInGroup/@id:[0-9]+', $groupApi, 'getPersonsInGroup');
         $this->routes[] = new Route('POST /api/registration/add/@personId:[0-9]+/@groupId:[0-9]+', $groupApi, 'addToGroup');

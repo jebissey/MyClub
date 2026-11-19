@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\EventAvailabilitiesApi as EventAvailabilitiesApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class EventAvailabilitiesApi implements RouteInterface
      */
     public function get(): array
     {
-        $eventAvailabilitiesApi = fn() => $this->apiFactory->makeEventAvailabilitiesApi();
+        $eventAvailabilitiesApi = fn() => $this->apiFactory->make(EventAvailabilitiesApiEndpoint::class);
 
         $this->routes[] = new Route('GET /api/event-availabilities/slot-events', $eventAvailabilitiesApi, 'getSlotEvents');
 

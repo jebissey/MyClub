@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserAvailabilitiesController;
 
 final class UserAvailabilities implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserAvailabilities implements RouteInterface
      */
     public function get(): array
     {
-        $userAvailabilitiesController = fn() => $this->controllerFactory->makeUserAvailabilitiesController();
+        $userAvailabilitiesController = fn() => $this->controllerFactory->make(UserAvailabilitiesController::class);
 
         $this->routes[] = new Route('GET  /user/availabilities', $userAvailabilitiesController, 'availabilities');
         $this->routes[] = new Route('POST /user/availabilities', $userAvailabilitiesController, 'availabilitiesSave');

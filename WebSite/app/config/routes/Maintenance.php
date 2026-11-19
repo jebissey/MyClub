@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Webmaster\MaintenanceController;
 
 final class Maintenance implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Maintenance implements RouteInterface
      */
     public function get(): array
     {
-        $maintenanceController = fn() => $this->controllerFactory->makeMaintenanceController();
+        $maintenanceController = fn() => $this->controllerFactory->make(MaintenanceController::class);
 
         $this->routes[] = new Route('GET /maintenance', $maintenanceController, 'maintenance');
         $this->routes[] = new Route('GET /maintenance/set', $maintenanceController, 'setSiteUnderMaintenance');

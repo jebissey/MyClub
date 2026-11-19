@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserPreferencesController;
 
 final class UserPreferences implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserPreferences implements RouteInterface
      */
     public function get(): array
     {
-        $userPreferencesController = fn() => $this->controllerFactory->makeUserPreferencesController();
+        $userPreferencesController = fn() => $this->controllerFactory->make(UserPreferencesController::class);
 
         $this->routes[] = new Route('GET  /user/preferences', $userPreferencesController, 'preferences');
         $this->routes[] = new Route('POST /user/preferences', $userPreferencesController, 'preferencesSave');

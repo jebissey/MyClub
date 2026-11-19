@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Event\EventEmailController;
 
 final class EventEmail implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class EventEmail implements RouteInterface
      */
     public function get(): array
     {
-        $eventEmailController = fn() => $this->controllerFactory->makeEventEmailController();
+        $eventEmailController = fn() => $this->controllerFactory->make(EventEmailController::class);
 
         $this->routes[] = new Route('GET  /emails', $eventEmailController, 'fetchEmails');
         $this->routes[] = new Route('POST /emails', $eventEmailController, 'copyEmails');

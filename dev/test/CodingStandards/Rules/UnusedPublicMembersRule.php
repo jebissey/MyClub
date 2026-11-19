@@ -450,8 +450,10 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
     /**
      * Resolves route declarations to "ClassName::method" pairs.
      *
-     * Matches the pattern used by app\config\routes\*:
-     *   $handler = fn() => $this->apiFactory->makeEventApi();
+     * Handles both styles used by app\config\routes\*:
+     *   $handler = fn() => $this->controllerFactory->make(EventController::class);
+     *   $handler = fn() => $this->apiFactory->makeEventApi();   (legacy, kept during the migration)
+     * followed by:
      *   new Route('POST /api/event/sendEmails', $handler, 'sendEmails');
      *
      * @param array<string, string> $factoryMap
@@ -461,6 +463,21 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
     {
         $handlers = [];
 
+        // Container style: make(SomeClass::class), the class may be imported with an alias.
+        $aliases = $this->importAliases($source);
+
+        preg_match_all(
+            '/\$(\w+)\s*=\s*(?:fn|function)\s*\(\)\s*(?:=>|\{\s*return)\s*\$this->\w+->make\(\s*\\\\?(?:[\w\\\\]*\\\\)?(\w+)::class\s*\)/',
+            $source,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        foreach ($matches as $match) {
+            $handlers[$match[1]] = $aliases[$match[2]] ?? $match[2];
+        }
+
+        // Legacy style: makeXxx() factory methods.
         preg_match_all(
             '/\$(\w+)\s*=\s*(?:fn|function)\s*\(\)\s*(?:=>|\{\s*return)\s*\$this->\w+->(make\w+)\(/',
             $source,
@@ -489,6 +506,29 @@ final readonly class UnusedPublicMembersRule implements RuleInterface
         }
 
         return $routed;
+    }
+
+    /**
+     * Maps import aliases to the short name of the imported class:
+     *   use app\apis\CarouselApi as CarouselApiEndpoint;  =>  ['CarouselApiEndpoint' => 'CarouselApi']
+     *
+     * @return array<string, string>
+     */
+    private function importAliases(string $source): array
+    {
+        preg_match_all(
+            '/^use\s+(?:[\w\\\\]*\\\\)?(\w+)\s+as\s+(\w+)\s*;/m',
+            $source,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        $aliases = [];
+        foreach ($matches as $match) {
+            $aliases[$match[2]] = $match[1];
+        }
+
+        return $aliases;
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\WebmasterApi as WebmasterApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class WebmasterApi implements RouteInterface
      */
     public function get(): array
     {
-        $webmasterApi = fn() => $this->apiFactory->makeWebmasterApi();
+        $webmasterApi = fn() => $this->apiFactory->make(WebmasterApiEndpoint::class);
 
         $this->routes[] = new Route('GET  /api/lastVersion', $webmasterApi, 'lastVersion');
         $this->routes[] = new Route('POST /api/notification/send', $webmasterApi, 'sendNotification');

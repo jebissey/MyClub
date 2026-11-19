@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\PersonManager\ImportController;
 
 final class Import implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Import implements RouteInterface
      */
     public function get(): array
     {
-        $importController = fn() => $this->controllerFactory->makeImportController();
+        $importController = fn() => $this->controllerFactory->make(ImportController::class);
 
         $this->routes[] = new Route('GET  /import', $importController, 'showImportForm');
         $this->routes[] = new Route('POST /import', $importController, 'processImport');

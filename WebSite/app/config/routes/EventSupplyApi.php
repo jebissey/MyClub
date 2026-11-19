@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\EventSupplyApi as EventSupplyApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class EventSupplyApi implements RouteInterface
      */
     public function get(): array
     {
-        $eventSupplyApi = fn() => $this->apiFactory->makeEventSupplyApi();
+        $eventSupplyApi = fn() => $this->apiFactory->make(EventSupplyApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/event/updateSupply', $eventSupplyApi, 'updateSupply');
         $this->routes[] = new Route('GET  /api/participants/supplies', $eventSupplyApi, 'participantsSupplies');

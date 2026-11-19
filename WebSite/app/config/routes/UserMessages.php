@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserMessagesController;
 
 final class UserMessages implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserMessages implements RouteInterface
      */
     public function get(): array
     {
-        $userMessagesController = fn() => $this->controllerFactory->makeUserMessagesController();
+        $userMessagesController = fn() => $this->controllerFactory->make(UserMessagesController::class);
 
         $this->routes[] = new Route('GET  /user/messages', $userMessagesController, 'showMessages');
 

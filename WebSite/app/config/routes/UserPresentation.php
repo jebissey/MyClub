@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserPresentationController;
 
 final class UserPresentation implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserPresentation implements RouteInterface
      */
     public function get(): array
     {
-        $userPresentationController = fn() => $this->controllerFactory->makeUserPresentationController();
+        $userPresentationController = fn() => $this->controllerFactory->make(UserPresentationController::class);
 
         $this->routes[] = new Route('GET  /user/presentation/edit', $userPresentationController, 'editPresentation');
         $this->routes[] = new Route('POST /user/presentation/edit', $userPresentationController, 'savePresentation');

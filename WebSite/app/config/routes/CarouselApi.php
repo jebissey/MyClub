@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\CarouselApi as CarouselApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class CarouselApi implements RouteInterface
      */
     public function get(): array
     {
-        $carouselApi = fn() => $this->apiFactory->makeCarouselApi();
+        $carouselApi = fn() => $this->apiFactory->make(CarouselApiEndpoint::class);
 
         $this->routes[] = new Route('GET  /api/carousel/@articleId:[0-9]+', $carouselApi, 'getItems');
         $this->routes[] = new Route('POST /api/carousel/save', $carouselApi, 'saveItem');

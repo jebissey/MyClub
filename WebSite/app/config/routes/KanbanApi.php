@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\KanbanApi as KanbanApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class KanbanApi implements RouteInterface
      */
     public function get(): array
     {
-        $kanbanApi = fn() => $this->apiFactory->makeKanbanApi();
+        $kanbanApi = fn() => $this->apiFactory->make(KanbanApiEndpoint::class);
 
         $this->routes[] = new Route('GET  /api/kanban/card/@id:[0-9]+/history', $kanbanApi, 'getHistory');
         $this->routes[] = new Route('POST /api/kanban/card/create', $kanbanApi, 'createCard');

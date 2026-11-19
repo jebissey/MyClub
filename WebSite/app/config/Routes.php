@@ -91,145 +91,41 @@ use app\config\routes\VisitorInsightsApi;
 use app\config\routes\WebappSettings;
 use app\config\routes\Webmaster;
 use app\config\routes\WebmasterApi;
-use app\config\valueObjects\DataHelpers;
-use app\config\valueObjects\Services;
 use app\enums\ApplicationError;
 use app\helpers\Application;
-use app\helpers\Backup;
-use app\helpers\ChatMessageMapper;
+use app\helpers\ConnectedUser;
 use app\helpers\ErrorManager;
-use app\helpers\GravatarHandler;
-use app\helpers\MediaManager;
-use app\helpers\MemberCustomFields;
 use app\helpers\News;
-use app\helpers\NotificationSender;
-use app\helpers\PersonPreferences;
 use app\helpers\WebApp;
 use app\models\AlertRecipientDataHelper;
-use app\models\DbBrowserDataHelper;
-use app\models\ArticleCrosstabDataHelper;
 use app\models\ArticleDataHelper;
-use app\models\ArticleTableDataHelper;
-use app\models\AttributeDataHelper;
-use app\models\AuthorizationDataHelper;
-use app\models\AvailabilityDataHelper;
-use app\models\CarouselDataHelper;
-use app\models\ChatMessageDataHelper;
-use app\models\ContactDataHelper;
-use app\models\CrosstabDataHelper;
 use app\models\DataHelper;
-use app\models\DesignDataHelper;
-use app\models\EventDataHelper;
-use app\models\EventInvitationDataHelper;
-use app\models\EventListDataHelper;
-use app\models\EventNeedDataHelper;
 use app\models\EventNewsDataHelper;
-use app\models\EventParticipationDataHelper;
-use app\models\EventTypeDataHelper;
-use app\models\ExerciseTableDataHelper;
-use app\models\GroupDataHelper;
-use app\models\KanbanDataHelper;
-use app\models\KaraokeDataHelper;
-use app\models\LanguagesDataHelper;
-use app\models\LoanItemDataHelper;
-use app\models\LoanRecordDataHelper;
-use app\models\LoanReservationDataHelper;
-use app\models\LogDataHelper;
-use app\models\LogAnalyticsDataHelper;
-use app\models\LogStatisticsDataHelper;
-use app\models\LogWriterDataHelper;
 use app\models\MemberDataHelper;
-use app\models\MemberDirectoryDataHelper;
-use app\models\MemberImportDataHelper;
-use app\models\MembershipDataHelper;
-use app\models\MenuItemDataHelper;
 use app\models\MessageDataHelper;
-use app\models\MessageImageDataHelper;
-use app\models\MessageStatisticsDataHelper;
-use app\models\MessageWriteDataHelper;
-use app\models\MetadataDataHelper;
-use app\models\NeedDataHelper;
-use app\models\NeedTypeDataHelper;
-use app\models\OrderDataHelper;
-use app\models\ParticipantDataHelper;
-use app\models\PersonDataHelper;
-use app\models\PersonGroupDataHelper;
-use app\models\PersonStatisticsDataHelper;
 use app\models\PresentationNewsDataHelper;
-use app\models\SharedFileDataHelper;
 use app\models\SurveyDataHelper;
-use app\models\TableControllerDataHelper;
 use app\modules\Article\services\ArticleAlertService;
-use app\modules\Article\services\ArticleAuthorizationService;
-use app\modules\Article\services\MediaCatalog;
-use app\modules\Article\services\MediaFileListBuilder;
-use app\modules\Article\services\MediaFileStreamer;
-use app\modules\Common\interfaces\NewsProviderInterface;
-use app\modules\Common\services\AnonymousAccessService;
-use app\modules\Common\services\ArticleService;
+use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\services\AuthenticationService;
 use app\modules\Common\services\CredentialService;
 use app\modules\Common\services\DatabaseSmtpConfigProvider;
 use app\modules\Common\services\EmailService;
-use app\modules\Common\services\EventService;
 use app\modules\Common\services\JsonEmailQuotaTracker;
-use app\modules\Common\services\MemberMapService;
-use app\modules\Common\services\MessageRecipientService;
-use app\modules\Common\services\RegistrationLinkService;
-use app\modules\Loan\services\LoanAvailabilityService;
-use app\modules\Loan\services\LoanCalendarService;
-use app\modules\PersonManager\services\MemberCsvImporter;
-use app\modules\PersonManager\services\MemberOdsImporter;
 use app\modules\Common\valueObjects\Route;
-use app\modules\Webmaster\services\InstallationDisplayService;
-use app\modules\Webmaster\services\InstallationStatusFilter;
-use app\modules\Webmaster\services\SitemapBuilder;
-use app\modules\Webmaster\services\VapidKeyService;
-use app\modules\Webmaster\services\VersionChecker;
 
 final class Routes
 {
-    /**
-     * @var array<int, Route>
-     */
-    private array $routes;
-    private ControllerFactory $controllerFactory;
-    private ApiFactory $apiFactory;
-    private readonly JsonEmailQuotaTracker $quotaTracker;
-    private readonly DataHelper $dataHelper;
-    private readonly AuthorizationDataHelper $authorizationDataHelper;
-    private readonly ArticleAuthorizationService $articleAuthorizationService;
-    private readonly PersonPreferences $personPreferences;
+    private readonly ControllerFactory $controllerFactory;
+    private readonly ApiFactory $apiFactory;
 
-    /**
-     * Build order, from the objects that depend on nothing to the ones that depend on everything:
-     *
-     *   1. base objects     only need the application / the generic DataHelper
-     *   2. data helpers     may use the base objects (authorization, preferences)
-     *   3. services         use the data helpers
-     *   4. factories        use data helpers and services
-     *
-     * ArticleAuthorizationService only depends on AuthorizationDataHelper, so it belongs to layer 1:
-     * SurveyDataHelper (layer 2) can use it without any circular dependency with the services (layer 3).
-     */
     public function __construct(private readonly Application $application, private readonly Engine $flight)
     {
-        $this->quotaTracker = new JsonEmailQuotaTracker(dirname(__DIR__, 2) . '/data/email_quota.json');
-        $this->dataHelper = new DataHelper(
-            $application->getPdo(),
-            $application->getErrorManager(),
-            $application->getPdoForLog()
-        );
+        $container = new Container();
+        $this->registerDefinitions($container);
 
-        // 1. Base objects
-        $this->authorizationDataHelper = new AuthorizationDataHelper($application);
-        $this->articleAuthorizationService = new ArticleAuthorizationService($this->authorizationDataHelper);
-        $this->personPreferences = new PersonPreferences($this->dataHelper);
-
-        // 2, 3, 4
-        $dataHelpers = $this->buildDataHelpers();
-        $services = $this->buildServices($dataHelpers);
-        $this->buildFactories($dataHelpers, $services);
+        $this->controllerFactory = new ControllerFactory($container);
+        $this->apiFactory = new ApiFactory($container);
     }
 
     public function add(ErrorManager $errorManager): void
@@ -277,6 +173,72 @@ final class Routes
     #region Private methods
 
     /**
+     * Only what cannot be autowired is declared here: existing instances, singletons,
+     * constructors needing scalars, lists or a special setup.
+     * Everything else is resolved by the container from the constructor types.
+     */
+    private function registerDefinitions(Container $container): void
+    {
+        $application = $this->application;
+
+        // Existing instances
+        $container->set(Application::class, $application);
+        $container->set(ErrorManager::class, $application->getErrorManager());
+        $container->set(ConnectedUser::class, $application->getConnectedUser());
+        $container->set(CredentialService::class, CredentialService::getInstance());
+
+        // Constructors needing scalars or a special setup
+        $container->define(
+            DataHelper::class,
+            fn() => new DataHelper(
+                $application->getPdo(),
+                $application->getErrorManager(),
+                $application->getPdoForLog()
+            )
+        );
+        $container->define(
+            JsonEmailQuotaTracker::class,
+            fn() => new JsonEmailQuotaTracker(dirname(__DIR__, 2) . '/data/email_quota.json')
+        );
+        $container->define(
+            EmailService::class,
+            fn(Container $c) => new EmailService(
+                new DatabaseSmtpConfigProvider($c->get(CredentialService::class)),
+                $c->get(JsonEmailQuotaTracker::class)
+            )
+        );
+        $container->define(
+            ArticleAlertService::class,
+            fn(Container $c) => new ArticleAlertService(
+                $c->get(AlertRecipientDataHelper::class),
+                Application::$root
+            )
+        );
+        $container->define(
+            AuthenticationService::class,
+            function (Container $c) use ($application) {
+                $service = new AuthenticationService($c->get(MemberDataHelper::class), Application::$root);
+                $application->setAuthenticationService($service);
+                return $service;
+            }
+        );
+        $container->define(
+            News::class,
+            fn(Container $c) => new News([
+                $c->get(ArticleDataHelper::class),
+                $c->get(EventNewsDataHelper::class),
+                $c->get(MessageDataHelper::class),
+                $c->get(PresentationNewsDataHelper::class),
+                $c->get(SurveyDataHelper::class),
+            ])
+        );
+
+        // The application expects the authentication service to be registered at startup,
+        // so it must not wait for the first lazy resolution.
+        $container->get(AuthenticationService::class);
+    }
+
+    /**
      * @return array{0: array<int, string>, 1: string}
      */
     private function splitMethodAndPath(string $methodAndPath): array
@@ -294,94 +256,95 @@ final class Routes
      */
     private function get(): array
     {
-        $this->routes = [];
+        /** @var list<RouteInterface> $providers */
+        $providers = [
+            new Article($this->controllerFactory),
+            new ArticleApi($this->apiFactory),
+            new Arward($this->controllerFactory),
+            new Astronomy($this->controllerFactory),
+            new BackupAllData($this->controllerFactory),
+            new CarouselApi($this->apiFactory),
+            new ChatApi($this->apiFactory),
+            new Communication($this->controllerFactory),
+            new CommunicationApi($this->apiFactory),
+            new Contact($this->controllerFactory),
+            new Credential($this->controllerFactory),
+            new DbBrowser($this->controllerFactory),
+            new Design($this->controllerFactory),
+            new Designer($this->controllerFactory),
+            new Event($this->controllerFactory),
+            new EventApi($this->apiFactory),
+            new EventAttributeApi($this->apiFactory),
+            new EventAvailabilities($this->controllerFactory),
+            new EventAvailabilitiesApi($this->apiFactory),
+            new EventEmail($this->controllerFactory),
+            new EventGuest($this->controllerFactory),
+            new EventNeed($this->controllerFactory),
+            new EventNeedApi($this->apiFactory),
+            new EventNeedTypeApi($this->apiFactory),
+            new EventSupplyApi($this->apiFactory),
+            new EventType($this->controllerFactory),
+            new Exercise($this->controllerFactory),
+            new ExerciseApi($this->apiFactory),
+            new Export($this->controllerFactory),
+            new Ffa($this->controllerFactory),
+            new GameManager($this->controllerFactory),
+            new Group($this->controllerFactory),
+            new GroupApi($this->apiFactory),
+            new HelloAssoApi($this->apiFactory),
+            new Home($this->controllerFactory),
+            new Import($this->controllerFactory),
+            new ImportApi($this->apiFactory),
+            new Kanban($this->controllerFactory),
+            new KanbanApi($this->apiFactory),
+            new Karaoke($this->controllerFactory),
+            new KaraokeApi($this->apiFactory),
+            new Leapfrog($this->controllerFactory),
+            new LeapfrogApi($this->apiFactory),
+            new Loan($this->controllerFactory),
+            new LoanApi($this->apiFactory),
+            new MakeTheTarget($this->controllerFactory),
+            new MakeTheTargetApi($this->apiFactory),
+            new Maintenance($this->controllerFactory),
+            new Media($this->controllerFactory),
+            new MediaApi($this->apiFactory),
+            new MemberFields($this->controllerFactory),
+            new Membership($this->controllerFactory),
+            new MenuItem($this->controllerFactory),
+            new MenuItemApi($this->apiFactory),
+            new MessageApi($this->apiFactory),
+            new NotificationApi($this->apiFactory),
+            new Order($this->controllerFactory),
+            new Person($this->controllerFactory),
+            new Pwa($this->controllerFactory),
+            new Registration($this->controllerFactory),
+            new Rss($this->controllerFactory),
+            new Solfege($this->controllerFactory),
+            new Survey($this->controllerFactory),
+            new Translator($this->controllerFactory),
+            new TranslatorApi($this->apiFactory),
+            new User($this->controllerFactory),
+            new UserAccount($this->controllerFactory),
+            new UserAvailabilities($this->controllerFactory),
+            new UserConnections($this->controllerFactory),
+            new UserDashboard($this->controllerFactory),
+            new UserDirectory($this->controllerFactory),
+            new UserGroups($this->controllerFactory),
+            new UserMessages($this->controllerFactory),
+            new UserNews($this->controllerFactory),
+            new UserNotepad($this->controllerFactory),
+            new UserNotifications($this->controllerFactory),
+            new UserPreferences($this->controllerFactory),
+            new UserPresentation($this->controllerFactory),
+            new UserStatistics($this->controllerFactory),
+            new VisitorInsights($this->controllerFactory),
+            new VisitorInsightsApi($this->apiFactory),
+            new WebappSettings($this->controllerFactory),
+            new Webmaster($this->controllerFactory),
+            new WebmasterApi($this->apiFactory),
+        ];
 
-        $this->routes = array_merge($this->routes, (new Article($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new ArticleApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Arward($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Astronomy($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new BackupAllData($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new CarouselApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new ChatApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Communication($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new CommunicationApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Contact($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Credential($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new DbBrowser($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Design($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Designer($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Event($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventAttributeApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventAvailabilities($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventAvailabilitiesApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventEmail($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventGuest($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventNeed($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventNeedApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventNeedTypeApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventSupplyApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new EventType($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Exercise($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new ExerciseApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Export($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Ffa($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new GameManager($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Group($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new GroupApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new HelloAssoApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Home($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Import($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new ImportApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Kanban($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new KanbanApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Karaoke($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new KaraokeApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Leapfrog($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new LeapfrogApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Loan($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new LoanApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new MakeTheTarget($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new MakeTheTargetApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Maintenance($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Media($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new MediaApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new MemberFields($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Membership($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new MenuItem($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new MenuItemApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new MessageApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new NotificationApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new Order($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Person($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Pwa($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Registration($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Rss($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Solfege($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Survey($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Translator($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new TranslatorApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new User($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserAccount($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserAvailabilities($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserConnections($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserDashboard($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserDirectory($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserGroups($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserMessages($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserNews($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserNotepad($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserNotifications($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserPreferences($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserPresentation($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new UserStatistics($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new VisitorInsights($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new VisitorInsightsApi($this->apiFactory))->get());
-        $this->routes = array_merge($this->routes, (new WebappSettings($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new Webmaster($this->controllerFactory))->get());
-        $this->routes = array_merge($this->routes, (new WebmasterApi($this->apiFactory))->get());
-
-        return $this->routes;
+        return array_merge(...array_map(static fn(RouteInterface $provider) => $provider->get(), $providers));
     }
 
     /**
@@ -579,262 +542,5 @@ final class Routes
         Flight::stop();
     }
 
-    /**
-     * Layer 2: every data helper is created here, once.
-     */
-    private function buildDataHelpers(): DataHelpers
-    {
-        $authorizationDataHelper = $this->authorizationDataHelper;
-        $articleDataHelper = new ArticleDataHelper($this->application, $authorizationDataHelper, $this->articleAuthorizationService);
-        $crosstabDataHelper = new CrosstabDataHelper($this->application, $authorizationDataHelper);
-        $languagesDataHelper = new LanguagesDataHelper($this->application, $this->application->getErrorManager());
-        $personDataHelper = new PersonDataHelper($this->application);
-        $eventDataHelper = new EventDataHelper($this->application);
-        $chatMessageMapper = new ChatMessageMapper();
-
-        return new DataHelpers(
-            alertRecipientDataHelper: new AlertRecipientDataHelper($this->application, $personDataHelper, $this->personPreferences),
-            articleCrosstabDataHelper: new ArticleCrosstabDataHelper($this->application, $crosstabDataHelper),
-            articleDataHelper: $articleDataHelper,
-            articleTableDataHelper: new ArticleTableDataHelper($this->application),
-            attributeDataHelper: new AttributeDataHelper($this->application, $eventDataHelper),
-            authorizationDataHelper: $authorizationDataHelper,
-            availabilityDataHelper: new AvailabilityDataHelper($this->application),
-            carouselDataHelper: new CarouselDataHelper($this->application),
-            chatMessageDataHelper: new ChatMessageDataHelper($this->application, $chatMessageMapper),
-            contactDataHelper: new ContactDataHelper($this->application),
-            crosstabDataHelper: $crosstabDataHelper,
-            dataHelper: $this->dataHelper,
-            dbBrowserDataHelper: new DbBrowserDataHelper($this->application),
-            designDataHelper: new DesignDataHelper($this->application),
-            eventListDataHelper: new EventListDataHelper($this->application, new PersonPreferences($this->dataHelper)),
-            eventDataHelper: $eventDataHelper,
-            eventInvitationDataHelper: new EventInvitationDataHelper($this->application),
-            eventNeedDataHelper: new EventNeedDataHelper($this->application),
-            eventNewsDataHelper: new EventNewsDataHelper($this->application),
-            eventParticipationDataHelper: new EventParticipationDataHelper($this->application),
-            eventTypeDataHelper: new EventTypeDataHelper($this->application),
-            exerciseTableDataHelper: new ExerciseTableDataHelper($this->application),
-            groupDataHelper: new GroupDataHelper($this->application),
-            kanbanDataHelper: new KanbanDataHelper($this->application),
-            karaokeDataHelper: new KaraokeDataHelper($this->application),
-            languagesDataHelper: $languagesDataHelper,
-            loanItemDataHelper: new LoanItemDataHelper($this->application),
-            loanRecordDataHelper: new LoanRecordDataHelper($this->application),
-            loanReservationDataHelper: new LoanReservationDataHelper($this->application),
-            logAnalyticsDataHelper: new LogAnalyticsDataHelper($this->application),
-            logStatisticsDataHelper: new LogStatisticsDataHelper($this->application),
-            logDataHelper: new LogDataHelper($this->application, $this->dataHelper),
-            logWriterDataHelper: new LogWriterDataHelper($this->application, $this->application->getErrorManager()),
-            memberDataHelper: new MemberDataHelper($this->application),
-            memberDirectoryDataHelper: new MemberDirectoryDataHelper($this->application),
-            memberImportDataHelper: new MemberImportDataHelper($this->application),
-            membershipDataHelper: new MembershipDataHelper($this->application),
-            menuItemDataHelper: new MenuItemDataHelper($this->application, $authorizationDataHelper),
-            messageDataHelper: new MessageDataHelper(
-                $this->application,
-                new MessageImageDataHelper($this->application, $languagesDataHelper),
-                new MessageStatisticsDataHelper($this->application),
-            ),
-            messageImageDataHelper: new MessageImageDataHelper($this->application, $languagesDataHelper),
-            messageStatisticsDataHelper: new MessageStatisticsDataHelper($this->application),
-            messageWriteDataHelper: new MessageWriteDataHelper($this->application),
-            metadataDataHelper: new MetadataDataHelper($this->application),
-            needDataHelper: new NeedDataHelper($this->application),
-            needTypeDataHelper: new NeedTypeDataHelper($this->application),
-            orderDataHelper: new OrderDataHelper($this->application, $articleDataHelper, $this->articleAuthorizationService),
-            participantDataHelper: new ParticipantDataHelper($this->application),
-            personDataHelper: $personDataHelper,
-            personGroupDataHelper: new PersonGroupDataHelper($this->application),
-            personStatisticsDataHelper: new PersonStatisticsDataHelper($this->application),
-            presentationNewsDataHelper: new PresentationNewsDataHelper($this->application),
-            sharedFileDataHelper: new SharedFileDataHelper($this->application),
-            surveyDataHelper: new SurveyDataHelper($this->application, $this->articleAuthorizationService),
-            tableControllerDataHelper: new TableControllerDataHelper($this->application),
-        );
-    }
-
-    /**
-     * Layer 3: services, built from the data helpers and the base objects.
-     */
-    private function buildServices(DataHelpers $dataHelpers): Services
-    {
-        $authenticationService = new AuthenticationService(
-            $dataHelpers->memberDataHelper,
-            Application::$root
-        );
-        $this->application->setAuthenticationService($authenticationService);
-
-        /** @var list<NewsProviderInterface> $newsProviders */
-        $newsProviders = [
-            $dataHelpers->articleDataHelper,
-            $dataHelpers->eventNewsDataHelper,
-            $dataHelpers->messageDataHelper,
-            $dataHelpers->presentationNewsDataHelper,
-            $dataHelpers->surveyDataHelper,
-        ];
-
-        $mediaCatalog = new MediaCatalog();
-
-        return new Services(
-            anonymousAccessService: new AnonymousAccessService($authenticationService, $this->application->getConnectedUser()),
-            articleAlertService: new ArticleAlertService($dataHelpers->alertRecipientDataHelper, Application::$root),
-            articleAuthorizationService: $this->articleAuthorizationService,
-            authenticationService: $authenticationService,
-            emailService: new EmailService(
-                new DatabaseSmtpConfigProvider(CredentialService::getInstance()),
-                $this->quotaTracker
-            ),
-            eventService: new EventService($dataHelpers->eventDataHelper),
-            installationDisplayService: new InstallationDisplayService(),
-            installationStatusFilter: new InstallationStatusFilter(),
-            loanAvailabilityService: new LoanAvailabilityService(
-                $dataHelpers->loanItemDataHelper,
-                $dataHelpers->loanRecordDataHelper,
-                $dataHelpers->loanReservationDataHelper,
-            ),
-            loanCalendarService: new LoanCalendarService(
-                $dataHelpers->loanRecordDataHelper,
-                $dataHelpers->loanReservationDataHelper,
-            ),
-            mediaCatalog: $mediaCatalog,
-            mediaFileListBuilder: new MediaFileListBuilder(
-                $mediaCatalog,
-                $dataHelpers->articleDataHelper,
-                $dataHelpers->carouselDataHelper,
-                $dataHelpers->sharedFileDataHelper,
-                $dataHelpers->messageDataHelper
-            ),
-            mediaFileStreamer: new MediaFileStreamer(),
-            mediaManager: new MediaManager(
-                $this->dataHelper,
-                $dataHelpers->sharedFileDataHelper,
-                $dataHelpers->languagesDataHelper
-            ),
-            memberCsvImporter: new MemberCsvImporter($dataHelpers->memberImportDataHelper),
-            memberOdsImporter: new MemberOdsImporter($dataHelpers->memberImportDataHelper, $dataHelpers->languagesDataHelper),
-            messageRecipientService: new MessageRecipientService($this->dataHelper),
-            news: new News($newsProviders),
-            notificationSender: new NotificationSender($this->dataHelper, CredentialService::getInstance()),
-            personDataHelper: $dataHelpers->personDataHelper,
-            personPreferences: $this->personPreferences,
-            sitemapBuilder: new SitemapBuilder($dataHelpers->articleDataHelper),
-            vapidKeyService: new VapidKeyService(CredentialService::getInstance()),
-            versionChecker: new VersionChecker(),
-        );
-    }
-
-    /**
-     * Layer 4: no object is created here besides the non-data-helper collaborators.
-     */
-    private function buildFactories(DataHelpers $dataHelpers, Services $services): void
-    {
-        $this->controllerFactory = new ControllerFactory(
-            $dataHelpers->alertRecipientDataHelper,
-            $services->anonymousAccessService,
-            $this->application,
-            $services->articleAlertService,
-            $services->articleAuthorizationService,
-            $dataHelpers->articleCrosstabDataHelper,
-            $dataHelpers->articleDataHelper,
-            new ArticleService($dataHelpers->carouselDataHelper, $services->mediaManager, $this->dataHelper),
-            $dataHelpers->articleTableDataHelper,
-            $dataHelpers->attributeDataHelper,
-            $services->authenticationService,
-            new Backup(),
-            $dataHelpers->carouselDataHelper,
-            $dataHelpers->chatMessageDataHelper,
-            CredentialService::getInstance(),
-            $dataHelpers->crosstabDataHelper,
-            $dataHelpers->dbBrowserDataHelper,
-            $dataHelpers->designDataHelper,
-            $services->emailService,
-            $dataHelpers->eventListDataHelper,
-            new ErrorManager($this->application),
-            $dataHelpers->eventDataHelper,
-            $dataHelpers->eventInvitationDataHelper,
-            $dataHelpers->eventNeedDataHelper,
-            $dataHelpers->eventParticipationDataHelper,
-            $dataHelpers->eventTypeDataHelper,
-            $dataHelpers->exerciseTableDataHelper,
-            $dataHelpers->groupDataHelper,
-            $services->installationDisplayService,
-            $services->installationStatusFilter,
-            $dataHelpers->kanbanDataHelper,
-            $dataHelpers->loanItemDataHelper,
-            $dataHelpers->loanRecordDataHelper,
-            $dataHelpers->loanReservationDataHelper,
-            $dataHelpers->logAnalyticsDataHelper,
-            $dataHelpers->logStatisticsDataHelper,
-            $dataHelpers->logDataHelper,
-            $services->mediaCatalog,
-            $services->mediaFileListBuilder,
-            $services->mediaFileStreamer,
-            new MemberCsvImporter($dataHelpers->memberImportDataHelper),
-            new MemberCustomFields($dataHelpers->dataHelper),
-            $dataHelpers->memberDataHelper,
-            $dataHelpers->memberDirectoryDataHelper,
-            new MemberMapService(new GravatarHandler()),
-            $dataHelpers->membershipDataHelper,
-            $dataHelpers->messageDataHelper,
-            $dataHelpers->metadataDataHelper,
-            $dataHelpers->needDataHelper,
-            $services->news,
-            $services->notificationSender,
-            $dataHelpers->orderDataHelper,
-            $dataHelpers->participantDataHelper,
-            $dataHelpers->personDataHelper,
-            $dataHelpers->personGroupDataHelper,
-            $dataHelpers->personStatisticsDataHelper,
-            new RegistrationLinkService($dataHelpers->contactDataHelper, $services->emailService),
-            $services->sitemapBuilder,
-            $dataHelpers->surveyDataHelper,
-            $dataHelpers->tableControllerDataHelper,
-            $services->vapidKeyService,
-            $services->versionChecker,
-        );
-
-        $this->apiFactory = new ApiFactory(
-            $dataHelpers->alertRecipientDataHelper,
-            $this->application,
-            $services->articleAuthorizationService,
-            $dataHelpers->articleDataHelper,
-            $dataHelpers->attributeDataHelper,
-            $dataHelpers->availabilityDataHelper,
-            $dataHelpers->carouselDataHelper,
-            $this->application->getConnectedUser(),
-            $dataHelpers->designDataHelper,
-            $services->emailService,
-            $dataHelpers->eventDataHelper,
-            $dataHelpers->eventNeedDataHelper,
-            $dataHelpers->eventParticipationDataHelper,
-            $services->eventService,
-            new GravatarHandler(),
-            $this->quotaTracker,
-            $dataHelpers->kanbanDataHelper,
-            $dataHelpers->karaokeDataHelper,
-            $dataHelpers->languagesDataHelper,
-            $services->loanAvailabilityService,
-            $services->loanCalendarService,
-            $dataHelpers->loanItemDataHelper,
-            $dataHelpers->loanRecordDataHelper,
-            $dataHelpers->loanReservationDataHelper,
-            $dataHelpers->logDataHelper,
-            $dataHelpers->logWriterDataHelper,
-            $services->mediaManager,
-            new MemberCustomFields($dataHelpers->dataHelper),
-            $dataHelpers->memberDataHelper,
-            $services->memberOdsImporter,
-            $dataHelpers->membershipDataHelper,
-            $dataHelpers->menuItemDataHelper,
-            $dataHelpers->messageDataHelper,
-            $services->messageRecipientService,
-            $dataHelpers->messageWriteDataHelper,
-            $dataHelpers->needDataHelper,
-            $dataHelpers->needTypeDataHelper,
-            $services->notificationSender,
-            $dataHelpers->participantDataHelper,
-            $dataHelpers->personDataHelper,
-        );
-    }
+    #endregion
 }

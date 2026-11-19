@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Pwa\PwaController;
 
 final class Pwa implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Pwa implements RouteInterface
      */
     public function get(): array
     {
-        $pwaController = fn() => $this->controllerFactory->makePwaController();
+        $pwaController = fn() => $this->controllerFactory->make(PwaController::class);
 
         $this->routes[] = new Route('GET  /manifest.json', $pwaController, 'manifest');
         $this->routes[] = new Route('POST /share-target', $pwaController, 'handleShare');

@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserAccountController;
 
 final class UserAccount implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserAccount implements RouteInterface
      */
     public function get(): array
     {
-        $userAccountController = fn() => $this->controllerFactory->makeUserAccountController();
+        $userAccountController = fn() => $this->controllerFactory->make(UserAccountController::class);
 
         $this->routes[] = new Route('GET  /user/account', $userAccountController, 'account');
         $this->routes[] = new Route('POST /user/account', $userAccountController, 'accountSave');

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\LeapfrogApi as LeapfrogApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class LeapfrogApi implements RouteInterface
      */
     public function get(): array
     {
-        $leapfrogApi = fn() => $this->apiFactory->makeLeapfrogApi();
+        $leapfrogApi = fn() => $this->apiFactory->make(LeapfrogApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/leapfrog', $leapfrogApi, 'logMovement');
 

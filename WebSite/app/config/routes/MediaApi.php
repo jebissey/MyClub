@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\MediaApi as MediaApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class MediaApi implements RouteInterface
      */
     public function get(): array
     {
-        $mediaApi = fn() => $this->apiFactory->makeMediaApi();
+        $mediaApi = fn() => $this->apiFactory->make(MediaApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/media/delete/@year:[0-9]+/@month:[0-9]+/@filename', $mediaApi, 'deleteFile');
         $this->routes[] = new Route('POST /api/media/editImage', $mediaApi, 'editImage');

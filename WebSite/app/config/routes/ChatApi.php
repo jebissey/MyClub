@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\ChatApi as ChatApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class ChatApi implements RouteInterface
      */
     public function get(): array
     {
-        $chatApi = fn() => $this->apiFactory->makeChatApi();
+        $chatApi = fn() => $this->apiFactory->make(ChatApiEndpoint::class);
 
         $this->routes[] = new Route('GET /api/chat/active-users', $chatApi, 'getActiveUsers');
 

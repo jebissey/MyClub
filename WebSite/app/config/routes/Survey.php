@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Article\SurveyController;
 
 final class Survey implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Survey implements RouteInterface
      */
     public function get(): array
     {
-        $surveyController = fn() => $this->controllerFactory->makeSurveyController();
+        $surveyController = fn() => $this->controllerFactory->make(SurveyController::class);
 
         $this->routes[] = new Route('GET  /survey/add/@id:[0-9]+', $surveyController, 'add');
         $this->routes[] = new Route('POST /survey/create', $surveyController, 'createOrUpdate');

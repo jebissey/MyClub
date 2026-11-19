@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Communication\CommunicationController;
 
 final class Communication implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Communication implements RouteInterface
      */
     public function get(): array
     {
-        $communicationController = fn() => $this->controllerFactory->makeCommunicationController();
+        $communicationController = fn() => $this->controllerFactory->make(CommunicationController::class);
 
         $this->routes[] = new Route('GET  /communication', $communicationController, 'edit');
         $this->routes[] = new Route('GET  /help/communication', $communicationController, 'help');

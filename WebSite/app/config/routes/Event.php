@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Event\EventController;
 
 final class Event implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Event implements RouteInterface
      */
     public function get(): array
     {
-        $eventController = fn() => $this->controllerFactory->makeEventController();
+        $eventController = fn() => $this->controllerFactory->make(EventController::class);
 
         $this->routes[] = new Route('GET  /eventManager', $eventController, 'home');
         $this->routes[] = new Route('GET  /eventManager/help', $eventController, 'help');

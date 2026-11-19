@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\ArticleApi as ArticleApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class ArticleApi implements RouteInterface
      */
     public function get(): array
     {
-        $articleApi = fn() => $this->apiFactory->makeArticleApi();
+        $articleApi = fn() => $this->apiFactory->make(ArticleApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/design/vote', $articleApi, 'designVote');
         $this->routes[] = new Route('POST /api/order/reply', $articleApi, 'saveOrderReply');

@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\VisitorInsights\VisitorInsightsController;
 
 final class VisitorInsights implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class VisitorInsights implements RouteInterface
      */
     public function get(): array
     {
-        $visitorInsightsController = fn() => $this->controllerFactory->makeVisitorInsightsController();
+        $visitorInsightsController = fn() => $this->controllerFactory->make(VisitorInsightsController::class);
 
         $this->routes[] = new Route('GET /analytics', $visitorInsightsController, 'analytics');
         $this->routes[] = new Route('GET /analytics/help', $visitorInsightsController, 'helpPage', ['analytics']);

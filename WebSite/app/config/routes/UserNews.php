@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserNewsController;
 
 final class UserNews implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserNews implements RouteInterface
      */
     public function get(): array
     {
-        $userNewsController = fn() => $this->controllerFactory->makeUserNewsController();
+        $userNewsController = fn() => $this->controllerFactory->make(UserNewsController::class);
 
         $this->routes[] = new Route('GET /user/news', $userNewsController, 'showNews');
 

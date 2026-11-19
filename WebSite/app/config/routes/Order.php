@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\config\routes;
 
 use app\config\ControllerFactory;
+use app\modules\Article\OrderController;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
@@ -24,7 +25,7 @@ final class Order implements RouteInterface
      */
     public function get(): array
     {
-        $orderController = fn() => $this->controllerFactory->makeOrderController();
+        $orderController = fn() => $this->controllerFactory->make(OrderController::class);
 
         $this->routes[] = new Route('GET  /order/add/@id:[0-9]+', $orderController, 'add');
         $this->routes[] = new Route('POST /order/create', $orderController, 'createOrUpdate');

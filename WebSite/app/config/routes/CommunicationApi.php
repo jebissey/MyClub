@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\CommunicationApi as CommunicationApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class CommunicationApi implements RouteInterface
      */
     public function get(): array
     {
-        $communicationApi = fn() => $this->apiFactory->makeCommunicationApi();
+        $communicationApi = fn() => $this->apiFactory->make(CommunicationApiEndpoint::class);
 
         $this->routes[] = new Route('GET  /api/communication/quota', $communicationApi, 'getQuota');
         $this->routes[] = new Route('POST /api/communication/members', $communicationApi, 'getMembers');

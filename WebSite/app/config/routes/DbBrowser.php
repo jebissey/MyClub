@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Webmaster\DbBrowserController;
 
 final class DbBrowser implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class DbBrowser implements RouteInterface
      */
     public function get(): array
     {
-        $dbBrowserController = fn() => $this->controllerFactory->makeDbBrowserController();
+        $dbBrowserController = fn() => $this->controllerFactory->make(DbBrowserController::class);
 
         $this->routes[] = new Route('GET  /dbbrowser', $dbBrowserController, 'index');
         $this->routes[] = new Route('GET  /dbbrowser/@table:[A-Za-z0-9_]+', $dbBrowserController, 'showTable');

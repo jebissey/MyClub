@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\KaraokeApi as KaraokeApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class KaraokeApi implements RouteInterface
      */
     public function get(): array
     {
-        $karaokeApi = fn() => $this->apiFactory->makeKaraokeApi();
+        $karaokeApi = fn() => $this->apiFactory->make(KaraokeApiEndpoint::class);
 
         $this->routes[] = new Route('GET /api/karaoke', $karaokeApi, 'handleApiRequest');
 

@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserDashboardController;
 
 final class UserDashboard implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserDashboard implements RouteInterface
      */
     public function get(): array
     {
-        $userDashboardController = fn() => $this->controllerFactory->makeUserDashboardController();
+        $userDashboardController = fn() => $this->controllerFactory->make(UserDashboardController::class);
 
         $this->routes[] = new Route('GET /user', $userDashboardController, 'user');
         $this->routes[] = new Route('GET /user/help', $userDashboardController, 'help');

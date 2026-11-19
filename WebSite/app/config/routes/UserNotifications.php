@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserNotificationsController;
 
 final class UserNotifications implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserNotifications implements RouteInterface
      */
     public function get(): array
     {
-        $userNotificationsController = fn() => $this->controllerFactory->makeUserNotificationsController();
+        $userNotificationsController = fn() => $this->controllerFactory->make(UserNotificationsController::class);
 
         $this->routes[] = new Route('GET  /user/notifications', $userNotificationsController, 'notifications');
         $this->routes[] = new Route('POST /user/notifications', $userNotificationsController, 'notificationsSave');

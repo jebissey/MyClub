@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\ExerciseApi as ExerciseApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class ExerciseApi implements RouteInterface
      */
     public function get(): array
     {
-        $api = fn() => $this->apiFactory->makeExerciseApi();
+        $api = fn() => $this->apiFactory->make(ExerciseApiEndpoint::class);
 
         $this->routes[] = new Route('GET  /api/exercise/@id:[0-9]+', $api, 'get');
         $this->routes[] = new Route('POST /api/exercise/save/@id:[0-9]+', $api, 'save');

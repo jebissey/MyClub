@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Games\Solfege\SolfegeController;
 
 final class Solfege implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Solfege implements RouteInterface
      */
     public function get(): array
     {
-        $solfegeController = fn() => $this->controllerFactory->makeSolfegeController();
+        $solfegeController = fn() => $this->controllerFactory->make(SolfegeController::class);
 
         $this->routes[] = new Route('GET  /game/solfege/learn', $solfegeController, 'learn');
         $this->routes[] = new Route('POST /game/solfege/save-score', $solfegeController, 'saveScore');

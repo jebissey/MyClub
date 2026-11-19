@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Designer\DesignController;
 
 final class Design implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Design implements RouteInterface
      */
     public function get(): array
     {
-        $designController = fn() => $this->controllerFactory->makeDesignController();
+        $designController = fn() => $this->controllerFactory->make(DesignController::class);
 
         $this->routes[] = new Route('GET  /design/create', $designController, 'create');
         $this->routes[] = new Route('POST /design/save', $designController, 'save');

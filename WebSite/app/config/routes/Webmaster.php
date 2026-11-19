@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Webmaster\WebmasterController;
 
 final class Webmaster implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Webmaster implements RouteInterface
      */
     public function get(): array
     {
-        $webmasterController = fn() => $this->controllerFactory->makeWebmasterController();
+        $webmasterController = fn() => $this->controllerFactory->make(WebmasterController::class);
 
         $this->routes[] = new Route('GET  /admin', $webmasterController, 'homeAdmin');
         $this->routes[] = new Route('GET  /admin/help', $webmasterController, 'helpAdmin');

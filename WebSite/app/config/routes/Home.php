@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\HomeController;
 
 final class Home implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Home implements RouteInterface
      */
     public function get(): array
     {
-        $homeController = fn() => $this->controllerFactory->makeHomeController();
+        $homeController = fn() => $this->controllerFactory->make(HomeController::class);
 
         $this->routes[] = new Route('GET  /', $homeController, 'home');
         $this->routes[] = new Route('GET  /help', $homeController, 'help');

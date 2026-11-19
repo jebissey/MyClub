@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\PersonManager\GroupController;
 
 final class Group implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Group implements RouteInterface
      */
     public function get(): array
     {
-        $groupController = fn() => $this->controllerFactory->makeGroupController();
+        $groupController = fn() => $this->controllerFactory->make(GroupController::class);
 
         $this->routes[] = new Route('GET  /group/chat/@id:[0-9]+', $groupController, 'showGroupChat');
         $this->routes[] = new Route('GET  /group/create', $groupController, 'groupCreate');

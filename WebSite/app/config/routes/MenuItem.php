@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Designer\MenuItemController;
 
 final class MenuItem implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class MenuItem implements RouteInterface
      */
     public function get(): array
     {
-        $menuItemController = fn() => $this->controllerFactory->makeMenuItemController();
+        $menuItemController = fn() => $this->controllerFactory->make(MenuItemController::class);
 
         $this->routes[] = new Route('GET /menu', $menuItemController, 'index');
         $this->routes[] = new Route('GET /menu/show/article/@id:[0-9]+', $menuItemController, 'showArticle');

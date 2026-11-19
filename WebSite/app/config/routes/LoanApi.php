@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\LoanApi as LoanApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class LoanApi implements RouteInterface
      */
     public function get(): array
     {
-        $loanApi = fn() => $this->apiFactory->makeLoanApi();
+        $loanApi = fn() => $this->apiFactory->make(LoanApiEndpoint::class);
 
         $this->routes[] = new Route('GET /api/loan/calendar', $loanApi, 'getCalendarEvents');
         $this->routes[] = new Route('GET /api/loan/availability/@itemId:[0-9]+', $loanApi, 'getAvailability');

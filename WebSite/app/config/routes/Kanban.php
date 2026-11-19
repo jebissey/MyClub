@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Kanban\KanbanController;
 
 final class Kanban implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Kanban implements RouteInterface
      */
     public function get(): array
     {
-        $kanbanController = fn() => $this->controllerFactory->makeKanbanController();
+        $kanbanController = fn() => $this->controllerFactory->make(KanbanController::class);
 
         $this->routes[] = new Route('GET  /kanban', $kanbanController, 'board');
         $this->routes[] = new Route('GET  /kanban/help', $kanbanController, 'help');

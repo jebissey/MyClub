@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\EventApi as EventApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class EventApi implements RouteInterface
      */
     public function get(): array
     {
-        $eventApi = fn() => $this->apiFactory->makeEventApi();
+        $eventApi = fn() => $this->apiFactory->make(EventApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/event/delete/@id:[0-9]+', $eventApi, 'deleteEvent');
         $this->routes[] = new Route('POST /api/event/duplicate/@id:[0-9]+', $eventApi, 'duplicateEvent');

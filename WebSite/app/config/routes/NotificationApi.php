@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\config\routes;
 
+use app\apis\NotificationApi as NotificationApiEndpoint;
 use app\config\ApiFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
@@ -24,7 +25,7 @@ final class NotificationApi implements RouteInterface
      */
     public function get(): array
     {
-        $notificationApi = fn() => $this->apiFactory->makeNotificationApi();
+        $notificationApi = fn() => $this->apiFactory->make(NotificationApiEndpoint::class);
 
         $this->routes[] = new Route('POST /api/push-subscription', $notificationApi, 'registerPushSubscription');
         $this->routes[] = new Route('POST /api/push-subscription/delete', $notificationApi, 'deletePushSubscription');

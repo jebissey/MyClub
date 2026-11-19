@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Webmaster\ArwardsController;
 
 final class Arward implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Arward implements RouteInterface
      */
     public function get(): array
     {
-        $arwardsController = fn() => $this->controllerFactory->makeArwardsController();
+        $arwardsController = fn() => $this->controllerFactory->make(ArwardsController::class);
 
         $this->routes[] = new Route('GET  /arwards', $arwardsController, 'seeArwards');
         $this->routes[] = new Route('POST /arward', $arwardsController, 'setArward');

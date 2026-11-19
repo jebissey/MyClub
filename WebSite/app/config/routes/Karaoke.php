@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Games\Karaoke\KaraokeController;
 
 final class Karaoke implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Karaoke implements RouteInterface
      */
     public function get(): array
     {
-        $karaokeController = fn() => $this->controllerFactory->makeKaraokeController();
+        $karaokeController = fn() => $this->controllerFactory->make(KaraokeController::class);
 
         $this->routes[] = new Route('GET /game/karaoke/@song:[A-Za-z0-9_]+', $karaokeController, 'play');
         $this->routes[] = new Route('GET /game/karaoke/files/@name:[A-Za-z0-9_]+', $karaokeController, 'files');

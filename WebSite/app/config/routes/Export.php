@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\PersonManager\ExportController;
 
 final class Export implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Export implements RouteInterface
      */
     public function get(): array
     {
-        $exportController = fn() => $this->controllerFactory->makeExportController();
+        $exportController = fn() => $this->controllerFactory->make(ExportController::class);
 
         $this->routes[] = new Route('GET /export', $exportController, 'showExportForm');
         $this->routes[] = new Route('GET /export/download', $exportController, 'download');

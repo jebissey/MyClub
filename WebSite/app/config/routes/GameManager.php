@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Games\GameManagerController;
 
 final class GameManager implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class GameManager implements RouteInterface
      */
     public function get(): array
     {
-        $gameManagerController = fn() => $this->controllerFactory->makeGameManagerController();
+        $gameManagerController = fn() => $this->controllerFactory->make(GameManagerController::class);
 
         $this->routes[] = new Route('GET /games', $gameManagerController, 'games');
         $this->routes[] = new Route('GET /games/help', $gameManagerController, 'help');

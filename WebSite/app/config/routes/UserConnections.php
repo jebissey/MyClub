@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserConnectionsController;
 
 final class UserConnections implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserConnections implements RouteInterface
      */
     public function get(): array
     {
-        $userConnectionsController = fn() => $this->controllerFactory->makeUserConnectionsController();
+        $userConnectionsController = fn() => $this->controllerFactory->make(UserConnectionsController::class);
 
         $this->routes[] = new Route('GET /user/connections', $userConnectionsController, 'showConnectionsOfConnectedUser');
         $this->routes[] = new Route('GET /user/connections/@id:[0-9]+', $userConnectionsController, 'showConnections');

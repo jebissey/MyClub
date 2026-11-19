@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\config\routes;
 
 use app\config\ControllerFactory;
+use app\modules\Backup\BackupController;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
 
@@ -24,7 +25,7 @@ final class Backup implements RouteInterface
      */
     public function get(): array
     {
-        $backupController = fn() => $this->controllerFactory->makeBackupController();
+        $backupController = fn() => $this->controllerFactory->make(BackupController::class);
 
         $this->routes[] = new Route('GET /backupAll', $backupController, 'showBackupForm');
         $this->routes[] = new Route('GET /backupAll/download', $backupController, 'download');

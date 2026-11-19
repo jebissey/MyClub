@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\PersonManager\PersonController;
 
 final class Person implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Person implements RouteInterface
      */
     public function get(): array
     {
-        $personController = fn() => $this->controllerFactory->makePersonController();
+        $personController = fn() => $this->controllerFactory->make(PersonController::class);
 
         $this->routes[] = new Route('GET  /personManager', $personController, 'home');
         $this->routes[] = new Route('GET  /personManager/help', $personController, 'help');

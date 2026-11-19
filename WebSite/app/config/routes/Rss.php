@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\Webmaster\RssController;
 
 final class Rss implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class Rss implements RouteInterface
      */
     public function get(): array
     {
-        $rssController = fn() => $this->controllerFactory->makeRssController();
+        $rssController = fn() => $this->controllerFactory->make(RssController::class);
 
         $this->routes[] = new Route('GET /articles-rss.xml', $rssController, 'articlesRssGenerator');
         $this->routes[] = new Route('GET /events-rss.xml', $rssController, 'eventsRssGenerator');

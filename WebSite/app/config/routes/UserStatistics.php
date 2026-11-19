@@ -7,6 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
+use app\modules\User\UserStatisticsController;
 
 final class UserStatistics implements RouteInterface
 {
@@ -24,7 +25,7 @@ final class UserStatistics implements RouteInterface
      */
     public function get(): array
     {
-        $userStatisticsController = fn() => $this->controllerFactory->makeUserStatisticsController();
+        $userStatisticsController = fn() => $this->controllerFactory->make(UserStatisticsController::class);
 
         $this->routes[] = new Route('GET /user/statistics', $userStatisticsController, 'showStatistics');
 
