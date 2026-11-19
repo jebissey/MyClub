@@ -48,9 +48,9 @@ final class UserStatisticsController extends AbstractController
             seasons: $this->personalStatisticsDataHelper->getAvailableSeasons(),
             currentSeason: $season,
             navItems: $this->getNavItems($person->email),
-            chartData: $this->buildChartData($this->getVisitCounts($season), $person),
-            participationChartData: $this->buildChartData($this->getParticipationCounts($season), $person),
-            messageChartData: $this->buildChartData($this->getMessageCounts($season), $person),
+            chartData: $this->buildChartData($this->getVisitCounts($season), $person->email),
+            participationChartData: $this->buildChartData($this->getParticipationCounts($season), $person->email),
+            messageChartData: $this->buildChartData($this->getMessageCounts($season), $person->email),
             i18n: [
                 'visitsYAxis' => ($this->t)('user.statistics.chart.visits.y_axis'),
                 'visitsXAxis' => ($this->t)('user.statistics.chart.visits.x_axis'),
@@ -139,13 +139,13 @@ final class UserStatisticsController extends AbstractController
      * @param array<string, int> $memberCounts
      * @return list<array{tranche: string, count: int, isHighlighted: bool}>
      */
-    private function buildChartData(array $memberCounts, Person $person): array
+    private function buildChartData(array $memberCounts, string $email): array
     {
         $dist             = $this->distributionCalculator->compute($memberCounts);
         $currentUserSlice = $this->distributionCalculator->findUserSlice(
             $dist['tranches'],
             $dist['memberCounts'],
-            $person->email
+            $email
         );
 
         return array_map(
