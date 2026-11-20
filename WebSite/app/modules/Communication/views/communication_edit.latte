@@ -245,6 +245,8 @@
         import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
         initTinyMCE('#tinymce-email', {
             mode: 'normal',
+            relative_urls: false,
+            remove_script_host: false,
             extraPlugins: ['insertbutton'],
             extraToolbar: 'insertbutton',
         });
