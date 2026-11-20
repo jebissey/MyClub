@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace app\config\routes;
+
+use app\config\ControllerFactory;
+use app\modules\Common\interfaces\RouteInterface;
+use app\modules\Common\valueObjects\Route;
+use app\modules\Event\EventManagerController;
+
+final class EventManager implements RouteInterface
+{
+    /**
+     * @var array<int, Route>
+     */
+    private array $routes = [];
+
+    public function __construct(private readonly ControllerFactory $controllerFactory)
+    {
+    }
+
+    /**
+     * @return array<int, Route>
+     */
+    public function get(): array
+    {
+        $eventManagerController = fn() => $this->controllerFactory->make(EventManagerController::class);
+
+        $this->routes[] = new Route('GET  /eventManager', $eventManagerController, 'home');
+        $this->routes[] = new Route('GET  /eventManager/help', $eventManagerController, 'help');
+
+        $this->routes[] = new Route('GET  /events/crosstab', $eventManagerController, 'showEventCrosstab');
+        $this->routes[] = new Route('GET  /events/crossTab/help', $eventManagerController, 'events_crossTab_help');
+
+        return $this->routes;
+    }
+}

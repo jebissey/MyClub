@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use DateTime;
+use RuntimeException;
 use app\helpers\Application;
 use app\modules\Event\valueObjects\IndividualRow;
 use app\modules\Event\valueObjects\InvitationRow;
@@ -74,27 +75,36 @@ final class EventInvitationDataHelper extends Data
     }
 
     /**
-     * Creates a Contact Individual and its associated Contact record.
+     * Creates a Contact Individual and its associated Contact record atomically.
      * The Contact record receives its own general access token.
      *
      * @return int The newly created Individual ID.
+     * @throws RuntimeException If one of the two inserts fails (nothing is persisted then).
      */
     public function createContactIndividual(string $email, string $nickname): int
     {
-        $id = (int) $this->set('Individual', [
-            'Type' => 'Contact',
-            'Email' => $email,
-            'FirstName' => $nickname !== '' ? $nickname : $email,
-            'LastName' => '',
-            'NickName' => $nickname,
-        ]);
+        return $this->transaction(function () use ($email, $nickname): int {
+            $id = $this->set('Individual', [
+                'Type' => 'Contact',
+                'Email' => $email,
+                'FirstName' => $nickname !== '' ? $nickname : $email,
+                'LastName' => '',
+                'NickName' => $nickname,
+            ]);
+            if (!is_int($id) || $id <= 0) {
+                throw new RuntimeException("Unable to create the contact individual for {$email}");
+            }
 
-        $this->set('Contact', [
-            'Id' => $id,
-            'Token' => bin2hex(random_bytes(32)),
-            'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s'),
-        ]);
+            $contactCreated = $this->set('Contact', [
+                'Id' => $id,
+                'Token' => bin2hex(random_bytes(32)),
+                'TokenCreatedAt' => (new DateTime())->format('Y-m-d H:i:s'),
+            ]);
+            if ($contactCreated === false) {
+                throw new RuntimeException("Unable to create the contact record for individual {$id}");
+            }
 
-        return $id;
+            return $id;
+        });
     }
 }

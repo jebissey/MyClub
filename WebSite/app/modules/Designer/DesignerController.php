@@ -102,6 +102,7 @@ final class DesignerController extends TableController
         }
 
         $viewModel = new DesignerRoutesViewModel(
+            title: ($this->t)('designer.routes.title'),
             routes: $items,
             currentPage: $currentPage,
             totalPages: $totalPages,

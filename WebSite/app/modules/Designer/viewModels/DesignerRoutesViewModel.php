@@ -23,6 +23,7 @@ final readonly class DesignerRoutesViewModel extends LayoutViewModel
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
+        public string $title,
         public array $routes,
         public int $currentPage,
         public int $totalPages,

@@ -11,6 +11,7 @@ use PDOException;
 use PDOStatement;
 use RuntimeException;
 use stdClass;
+use Throwable;
 use UnexpectedValueException;
 use app\enums\ApplicationError;
 use app\exceptions\SqliteTableException;
@@ -141,6 +142,36 @@ abstract class Data
         }
         if (!in_array($table, $this->tables, true)) {
             throw new SqliteTableException("Table '$table' not found in file $file at line $line");
+        }
+    }
+
+
+    /**
+     * Runs the callback inside a transaction and rolls back if it throws.
+     * If a transaction is already active, the callback simply joins it.
+     *
+     * Note: set() and query() report PDO errors and return false instead of throwing,
+     * so the callback must throw itself when a write fails.
+     *
+     * @template T
+     * @param callable(): T $callback
+     * @return T
+     */
+    protected function transaction(callable $callback): mixed
+    {
+        if ($this->pdo->inTransaction()) {
+            return $callback();
+        }
+
+        $this->pdo->beginTransaction();
+        try {
+            $result = $callback();
+            $this->pdo->commit();
+
+            return $result;
+        } catch (Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
         }
     }
 

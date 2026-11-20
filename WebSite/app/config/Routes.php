@@ -23,16 +23,19 @@ use app\config\routes\Credential;
 use app\config\routes\DbBrowser;
 use app\config\routes\Design;
 use app\config\routes\Designer;
-use app\config\routes\Event;
 use app\config\routes\EventApi;
 use app\config\routes\EventAttributeApi;
 use app\config\routes\EventAvailabilities;
 use app\config\routes\EventAvailabilitiesApi;
+use app\config\routes\EventDetail;
 use app\config\routes\EventEmail;
 use app\config\routes\EventGuest;
+use app\config\routes\EventList;
+use app\config\routes\EventManager;
 use app\config\routes\EventNeed;
 use app\config\routes\EventNeedApi;
 use app\config\routes\EventNeedTypeApi;
+use app\config\routes\EventRegistration;
 use app\config\routes\EventSupplyApi;
 use app\config\routes\EventType;
 use app\config\routes\Exercise;
@@ -276,16 +279,19 @@ final class Routes
             new DbBrowser($this->controllerFactory),
             new Design($this->controllerFactory),
             new Designer($this->controllerFactory),
-            new Event($this->controllerFactory),
             new EventApi($this->apiFactory),
             new EventAttributeApi($this->apiFactory),
             new EventAvailabilities($this->controllerFactory),
             new EventAvailabilitiesApi($this->apiFactory),
+            new EventDetail($this->controllerFactory),
             new EventEmail($this->controllerFactory),
             new EventGuest($this->controllerFactory),
+            new EventList($this->controllerFactory),
+            new EventManager($this->controllerFactory),
             new EventNeed($this->controllerFactory),
             new EventNeedApi($this->apiFactory),
             new EventNeedTypeApi($this->apiFactory),
+            new EventRegistration($this->controllerFactory),
             new EventSupplyApi($this->apiFactory),
             new EventType($this->controllerFactory),
             new Exercise($this->controllerFactory),

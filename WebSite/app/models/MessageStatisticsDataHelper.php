@@ -22,14 +22,6 @@ final class MessageStatisticsDataHelper extends Data
         );
     }
 
-    public function countUserMessagesForArticle(int $articleId): int
-    {
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Message WHERE "From" = :from AND ArticleId = :articleId');
-        $stmt->execute([':from' => 'User', ':articleId' => $articleId]);
-
-        return To::requireInt($stmt->fetchColumn());
-    }
-
     /**
      * @param array{start: string, end: string} $season
      * @return array<string, int> message count indexed by lowercase email
@@ -53,5 +45,21 @@ final class MessageStatisticsDataHelper extends Data
         $result = $query->fetchAll(PDO::FETCH_KEY_PAIR);
 
         return $result;
+    }
+
+    public function countUserMessagesForArticle(int $articleId): int
+    {
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Message WHERE "From" = :from AND ArticleId = :articleId');
+        $stmt->execute([':from' => 'User', ':articleId' => $articleId]);
+
+        return To::requireInt($stmt->fetchColumn());
+    }
+
+    public function countUserMessagesForEvent(int $eventId): int
+    {
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM Message WHERE "From" = :from AND EventId = :eventId');
+        $stmt->execute([':from' => 'User', ':eventId' => $eventId]);
+
+        return To::requireInt($stmt->fetchColumn());
     }
 }

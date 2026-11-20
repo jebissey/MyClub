@@ -16,9 +16,12 @@ use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\To;
 use app\modules\Common\valueObjects\ApiResponse;
+use app\modules\Event\valueObjects\EventAudienceRow;
+use app\modules\Common\valueObjects\EventChatRow;
 use app\modules\Event\valueObjects\EventDetailRow;
 use app\modules\Event\valueObjects\EventExternalRow;
 use app\modules\Event\valueObjects\EventFullRow;
+use app\modules\Event\valueObjects\RegistrationEventInfo;
 
 final class EventDataHelper extends Data
 {
@@ -88,6 +91,31 @@ final class EventDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':eventId' => $eventId]);
         return $stmt->fetch(PDO::FETCH_OBJ) !== false;
+    }
+
+    public function findAudience(int $eventId): ?EventAudienceRow
+    {
+        $row = $this->get('Event', ['Id' => $eventId], 'Id, Audience');
+
+        return $row === false ? null : EventAudienceRow::fromStdClass($row);
+    }
+
+    public function findChatRow(int $eventId): ?EventChatRow
+    {
+        $row = $this->get('Event', ['Id' => $eventId], 'CreatedBy, Summary, Id, StartTime, Duration, Location');
+
+        return $row === false ? null : EventChatRow::fromRow($row);
+    }
+
+    public function findRegistrationInfo(int $eventId): ?RegistrationEventInfo
+    {
+        $row = $this->get('Event', ['Id' => $eventId], 'Summary, StartTime, Location');
+        if ($row === false) {
+            return null;
+        }
+
+        /** @var object{Summary: mixed, StartTime: mixed, Location: mixed} $row */
+        return RegistrationEventInfo::fromStdClass($row);
     }
 
     public function getEvent(int $eventId): EventDetailRow
