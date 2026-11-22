@@ -6,88 +6,60 @@ namespace app\apis;
 
 use PDOException;
 use Throwable;
-use finfo;
 use app\enums\ApplicationError;
 use app\exceptions\UnauthorizedAccessException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
-use app\helpers\MediaManager;
-use app\helpers\NotificationSender;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\LanguagesDataHelper;
-use app\models\MessageDataHelper;
 use app\models\MessageWriteDataHelper;
 use app\models\PersonDataHelper;
-use app\modules\Common\services\MessageRecipientService;
+use app\modules\Common\services\MessageImageService;
+use app\modules\Common\services\MessageNotificationService;
 use app\modules\Common\valueObjects\ApiResponse;
-use app\modules\Event\valueObjects\EventCreatorSummaryRow;
-use app\modules\Common\valueObjects\MessageContext;
 use app\modules\Common\valueObjects\MessageTarget;
-use app\modules\Common\valueObjects\UploadedFileInput;
-
-use function imagecreatefromstring;
-use function imagesx;
-use function imagesy;
-use function imagecreatetruecolor;
-use function imagealphablending;
-use function imagesavealpha;
-use function imagecolorallocatealpha;
-use function imagefilledrectangle;
-use function imagecopyresampled;
-use function imagejpeg;
-use function imagepng;
-use function imagewebp;
-use function imagegif;
 
 final class MessageApi extends AbstractApi
 {
-    private const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    private const MAX_BYTES    = 1 * 1024 * 1024;
-
     public function __construct(
         Application $application,
         ConnectedUser $connectedUser,
         LanguagesDataHelper $languagesDataHelper,
         PersonDataHelper $personDataHelper,
-        private readonly MessageDataHelper $messageDataHelper,
-        private readonly MessageRecipientService $messageRecipientService,
-        private readonly NotificationSender $notificationSender,
-        private readonly MediaManager $mediaManager,
         private readonly MessageWriteDataHelper $messageWriteDataHelper,
+        private readonly MessageImageService $messageImageService,
+        private readonly MessageNotificationService $messageNotificationService,
     ) {
         parent::__construct($application, $connectedUser, $personDataHelper, $languagesDataHelper);
     }
 
     public function addMessage(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
+        if (!$this->isConnectedPost()) {
             return;
         }
 
         $data = $this->getJsonInput();
-        if (
-            (!isset($data['eventId']) && !isset($data['articleId']) && !isset($data['groupId']))
-            || !isset($data['text'])
-        ) {
+        if (!isset($data['text'])) {
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
 
         try {
-            $articleId = isset($data['articleId']) && $data['articleId'] !== '' ? To::int($data['articleId']) : null;
-            $eventId   = isset($data['eventId'])   && $data['eventId']   !== '' ? To::int($data['eventId'])   : null;
-            $groupId   = isset($data['groupId'])   && $data['groupId']   !== '' ? To::int($data['groupId'])   : null;
-
-            $target = MessageTarget::fromIds($articleId, $eventId, $groupId);
+            $target = MessageTarget::fromIds(
+                $this->optionalId($data, 'articleId'),
+                $this->optionalId($data, 'eventId'),
+                $this->optionalId($data, 'groupId'),
+            );
             if ($target === null) {
                 $this->renderJsonBadRequest('Exactly one target is required', __FILE__, __LINE__);
                 return;
             }
 
-            $imagePath = null;
+            $imageUrl = null;
             if (!empty($data['imageBase64'])) {
-                $imagePath = $this->handleMessageImageBase64(
+                $imagePath = $this->messageImageService->storeFromDataUri(
                     To::str($data['imageBase64']),
                     To::str($data['imageName'] ?? '')
                 );
@@ -95,22 +67,13 @@ final class MessageApi extends AbstractApi
                     $this->renderJsonBadRequest('Image invalide ou trop volumineuse', __FILE__, __LINE__);
                     return;
                 }
+                $imageUrl = WebApp::getBaseUrl() . $imagePath;
             }
 
-            $apiResponse = $this->doAddMessage(
-                $target,
-                $this->application->getConnectedUser(true)->person->id,
-                To::str($data['text']),
-                $imagePath !== null ? WebApp::getBaseUrl() . $imagePath : null,
-            );
+            $apiResponse = $this->doAddMessage($target, $this->currentPersonId(), To::str($data['text']), $imageUrl);
 
             if ($apiResponse->success === true && isset($apiResponse->data['messageId'])) {
-                $this->notifyMessageRecipients(
-                    To::int($apiResponse->data['messageId']),
-                    $articleId,
-                    $eventId,
-                    $groupId
-                );
+                $this->messageNotificationService->notifyRecipients($target, To::int($apiResponse->data['messageId']));
             }
 
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
@@ -121,13 +84,13 @@ final class MessageApi extends AbstractApi
 
     public function deleteMessage(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
+        if (!$this->isConnectedPost()) {
             return;
         }
 
         try {
             $data = $this->getJsonInput();
-            $apiResponse = $this->doDeleteMessage(To::int($data['messageId']), $this->application->getConnectedUser(true)->person->id);
+            $apiResponse = $this->doDeleteMessage(To::int($data['messageId']), $this->currentPersonId());
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
@@ -136,45 +99,34 @@ final class MessageApi extends AbstractApi
 
     public function deleteMessageImage(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
+        if (!$this->isConnectedPost()) {
             return;
         }
 
         try {
-            $data = $this->getJsonInput();
-
-            $messageId = To::int($data['messageId'] ?? 0);
+            $messageId = To::int($this->getJsonInput()['messageId'] ?? 0);
             if ($messageId <= 0) {
-                $this->renderJsonBadRequest(
-                    "messageId invalide",
-                    __FILE__,
-                    __LINE__
-                );
+                $this->renderJsonBadRequest('messageId invalide', __FILE__, __LINE__);
                 return;
             }
 
-            [$year, $month, $filename] = $this->messageDataHelper->getImageInfoFromMessage($messageId);
+            $failure = $this->ownershipFailure($messageId, $this->currentPersonId());
+            if ($failure !== null) {
+                $this->renderJson($failure->data, $failure->success, $failure->responseCode);
+                return;
+            }
 
-            $result = $this->mediaManager->deleteFile($year, $month, $filename);
+            $result = $this->messageImageService->deleteForMessage($messageId);
 
-            $this->renderJson(
-                [],
-                $result->success,
-                $result->success ? 200 : 400,
-                $result->message ?? ''
-            );
+            $this->renderJson([], $result['success'], $result['success'] ? 200 : 400, $result['message']);
         } catch (Throwable $e) {
-            $this->renderJsonError(
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine()
-            );
+            $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
     public function updateMessage(): void
     {
-        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
+        if (!$this->isConnectedPost()) {
             return;
         }
 
@@ -183,18 +135,14 @@ final class MessageApi extends AbstractApi
             $this->renderJsonBadRequest('Données manquantes', __FILE__, __LINE__);
             return;
         }
-        $message = $this->dataHelper->get('Message', ['Id' => To::int($data['messageId'])], 'Id');
-        if (!$message) {
-            $this->renderJsonBadRequest('Message introuvable', __FILE__, __LINE__);
-            return;
-        }
+        $messageId = To::int($data['messageId']);
+
         try {
-            $data = $this->getJsonInput();
-            $apiResponse = $this->doUpdateMessage(
-                To::int($data['messageId']),
-                $this->application->getConnectedUser(true)->person->id,
-                To::str($data['text'])
-            );
+            if (!$this->dataHelper->get('Message', ['Id' => $messageId], 'Id')) {
+                $this->renderJsonBadRequest('Message introuvable', __FILE__, __LINE__);
+                return;
+            }
+            $apiResponse = $this->doUpdateMessage($messageId, $this->currentPersonId(), To::str($data['text']));
             $this->renderJson($apiResponse->data, $apiResponse->success, $apiResponse->responseCode);
         } catch (Throwable $e) {
             $this->renderJsonError($e->getMessage(), $e->getFile(), $e->getLine());
@@ -202,28 +150,60 @@ final class MessageApi extends AbstractApi
     }
 
     #region Private functions
-    private function doAddMessage(
-        MessageTarget $target,
-        int $personId,
-        string $text,
-        ?string $imagePath = null
-    ): ApiResponse {
+    private function isConnectedPost(): bool
+    {
+        return $this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isConnected(), __FILE__, __LINE__);
+    }
+
+    private function currentPersonId(): int
+    {
+        return $this->application->getConnectedUser(true)->person->id;
+    }
+
+    /** @param array<string, mixed> $data */
+    private function optionalId(array $data, string $key): ?int
+    {
+        $value = $data[$key] ?? null;
+
+        return $value === null || $value === '' ? null : To::int($value);
+    }
+
+    private function doAddMessage(MessageTarget $target, int $personId, string $text, ?string $imageUrl): ApiResponse
+    {
         try {
-            $messageId = $this->messageWriteDataHelper->addMessage($target, $personId, $text, $imagePath);
+            $messageId = $this->messageWriteDataHelper->addMessage($target, $personId, $text, $imageUrl);
             return new ApiResponse(
                 $messageId !== false,
                 $messageId === false ? ApplicationError::BadRequest->value : ApplicationError::Ok->value,
                 ['messageId' => $messageId],
                 'Message ajouté'
             );
-        } catch (PDOException $e) {
-            return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
         } catch (Throwable $e) {
-            return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
+            return $this->toFailure($e);
         }
     }
 
     private function doDeleteMessage(int $messageId, int $personId): ApiResponse
+    {
+        $failure = $this->ownershipFailure($messageId, $personId);
+        if ($failure !== null) {
+            return $failure;
+        }
+
+        try {
+            if ($this->dataHelper->delete('Message', ['Id' => $messageId]) > 0) {
+                return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId]], 'Message supprimé');
+            }
+            return new ApiResponse(false, ApplicationError::BadRequest->value);
+        } catch (Throwable $e) {
+            return $this->toFailure($e);
+        }
+    }
+
+    /**
+     * Returns a failure response if the message doesn't exist or isn't owned by the person, null otherwise.
+     */
+    private function ownershipFailure(int $messageId, int $personId): ?ApiResponse
     {
         $row = $this->dataHelper->get('Message', ['Id' => $messageId], 'PersonId');
         if ($row === false) {
@@ -235,20 +215,11 @@ final class MessageApi extends AbstractApi
                 false,
                 ApplicationError::Forbidden->value,
                 [],
-                "Person {$personId} isn't allowed to remove message {$messageId}"
+                "Person {$personId} isn't allowed to modify message {$messageId}"
             );
         }
-        try {
-            $result = $this->dataHelper->delete('Message', ['Id' => $messageId]);
-            if ($result > 0) {
-                return new ApiResponse(true, ApplicationError::Ok->value, ['data' => ['messageId' => $messageId]], 'Message supprimé');
-            }
-            return new ApiResponse(false, ApplicationError::BadRequest->value);
-        } catch (PDOException $e) {
-            return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
-        } catch (Throwable $e) {
-            return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
-        }
+
+        return null;
     }
 
     private function doUpdateMessage(int $messageId, int $personId, string $text): ApiResponse
@@ -261,194 +232,20 @@ final class MessageApi extends AbstractApi
                 ['data' => ['messageId' => $messageId, 'text' => $text]],
                 'Message mis à jour'
             );
-        } catch (UnauthorizedAccessException $e) {
-            return new ApiResponse(false, ApplicationError::Forbidden->value, [], $e->getMessage());
-        } catch (PDOException $e) {
-            return new ApiResponse(false, ApplicationError::BadRequest->value, [], $e->getMessage());
         } catch (Throwable $e) {
-            return new ApiResponse(false, ApplicationError::Error->value, [], $e->getMessage());
+            return $this->toFailure($e);
         }
     }
 
-    private function notifyMessageRecipients(int $messageId, ?int $articleId, ?int $eventId, ?int $groupId): void
+    private function toFailure(Throwable $e): ApiResponse
     {
-        $articleAuthorId = null;
-        $eventCreatorId = null;
-        $article = null;
-        $event = null;
-        $group = null;
-
-        if ($articleId !== null) {
-            $row = $this->dataHelper->get('Article', ['Id' => $articleId], 'CreatedBy, Title');
-            if ($row === false) {
-                $this->application->getErrorManager()->raise(
-                    ApplicationError::Error,
-                    "Article {$articleId} not found when notifying message recipients for message {$messageId}"
-                );
-                return;
-            }
-            /** @var object{CreatedBy: int|string, Title: string} $row */
-            $articleAuthorId = (int) $row->CreatedBy;
-            $articleTitle = $row->Title;
-        }
-
-        if ($eventId !== null) {
-            $row = $this->dataHelper->get('Event', ['Id' => $eventId], 'CreatedBy, Summary');
-            if ($row === false) {
-                $this->application->getErrorManager()->raise(
-                    ApplicationError::Error,
-                    "Event {$eventId} not found when notifying message recipients for message {$messageId}"
-                );
-                return;
-            }
-            /** @var object{CreatedBy: int|string, Summary: string} $row */
-            $event = EventCreatorSummaryRow::fromStdClass($row);
-            $eventCreatorId = $event->createdBy;
-        }
-        if ($groupId !== null) {
-            $row = $this->dataHelper->get('Group', ['Id' => $groupId], 'Name');
-            if ($row === false) {
-                $this->application->getErrorManager()->raise(
-                    ApplicationError::Error,
-                    "Group {$groupId} not found when notifying message recipients for message {$messageId}"
-                );
-                return;
-            }
-            /** @var object{Name: string} $row */
-            $groupName = $row->Name;
-        }
-
-        $context = new MessageContext(
-            articleId: $articleId,
-            articleAuthorId: $articleAuthorId,
-            eventId: $eventId,
-            eventCreatorId: $eventCreatorId,
-            groupId: $groupId
-        );
-
-        $personIds = $this->messageRecipientService->getRecipientsForContext($context);
-        $title = 'Nouveau message';
-        $body = 'Un nouveau message a été ajouté ';
-        $from = '';
-        $id = null;
-        if ($articleId !== null) {
-            $from = 'article';
-            $id = $articleId;
-            $body .= "à l'article {$articleTitle})";
-        } elseif ($eventId !== null) {
-            $from = 'event';
-            $id = $eventId;
-            $body .= "à l'événement {$event->summary} ({$eventId})";
-        } elseif ($groupId !== null) {
-            $from = 'group';
-            $id = $groupId;
-            $body .= "au groupe {$groupName}";
-        }
-        $notificationData = [
-            'title' => $title,
-            'body' => $body,
-            'data' => [
-                'url' => "/{$from}/chat/{$id}",
-                'messageId' => $messageId
-            ]
-        ];
-        $this->notificationSender->sendToRecipients($personIds, $notificationData);
-    }
-
-    private function handleMessageImageBase64(string $dataUri, string $originalName): ?string
-    {
-        if (!preg_match('/^data:(image\/[a-z]+);base64,(.+)$/s', $dataUri, $matches)) {
-            return null;
-        }
-        $mime   = $matches[1];
-        $binary = base64_decode($matches[2], strict: true);
-
-        if ($binary === false || !in_array($mime, self::ALLOWED_MIME, true)) {
-            return null;
-        }
-        if (strlen($binary) > self::MAX_BYTES) {
-            return null;
-        }
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        if ($finfo->buffer($binary) !== $mime) {
-            return null;
-        }
-        $binary = $this->resizeImageBinary($binary, $mime, 800) ?? $binary;
-        $tmpPath = tempnam(sys_get_temp_dir(), 'chat_img_');
-        if ($tmpPath === false || file_put_contents($tmpPath, $binary) === false) {
-            return null;
-        }
-
-        $extension = match ($mime) {
-            'image/jpeg' => 'jpg',
-            'image/png'  => 'png',
-            'image/webp' => 'webp',
-            'image/gif'  => 'gif',
+        $error = match (true) {
+            $e instanceof UnauthorizedAccessException => ApplicationError::Forbidden,
+            $e instanceof PDOException                => ApplicationError::BadRequest,
+            default                                   => ApplicationError::Error,
         };
-        $filename = ($originalName !== '' ? pathinfo($originalName, PATHINFO_FILENAME) : bin2hex(random_bytes(8)))
-            . '.' . $extension;
 
-        $uploadedFile = new UploadedFileInput(
-            name: $filename,
-            tmpName: $tmpPath,
-            size: strlen($binary),
-            type: $mime,
-        );
-
-        try {
-            $result = $this->mediaManager->uploadFile($uploadedFile);
-            return $result->file->path;
-        } finally {
-            if (file_exists($tmpPath)) {
-                unlink($tmpPath);
-            }
-        }
+        return new ApiResponse(false, $error->value, [], $e->getMessage());
     }
-
-    private function resizeImageBinary(string $binary, string $mime, int $maxDim): ?string
-    {
-        $src = imagecreatefromstring($binary);
-        if ($src === false) {
-            return null;
-        }
-
-        $w = imagesx($src);
-        $h = imagesy($src);
-
-        if ($w <= $maxDim && $h <= $maxDim) {
-            return $binary;
-        }
-
-        $ratio = min($maxDim / $w, $maxDim / $h);
-        $newW  = max(1, (int)round($w * $ratio));
-        $newH  = max(1, (int)round($h * $ratio));
-
-        $dst = imagecreatetruecolor($newW, $newH);
-        if ($dst === false) {
-            return null;
-        }
-
-        if (in_array($mime, ['image/png', 'image/webp'], true)) {
-            imagealphablending($dst, false);
-            imagesavealpha($dst, true);
-            $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-            if ($transparent !== false) {
-                imagefilledrectangle($dst, 0, 0, $newW, $newH, $transparent);
-            }
-        }
-
-        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $w, $h);
-
-        ob_start();
-        match ($mime) {
-            'image/jpeg' => imagejpeg($dst, null, 85),
-            'image/png'  => imagepng($dst, null, 6),
-            'image/webp' => imagewebp($dst, null, 85),
-            'image/gif'  => imagegif($dst),
-            default => ob_end_clean() && null,
-        };
-        $resized = ob_get_clean();
-
-        return $resized ?: null;
-    }
+    #endregion
 }
