@@ -8,7 +8,6 @@
         "guzzlehttp/guzzle": "^7.9",
         "minishlink/web-push": "^9.0",
         "phpmailer/phpmailer": "^7.0",
-        "mailjet/mailjet-apiv3-php": "^1.6",
         "getbrevo/brevo-php": "^4.0"
     },
     "autoload": {
@@ -32,7 +31,7 @@
         "phpstan/phpstan": "^2.2",
         "friendsofphp/php-cs-fixer": "^3.95",
         "phpunit/phpunit": "^13.3",
-        "efabrica/phpstan-latte": "^0.19.0",
+        "efabrica/phpstan-latte": "^0.20",
         "shipmonk/dead-code-detector": "^1.4"
     }
 }

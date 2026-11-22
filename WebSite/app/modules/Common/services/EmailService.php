@@ -12,8 +12,6 @@ use Brevo\TransactionalEmails\Types\SendTransacEmailRequestCcItem;
 use Brevo\TransactionalEmails\Types\SendTransacEmailRequestBccItem;
 use Brevo\TransactionalEmails\Types\SendTransacEmailRequestReplyTo;
 use Brevo\Exceptions\BrevoApiException;
-use Mailjet\Client as MailjetClient;
-use Mailjet\Resources as MailjetResources;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use app\modules\Common\services\DatabaseSmtpConfigProvider;
@@ -25,8 +23,6 @@ use InvalidArgumentException;
 
 final class EmailService
 {
-    private const MAILJET_BATCH_SIZE = 50;
-
     public function __construct(
         private readonly ?DatabaseSmtpConfigProvider $configProvider,
         private readonly ?JsonEmailQuotaTracker $quotaTracker,
@@ -68,7 +64,6 @@ final class EmailService
 
         $sent = match ($config?->method) {
             'smtp'    => $this->sendWithPHPMailer($message, $config),
-            'mailjet' => $this->sendWithMailjet($message, $config),
             'brevo'   => $this->sendWithBrevoApi($message, $config->brevoApikey, $config->brevoSenderEmail),
             default   => $this->sendWithNativeMail($message),
         };
@@ -197,59 +192,6 @@ final class EmailService
         }
     }
 
-
-    private function sendWithMailjet(EmailMessage $message, SmtpConfig $config): bool
-    {
-        if ($config->apiKey === '' || $config->apiSecret === '') {
-            throw new InvalidArgumentException(
-                'Mailjet credentials are not configured (api_key or api_secret is empty).'
-            );
-        }
-
-        $mj = new MailjetClient(
-            $config->apiKey,
-            $config->apiSecret,
-            true,
-            ['version' => 'v3.1']
-        );
-        $from = [
-            'Email' => $config->senderEmail !== '' ? $config->senderEmail : $message->from,
-            'Name'  => 'MyClub',
-        ];
-        $baseMsg = [
-            'From'     => $from,
-            'To'       => [['Email' => $message->to]],
-            'Subject'  => $message->subject,
-            'HTMLPart' => $message->isHtml  ? $message->body : null,
-            'TextPart' => !$message->isHtml ? $message->body : strip_tags($message->body),
-        ];
-        if ($message->replyTo !== null) {
-            $baseMsg['ReplyTo'] = ['Email' => $message->replyTo];
-        }
-        if ($message->cc !== []) {
-            $baseMsg['Cc'] = array_map(static fn($e) => ['Email' => $e], $message->cc);
-        }
-        $baseMsg = array_filter($baseMsg, static fn($v) => $v !== null);
-        $messages = [$baseMsg];
-        foreach ($message->bcc as $bccEmail) {
-            $bccMsg        = $baseMsg;
-            $bccMsg['To']  = [['Email' => $bccEmail]];
-            $messages[] = $bccMsg;
-        }
-        foreach (array_chunk($messages, self::MAILJET_BATCH_SIZE) as $chunk) {
-            $response = $mj->post(MailjetResources::$Email, ['body' => ['Messages' => $chunk]]);
-
-            if (!$response->success()) {
-                throw new EmailException(sprintf(
-                    'Mailjet sending failed (HTTP %d): %s',
-                    $response->getStatus(),
-                    json_encode($response->getData(), JSON_UNESCAPED_UNICODE)
-                ));
-            }
-        }
-
-        return true;
-    }
 
     private function sendWithBrevoApi(EmailMessage $message, string $apiKey, string $senderEmail): bool
     {

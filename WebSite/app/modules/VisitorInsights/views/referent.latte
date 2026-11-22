@@ -44,7 +44,7 @@
                         </tr>
                     {/foreach}
 
-                    {if $externalRefs !=''}
+                    {if count($externalRefs) > 0}
                         <tr><td colspan="2" class="border-top"></td></tr>
                         {foreach $externalRefs as $row}
                             <tr>

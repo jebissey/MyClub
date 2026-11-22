@@ -30,9 +30,6 @@ final class EmailCredentialsSaver
             case 'smtp':
                 $this->saveSmtp($input);
                 break;
-            case 'mailjet':
-                $this->saveMailjet($input);
-                break;
             case 'brevo':
                 $this->saveBrevo($input);
                 break;
@@ -48,14 +45,6 @@ final class EmailCredentialsSaver
         $this->credentials->set('smtp', 'host', To::str($input['smtpHost'] ?? null, ''));
         $this->credentials->set('smtp', 'port', To::str($input['smtpPort'] ?? null, '587'));
         $this->credentials->set('smtp', 'encryption', To::str($input['smtpEncryption'] ?? null, 'tls'));
-    }
-
-    /** @param array<string, mixed> $input */
-    private function saveMailjet(array $input): void
-    {
-        $this->credentials->set('mailjet', 'api_key', To::str($input['mailjetApiKey'] ?? null, ''));
-        $this->setIfProvided('mailjet', 'api_secret', $input['mailjetApiSecret'] ?? null);
-        $this->credentials->set('mailjet', 'sender', To::str($input['mailjetSender'] ?? null, ''));
     }
 
     /** @param array<string, mixed> $input */

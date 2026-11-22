@@ -6,7 +6,6 @@ class EmailCredentials {
         this.sections = {
             mail: { alert: 'alert-mail', fields: null },
             smtp: { alert: 'alert-smtp', fields: 'fields-smtp' },
-            mailjet: { alert: 'alert-mailjet', fields: 'fields-mailjet' },
             brevo: { alert: 'alert-brevo', fields: 'fields-brevo' },
         };
 
@@ -19,12 +18,6 @@ class EmailCredentials {
             'smtpEncryption'
         ];
 
-        this.mailjetFields = [
-            'mailjetApiKey',
-            'mailjetApiSecret',
-            'mailjetSender'
-        ];
-
         this.brevoFields = [
             'brevoApiKey',
             'brevoSender'
@@ -33,7 +26,6 @@ class EmailCredentials {
         this.limitPlaceholders = {
             mail: { daily: '0', monthly: '0' },
             smtp: { daily: '0', monthly: '0' },
-            mailjet: { daily: '200', monthly: '6000' },
             brevo: { daily: '300', monthly: '9000' },
         };
     }
@@ -49,7 +41,6 @@ class EmailCredentials {
         this.applyMethod(this.select.value);
 
         this.setupPasswordToggle('togglePassword', 'smtpPassword');
-        this.setupPasswordToggle('toggleSecret', 'mailjetApiSecret');
         this.setupPasswordToggle('toggleBrevoKey', 'brevoApiKey');
     }
 
@@ -71,7 +62,6 @@ class EmailCredentials {
         });
 
         this.setRequired(this.smtpFields, method === 'smtp');
-        this.setRequired(this.mailjetFields, method === 'mailjet');
         this.setRequired(this.brevoFields, method === 'brevo');
 
         const placeholders = this.limitPlaceholders[method] ?? { daily: '0', monthly: '0' };

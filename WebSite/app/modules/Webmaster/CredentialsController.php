@@ -36,8 +36,6 @@ final class CredentialsController extends TableController
                 smtpHost: $this->credentials->get('smtp', 'host'),
                 smtpPort: $this->credentials->get('smtp', 'port'),
                 smtpEncryption: $this->credentials->get('smtp', 'encryption'),
-                mailjetApiKey: $this->credentials->get('mailjet', 'api_key'),
-                mailjetSender: $this->credentials->get('mailjet', 'sender'),
                 brevoApiKey: $this->credentials->get('brevo', 'api_key'),
                 brevoSender: $this->credentials->get('brevo', 'sender'),
                 dailyLimit: $this->credentials->get('email', 'daily_limit'),

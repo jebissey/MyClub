@@ -7,7 +7,7 @@ namespace app\modules\Common\valueObjects;
 final readonly class SmtpConfig
 {
     public function __construct(
-        public string $method,           // 'mail' | 'smtp' | 'mailjet' | 'brevo'
+        public string $method,           // 'mail' | 'smtp' | 'brevo'
         // SMTP / PHPMailer
         public string $host = '',
         public string $username = '',
@@ -15,10 +15,6 @@ final readonly class SmtpConfig
         public string $from = '',
         public int $port = 587,
         public string $encryption = 'tls',
-        // Mailjet
-        public string $apiKey = '',
-        public string $apiSecret = '',
-        public string $senderEmail = '',
         // Brevo
         public string $brevoApikey = '',
         public string $brevoSenderEmail = '',
@@ -32,7 +28,6 @@ final readonly class SmtpConfig
     {
         return match ($this->method) {
             'smtp'    => $this->from,
-            'mailjet' => $this->senderEmail,
             'brevo'   => $this->brevoSenderEmail,
             default   => $connectedUserEmail,
         };
