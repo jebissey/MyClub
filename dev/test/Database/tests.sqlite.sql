@@ -1700,7 +1700,7 @@ WHERE i.Id = 4','[{"FirstName":"first name updated","LastName":"last name update
  (1857,1,NULL,'GET','/eventManager/help',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL),
  (1858,1,NULL,'GET','/events-rss.xml',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL),
  (1859,1,NULL,'GET','/events/crosstab',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL),
- (1860,1,NULL,'GET','/events/crossTab/help',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL),
+ (1860,1,NULL,'GET','/events/crossTab/help',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL),
  (1861,1,NULL,'GET','/events/guest/help',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','200',NULL,NULL),
  (1862,1,NULL,'GET','/events/guest',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL),
  (1864,1,NULL,'GET','/eventType/create',NULL,NULL,'{"email":"editor@myclub.foo","password":"editor1234" }','403',NULL,NULL),
