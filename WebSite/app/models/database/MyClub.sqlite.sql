@@ -7711,4710 +7711,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </div>
 </div>'),
- (1909,'designer.routes.help.EventAttributeApi.createAttribute','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (createAttribute).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Crée une nouvelle ressource (createAttribute).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (createAttribute).</p>
-    </div>
-  </div>
-</div>'),
- (1910,'designer.routes.help.EventAttributeApi.deleteAttribute','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteAttribute).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteAttribute).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteAttribute).</p>
-    </div>
-  </div>
-</div>'),
- (1911,'designer.routes.help.EventAttributeApi.updateAttribute','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateAttribute).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (updateAttribute).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateAttribute).</p>
-    </div>
-  </div>
-</div>'),
- (1912,'designer.routes.help.EventAttributeApi.getAttributesByEventType','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getAttributesByEventType ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getAttributesByEventType ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getAttributesByEventType ».</p>
-    </div>
-  </div>
-</div>'),
- (1913,'designer.routes.help.EventAttributeApi.getAttributes','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getAttributes ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getAttributes ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getAttributes ».</p>
-    </div>
-  </div>
-</div>'),
- (1914,'designer.routes.help.CarouselApi.getItems','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getItems ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getItems ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getItems ».</p>
-    </div>
-  </div>
-</div>'),
- (1915,'designer.routes.help.CarouselApi.deleteItem','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteItem).</p>
-    </div>
-  </div>
-</div>'),
- (1916,'designer.routes.help.CarouselApi.saveItem','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveItem).</p>
-    </div>
-  </div>
-</div>'),
- (1917,'designer.routes.help.ChatApi.getActiveUsers','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getActiveUsers ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getActiveUsers ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getActiveUsers ».</p>
-    </div>
-  </div>
-</div>'),
- (1918,'designer.routes.help.CommunicationApi.updateContactEmail','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateContactEmail).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (updateContactEmail).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateContactEmail).</p>
-    </div>
-  </div>
-</div>'),
- (1919,'designer.routes.help.CommunicationApi.getMembers','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getMembers ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getMembers ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getMembers ».</p>
-    </div>
-  </div>
-</div>'),
- (1920,'designer.routes.help.CommunicationApi.getQuota','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getQuota ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getQuota ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getQuota ».</p>
-    </div>
-  </div>
-</div>'),
- (1921,'designer.routes.help.CommunicationApi.sendCommunication','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendCommunication » of controller CommunicationApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendCommunication » du contrôleur CommunicationApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendCommunication » of controller CommunicationApi.</p>
-    </div>
-  </div>
-</div>'),
- (1922,'designer.routes.help.ArticleApi.designVote','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « designVote » of controller ArticleApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « designVote » du contrôleur ArticleApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « designVote » of controller ArticleApi.</p>
-    </div>
-  </div>
-</div>'),
- (1923,'designer.routes.help.EventAvailabilitiesApi.getSlotEvents','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getSlotEvents ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getSlotEvents ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getSlotEvents ».</p>
-    </div>
-  </div>
-</div>'),
- (1924,'designer.routes.help.EventApi.getEvent','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getEvent ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getEvent ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getEvent ».</p>
-    </div>
-  </div>
-</div>'),
- (1925,'designer.routes.help.EventApi.deleteEvent','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteEvent).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteEvent).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteEvent).</p>
-    </div>
-  </div>
-</div>'),
- (1926,'designer.routes.help.EventApi.duplicateEvent','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « duplicateEvent » of controller EventApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « duplicateEvent » du contrôleur EventApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « duplicateEvent » of controller EventApi.</p>
-    </div>
-  </div>
-</div>'),
- (1927,'designer.routes.help.EventNeedApi.getEventNeeds','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getEventNeeds ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getEventNeeds ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getEventNeeds ».</p>
-    </div>
-  </div>
-</div>'),
- (1928,'designer.routes.help.EventApi.saveEvent','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveEvent).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveEvent).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveEvent).</p>
-    </div>
-  </div>
-</div>'),
- (1929,'designer.routes.help.EventApi.sendEmails','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendEmails » of controller EventApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendEmails » du contrôleur EventApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendEmails » of controller EventApi.</p>
-    </div>
-  </div>
-</div>'),
- (1930,'designer.routes.help.EventSupplyApi.updateSupply','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateSupply).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (updateSupply).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateSupply).</p>
-    </div>
-  </div>
-</div>'),
- (1931,'designer.routes.help.HelloAssoApi.checkout','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « checkout » of controller HelloAssoApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « checkout » du contrôleur HelloAssoApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « checkout » of controller HelloAssoApi.</p>
-    </div>
-  </div>
-</div>'),
- (1932,'designer.routes.help.HelloAssoApi.paymentReturn','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « paymentReturn » of controller HelloAssoApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « paymentReturn » du contrôleur HelloAssoApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « paymentReturn » of controller HelloAssoApi.</p>
-    </div>
-  </div>
-</div>'),
- (1933,'designer.routes.help.HelloAssoApi.webhook','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « webhook » of controller HelloAssoApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « webhook » du contrôleur HelloAssoApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « webhook » of controller HelloAssoApi.</p>
-    </div>
-  </div>
-</div>'),
- (1934,'designer.routes.help.ImportApi.getHeadersFromCSV','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getHeadersFromCSV ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getHeadersFromCSV ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getHeadersFromCSV ».</p>
-    </div>
-  </div>
-</div>'),
- (1935,'designer.routes.help.ImportApi.importOds','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « importOds » of controller ImportApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « importOds » du contrôleur ImportApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « importOds » of controller ImportApi.</p>
-    </div>
-  </div>
-</div>'),
- (1936,'designer.routes.help.KanbanApi.getHistory','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getHistory ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getHistory ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getHistory ».</p>
-    </div>
-  </div>
-</div>'),
- (1937,'designer.routes.help.KanbanApi.createCard','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (createCard).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Crée une nouvelle ressource (createCard).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (createCard).</p>
-    </div>
-  </div>
-</div>'),
- (1938,'designer.routes.help.KanbanApi.deleteCard','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteCard).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteCard).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteCard).</p>
-    </div>
-  </div>
-</div>'),
- (1939,'designer.routes.help.KanbanApi.moveCard','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « moveCard » of controller KanbanApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « moveCard » du contrôleur KanbanApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « moveCard » of controller KanbanApi.</p>
-    </div>
-  </div>
-</div>'),
- (1940,'designer.routes.help.KanbanApi.updateCard','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateCard).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (updateCard).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateCard).</p>
-    </div>
-  </div>
-</div>'),
- (1941,'designer.routes.help.KanbanApi.updateCardStatus','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateCardStatus).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (updateCardStatus).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateCardStatus).</p>
-    </div>
-  </div>
-</div>'),
- (1942,'designer.routes.help.KanbanApi.createCardType','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (createCardType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Crée une nouvelle ressource (createCardType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (createCardType).</p>
-    </div>
-  </div>
-</div>'),
- (1943,'designer.routes.help.KanbanApi.deleteCardType','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteCardType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteCardType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteCardType).</p>
-    </div>
-  </div>
-</div>'),
- (1944,'designer.routes.help.KanbanApi.updateCardType','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateCardType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (updateCardType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateCardType).</p>
-    </div>
-  </div>
-</div>'),
- (1945,'designer.routes.help.KanbanApi.getProject','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getProject ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getProject ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getProject ».</p>
-    </div>
-  </div>
-</div>'),
- (1946,'designer.routes.help.KanbanApi.getProjectCardTypes','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getProjectCardTypes ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getProjectCardTypes ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getProjectCardTypes ».</p>
-    </div>
-  </div>
-</div>'),
- (1947,'designer.routes.help.KanbanApi.getProjectCards','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getProjectCards ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getProjectCards ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getProjectCards ».</p>
-    </div>
-  </div>
-</div>'),
- (1948,'designer.routes.help.KanbanApi.createProject','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (createProject).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Crée une nouvelle ressource (createProject).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (createProject).</p>
-    </div>
-  </div>
-</div>'),
- (1949,'designer.routes.help.KanbanApi.deleteProject','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteProject).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteProject).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteProject).</p>
-    </div>
-  </div>
-</div>'),
- (1950,'designer.routes.help.KanbanApi.updateProject','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateProject).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (updateProject).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateProject).</p>
-    </div>
-  </div>
-</div>'),
- (1951,'designer.routes.help.KaraokeApi.handleApiRequest','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « handleApiRequest » of controller KaraokeApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « handleApiRequest » du contrôleur KaraokeApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « handleApiRequest » of controller KaraokeApi.</p>
-    </div>
-  </div>
-</div>'),
- (1952,'designer.routes.help.WebmasterApi.lastVersion','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « lastVersion » of controller WebmasterApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « lastVersion » du contrôleur WebmasterApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « lastVersion » of controller WebmasterApi.</p>
-    </div>
-  </div>
-</div>'),
- (1953,'designer.routes.help.LeapfrogApi.logMovement','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « logMovement » of controller LeapfrogApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « logMovement » du contrôleur LeapfrogApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « logMovement » of controller LeapfrogApi.</p>
-    </div>
-  </div>
-</div>'),
- (1954,'designer.routes.help.LoanApi.getAvailability','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getAvailability ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getAvailability ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getAvailability ».</p>
-    </div>
-  </div>
-</div>'),
- (1955,'designer.routes.help.LoanApi.getCalendarEvents','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getCalendarEvents ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getCalendarEvents ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getCalendarEvents ».</p>
-    </div>
-  </div>
-</div>'),
- (1956,'designer.routes.help.LoanApi.getItem','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getItem ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getItem ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getItem ».</p>
-    </div>
-  </div>
-</div>'),
- (1957,'designer.routes.help.LoanApi.deleteItem','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteItem).</p>
-    </div>
-  </div>
-</div>'),
- (1958,'designer.routes.help.LoanApi.saveItem','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveItem).</p>
-    </div>
-  </div>
-</div>'),
- (1959,'designer.routes.help.LoanApi.getItems','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getItems ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getItems ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getItems ».</p>
-    </div>
-  </div>
-</div>'),
- (1960,'designer.routes.help.LoanApi.getLoan','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getLoan ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getLoan ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getLoan ».</p>
-    </div>
-  </div>
-</div>'),
- (1961,'designer.routes.help.LoanApi.cancelLoan','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « cancelLoan » of controller LoanApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « cancelLoan » du contrôleur LoanApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « cancelLoan » of controller LoanApi.</p>
-    </div>
-  </div>
-</div>'),
- (1962,'designer.routes.help.LoanApi.returnLoan','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « returnLoan » of controller LoanApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « returnLoan » du contrôleur LoanApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « returnLoan » of controller LoanApi.</p>
-    </div>
-  </div>
-</div>'),
- (1963,'designer.routes.help.LoanApi.saveLoan','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveLoan).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveLoan).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveLoan).</p>
-    </div>
-  </div>
-</div>'),
- (1964,'designer.routes.help.LoanApi.getLoans','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getLoans ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getLoans ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getLoans ».</p>
-    </div>
-  </div>
-</div>'),
- (1965,'designer.routes.help.LoanApi.getReservation','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getReservation ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getReservation ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getReservation ».</p>
-    </div>
-  </div>
-</div>'),
- (1966,'designer.routes.help.LoanApi.cancelReservation','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « cancelReservation » of controller LoanApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « cancelReservation » du contrôleur LoanApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « cancelReservation » of controller LoanApi.</p>
-    </div>
-  </div>
-</div>'),
- (1967,'designer.routes.help.LoanApi.saveReservation','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveReservation).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveReservation).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveReservation).</p>
-    </div>
-  </div>
-</div>'),
- (1968,'designer.routes.help.LoanApi.getReservations','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getReservations ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getReservations ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getReservations ».</p>
-    </div>
-  </div>
-</div>'),
- (1969,'designer.routes.help.MakeTheTargetApi.logMovement','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « logMovement » of controller MakeTheTargetApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « logMovement » du contrôleur MakeTheTargetApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « logMovement » of controller MakeTheTargetApi.</p>
-    </div>
-  </div>
-</div>'),
- (1970,'designer.routes.help.MediaApi.deleteFile','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteFile).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteFile).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteFile).</p>
-    </div>
-  </div>
-</div>'),
- (1971,'designer.routes.help.MediaApi.editImage','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (editImage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (editImage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (editImage).</p>
-    </div>
-  </div>
-</div>'),
- (1972,'designer.routes.help.MediaApi.isShared','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « isShared » of controller MediaApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « isShared » du contrôleur MediaApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « isShared » of controller MediaApi.</p>
-    </div>
-  </div>
-</div>'),
- (1973,'designer.routes.help.MediaApi.removeFileShare','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (removeFileShare).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (removeFileShare).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (removeFileShare).</p>
-    </div>
-  </div>
-</div>'),
- (1974,'designer.routes.help.MediaApi.shareFile','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « shareFile » of controller MediaApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « shareFile » du contrôleur MediaApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « shareFile » of controller MediaApi.</p>
-    </div>
-  </div>
-</div>'),
- (1975,'designer.routes.help.MediaApi.uploadFile','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « uploadFile » of controller MediaApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « uploadFile » du contrôleur MediaApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « uploadFile » of controller MediaApi.</p>
-    </div>
-  </div>
-</div>'),
- (1976,'designer.routes.help.MenuItemApi.deleteItem','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteItem).</p>
-    </div>
-  </div>
-</div>'),
- (1977,'designer.routes.help.MenuItemApi.getMenuItem','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getMenuItem ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getMenuItem ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getMenuItem ».</p>
-    </div>
-  </div>
-</div>'),
- (1978,'designer.routes.help.MenuItemApi.saveMenuItem','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveMenuItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveMenuItem).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveMenuItem).</p>
-    </div>
-  </div>
-</div>'),
- (1979,'designer.routes.help.MenuItemApi.updatePositions','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updatePositions).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (updatePositions).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updatePositions).</p>
-    </div>
-  </div>
-</div>'),
- (1980,'designer.routes.help.MessageApi.addMessage','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (addMessage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Crée une nouvelle ressource (addMessage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (addMessage).</p>
-    </div>
-  </div>
-</div>'),
- (1981,'designer.routes.help.MessageApi.deleteMessage','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteMessage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteMessage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteMessage).</p>
-    </div>
-  </div>
-</div>'),
- (1982,'designer.routes.help.MessageApi.deleteMessageImage','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteMessageImage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteMessageImage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteMessageImage).</p>
-    </div>
-  </div>
-</div>'),
- (1983,'designer.routes.help.MessageApi.updateMessage','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateMessage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (updateMessage).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (updateMessage).</p>
-    </div>
-  </div>
-</div>'),
- (1984,'designer.routes.help.EventNeedApi.deleteNeed','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteNeed).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteNeed).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteNeed).</p>
-    </div>
-  </div>
-</div>'),
- (1985,'designer.routes.help.EventNeedApi.saveNeed','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveNeed).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveNeed).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveNeed).</p>
-    </div>
-  </div>
-</div>'),
- (1986,'designer.routes.help.EventNeedTypeApi.deleteNeedType','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteNeedType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deleteNeedType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deleteNeedType).</p>
-    </div>
-  </div>
-</div>'),
- (1987,'designer.routes.help.EventNeedTypeApi.saveNeedType','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveNeedType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveNeedType).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveNeedType).</p>
-    </div>
-  </div>
-</div>'),
- (1988,'designer.routes.help.EventNeedTypeApi.getNeedsByNeedType','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getNeedsByNeedType ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getNeedsByNeedType ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getNeedsByNeedType ».</p>
-    </div>
-  </div>
-</div>'),
- (1989,'designer.routes.help.WebmasterApi.sendNotification','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendNotification » of controller WebmasterApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendNotification » du contrôleur WebmasterApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendNotification » of controller WebmasterApi.</p>
-    </div>
-  </div>
-</div>'),
- (1990,'designer.routes.help.WebmasterApi.notifySubscribe','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « notifySubscribe » of controller WebmasterApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « notifySubscribe » du contrôleur WebmasterApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « notifySubscribe » of controller WebmasterApi.</p>
-    </div>
-  </div>
-</div>'),
- (1991,'designer.routes.help.ArticleApi.saveOrderReply','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveOrderReply).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveOrderReply).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveOrderReply).</p>
-    </div>
-  </div>
-</div>'),
- (1992,'designer.routes.help.ArticleApi.showOrderReplyForm','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « showOrderReplyForm ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « showOrderReplyForm ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « showOrderReplyForm ».</p>
-    </div>
-  </div>
-</div>'),
- (1993,'designer.routes.help.EventSupplyApi.participantsSupplies','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « participantsSupplies » of controller EventSupplyApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « participantsSupplies » du contrôleur EventSupplyApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">EventDesigner</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « participantsSupplies » of controller EventSupplyApi.</p>
-    </div>
-  </div>
-</div>'),
- (1994,'designer.routes.help.GroupApi.getPersonsInGroup','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getPersonsInGroup ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getPersonsInGroup ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getPersonsInGroup ».</p>
-    </div>
-  </div>
-</div>'),
- (1995,'designer.routes.help.NotificationApi.registerPushSubscription','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « registerPushSubscription » of controller NotificationApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « registerPushSubscription » du contrôleur NotificationApi.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « registerPushSubscription » of controller NotificationApi.</p>
-    </div>
-  </div>
-</div>'),
- (1996,'designer.routes.help.NotificationApi.deletePushSubscription','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deletePushSubscription).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (deletePushSubscription).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (deletePushSubscription).</p>
-    </div>
-  </div>
-</div>'),
- (1997,'designer.routes.help.GroupApi.addToGroup','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (addToGroup).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Crée une nouvelle ressource (addToGroup).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Creates a new resource (addToGroup).</p>
-    </div>
-  </div>
-</div>'),
- (1998,'designer.routes.help.GroupApi.removeFromGroup','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (removeFromGroup).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Supprime une ressource (removeFromGroup).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Deletes a resource (removeFromGroup).</p>
-    </div>
-  </div>
-</div>'),
- (1999,'designer.routes.help.ArticleApi.saveSurveyReply','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveSurveyReply).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (saveSurveyReply).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (saveSurveyReply).</p>
-    </div>
-  </div>
-</div>'),
- (2000,'designer.routes.help.ArticleApi.showSurveyReplyForm','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « showSurveyReplyForm ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « showSurveyReplyForm ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « showSurveyReplyForm ».</p>
-    </div>
-  </div>
-</div>'),
- (2001,'designer.routes.help.TranslatorApi.save','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (save).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Met à jour une ressource (save).</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Updates a resource (save).</p>
-    </div>
-  </div>
-</div>'),
- (2002,'designer.routes.help.WebmasterApi.getVapidPublicKey','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getVapidPublicKey ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getVapidPublicKey ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getVapidPublicKey ».</p>
-    </div>
-  </div>
-</div>'),
- (2003,'designer.routes.help.VisitorInsightsApi.getCreationTimeDistribution','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">VisitorInsights</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getCreationTimeDistribution ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">VisitorInsights</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getCreationTimeDistribution ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">VisitorInsights</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getCreationTimeDistribution ».</p>
-    </div>
-  </div>
-</div>'),
- (2004,'designer.routes.help.VisitorInsightsApi.getCreationTimeTrend','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">VisitorInsights</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getCreationTimeTrend ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">VisitorInsights</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « getCreationTimeTrend ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">JSON</span>
-        <span class="badge bg-secondary">VisitorInsights</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « getCreationTimeTrend ».</p>
-    </div>
-  </div>
-</div>'),
  (2005,'designer.routes.help.ArticleController.show','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
@@ -14473,301 +9769,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </div>
 </div>'),
- (2047,'designer.routes.help.EventController.show','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">depends on the connected user</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « show ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « show ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « show ».</p>
-    </div>
-  </div>
-</div>'),
- (2048,'designer.routes.help.EventController.registerSet','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">depends on the connected user</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « registerSet » of controller EventController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « registerSet » du contrôleur EventController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « registerSet » of controller EventController.</p>
-    </div>
-  </div>
-</div>'),
- (2049,'designer.routes.help.EventController.registerUnset','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">depends on the connected user</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « registerUnset » of controller EventController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « registerUnset » du contrôleur EventController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « registerUnset » of controller EventController.</p>
-    </div>
-  </div>
-</div>'),
- (2050,'designer.routes.help.EventController.showEventChat','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">depends on the connected user</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « showEventChat ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « showEventChat ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « showEventChat ».</p>
-    </div>
-  </div>
-</div>'),
- (2051,'designer.routes.help.EventController.home','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">according to the module</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Home page. Content depends on the visitor''s authorizations, especially for the navbar, sidebar and article list.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">selon le module</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), 
-      le menu latéral (sidebar) et la liste des articles.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zgodnie z modułem</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Home page. Content depends on the visitor''s authorizations, especially for the navbar, sidebar and article list.</p>
-    </div>
-  </div>
-</div>'),
- (2052,'designer.routes.help.EventController.help','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">according to the module</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Contextual help page for the module.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">selon le module</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Page d''aide contextuelle du module.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zgodnie z modułem</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Contextual help page for the module.</p>
-    </div>
-  </div>
-</div>'),
  (2053,'designer.routes.help.EventTypeController.create','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
@@ -15062,104 +10063,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </div>
 </div>'),
- (2059,'designer.routes.help.EventController.events_crossTab_help','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">according to the module</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Help page: events_crossTab_help.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">selon le module</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Page d''aide : events_crossTab_help.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zgodnie z modułem</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Help page: events_crossTab_help.</p>
-    </div>
-  </div>
-</div>'),
- (2060,'designer.routes.help.EventController.showEventCrosstab','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">depends on the connected user</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « showEventCrosstab ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Affiche ou retourne les données liées à « showEventCrosstab ».</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Displays or returns data related to « showEventCrosstab ».</p>
-    </div>
-  </div>
-</div>'),
  (2061,'designer.routes.help.EventGuestController.guest','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
@@ -15255,55 +10158,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
       <p class="mb-0">Action « guestInvite » of controller EventGuestController.</p>
-    </div>
-  </div>
-</div>'),
- (2063,'designer.routes.help.EventController.events_guest_help','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">according to the module</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Help page: events_guest_help.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">selon le module</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Page d''aide : events_guest_help.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zgodnie z modułem</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Help page: events_guest_help.</p>
     </div>
   </div>
 </div>'),
@@ -16186,104 +11040,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
       <p class="mb-0">Action « groupIndex » of controller GroupController.</p>
-    </div>
-  </div>
-</div>'),
- (2082,'designer.routes.help.WebmasterController.helloassoCredentialsEdit','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « helloassoCredentialsEdit » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « helloassoCredentialsEdit » du contrôleur WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « helloassoCredentialsEdit » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>'),
- (2083,'designer.routes.help.WebmasterController.helloassoCredentialsSave','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « helloassoCredentialsSave » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « helloassoCredentialsSave » du contrôleur WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « helloassoCredentialsSave » of controller WebmasterController.</p>
     </div>
   </div>
 </div>'),
@@ -17316,55 +12072,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </div>
 </div>'),
- (2105,'designer.routes.help.MediaController.isShared','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « isShared » of controller MediaController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « isShared » du contrôleur MediaController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Redactor / Editor</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « isShared » of controller MediaController.</p>
-    </div>
-  </div>
-</div>'),
  (2106,'designer.routes.help.MediaController.listFiles','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
@@ -18097,104 +12804,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
       <p class="mb-0">Action « needs » of controller EventNeedController.</p>
-    </div>
-  </div>
-</div>'),
- (2121,'designer.routes.help.EventController.nextEvents','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">depends on the connected user</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « nextEvents » of controller EventController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « nextEvents » du contrôleur EventController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « nextEvents » of controller EventController.</p>
-    </div>
-  </div>
-</div>'),
- (2122,'designer.routes.help.EventController.nextEventsHelp','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">according to the module</span>
-        <span class="badge bg-success">read-only</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Contextual help for nextEvents.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">selon le module</span>
-        <span class="badge bg-success">lecture seule</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Aide contextuelle pour nextEvents.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">zgodnie z modułem</span>
-        <span class="badge bg-success">tylko odczyt</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Contextual help for nextEvents.</p>
     </div>
   </div>
 </div>'),
@@ -19132,104 +13741,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </div>
 </div>'),
- (2142,'designer.routes.help.WebmasterController.sendEmailCredentialsEdit','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendEmailCredentialsEdit » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendEmailCredentialsEdit » du contrôleur WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendEmailCredentialsEdit » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>'),
- (2143,'designer.routes.help.WebmasterController.sendEmailCredentialsSave','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendEmailCredentialsSave » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendEmailCredentialsSave » du contrôleur WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « sendEmailCredentialsSave » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>'),
  (2144,'designer.routes.help.WebappSettingsController.editSettings','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
@@ -19815,104 +14326,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
       <p class="mb-0">Action « index » of controller TranslatorController.</p>
-    </div>
-  </div>
-</div>'),
- (2156,'designer.routes.help.WebmasterController.turnstileCredentialsEdit','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « turnstileCredentialsEdit » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « turnstileCredentialsEdit » du contrôleur WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « turnstileCredentialsEdit » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>'),
- (2157,'designer.routes.help.WebmasterController.turnstileCredentialsSave','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Route help</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">update</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « turnstileCredentialsSave » of controller WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Aide de la route</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">mise à jour</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « turnstileCredentialsSave » du contrôleur WebmasterController.</p>
-    </div>
-  </div>
-</div>','<div class="container mt-4" style="max-width: 720px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
-      <i class="bi bi-info-circle fs-4"></i>
-      <span class="fw-semibold">Pomoc trasy</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-info text-dark">HTML</span>
-        <span class="badge bg-secondary">Webmaster</span>
-        <span class="badge bg-success">aktualizacja</span>
-      </div>
-      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « turnstileCredentialsSave » of controller WebmasterController.</p>
     </div>
   </div>
 </div>'),
@@ -21533,7 +15946,7 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </div>
 </div>'),
- (2191,'designer.routes.help.EventController.weekEvents','<div class="container mt-4" style="max-width: 720px;">
+ (2193,'designer.routes.help.EventDetailController.show','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
       <i class="bi bi-info-circle fs-4"></i>
@@ -21546,7 +15959,7 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
         <span class="badge bg-success">read-only</span>
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « weekEvents » of controller EventController.</p>
+      <p class="mb-0">Displays or returns data related to « show ».</p>
     </div>
   </div>
 </div>','<div class="container mt-4" style="max-width: 720px;">
@@ -21562,7 +15975,7 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
         <span class="badge bg-success">lecture seule</span>
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « weekEvents » du contrôleur EventController.</p>
+      <p class="mb-0">Affiche ou retourne les données liées à « show ».</p>
     </div>
   </div>
 </div>','<div class="container mt-4" style="max-width: 720px;">
@@ -21578,11 +15991,256 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
         <span class="badge bg-success">tylko odczyt</span>
       </div>
       <h6 class="text-muted text-uppercase small mb-2">Description</h6>
-      <p class="mb-0">Action « weekEvents » of controller EventController.</p>
+      <p class="mb-0">Displays or returns data related to « show ».</p>
     </div>
   </div>
 </div>'),
- (2192,'designer.routes.help.EventController.weekEventsHelp','<div class="container mt-4" style="max-width: 720px;">
+ (2194,'designer.routes.help.EventDetailController.showEventChat','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « showEventChat ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « showEventChat ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « showEventChat ».</p>
+    </div>
+  </div>
+</div>'),
+ (2195,'designer.routes.help.EventListController.eventsGuestHelp','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">according to the module</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Help page: events_guest_help.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">selon le module</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page d''aide : events_guest_help.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zgodnie z modułem</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Help page: events_guest_help.</p>
+    </div>
+  </div>
+</div>'),
+ (2196,'designer.routes.help.EventListController.nextEvents','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « nextEvents » of controller EventListController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « nextEvents » du contrôleur EventListController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « nextEvents » of controller EventListController.</p>
+    </div>
+  </div>
+</div>'),
+ (2197,'designer.routes.help.EventListController.nextEventsHelp','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">according to the module</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Contextual help for nextEvents.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">selon le module</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Aide contextuelle pour nextEvents.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zgodnie z modułem</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Contextual help for nextEvents.</p>
+    </div>
+  </div>
+</div>'),
+ (2198,'designer.routes.help.EventListController.weekEvents','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « weekEvents » of controller EventListController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « weekEvents » du contrôleur EventListController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « weekEvents » of controller EventListController.</p>
+    </div>
+  </div>
+</div>'),
+ (2199,'designer.routes.help.EventListController.weekEventsHelp','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
       <i class="bi bi-info-circle fs-4"></i>
@@ -21630,7 +16288,5794 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
       <p class="mb-0">Help for the weekly events view.</p>
     </div>
   </div>
-</div>');
+</div>'),
+ (2200,'designer.routes.help.EventManagerController.eventsCrossTabHelp','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">according to the module</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Help page: events_crossTab_help.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">selon le module</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page d''aide : events_crossTab_help.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zgodnie z modułem</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Help page: events_crossTab_help.</p>
+    </div>
+  </div>
+</div>'),
+ (2201,'designer.routes.help.EventManagerController.help','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">according to the module</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Contextual help page for the module.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">selon le module</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page d''aide contextuelle du module.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zgodnie z modułem</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Contextual help page for the module.</p>
+    </div>
+  </div>
+</div>'),
+ (2202,'designer.routes.help.EventManagerController.home','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">according to the module</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Home page. Content depends on the visitor''s authorizations, especially for the navbar, sidebar and article list.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">selon le module</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page d''accueil. Le contenu dépend des autorisations du visiteur notamment pour la barre de navigation (navbar), 
+      le menu latéral (sidebar) et la liste des articles.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zgodnie z modułem</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Home page. Content depends on the visitor''s authorizations, especially for the navbar, sidebar and article list.</p>
+    </div>
+  </div>
+</div>'),
+ (2203,'designer.routes.help.EventManagerController.showEventCrosstab','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « showEventCrosstab ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « showEventCrosstab ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « showEventCrosstab ».</p>
+    </div>
+  </div>
+</div>'),
+ (2204,'designer.routes.help.EventRegistrationController.registerSet','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « registerSet » of controller EventRegistrationController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « registerSet » du contrôleur EventRegistrationController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « registerSet » of controller EventRegistrationController.</p>
+    </div>
+  </div>
+</div>'),
+ (2205,'designer.routes.help.EventRegistrationController.registerUnset','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « registerUnset » of controller EventRegistrationController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « registerUnset » du contrôleur EventRegistrationController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « registerUnset » of controller EventRegistrationController.</p>
+    </div>
+  </div>
+</div>'),
+ (2206,'designer.routes.help.CredentialsController.helloassoCredentialsEdit','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « helloassoCredentialsEdit » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « helloassoCredentialsEdit » du contrôleur CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « helloassoCredentialsEdit » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>'),
+ (2207,'designer.routes.help.CredentialsController.helloassoCredentialsSave','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « helloassoCredentialsSave » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « helloassoCredentialsSave » du contrôleur CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « helloassoCredentialsSave » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>'),
+ (2208,'designer.routes.help.CredentialsController.sendEmailCredentialsEdit','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendEmailCredentialsEdit » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendEmailCredentialsEdit » du contrôleur CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendEmailCredentialsEdit » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>'),
+ (2209,'designer.routes.help.CredentialsController.sendEmailCredentialsSave','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendEmailCredentialsSave » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendEmailCredentialsSave » du contrôleur CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendEmailCredentialsSave » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>'),
+ (2210,'designer.routes.help.CredentialsController.turnstileCredentialsEdit','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « turnstileCredentialsEdit » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « turnstileCredentialsEdit » du contrôleur CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « turnstileCredentialsEdit » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>'),
+ (2211,'designer.routes.help.CredentialsController.turnstileCredentialsSave','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « turnstileCredentialsSave » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « turnstileCredentialsSave » du contrôleur CredentialsController.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « turnstileCredentialsSave » of controller CredentialsController.</p>
+    </div>
+  </div>
+</div>'),
+ (2308,'designer.routes.help.ExerciseController.create','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Exercise creation page.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page de création d''un exercice.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Exercise creation page.</p>
+    </div>
+  </div>
+</div>'),
+ (2309,'designer.routes.help.ExerciseController.edit','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Exercise edit page.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page de modification d''un exercice.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Exercise edit page.</p>
+    </div>
+  </div>
+</div>'),
+ (2310,'designer.routes.help.ExerciseController.play','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page to play an exercise.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page pour jouer un exercice.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page to play an exercise.</p>
+    </div>
+  </div>
+</div>'),
+ (2311,'designer.routes.help.ExerciseController.index','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">List of exercises.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Liste des exercices.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">List of exercises.</p>
+    </div>
+  </div>
+</div>'),
+ (2312,'designer.routes.help.SolfegeController.learn','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Solfège learning page.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page d''apprentissage du solfège.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Solfège learning page.</p>
+    </div>
+  </div>
+</div>'),
+ (2313,'designer.routes.help.ExerciseController.save','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Saves an exercise.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Enregistre un exercice.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Saves an exercise.</p>
+    </div>
+  </div>
+</div>'),
+ (2314,'designer.routes.help.SolfegeController.saveScore','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">depends on the connected user</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Saves the score of a solfège game.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">dépend de l''utilisateur connecté</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Enregistre le score d''un jeu de solfège.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">zależy od zalogowanego użytkownika</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Saves the score of a solfège game.</p>
+    </div>
+  </div>
+</div>'),
+ (2318,'designer.routes.help.DesignerController.routesHelp','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">none (isAnybody)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Help page of the routes list.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">aucune (isAnybody)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Page d''aide de la liste des routes.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">brak (isAnybody)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Help page of the routes list.</p>
+    </div>
+  </div>
+</div>'),
+ (2319,'designer.routes.help.DesignerController.showRouteHelp','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">none (isAnybody)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays the help text of one route.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">aucune (isAnybody)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche le texte d''aide d''une route.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">HTML</span>
+        <span class="badge bg-secondary">brak (isAnybody)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays the help text of one route.</p>
+    </div>
+  </div>
+</div>'),
+ (2320,'designer.routes.help.EventAttributeApi.createAttribute','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (createAttribute).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Crée une nouvelle ressource (createAttribute).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (createAttribute).</p>
+    </div>
+  </div>
+</div>'),
+ (2321,'designer.routes.help.EventAttributeApi.deleteAttribute','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteAttribute).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteAttribute).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteAttribute).</p>
+    </div>
+  </div>
+</div>'),
+ (2322,'designer.routes.help.EventAttributeApi.updateAttribute','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateAttribute).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (updateAttribute).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateAttribute).</p>
+    </div>
+  </div>
+</div>'),
+ (2323,'designer.routes.help.EventAttributeApi.getAttributesByEventType','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getAttributesByEventType ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getAttributesByEventType ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getAttributesByEventType ».</p>
+    </div>
+  </div>
+</div>'),
+ (2324,'designer.routes.help.EventAttributeApi.getAttributes','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getAttributes ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getAttributes ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getAttributes ».</p>
+    </div>
+  </div>
+</div>'),
+ (2325,'designer.routes.help.CarouselApi.getItems','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getItems ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getItems ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getItems ».</p>
+    </div>
+  </div>
+</div>'),
+ (2326,'designer.routes.help.CarouselApi.deleteItem','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteItem).</p>
+    </div>
+  </div>
+</div>'),
+ (2327,'designer.routes.help.CarouselApi.saveItem','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveItem).</p>
+    </div>
+  </div>
+</div>'),
+ (2328,'designer.routes.help.ChatApi.getActiveUsers','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getActiveUsers ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getActiveUsers ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getActiveUsers ».</p>
+    </div>
+  </div>
+</div>'),
+ (2329,'designer.routes.help.CommunicationApi.updateContactEmail','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateContactEmail).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (updateContactEmail).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateContactEmail).</p>
+    </div>
+  </div>
+</div>'),
+ (2330,'designer.routes.help.CommunicationApi.getMembers','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getMembers ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getMembers ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getMembers ».</p>
+    </div>
+  </div>
+</div>'),
+ (2331,'designer.routes.help.CommunicationApi.getQuota','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getQuota ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getQuota ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getQuota ».</p>
+    </div>
+  </div>
+</div>'),
+ (2332,'designer.routes.help.CommunicationApi.sendCommunication','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendCommunication » of controller CommunicationApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendCommunication » du contrôleur CommunicationApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendCommunication » of controller CommunicationApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2333,'designer.routes.help.ArticleApi.designVote','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « designVote » of controller ArticleApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « designVote » du contrôleur ArticleApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « designVote » of controller ArticleApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2334,'designer.routes.help.EventAvailabilitiesApi.getSlotEvents','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getSlotEvents ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getSlotEvents ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getSlotEvents ».</p>
+    </div>
+  </div>
+</div>'),
+ (2335,'designer.routes.help.EventApi.getEvent','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getEvent ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getEvent ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getEvent ».</p>
+    </div>
+  </div>
+</div>'),
+ (2336,'designer.routes.help.EventApi.deleteEvent','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteEvent).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteEvent).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteEvent).</p>
+    </div>
+  </div>
+</div>'),
+ (2337,'designer.routes.help.EventApi.duplicateEvent','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « duplicateEvent » of controller EventApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « duplicateEvent » du contrôleur EventApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « duplicateEvent » of controller EventApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2338,'designer.routes.help.EventNeedApi.getEventNeeds','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getEventNeeds ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getEventNeeds ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getEventNeeds ».</p>
+    </div>
+  </div>
+</div>'),
+ (2339,'designer.routes.help.EventApi.saveEvent','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveEvent).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveEvent).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveEvent).</p>
+    </div>
+  </div>
+</div>'),
+ (2340,'designer.routes.help.EventApi.sendEmails','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendEmails » of controller EventApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendEmails » du contrôleur EventApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendEmails » of controller EventApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2341,'designer.routes.help.EventSupplyApi.updateSupply','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateSupply).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (updateSupply).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateSupply).</p>
+    </div>
+  </div>
+</div>'),
+ (2342,'designer.routes.help.HelloAssoApi.checkout','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « checkout » of controller HelloAssoApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « checkout » du contrôleur HelloAssoApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « checkout » of controller HelloAssoApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2343,'designer.routes.help.HelloAssoApi.paymentReturn','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « paymentReturn » of controller HelloAssoApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « paymentReturn » du contrôleur HelloAssoApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « paymentReturn » of controller HelloAssoApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2344,'designer.routes.help.HelloAssoApi.webhook','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « webhook » of controller HelloAssoApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « webhook » du contrôleur HelloAssoApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « webhook » of controller HelloAssoApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2345,'designer.routes.help.ImportApi.getHeadersFromCSV','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getHeadersFromCSV ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getHeadersFromCSV ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getHeadersFromCSV ».</p>
+    </div>
+  </div>
+</div>'),
+ (2346,'designer.routes.help.ImportApi.importOds','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « importOds » of controller ImportApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « importOds » du contrôleur ImportApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « importOds » of controller ImportApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2347,'designer.routes.help.KanbanApi.getHistory','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getHistory ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getHistory ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getHistory ».</p>
+    </div>
+  </div>
+</div>'),
+ (2348,'designer.routes.help.KanbanApi.createCard','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (createCard).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Crée une nouvelle ressource (createCard).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (createCard).</p>
+    </div>
+  </div>
+</div>'),
+ (2349,'designer.routes.help.KanbanApi.deleteCard','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteCard).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteCard).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteCard).</p>
+    </div>
+  </div>
+</div>'),
+ (2350,'designer.routes.help.KanbanApi.moveCard','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « moveCard » of controller KanbanApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « moveCard » du contrôleur KanbanApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « moveCard » of controller KanbanApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2351,'designer.routes.help.KanbanApi.updateCard','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateCard).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (updateCard).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateCard).</p>
+    </div>
+  </div>
+</div>'),
+ (2352,'designer.routes.help.KanbanApi.updateCardStatus','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateCardStatus).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (updateCardStatus).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateCardStatus).</p>
+    </div>
+  </div>
+</div>'),
+ (2353,'designer.routes.help.KanbanApi.createCardType','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (createCardType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Crée une nouvelle ressource (createCardType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (createCardType).</p>
+    </div>
+  </div>
+</div>'),
+ (2354,'designer.routes.help.KanbanApi.deleteCardType','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteCardType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteCardType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteCardType).</p>
+    </div>
+  </div>
+</div>'),
+ (2355,'designer.routes.help.KanbanApi.updateCardType','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateCardType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (updateCardType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateCardType).</p>
+    </div>
+  </div>
+</div>'),
+ (2356,'designer.routes.help.KanbanApi.getProject','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getProject ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getProject ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getProject ».</p>
+    </div>
+  </div>
+</div>'),
+ (2357,'designer.routes.help.KanbanApi.getProjectCardTypes','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getProjectCardTypes ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getProjectCardTypes ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getProjectCardTypes ».</p>
+    </div>
+  </div>
+</div>'),
+ (2358,'designer.routes.help.KanbanApi.getProjectCards','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getProjectCards ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getProjectCards ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getProjectCards ».</p>
+    </div>
+  </div>
+</div>'),
+ (2359,'designer.routes.help.KanbanApi.createProject','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (createProject).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Crée une nouvelle ressource (createProject).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (createProject).</p>
+    </div>
+  </div>
+</div>'),
+ (2360,'designer.routes.help.KanbanApi.deleteProject','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteProject).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteProject).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteProject).</p>
+    </div>
+  </div>
+</div>'),
+ (2361,'designer.routes.help.KanbanApi.updateProject','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateProject).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (updateProject).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateProject).</p>
+    </div>
+  </div>
+</div>'),
+ (2362,'designer.routes.help.KaraokeApi.handleApiRequest','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « handleApiRequest » of controller KaraokeApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « handleApiRequest » du contrôleur KaraokeApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « handleApiRequest » of controller KaraokeApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2363,'designer.routes.help.WebmasterApi.lastVersion','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « lastVersion » of controller WebmasterApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « lastVersion » du contrôleur WebmasterApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « lastVersion » of controller WebmasterApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2364,'designer.routes.help.LeapfrogApi.logMovement','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « logMovement » of controller LeapfrogApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « logMovement » du contrôleur LeapfrogApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « logMovement » of controller LeapfrogApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2365,'designer.routes.help.LoanApi.getAvailability','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getAvailability ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getAvailability ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getAvailability ».</p>
+    </div>
+  </div>
+</div>'),
+ (2366,'designer.routes.help.LoanApi.getCalendarEvents','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getCalendarEvents ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getCalendarEvents ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getCalendarEvents ».</p>
+    </div>
+  </div>
+</div>'),
+ (2367,'designer.routes.help.LoanApi.getItem','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getItem ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getItem ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getItem ».</p>
+    </div>
+  </div>
+</div>'),
+ (2368,'designer.routes.help.LoanApi.deleteItem','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteItem).</p>
+    </div>
+  </div>
+</div>'),
+ (2369,'designer.routes.help.LoanApi.saveItem','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveItem).</p>
+    </div>
+  </div>
+</div>'),
+ (2370,'designer.routes.help.LoanApi.getItems','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getItems ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getItems ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getItems ».</p>
+    </div>
+  </div>
+</div>'),
+ (2371,'designer.routes.help.LoanApi.getLoan','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getLoan ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getLoan ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getLoan ».</p>
+    </div>
+  </div>
+</div>'),
+ (2372,'designer.routes.help.LoanApi.cancelLoan','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « cancelLoan » of controller LoanApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « cancelLoan » du contrôleur LoanApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « cancelLoan » of controller LoanApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2373,'designer.routes.help.LoanApi.returnLoan','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « returnLoan » of controller LoanApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « returnLoan » du contrôleur LoanApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « returnLoan » of controller LoanApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2374,'designer.routes.help.LoanApi.saveLoan','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveLoan).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveLoan).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveLoan).</p>
+    </div>
+  </div>
+</div>'),
+ (2375,'designer.routes.help.LoanApi.getLoans','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getLoans ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getLoans ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getLoans ».</p>
+    </div>
+  </div>
+</div>'),
+ (2376,'designer.routes.help.LoanApi.getReservation','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getReservation ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getReservation ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getReservation ».</p>
+    </div>
+  </div>
+</div>'),
+ (2377,'designer.routes.help.LoanApi.cancelReservation','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « cancelReservation » of controller LoanApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « cancelReservation » du contrôleur LoanApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « cancelReservation » of controller LoanApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2378,'designer.routes.help.LoanApi.saveReservation','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveReservation).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveReservation).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveReservation).</p>
+    </div>
+  </div>
+</div>'),
+ (2379,'designer.routes.help.LoanApi.getReservations','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getReservations ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getReservations ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getReservations ».</p>
+    </div>
+  </div>
+</div>'),
+ (2380,'designer.routes.help.MakeTheTargetApi.logMovement','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « logMovement » of controller MakeTheTargetApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « logMovement » du contrôleur MakeTheTargetApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « logMovement » of controller MakeTheTargetApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2381,'designer.routes.help.MediaApi.deleteFile','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteFile).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteFile).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteFile).</p>
+    </div>
+  </div>
+</div>'),
+ (2382,'designer.routes.help.MediaApi.editImage','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (editImage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (editImage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (editImage).</p>
+    </div>
+  </div>
+</div>'),
+ (2383,'designer.routes.help.MediaApi.isShared','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « isShared » of controller MediaApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « isShared » du contrôleur MediaApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « isShared » of controller MediaApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2384,'designer.routes.help.MediaApi.removeFileShare','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (removeFileShare).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (removeFileShare).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (removeFileShare).</p>
+    </div>
+  </div>
+</div>'),
+ (2385,'designer.routes.help.MediaApi.shareFile','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « shareFile » of controller MediaApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « shareFile » du contrôleur MediaApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « shareFile » of controller MediaApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2386,'designer.routes.help.MediaApi.uploadFile','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « uploadFile » of controller MediaApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « uploadFile » du contrôleur MediaApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « uploadFile » of controller MediaApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2387,'designer.routes.help.MenuItemApi.deleteItem','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteItem).</p>
+    </div>
+  </div>
+</div>'),
+ (2388,'designer.routes.help.MenuItemApi.getMenuItem','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getMenuItem ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getMenuItem ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getMenuItem ».</p>
+    </div>
+  </div>
+</div>'),
+ (2389,'designer.routes.help.MenuItemApi.saveMenuItem','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveMenuItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveMenuItem).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveMenuItem).</p>
+    </div>
+  </div>
+</div>'),
+ (2390,'designer.routes.help.MenuItemApi.updatePositions','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updatePositions).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (updatePositions).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Designer / HomeDesigner / MenuDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updatePositions).</p>
+    </div>
+  </div>
+</div>'),
+ (2391,'designer.routes.help.MessageApi.addMessage','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (addMessage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Crée une nouvelle ressource (addMessage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (addMessage).</p>
+    </div>
+  </div>
+</div>'),
+ (2392,'designer.routes.help.MessageApi.deleteMessage','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteMessage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteMessage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteMessage).</p>
+    </div>
+  </div>
+</div>'),
+ (2393,'designer.routes.help.MessageApi.deleteMessageImage','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteMessageImage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteMessageImage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteMessageImage).</p>
+    </div>
+  </div>
+</div>'),
+ (2394,'designer.routes.help.MessageApi.updateMessage','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateMessage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (updateMessage).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (updateMessage).</p>
+    </div>
+  </div>
+</div>'),
+ (2395,'designer.routes.help.EventNeedApi.deleteNeed','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteNeed).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteNeed).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteNeed).</p>
+    </div>
+  </div>
+</div>'),
+ (2396,'designer.routes.help.EventNeedApi.saveNeed','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveNeed).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveNeed).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveNeed).</p>
+    </div>
+  </div>
+</div>'),
+ (2397,'designer.routes.help.EventNeedTypeApi.deleteNeedType','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteNeedType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deleteNeedType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deleteNeedType).</p>
+    </div>
+  </div>
+</div>'),
+ (2398,'designer.routes.help.EventNeedTypeApi.saveNeedType','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveNeedType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveNeedType).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveNeedType).</p>
+    </div>
+  </div>
+</div>'),
+ (2399,'designer.routes.help.EventNeedTypeApi.getNeedsByNeedType','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getNeedsByNeedType ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getNeedsByNeedType ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getNeedsByNeedType ».</p>
+    </div>
+  </div>
+</div>'),
+ (2400,'designer.routes.help.WebmasterApi.sendNotification','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendNotification » of controller WebmasterApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendNotification » du contrôleur WebmasterApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Webmaster</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « sendNotification » of controller WebmasterApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2402,'designer.routes.help.ArticleApi.saveOrderReply','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveOrderReply).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveOrderReply).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveOrderReply).</p>
+    </div>
+  </div>
+</div>'),
+ (2403,'designer.routes.help.ArticleApi.showOrderReplyForm','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « showOrderReplyForm ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « showOrderReplyForm ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « showOrderReplyForm ».</p>
+    </div>
+  </div>
+</div>'),
+ (2404,'designer.routes.help.EventSupplyApi.participantsSupplies','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « participantsSupplies » of controller EventSupplyApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « participantsSupplies » du contrôleur EventSupplyApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">EventDesigner</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « participantsSupplies » of controller EventSupplyApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2405,'designer.routes.help.GroupApi.getPersonsInGroup','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getPersonsInGroup ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getPersonsInGroup ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getPersonsInGroup ».</p>
+    </div>
+  </div>
+</div>'),
+ (2406,'designer.routes.help.NotificationApi.registerPushSubscription','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « registerPushSubscription » of controller NotificationApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « registerPushSubscription » du contrôleur NotificationApi.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Action « registerPushSubscription » of controller NotificationApi.</p>
+    </div>
+  </div>
+</div>'),
+ (2407,'designer.routes.help.NotificationApi.deletePushSubscription','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deletePushSubscription).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (deletePushSubscription).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (deletePushSubscription).</p>
+    </div>
+  </div>
+</div>'),
+ (2408,'designer.routes.help.GroupApi.addToGroup','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (addToGroup).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Crée une nouvelle ressource (addToGroup).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Creates a new resource (addToGroup).</p>
+    </div>
+  </div>
+</div>'),
+ (2409,'designer.routes.help.GroupApi.removeFromGroup','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (removeFromGroup).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime une ressource (removeFromGroup).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes a resource (removeFromGroup).</p>
+    </div>
+  </div>
+</div>'),
+ (2410,'designer.routes.help.ArticleApi.saveSurveyReply','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveSurveyReply).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (saveSurveyReply).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (saveSurveyReply).</p>
+    </div>
+  </div>
+</div>'),
+ (2411,'designer.routes.help.ArticleApi.showSurveyReplyForm','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « showSurveyReplyForm ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « showSurveyReplyForm ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">Redactor / Editor</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « showSurveyReplyForm ».</p>
+    </div>
+  </div>
+</div>'),
+ (2412,'designer.routes.help.TranslatorApi.save','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (save).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Met à jour une ressource (save).</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Updates a resource (save).</p>
+    </div>
+  </div>
+</div>'),
+ (2414,'designer.routes.help.VisitorInsightsApi.getCreationTimeDistribution','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">VisitorInsights</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getCreationTimeDistribution ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">VisitorInsights</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getCreationTimeDistribution ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">VisitorInsights</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getCreationTimeDistribution ».</p>
+    </div>
+  </div>
+</div>'),
+ (2415,'designer.routes.help.VisitorInsightsApi.getCreationTimeTrend','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">VisitorInsights</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getCreationTimeTrend ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">VisitorInsights</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Affiche ou retourne les données liées à « getCreationTimeTrend ».</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">VisitorInsights</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Displays or returns data related to « getCreationTimeTrend ».</p>
+    </div>
+  </div>
+</div>'),
+ (2416,'designer.routes.help.ExerciseApi.get','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">read-only</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Returns an exercise.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">lecture seule</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Retourne un exercice.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">tylko odczyt</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Returns an exercise.</p>
+    </div>
+  </div>
+</div>'),
+ (2417,'designer.routes.help.ExerciseApi.save','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Saves an exercise.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Enregistre un exercice.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Saves an exercise.</p>
+    </div>
+  </div>
+</div>'),
+ (2418,'designer.routes.help.ExerciseApi.delete','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Route help</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">depends on the endpoint (business role)</span>
+        <span class="badge bg-success">update</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes an exercise.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Aide de la route</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">selon l''endpoint (rôle métier)</span>
+        <span class="badge bg-success">mise à jour</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Supprime un exercice.</p>
+    </div>
+  </div>
+</div>','<div class="container mt-4" style="max-width: 720px;">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+      <i class="bi bi-info-circle fs-4"></i>
+      <span class="fw-semibold">Pomoc trasy</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-info text-dark">JSON</span>
+        <span class="badge bg-secondary">zależy od endpointu (rola biznesowa)</span>
+        <span class="badge bg-success">aktualizacja</span>
+      </div>
+      <h6 class="text-muted text-uppercase small mb-2">Description</h6>
+      <p class="mb-0">Deletes an exercise.</p>
+    </div>
+  </div>
+</div>'),
+ (2419,'Help_NextEvents','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>'),
+ (2420,'Help_EventsGuest','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>'),
+ (2421,'Help_WeekEvents','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>'),
+ (2422,'Help_EventsCrossTab','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
 INSERT INTO "Metadata" VALUES (1,'MyClub',104,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);

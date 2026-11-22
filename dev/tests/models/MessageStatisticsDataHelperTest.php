@@ -19,6 +19,7 @@ class MessageStatisticsDataHelperTest extends DataHelperTestCase
             'PersonId',
             'From',
             'ArticleId',
+            'EventId',
             'LastUpdate',
         ]);
 

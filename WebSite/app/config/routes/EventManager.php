@@ -31,7 +31,7 @@ final class EventManager implements RouteInterface
         $this->routes[] = new Route('GET  /eventManager/help', $eventManagerController, 'help');
 
         $this->routes[] = new Route('GET  /events/crosstab', $eventManagerController, 'showEventCrosstab');
-        $this->routes[] = new Route('GET  /events/crossTab/help', $eventManagerController, 'events_crossTab_help');
+        $this->routes[] = new Route('GET  /events/crossTab/help', $eventManagerController, 'eventsCrossTabHelp');
 
         return $this->routes;
     }

@@ -21,6 +21,11 @@ final class EventManagerController extends AbstractController
         parent::__construct($application);
     }
 
+    public function eventsCrossTabHelp(): void
+    {
+        $this->renderHelp('Help_EventsCrossTab', fn($u) => $u->isEventManager(), __FILE__, __LINE__);
+    }
+
     public function help(): void
     {
         $this->renderHelp('Help_EventManager', fn($u) => $u->isEventManager(), __FILE__, __LINE__);

@@ -33,7 +33,7 @@ final class EventList implements RouteInterface
         $this->routes[] = new Route('GET  /weekEvents', $eventListController, 'weekEvents');
         $this->routes[] = new Route('GET  /weekEvents/help', $eventListController, 'weekEventsHelp');
 
-        $this->routes[] = new Route('GET  /events/guest/help', $eventListController, 'events_guest_help');
+        $this->routes[] = new Route('GET  /events/guest/help', $eventListController, 'eventsGuestHelp');
 
         return $this->routes;
     }

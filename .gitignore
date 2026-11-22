@@ -15,3 +15,4 @@ dev/.scannerwork/
 dev/phpstan-report.json
 dev/coverage.xml
 dev/junit.xml
+.repository-analysis/

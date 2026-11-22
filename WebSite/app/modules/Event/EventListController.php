@@ -26,6 +26,22 @@ final class EventListController extends AbstractController
         parent::__construct($application);
     }
 
+    public function eventsGuestHelp(): void
+    {
+        $user = $this->application->getConnectedUser();
+
+        $this->renderHelp(
+            'Help_EventsGuest',
+            fn($u) => $u->isAnybody(),
+            __FILE__,
+            __LINE__,
+            [
+                'hasAuthorization' => $user->isRedactor(),
+                'previousPage' => true,
+            ]
+        );
+    }
+
     public function nextEventsHelp(): void
     {
         $user = $this->application->getConnectedUser();
@@ -115,5 +131,21 @@ final class EventListController extends AbstractController
         );
 
         $this->views->render('Event/views/weekEvents.latte', $viewModel);
+    }
+
+    public function weekEventsHelp(): void
+    {
+        $user = $this->application->getConnectedUser();
+
+        $this->renderHelp(
+            'Help_WeekEvents',
+            fn($u) => $u->isAnybody(),
+            __FILE__,
+            __LINE__,
+            [
+                'hasAuthorization' => $user->isRedactor(),
+                'previousPage' => true,
+            ]
+        );
     }
 }
