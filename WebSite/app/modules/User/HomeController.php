@@ -5,23 +5,21 @@ declare(strict_types=1);
 namespace app\modules\User;
 
 use app\helpers\Application;
-use app\helpers\News;
-use app\helpers\Params;
-use app\helpers\TranslationManager;
 use app\helpers\To;
-use app\helpers\WebApp;
+use app\helpers\TranslationManager;
 use app\models\ArticleDataHelper;
 use app\models\CarouselDataHelper;
-use app\models\DesignDataHelper;
-use app\models\MetadataDataHelper;
 use app\models\PersonDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\Common\valueObjects\Person;
+use app\modules\Common\valueObjects\ArticleRow;
 use app\modules\Common\viewModels\HomeViewModel;
 use app\modules\Common\viewModels\SignpostViewModel;
-use app\modules\Common\valueObjects\SidebarMenuChild;
-use app\modules\Common\valueObjects\SidebarMenuItem;
+use app\modules\User\services\FeaturedArticleSelector;
+use app\modules\User\services\GuestLayoutParams;
+use app\modules\User\services\PendingItemsProvider;
+use app\modules\User\services\SidebarMenuBuilder;
+use app\modules\User\valueObjects\PendingItems;
 
 final class HomeController extends AbstractController
 {
@@ -29,11 +27,12 @@ final class HomeController extends AbstractController
         Application $application,
         private readonly ArticleDataHelper $articleDataHelper,
         private readonly SurveyDataHelper $surveyDataHelper,
-        private readonly DesignDataHelper $designDataHelper,
-        private readonly News $news,
         private readonly PersonDataHelper $personDataHelper,
-        private readonly MetadataDataHelper $metadataDataHelper,
-        private readonly CarouselDataHelper $carouselDataHelper
+        private readonly CarouselDataHelper $carouselDataHelper,
+        private readonly FeaturedArticleSelector $featuredArticleSelector,
+        private readonly SidebarMenuBuilder $sidebarMenuBuilder,
+        private readonly PendingItemsProvider $pendingItemsProvider,
+        private readonly GuestLayoutParams $guestLayoutParams
     ) {
         parent::__construct($application);
     }
@@ -45,142 +44,56 @@ final class HomeController extends AbstractController
         }
 
         $_SESSION['navbar'] = '';
-        $userPendingSurveys = $userPendingDesigns = [];
         $userEmail = is_string($_SESSION['user'] ?? null) ? $_SESSION['user'] : '';
-        $news = false;
-
         $lang = TranslationManager::getCurrentLanguage();
         $connectedUser = $this->application->getConnectedUser();
 
-        if ($userEmail) {
+        if ($userEmail !== '') {
             if ($connectedUser->person === null) {
                 unset($_SESSION['user']);
                 $this->errors->badRequest("Unknown user with this email address {$userEmail}", __FILE__, __LINE__);
                 return;
             }
-
-            $pendingSurveyResponses = $this->surveyDataHelper->getPendingSurveyResponses();
-            $userPendingSurveys = array_values(array_filter(
-                $pendingSurveyResponses,
-                static fn($item) => strcasecmp($item->email, $userEmail) === 0
-            ));
-
-            $pendingDesignResponses = $this->designDataHelper->getPendingDesignResponses();
-            /** @var list<object{designName: string, designDetail: string}> $userPendingDesigns */
-            $userPendingDesigns = array_values(array_filter(
-                $pendingDesignResponses,
-                static fn($item) => strcasecmp(To::str($item->Email), $userEmail) === 0
-            ));
-
-            $news = $this->news->anyNews($connectedUser);
+            $pending = $this->pendingItemsProvider->forUser($userEmail, $connectedUser);
         } else {
-            $navbarColors = $this->dataHelper->getNavbarColors();
-            Params::setParams(
-                [
-                    'href'               => '/user/sign/in',
-                    'userImg'            => '👻',
-                    'userEmail'          => '',
-                    'isAdmin'            => false,
-                    'currentVersion'     => Application::VERSION,
-                    'currentLanguage'    => $lang,
-                    'supportedLanguages' => TranslationManager::getSupportedLanguages(),
-                    'flag'               => TranslationManager::getFlag($lang),
-                    'isRedactor'         => false,
-                    'page'               => $connectedUser->getPage(),
-                    'currentPath'        => parse_url(
-                        is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '',
-                        PHP_URL_PATH
-                    ),
-                    'isMyclubWebSite'    => WebApp::isMyClubWebSite(),
-                    'navbarBgColor'      => $navbarColors->bgColor,
-                    'navbarInkColor'     => $navbarColors->inkColor,
-                    'navbarIconColor'    => $navbarColors->iconColor,
-                ],
-                $this->metadataDataHelper->isTestSite() && !empty($prodSiteUrl = $this->metadataDataHelper->getProdSiteUrl())
-                    ? $prodSiteUrl
-                    : null,
-                $connectedUser->person?->alert
-            );
+            $pending = PendingItems::none();
+            $this->guestLayoutParams->apply($lang, $connectedUser);
         }
+
         $latestArticlesCount = To::int($this->dataHelper->getSetting('Home_LatestArticlesCount', '10'));
         $featuredArticleId   = To::int($this->dataHelper->getSetting('Home_FeaturedArticleId', '0'));
-        $homeHeader          = $this->dataHelper->getLanguageText('Home_Header', $lang);
-        $homeFooter          = $this->dataHelper->getLanguageText('Home_Footer', $lang);
-        $articles            = $this->articleDataHelper->getLatestArticles($userEmail, $latestArticlesCount);
-
-        $latestArticle = null;
-        $displayArticleId = 0;
-
-        if (
-            $featuredArticleId > 0
-            && $this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $featuredArticleId)
-        ) {
-            $displayArticleId = $featuredArticleId;
-        } else {
-            $spotlight = $this->articleDataHelper->getSpotlightArticle();
-            if ($spotlight !== null) {
-                /** @var array{articleId: int, spotlightUntil: string} $spotlight */
-                $articleId = (int) $spotlight['articleId'];
-                if (
-                    $this->articleDataHelper->isUserAllowedToReadArticle($userEmail, $articleId)
-                    && strtotime($spotlight['spotlightUntil']) >= strtotime(date('Y-m-d'))
-                ) {
-                    $displayArticleId = $articleId;
-                }
-            }
-        }
-
-        if ($displayArticleId > 0) {
-            $latestArticle = $this->articleDataHelper->getWithAuthor($displayArticleId) ?: null;
-        }
-
-        if ($latestArticle === null && isset($articles['latestArticle'])) {
-            $latestArticle = $this->articleDataHelper->getWithAuthor(
-                $articles['latestArticle']->id
-            ) ?: null;
-        }
-
-        $footerArticleId = (int) $this->dataHelper->getSetting('Home_FooterArticleId', '0');
-
-        /** @var object{Title: string, Content: string}|null $footerArticle */
-        $footerArticle = $footerArticleId > 0
-            ? ($this->dataHelper->get('Article', ['Id' => $footerArticleId], 'Title, Content') ?: null)
-            : null;
+        $footerArticleId     = To::int($this->dataHelper->getSetting('Home_FooterArticleId', '0'));
+        $articles = $this->articleDataHelper->getLatestArticles($userEmail, $latestArticlesCount);
+        $latestArticle = $this->resolveLatestArticle(
+            $userEmail,
+            $featuredArticleId,
+            isset($articles['latestArticle']) ? $articles['latestArticle']->id : null
+        );
 
         $publishedBy = '';
-
-        if (
-            $latestArticle !== null
-            && $latestArticle->publishedBy !== $latestArticle->createdBy
-        ) {
-            $publishedBy = $this->personDataHelper->getPublisher(
-                $latestArticle->publishedBy
-            ) ?? '';
+        if ($latestArticle !== null && $latestArticle->publishedBy !== $latestArticle->createdBy) {
+            $publishedBy = $this->personDataHelper->getPublisher($latestArticle->publishedBy) ?? '';
         }
-
-        $latestArticleHasSurvey = $latestArticle !== null
-            && (bool) $this->surveyDataHelper->articleHasSurveyNotClosed($latestArticle->id);
-
-        $carouselItems = $latestArticle !== null
-            ? $this->carouselDataHelper->getCarouselItems($latestArticle->id)
-            : [];
 
         $viewModel = new HomeViewModel(
             latestArticle: $latestArticle,
             latestArticles: $articles['latestArticles'],
             latestArticlesCount: $latestArticlesCount,
-            homeHeader: $homeHeader,
-            homeFooter: $homeFooter,
+            homeHeader: $this->dataHelper->getLanguageText('Home_Header', $lang),
+            homeFooter: $this->dataHelper->getLanguageText('Home_Footer', $lang),
             navItems: $this->getNavItems($connectedUser->person?->email),
-            sidebarMenu: $this->getSidebarMenuItems($connectedUser->person),
+            sidebarMenu: $this->sidebarMenuBuilder->build($connectedUser->person),
             publishedBy: $publishedBy,
-            latestArticleHasSurvey: $latestArticleHasSurvey,
-            pendingSurveys: $userPendingSurveys,
-            pendingDesigns: $userPendingDesigns,
-            news: $news,
-            carouselItems: $carouselItems,
-            homeParagraphsCount: (int) $this->dataHelper->getSetting('Home_FeaturedArticleParagraphs', '1'),
-            footerArticle: $footerArticle,
+            latestArticleHasSurvey: $latestArticle !== null
+                && (bool) $this->surveyDataHelper->articleHasSurveyNotClosed($latestArticle->id),
+            pendingSurveys: $pending->surveys,
+            pendingDesigns: $pending->designs,
+            news: $pending->news,
+            carouselItems: $latestArticle !== null
+                ? $this->carouselDataHelper->getCarouselItems($latestArticle->id)
+                : [],
+            homeParagraphsCount: To::int($this->dataHelper->getSetting('Home_FeaturedArticleParagraphs', '1')),
+            footerArticle: $this->articleDataHelper->getFooterArticle($footerArticleId),
             layoutParams: $this->getAllParams([
                 'page' => $connectedUser->getPage(),
             ]),
@@ -213,81 +126,24 @@ final class HomeController extends AbstractController
         $this->views->render('Common/views/signpost.latte', $viewModel);
     }
 
-
-#region Privates functions
+    #region Privates functions
     /**
-     * @return list<SidebarMenuItem>
+     * Picks the featured or spotlight article, falling back to the latest published one.
      */
-    private function getSidebarMenuItems(?Person $person, bool $all = false): array
+    private function resolveLatestArticle(string $userEmail, int $featuredArticleId, ?int $latestArticleId): ?ArticleRow
     {
-        $userGroups = [];
-        if ($person !== null) {
-            $userGroups = $this->authorizationDataHelper->getUserGroups($person->email);
-        }
+        $displayArticleId = $this->featuredArticleSelector->selectId($userEmail, $featuredArticleId);
 
-        $navItems = $this->dataHelper->gets(
-            'MenuItem',
-            ['What' => 'sidebar'],
-            'Id, ParentId, Type, Label, Icon, Url, IdGroup, ForMembers, ForContacts, ForAnonymous',
-            'Position'
-        );
-
-        $filteredNavItems = [];
-        foreach ($navItems as $navItem) {
-            if (
-                ($person === null && $navItem->ForAnonymous == 1) ||
-                ($person !== null && $navItem->ForMembers == 1 &&
-                    (
-                        $navItem->IdGroup === null ||
-                        (!empty($userGroups) && in_array($navItem->IdGroup, $userGroups, true))
-                    )
-                ) ||
-                $all
-            ) {
-                $filteredNavItems[To::int($navItem->Id)] = $navItem;
+        if ($displayArticleId > 0) {
+            $article = $this->articleDataHelper->getWithAuthor($displayArticleId) ?: null;
+            if ($article !== null) {
+                return $article;
             }
         }
 
-        // Build structured menu from flat filtered list
-        $sidebarMenu = [];
-        foreach ($filteredNavItems as $navItem) {
-            if ($navItem->ParentId !== null) {
-                continue; // children are attached below
-            }
-
-            $sidebarMenu[] = match ($navItem->Type) {
-                'heading' => new SidebarMenuItem(
-                    type: 'heading',
-                    label: To::str($navItem->Label),
-                ),
-                'divider' => new SidebarMenuItem(type: 'divider'),
-                'link' => new SidebarMenuItem(
-                    type: 'link',
-                    label: To::str($navItem->Label),
-                    icon: $navItem->Icon !== null ? To::str($navItem->Icon) : null,
-                    url: $navItem->Url !== null ? To::str($navItem->Url) : null,
-                ),
-                'submenu' => new SidebarMenuItem(
-                    type: 'submenu',
-                    label: To::str($navItem->Label),
-                    icon: $navItem->Icon !== null ? To::str($navItem->Icon) : null,
-                    children: array_values(
-                        array_map(
-                            static fn($child) => new SidebarMenuChild(
-                                label: To::str($child->Label),
-                                url: $child->Url !== null ? To::str($child->Url) : null,
-                            ),
-                            array_filter(
-                                $filteredNavItems,
-                                static fn($child) => $child->ParentId === $navItem->Id
-                            )
-                        )
-                    ),
-                ),
-                default => Application::unreachable("Fatal error in file with navItemType=" . To::str($navItem->Type)),
-            };
-        }
-
-        return $sidebarMenu;
+        return $latestArticleId !== null
+            ? ($this->articleDataHelper->getWithAuthor($latestArticleId) ?: null)
+            : null;
     }
+    #endregion
 }

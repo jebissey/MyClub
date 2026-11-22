@@ -166,6 +166,23 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
     }
 
     /**
+     * Returns the title and content of the home page footer article, or null if none is configured.
+     *
+     * @return object{Title: string, Content: string}|null
+     */
+    public function getFooterArticle(int $articleId): ?object
+    {
+        if ($articleId <= 0) {
+            return null;
+        }
+
+        /** @var object{Title: string, Content: string}|false $article */
+        $article = $this->get('Article', ['Id' => $articleId], 'Title, Content');
+
+        return $article ?: null;
+    }
+
+    /**
      * @param list<int> $articleIds
      *
      * @return ArticleRow|null
