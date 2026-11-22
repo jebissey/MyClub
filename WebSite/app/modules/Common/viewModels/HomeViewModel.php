@@ -40,7 +40,7 @@ final readonly class HomeViewModel extends LayoutViewModel
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),
-            btnHistoryBack: true,
+            btnHistoryBack: false,
             btnPlus: false,
             btnParent: null,
         );
