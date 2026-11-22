@@ -5,11 +5,21 @@ declare(strict_types=1);
 namespace app\models;
 
 use stdClass;
+use app\helpers\Application;
 use app\helpers\To;
 use app\modules\Common\valueObjects\SidebarMenuRow;
 
 final class MenuDataHelper extends Data
 {
+    public function __construct(Application $application)
+    {
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
+    }
+
     /**
      * Returns every sidebar menu item, ordered by position.
      *

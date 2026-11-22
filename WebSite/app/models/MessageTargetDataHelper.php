@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use app\helpers\Application;
 use app\modules\Common\valueObjects\MessageTarget;
 use app\modules\Common\valueObjects\MessageTargetInfo;
 use app\modules\Event\valueObjects\EventCreatorSummaryRow;
 
-// Adapt the constructor/inheritance to match your other DataHelpers
 final class MessageTargetDataHelper extends Data
 {
+    public function __construct(Application $application)
+    {
+        parent::__construct(
+            $application->getPdo(),
+            $application->getErrorManager(),
+            $application->getPdoForLog()
+        );
+    }
+
     public function find(MessageTarget $target): ?MessageTargetInfo
     {
         return match (true) {
