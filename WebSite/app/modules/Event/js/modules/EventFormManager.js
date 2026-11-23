@@ -1,5 +1,6 @@
 import AttributeManager from "./AttributeManager.js";
 import NeedManager from "./NeedManager.js";
+import { t } from "/app/modules/Common/js/i18n.js";
 
 export default class EventFormManager {
     constructor(apiClient) {
@@ -22,8 +23,8 @@ export default class EventFormManager {
     }
 
     openCreateModal() {
-        document.getElementById('eventModalLabel').textContent = 'Créer un événement';
-        document.getElementById('submitEventBtn').textContent = 'Créer';
+        document.getElementById('eventModalLabel').textContent = t('events.form.create_title');
+        document.getElementById('submitEventBtn').textContent = t('events.form.create');
         this.formMode.value = 'create';
 
         const eventTypeId = document.getElementById('eventTypeInput')?.value;
@@ -41,30 +42,34 @@ export default class EventFormManager {
     }
 
     async openUpdateModal(event, attributes) {
-        document.getElementById('eventModalLabel').textContent = 'Mettre à jour l\'événement';
-        document.getElementById('submitEventBtn').textContent = 'Mettre à jour';
+        document.getElementById('eventModalLabel').textContent = t('events.form.update_title');
+        document.getElementById('submitEventBtn').textContent = t('events.form.update');
         this.formMode.value = 'update';
-        this.eventId.value = event.Id;
+        this.eventId.value = event.id;
 
         this.populateFormFields(event);
-        await this.attributeManager.loadForEvent(event.IdEventType, attributes);
-        await this.needManager.loadForEvent(event.Id);
+        await this.attributeManager.loadForEvent(event.idEventType, attributes);
+        await this.needManager.loadForEvent(event.id);
 
         new bootstrap.Modal(this.modal).show();
     }
 
     populateFormFields(event) {
-        document.getElementById('summaryInput').value = event.Summary;
-        document.getElementById('descriptionInput').value = event.Description;
-        document.getElementById('locationInput').value = event.Location;
-        document.getElementById('eventTypeInput').value = event.IdEventType;
-        document.getElementById('maxParticipantsInput').value = event.MaxParticipants || 0;
-        document.getElementById('audienceInput').value = event.Audience || 'ClubMembersOnly';
+        document.getElementById('summaryInput').value = event.summary ?? '';
+        document.getElementById('descriptionInput').value = event.description ?? '';
+        document.getElementById('locationInput').value = event.location ?? '';
+        document.getElementById('eventTypeInput').value = event.idEventType;
+        document.getElementById('maxParticipantsInput').value = event.maxParticipants || 0;
+        document.getElementById('audienceInput').value = event.audience || 'ClubMembersOnly';
 
-        const startDate = new Date(event.StartTime);
-        document.getElementById('dateInput').value = startDate.toISOString().split('T')[0];
-        document.getElementById('startTimeInput').value = startDate.toTimeString().split(' ')[0].slice(0, 5);
-        document.getElementById('durationInput').value = (event.Duration / 3600).toFixed(1);
+        // startTime comes as local ISO 8601 without timezone ("2026-11-29T06:15:00").
+        // Build the string in local time to avoid the one-day shift that
+        // toISOString() (which converts to UTC) would cause.
+        const startDate = new Date(event.startTime);
+        document.getElementById('dateInput').value = this._formatLocalDate(startDate);
+        document.getElementById('startTimeInput').value = this._formatLocalTime(startDate);
+
+        document.getElementById('durationInput').value = (event.duration / 3600).toFixed(1);
     }
 
     async handleSubmit(e) {
@@ -81,11 +86,11 @@ export default class EventFormManager {
                 location: document.getElementById('locationInput').value,
                 idEventType: document.getElementById('eventTypeInput').value,
                 attributes: this.attributeManager.getSelectedIds(),
-                maxParticipants: parseInt(document.getElementById('maxParticipantsInput').value),
+                maxParticipants: parseInt(document.getElementById('maxParticipantsInput').value, 10),
                 audience: document.getElementById('audienceInput').value,
                 needs: this.needManager.getSelectedNeeds(),
                 startTime: `${dateValue}T${timeValue}:00`,
-                duration: parseInt(document.getElementById('durationInput').value * 3600)
+                duration: parseInt(document.getElementById('durationInput').value, 10) * 3600
             };
         };
 
@@ -96,7 +101,40 @@ export default class EventFormManager {
             bootstrap.Modal.getInstance(this.modal).hide();
             window.location.reload();
         } else {
-            alert('Erreur: ' + (result.message || 'Erreur inconnue'));
+            // The server may return a localized message in result.message;
+            // if not, fall back to a generic localized "unknown error".
+            const detail = result.message || t('events.js.unknown_error');
+            alert(`${t('events.js.error')}: ${detail}`);
         }
+    }
+
+    /**
+     * Formats a Date as YYYY-MM-DD in local time (compatible with <input type="date">).
+     * We avoid toISOString() because it converts to UTC and may shift the date by one day.
+     * @param {Date} date
+     * @returns {string}
+     */
+    _formatLocalDate(date) {
+        if (!(date instanceof Date) || isNaN(date.getTime())) {
+            return '';
+        }
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    /**
+     * Formats a Date as HH:MM in local time (compatible with <input type="time">).
+     * @param {Date} date
+     * @returns {string}
+     */
+    _formatLocalTime(date) {
+        if (!(date instanceof Date) || isNaN(date.getTime())) {
+            return '00:00';
+        }
+        const h = String(date.getHours()).padStart(2, '0');
+        const m = String(date.getMinutes()).padStart(2, '0');
+        return `${h}:${m}`;
     }
 }

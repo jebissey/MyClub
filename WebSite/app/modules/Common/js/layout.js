@@ -46,7 +46,7 @@ function initSaveGuard() {
 
     window.addEventListener('beforeunload', e => {
         if (formModified) {
-            const message = window.t('unsavedWarning');
+            const message = window.t('layout.save_guard.unsaved_warning');
             e.returnValue = message;
             return message;
         }
@@ -137,7 +137,7 @@ function showIosInstallBanner() {
 
     if (!isIos || isStandalone || dismissed) return;
 
-    const installMessage = window.t('iosInstallMessage');
+    const installMessage = window.t('layout.pwa.ios_install.message');
 
     const banner = document.createElement('div');
     banner.id = 'ios-install-banner';

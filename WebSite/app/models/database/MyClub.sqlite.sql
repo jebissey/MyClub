@@ -22075,10 +22075,15 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (2419,'Help_NextEvents','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>'),
  (2420,'Help_EventsGuest','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>'),
  (2421,'Help_WeekEvents','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>'),
- (2422,'Help_EventsCrossTab','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>');
+ (2422,'Help_EventsCrossTab','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>','<div class="container mt-4" style="max-width: 720px;"><p>TODO</p></div>'),
+ (2423,'events.form.create_title','Create event','Créer un événement','Utwórz wydarzenie'),
+ (2424,'events.form.update_title','Update event','Mettre à jour l''événement','Aktualizuj wydarzenie'),
+ (2425,'events.form.update','Update','Mettre à jour','Aktualizuj'),
+ (2426,'events.js.error','Error','Erreur','Błąd'),
+ (2427,'events.js.unknown_error','Unknown error','Erreur inconnue','Nieznany błąd');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',104,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',105,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

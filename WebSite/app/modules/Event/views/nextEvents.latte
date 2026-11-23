@@ -187,5 +187,14 @@
 {/block}
 
 {block scripts}
+    <script>
+        window.i18n ??= {};
+        window.i18n['events.form.create_title'] = {='events.form.create_title'|translate};
+        window.i18n['events.form.update_title'] = {='events.form.update_title'|translate};
+        window.i18n['events.form.create'] = {='events.form.create'|translate};
+        window.i18n['events.form.update'] = {='events.form.update'|translate};
+        window.i18n['events.js.error'] = {='events.js.error'|translate};
+        window.i18n['events.js.unknown_error'] = {='events.js.unknown_error'|translate};
+    </script>
     <script type="module" src="{='/app/modules/Event/js/EventManager.js'|version}"></script>
 {/block}

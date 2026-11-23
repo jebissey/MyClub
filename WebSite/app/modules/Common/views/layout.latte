@@ -90,16 +90,20 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="{='/app/modules/Common/js/layout.js'|version}"></script>
+
+    {* Global translations used by layout.js. Populated synchronously here so that
+       window.i18n is ready before any deferred module (i18n.js, layout.js) executes. *}
     <script>
-        window.i18n = {
-            unsavedWarning:    {='layout.save_guard.unsaved_warning'|translate},
-            iosInstallMessage: {='layout.pwa.ios_install.message'|translate}
-        };
-        window.t = function(key) {
-            return window.i18n?.[key] ?? key;
-        };
+        window.i18n ??= {};
+        window.i18n['layout.save_guard.unsaved_warning'] = {='layout.save_guard.unsaved_warning'|translate};
+        window.i18n['layout.pwa.ios_install.message']    = {='layout.pwa.ios_install.message'|translate};
     </script>
+
+    {* i18n.js exposes `window.t` and the ES export `t`. Loaded before layout.js
+       so that window.t is defined when layout.js runs at DOMContentLoaded. *}
+    <script type="module" src="{='/app/modules/Common/js/i18n.js'|version}"></script>
+    <script type="module" src="{='/app/modules/Common/js/layout.js'|version}"></script>
+
     {block scripts}{/block}
 </body>
 </html>
