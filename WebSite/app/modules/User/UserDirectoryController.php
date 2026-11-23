@@ -35,6 +35,7 @@ final class UserDirectoryController extends AbstractController
 
         $filterMyGroups = $this->getQueryBool('my') ?? false;
         $filterWithAuth = $this->getQueryBool('auth') ?? false;
+
         // "Self-enrollable" and "with authorization" are mutually exclusive; "auth" wins
         $filterSelfEnroll = $filterWithAuth ? false : ($this->getQueryBool('self') ?? false);
         $selectedGroup = $this->getQueryInt('group');
@@ -45,20 +46,14 @@ final class UserDirectoryController extends AbstractController
             ? $this->memberDirectoryDataHelper->getPersonsInGroupForDirectory($selectedGroup)
             : $this->memberDirectoryDataHelper->getPersonsForDirectory();
 
-        $loggedPersonRow = $this->dataHelper->get(
-            'Member',
-            ['Id' => $person->id],
-            'InPresentationDirectory'
-        );
-        /** @var object{InPresentationDirectory: bool|int|string|null}|false $loggedPersonRow */
-        $loggedPersonInPresentationDirectory = $loggedPersonRow !== false
-            && (bool) ($loggedPersonRow->InPresentationDirectory ?? false);
+        $loggedPersonInPresentationDirectory =
+            $this->memberDirectoryDataHelper->isInPresentationDirectory($person->id);
 
         // Preserve the active filters in every generated URL
         $queryFilters = array_filter([
-            'my'   => $filterMyGroups   ? '1' : null,
+            'my'   => $filterMyGroups ? '1' : null,
             'self' => $filterSelfEnroll ? '1' : null,
-            'auth' => $filterWithAuth   ? '1' : null,
+            'auth' => $filterWithAuth ? '1' : null,
         ]);
 
         $allGroupsUrl = '/user/directory' . ($queryFilters ? '?' . http_build_query($queryFilters) : '');
@@ -82,24 +77,12 @@ final class UserDirectoryController extends AbstractController
             groups: $groups,
             groupCounts: $this->groupDataHelper->getGroupCount(),
             selectedGroup: $selectedGroup,
-            countOfMessages: count($this->dataHelper->gets('Message', [
-                '"From"' => 'User',
-                'GroupId' => $selectedGroup
-            ], '*')),
+            countOfMessages: $this->memberDirectoryDataHelper->getMessageCountForGroup($selectedGroup),
             userIsInGroup: $this->personGroupDataHelper->isPersonInGroup($person->id, $selectedGroup ?? 0),
             countOfLocatedMembers: count($persons),
-            numberOfPublicMembers: count($this->dataHelper->gets('Member', [
-                'InPresentationDirectory' => 1,
-                'Inactivated' => 0,
-                'MyPublicDataInPresentationDirectory IS NOT NULL AND MyPublicDataInPresentationDirectory != ""' => null
-            ], 'Id')),
-            totalWithPresentation: count($this->dataHelper->gets('Member', [
-                'InPresentationDirectory' => 1,
-                'Inactivated' => 0
-            ], 'Id')),
-            totalPersons: count($this->dataHelper->gets('Member', [
-                'Inactivated' => 0
-            ], 'Id')),
+            numberOfPublicMembers: $this->memberDirectoryDataHelper->getPublicPresentationMemberCount(),
+            totalWithPresentation: $this->memberDirectoryDataHelper->getPresentationMemberCount(),
+            totalPersons: $this->memberDirectoryDataHelper->getActiveMemberCount(),
             filterMyGroups: $filterMyGroups,
             filterSelfEnroll: $filterSelfEnroll,
             filterWithAuth: $filterWithAuth,

@@ -244,4 +244,78 @@ final class MemberDirectoryDataHelper extends Data
 
         return $result;
     }
+
+    /**
+     * Indicates whether the connected member appears in the presentation directory.
+     */
+    public function isInPresentationDirectory(int $memberId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT InPresentationDirectory FROM Member WHERE Id = ?'
+        );
+        $stmt->execute([$memberId]);
+
+        $value = $stmt->fetchColumn();
+
+        return $value !== false && (bool) $value;
+    }
+
+    /**
+     * Returns the number of messages associated with a group.
+     */
+    public function getMessageCountForGroup(?int $groupId): int
+    {
+        if ($groupId === null) {
+            return 0;
+        }
+
+        $stmt = $this->pdo->prepare(
+            'SELECT COUNT(*) FROM Message WHERE "From" = ? AND GroupId = ?'
+        );
+        $stmt->execute(['User', $groupId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Returns the number of active members who have public presentation data.
+     */
+    public function getPublicPresentationMemberCount(): int
+    {
+        $stmt = $this->pdo->query(
+            'SELECT COUNT(*) FROM Member
+         WHERE InPresentationDirectory = 1
+           AND Inactivated = 0
+           AND MyPublicDataInPresentationDirectory IS NOT NULL
+           AND MyPublicDataInPresentationDirectory != ""'
+        );
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Returns the number of active members who appear in the presentation directory.
+     */
+    public function getPresentationMemberCount(): int
+    {
+        $stmt = $this->pdo->query(
+            'SELECT COUNT(*) FROM Member
+         WHERE InPresentationDirectory = 1
+           AND Inactivated = 0'
+        );
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Returns the total number of active members.
+     */
+    public function getActiveMemberCount(): int
+    {
+        $stmt = $this->pdo->query(
+            'SELECT COUNT(*) FROM Member WHERE Inactivated = 0'
+        );
+
+        return (int) $stmt->fetchColumn();
+    }
 }
