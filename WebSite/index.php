@@ -31,10 +31,18 @@ use app\modules\Webmaster\services\MaintenanceService;
 $startTime = microtime(true);
 
 $logDir = __DIR__ . '/var/tracy/log';
-if (!is_dir($logDir)) mkdir($logDir, 0777, true);
-$local_access = ($_SERVER['REMOTE_ADDR'] === '127.0.0.1' || $_SERVER['REMOTE_ADDR'] === '::1');
-if ($local_access) Debugger::enable(Debugger::Development, $logDir);
-else               Debugger::enable(Debugger::Production, $logDir);
+if (!is_dir($logDir)) {
+    mkdir($logDir, 0777, true);
+}
+
+$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+$isTestDevice = is_string($userAgent) && stripos($userAgent, 'TestDevice') !== false;
+$isLocalAccess = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
+Debugger::enable(
+    $isLocalAccess && !$isTestDevice ? Debugger::Development : Debugger::Production,
+    $logDir
+);
+Debugger::enable(Debugger::Production, $logDir);
 
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $application = Application::init();

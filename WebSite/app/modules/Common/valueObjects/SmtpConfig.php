@@ -7,18 +7,13 @@ namespace app\modules\Common\valueObjects;
 final readonly class SmtpConfig
 {
     public function __construct(
-        public string $method,           // 'mail' | 'smtp' | 'brevo'
-        // SMTP / PHPMailer
+        public string $method, // 'mail' | 'smtp'
         public string $host = '',
         public string $username = '',
         public string $password = '',
         public string $from = '',
         public int $port = 587,
         public string $encryption = 'tls',
-        // Brevo
-        public string $brevoApikey = '',
-        public string $brevoSenderEmail = '',
-        // Quotas
         public ?int $dailyLimit = null,
         public ?int $monthlyLimit = null,
     ) {
@@ -27,9 +22,8 @@ final readonly class SmtpConfig
     public function getSenderAddress(string $connectedUserEmail): string
     {
         return match ($this->method) {
-            'smtp'    => $this->from,
-            'brevo'   => $this->brevoSenderEmail,
-            default   => $connectedUserEmail,
+            'smtp' => $this->from,
+            default => $connectedUserEmail,
         };
     }
 }

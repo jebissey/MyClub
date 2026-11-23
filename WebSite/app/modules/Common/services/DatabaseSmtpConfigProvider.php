@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\modules\Common\services;
 
-use app\modules\Common\services\CredentialService;
 use app\modules\Common\valueObjects\SmtpConfig;
 
 final class DatabaseSmtpConfigProvider
@@ -24,11 +23,15 @@ final class DatabaseSmtpConfigProvider
         if ($this->resolved) {
             return $this->cached;
         }
+
         $this->resolved = true;
+
         $method = $this->credentials->get('email', 'method');
+
         if (!$method) {
             return null;
         }
+
         $this->cached = new SmtpConfig(
             $method,
             $this->credentials->get(self::SERVICE, 'host') ?? '',
@@ -37,8 +40,6 @@ final class DatabaseSmtpConfigProvider
             $this->credentials->get(self::SERVICE, 'from') ?? '',
             (int) ($this->credentials->get(self::SERVICE, 'port') ?? 587),
             $this->credentials->get(self::SERVICE, 'encryption') ?? 'tls',
-            $this->credentials->get('brevo', 'api_key') ?? '',
-            $this->credentials->get('brevo', 'sender') ?? '',
             (int) ($this->credentials->get('email', 'daily_limit') ?? 0),
             (int) ($this->credentials->get('email', 'monthly_limit') ?? 0),
         );

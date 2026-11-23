@@ -36,8 +36,6 @@ final class CredentialsController extends TableController
                 smtpHost: $this->credentials->get('smtp', 'host'),
                 smtpPort: $this->credentials->get('smtp', 'port'),
                 smtpEncryption: $this->credentials->get('smtp', 'encryption'),
-                brevoApiKey: $this->credentials->get('brevo', 'api_key'),
-                brevoSender: $this->credentials->get('brevo', 'sender'),
                 dailyLimit: $this->credentials->get('email', 'daily_limit'),
                 monthlyLimit: $this->credentials->get('email', 'monthly_limit'),
                 layoutParams: $this->getAllParams([
@@ -60,11 +58,6 @@ final class CredentialsController extends TableController
                 'smtpHost'         => FilterInputRule::Uri->value,
                 'smtpPort'         => FilterInputRule::Integer->value,
                 'smtpEncryption'   => FilterInputRule::Text->value,
-                'mailjetApiKey'    => FilterInputRule::Text->value,
-                'mailjetApiSecret' => FilterInputRule::Text->value,
-                'mailjetSender'    => FilterInputRule::Email->value,
-                'brevoApiKey'      => FilterInputRule::Text->value,
-                'brevoSender'      => FilterInputRule::Email->value,
                 'dailyLimit'       => FilterInputRule::Integer->value,
                 'monthlyLimit'     => FilterInputRule::Integer->value,
             ];

@@ -30,7 +30,7 @@ use app\modules\Common\valueObjects\Person;
 
 final class Application
 {
-    public const VERSION = '0.102.3';
+    public const VERSION = '0.102.4';
 
     // @formatter:off
     public const  EMOJI_LIST = [

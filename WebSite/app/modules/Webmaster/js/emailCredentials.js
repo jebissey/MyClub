@@ -1,3 +1,4 @@
+
 class EmailCredentials {
 
     constructor() {
@@ -6,7 +7,6 @@ class EmailCredentials {
         this.sections = {
             mail: { alert: 'alert-mail', fields: null },
             smtp: { alert: 'alert-smtp', fields: 'fields-smtp' },
-            brevo: { alert: 'alert-brevo', fields: 'fields-brevo' },
         };
 
         this.smtpFields = [
@@ -18,15 +18,9 @@ class EmailCredentials {
             'smtpEncryption'
         ];
 
-        this.brevoFields = [
-            'brevoApiKey',
-            'brevoSender'
-        ];
-
         this.limitPlaceholders = {
             mail: { daily: '0', monthly: '0' },
             smtp: { daily: '0', monthly: '0' },
-            brevo: { daily: '300', monthly: '9000' },
         };
     }
 
@@ -41,7 +35,6 @@ class EmailCredentials {
         this.applyMethod(this.select.value);
 
         this.setupPasswordToggle('togglePassword', 'smtpPassword');
-        this.setupPasswordToggle('toggleBrevoKey', 'brevoApiKey');
     }
 
     applyMethod(method) {
@@ -62,11 +55,15 @@ class EmailCredentials {
         });
 
         this.setRequired(this.smtpFields, method === 'smtp');
-        this.setRequired(this.brevoFields, method === 'brevo');
 
-        const placeholders = this.limitPlaceholders[method] ?? { daily: '0', monthly: '0' };
+        const placeholders = this.limitPlaceholders[method] ?? {
+            daily: '0',
+            monthly: '0'
+        };
+
         const dailyEl = document.getElementById('dailyLimit');
         const monthlyEl = document.getElementById('monthlyLimit');
+
         if (dailyEl) dailyEl.placeholder = placeholders.daily;
         if (monthlyEl) monthlyEl.placeholder = placeholders.monthly;
     }

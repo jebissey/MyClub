@@ -26,13 +26,8 @@ final class EmailCredentialsSaver
         $this->credentials->set('email', 'daily_limit', To::str($input['dailyLimit'] ?? null, '0'));
         $this->credentials->set('email', 'monthly_limit', To::str($input['monthlyLimit'] ?? null, '0'));
 
-        switch ($method) {
-            case 'smtp':
-                $this->saveSmtp($input);
-                break;
-            case 'brevo':
-                $this->saveBrevo($input);
-                break;
+        if ($method === 'smtp') {
+            $this->saveSmtp($input);
         }
     }
 
@@ -45,13 +40,6 @@ final class EmailCredentialsSaver
         $this->credentials->set('smtp', 'host', To::str($input['smtpHost'] ?? null, ''));
         $this->credentials->set('smtp', 'port', To::str($input['smtpPort'] ?? null, '587'));
         $this->credentials->set('smtp', 'encryption', To::str($input['smtpEncryption'] ?? null, 'tls'));
-    }
-
-    /** @param array<string, mixed> $input */
-    private function saveBrevo(array $input): void
-    {
-        $this->setIfProvided('brevo', 'api_key', $input['brevoApiKey'] ?? null);
-        $this->credentials->set('brevo', 'sender', To::str($input['brevoSender'] ?? null, ''));
     }
 
     /**
