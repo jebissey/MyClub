@@ -289,8 +289,11 @@ final class MemberDirectoryDataHelper extends Data
            AND MyPublicDataInPresentationDirectory IS NOT NULL
            AND MyPublicDataInPresentationDirectory != ""'
         );
+        if ($stmt === false) {
+            return 0;
+        }
 
-        return (int) $stmt->fetchColumn();
+        return To::int($stmt->fetchColumn());
     }
 
     /**
@@ -303,8 +306,11 @@ final class MemberDirectoryDataHelper extends Data
          WHERE InPresentationDirectory = 1
            AND Inactivated = 0'
         );
+        if ($stmt === false) {
+            return 0;
+        }
 
-        return (int) $stmt->fetchColumn();
+        return To::int($stmt->fetchColumn());
     }
 
     /**
@@ -315,7 +321,10 @@ final class MemberDirectoryDataHelper extends Data
         $stmt = $this->pdo->query(
             'SELECT COUNT(*) FROM Member WHERE Inactivated = 0'
         );
+        if ($stmt === false) {
+            return 0;
+        }
 
-        return (int) $stmt->fetchColumn();
+        return To::int($stmt->fetchColumn());
     }
 }

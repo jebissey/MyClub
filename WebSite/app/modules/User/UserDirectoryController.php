@@ -128,7 +128,7 @@ final class UserDirectoryController extends AbstractController
         $viewModel = new UsersMapViewModel(
             locationData: $locationData,
             membersCount: count($locationData),
-            navItems: $this->getNavItems($this->application->getConnectedUser()?->person?->email),
+            navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
             title: $this->translate('directory.map.public_title'),
             isPublic: true,
             maxZoom: 11,
