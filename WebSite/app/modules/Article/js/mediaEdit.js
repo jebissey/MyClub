@@ -1,11 +1,10 @@
 import ApiClient from '../../Common/js/ApiClient.js';
 import ImageHelper from '../../Common/js/ImageHelper.js';
+import { t } from '/app/modules/Common/js/i18n.js';
 
 const api = new ApiClient();
-const t = (key) => window.t?.(key) ?? key;
 
 // ── Edit image modal ──────────────────────────────────────────────────────────
-
 const editModal = new bootstrap.Modal(document.getElementById('editImageModal'));
 const editImageEl = document.getElementById('editImageEl');
 const editFilename = document.getElementById('editImageFilename');
@@ -14,13 +13,13 @@ const maxSizeInput = document.getElementById('maxSizeInput');
 const resetCropBtn = document.getElementById('resetCropBtn');
 const saveEditBtn = document.getElementById('saveEditBtn');
 const cropDimensions = document.getElementById('cropDimensions');
-
 let cropper = null;
 let currentEditPath = null;
 
 function setEditStatus(message, type = 'info') {
     editStatus.innerHTML = `<div class="alert alert-${type} py-2">${message}</div>`;
 }
+
 function clearEditStatus() {
     editStatus.innerHTML = '';
 }
@@ -51,9 +50,7 @@ let modalShown = false;
 
 function tryInitCropper() {
     if (!imageLoaded || !modalShown) return;
-
     if (cropper) { cropper.destroy(); cropper = null; }
-
     cropper = new Cropper(editImageEl, {
         viewMode: 1,
         autoCropArea: 1,
@@ -81,17 +78,14 @@ document.querySelectorAll('.edit-image-btn').forEach((btn) => {
         clearEditStatus();
         cropDimensions.textContent = '';
         maxSizeInput.value = 1200;
-
         imageLoaded = false;
         modalShown = false;
         if (cropper) { cropper.destroy(); cropper = null; }
-
         editImageEl.onload = () => {
             imageLoaded = true;
             tryInitCropper();
         };
         editImageEl.src = btn.dataset.url + '?_=' + Date.now();
-
         editModal.show();
     });
 });
@@ -103,45 +97,34 @@ document.getElementById('editImageModal').addEventListener('hidden.bs.modal', ()
 
 saveEditBtn.addEventListener('click', async () => {
     if (!cropper) return;
-
     const maxPx = Math.min(parseInt(maxSizeInput.value, 10) || 1200, 1200);
-
     // 1. Get cropped canvas at natural resolution
     let canvas = cropper.getCroppedCanvas();
-
     // 2. Resize + convert via ImageHelper
     canvas = ImageHelper.resizeCanvas(canvas, maxPx);
-
     const ext = currentEditPath.split('.').pop().toLowerCase();
     const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
     const quality = mime === 'image/jpeg' ? 0.92 : undefined;
-
     const imageData = canvas.toDataURL(mime, quality);
-
     saveEditBtn.disabled = true;
     saveEditBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + t('saving');
-
     try {
         const response = await api.post('/api/media/editImage', {
             path: currentEditPath,
             imageData,
             maxSize: maxPx,
         });
-
         if (response.success === false) {
             setEditStatus(t('editError'), 'danger');
             return;
         }
-
         setEditStatus(t('editSaved'), 'success');
-
         // Refresh the thumbnail in the table row
         const row = document.querySelector(`tr .edit-image-btn[data-path="${CSS.escape(currentEditPath)}"]`)?.closest('tr');
         if (row) {
             const thumb = row.querySelector('td:first-child img');
             if (thumb) thumb.src = thumb.src.split('?')[0] + '?_=' + Date.now();
         }
-
         setTimeout(() => editModal.hide(), 1200);
     } finally {
         saveEditBtn.disabled = false;

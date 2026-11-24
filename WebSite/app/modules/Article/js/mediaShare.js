@@ -1,15 +1,13 @@
 import ApiClient from '../../Common/js/ApiClient.js';
+import { t } from '/app/modules/Common/js/i18n.js';
 
 const api = new ApiClient();
-const t = (key) => window.t?.(key) ?? key;
 
 // ── Copy URL buttons ──────────────────────────────────────────────────────────
-
 document.querySelectorAll('.copy-url-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
         const url = btn.dataset.url;
         await navigator.clipboard.writeText(url);
-
         const original = btn.innerHTML;
         btn.innerHTML = '<i class="bi bi-check"></i>';
         btn.title = t('urlCopied');
@@ -21,27 +19,21 @@ document.querySelectorAll('.copy-url-btn').forEach((btn) => {
 });
 
 // ── Delete file buttons ───────────────────────────────────────────────────────
-
 document.querySelectorAll('.delete-file-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
         if (!confirm(t('deleteConfirm'))) return;
-
         const [year, month, ...rest] = btn.dataset.path.split('/');
         const filename = rest.join('/');
-
         const data = await api.post(`/api/media/delete/${year}/${month}/${filename}`, {});
-
         if (data.success === false) {
             alert(data.message || t('deleteError'));
             return;
         }
-
         btn.closest('tr').remove();
     });
 });
 
 // ── Share modal ───────────────────────────────────────────────────────────────
-
 const shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
 const shareFileName = document.getElementById('shareFileName');
 const shareStatus = document.getElementById('shareStatus');
@@ -53,7 +45,6 @@ const membersOnly = document.getElementById('members-only-checkbox');
 const createShareBtn = document.getElementById('createShareBtn');
 const deleteShareBtn = document.getElementById('deleteShareBtn');
 const copyShareLink = document.getElementById('copyShareLink');
-
 let currentPath = null;
 
 function setStatus(message, type = 'info', detail = '') {
@@ -71,7 +62,6 @@ async function loadShareState(path) {
         setStatus(t('shareError'), 'danger');
         return;
     }
-
     const data = response.data;
     if (data.shared) {
         groupSelect.value = data.idGroup ?? '';
@@ -90,10 +80,8 @@ async function loadShareState(path) {
 function updateSharedColumn(path, isShared) {
     const row = document.querySelector(`tr .share-file-btn[data-path="${CSS.escape(path)}"]`)?.closest('tr');
     if (!row) return;
-
-    const sharedCell = row.querySelector('td:nth-child(7)'); // 7ème colonne = "Partagé"
+    const sharedCell = row.querySelector('td:nth-child(7)'); // 7th column = "Shared"
     if (!sharedCell) return;
-
     if (isShared) {
         sharedCell.innerHTML = `<span class="text-success">Oui</span>`;
     } else {
@@ -118,12 +106,10 @@ createShareBtn.addEventListener('click', async () => {
         idGroup: groupSelect.value,
         membersOnly: membersOnly.checked ? 1 : 0,
     });
-
     if (response.success === false) {
         setStatus(t('shareError'), 'danger');
         return;
     }
-
     shareLinkInput.value = response.data.link;
     shareLinkBox.classList.remove('d-none');
     deleteShareBtn.classList.remove('d-none');
@@ -141,12 +127,10 @@ deleteShareBtn.addEventListener('click', async () => {
         setStatus(t('shareError'), 'danger', err.message);
         return;
     }
-
     if (!data?.success) {
         setStatus(t('shareError'), 'danger');
         return;
     }
-
     shareLinkBox.classList.add('d-none');
     deleteShareBtn.classList.add('d-none');
     createShareBtn.classList.remove('d-none');
