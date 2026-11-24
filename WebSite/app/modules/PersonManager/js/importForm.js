@@ -1,10 +1,5 @@
 import ApiClient from '../../Common/js/ApiClient.js';
-
-const t = (key, params = {}) =>
-    Object.entries(params).reduce(
-        (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
-        window.i18n?.[key] ?? key
-    );
+import { t } from '/app/modules/Common/js/i18n.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const api = new ApiClient();

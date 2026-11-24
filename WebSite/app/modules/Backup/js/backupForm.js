@@ -1,8 +1,4 @@
-const t = (key, params = {}) =>
-    Object.entries(params).reduce(
-        (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
-        window.i18n?.[key] ?? key
-    );
+import { t } from "/app/modules/Common/js/i18n.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     initBackup();
@@ -80,7 +76,7 @@ function initBackup() {
 
             showStatus(t('backup.js.done'), 'success');
         } catch (error) {
-            // AbortError : l'utilisateur a fermé la fenêtre d'enregistrement
+            // AbortError: the user closed the save dialog
             if (error.name !== 'AbortError') {
                 console.error(error);
                 showStatus(`${t('backup.js.error')} (${error.message})`, 'danger');

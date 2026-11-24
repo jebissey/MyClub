@@ -154,16 +154,15 @@
 	{/if}
 
 </div>
+{/block}
 
 {block scripts}
 <script>
-	window.i18n     = {=json_encode($translations)|noescape};
-	window.t        = k => window.i18n?.[k] ?? k;
+        window.i18n ??= {};
+        Object.assign(window.i18n, {=json_encode($translations)|noescape});
 </script>
 <script n:syntax="off">
-	window.haWidget = {widgetUrl: {=$widgetUrl !== null ? json_encode($widgetUrl) : 'null'|noescape}};
+        window.haWidget = {widgetUrl: {=$widgetUrl !== null ? json_encode($widgetUrl) : 'null'|noescape}};
 </script>
 <script type="module" src="{='/app/modules/Membership/js/membership.js'|version}"></script>
-{/block}
-
 {/block}

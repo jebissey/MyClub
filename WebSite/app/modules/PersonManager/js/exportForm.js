@@ -1,13 +1,8 @@
 import DragDropManager from '../../Common/js/DragDropManager.js';
 import ApiClient from '../../Common/js/ApiClient.js';
+import { t } from '/app/modules/Common/js/i18n.js';
 
 const apiClient = new ApiClient();
-
-const t = (key, params = {}) =>
-    Object.entries(params).reduce(
-        (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
-        window.i18n?.[key] ?? key
-    );
 
 const MAX_ODS_MB = 10;
 
@@ -88,7 +83,7 @@ function initExport() {
 
             showStatus(t('export.js.done'), 'success');
         } catch (error) {
-            // AbortError : l'utilisateur a fermé la fenêtre d'enregistrement
+            // AbortError: the user closed the save dialog
             if (error.name !== 'AbortError') {
                 console.error(error);
                 showStatus(`${t('export.js.error')} (${error.message})`, 'danger');
@@ -110,19 +105,19 @@ function initOdsImport() {
 
     const manager = new DragDropManager({
         containerSelector: '#odsDropZone',
-        itemSelector: '.ods-no-draggable-item', // aucun élément à déplacer : seuls des fichiers sont déposés
+        itemSelector: '.ods-no-draggable-item', // no element to move: only files are dropped
         dragOverClass: 'drag-over',
         onDrop: (_item, _container, event) => {
             const file = event.dataTransfer?.files?.[0];
             if (file) {
                 processFile(file);
             }
-            return false; // empêche le manager d'ajouter un élément à la zone
+            return false; // prevent the manager from adding an element to the zone
         },
     });
     manager.init();
 
-    // Un fichier lâché à côté de la zone ne doit pas être ouvert par le navigateur
+    // A file dropped outside the zone must not be opened by the browser
     ['dragover', 'drop'].forEach((type) => {
         window.addEventListener(type, (event) => {
             if (event.dataTransfer?.types?.includes('Files')) {
@@ -131,7 +126,7 @@ function initOdsImport() {
         });
     });
 
-    // Alternative au glisser-déposer : clic ou clavier
+    // Alternative to drag-and-drop: click or keyboard
     zone.addEventListener('click', () => fileInput.click());
     zone.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -160,14 +155,14 @@ function initOdsImport() {
 
         setBusy(true);
         try {
-            // 1) Aperçu : le serveur rejoue l'import puis annule tout
+            // 1) Preview: the server replays the import then rolls everything back
             const preview = await upload(file, true);
             const changes = preview.created + preview.updated + preview.deactivated + preview.reactivated;
             if (changes === 0) {
                 renderResults(preview, false);
                 return;
             }
-            // 2) Confirmation, puis import réel
+            // 2) Confirmation, then real import
             if (!window.confirm(t('export.import.confirm', preview))) {
                 return;
             }
@@ -240,7 +235,7 @@ function initOdsImport() {
             details.textContent = t('import.result.details');
             box.appendChild(details);
 
-            // textContent : les messages contiennent des emails saisis par l'utilisateur
+            // textContent: messages contain emails typed by the user
             const list = document.createElement('ul');
             list.className = 'small mb-0';
             list.style.maxHeight = '20rem';

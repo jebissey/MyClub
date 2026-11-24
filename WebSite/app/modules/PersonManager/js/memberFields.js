@@ -15,9 +15,7 @@ list.addEventListener('click', (event) => {
     const isExistingField = keyInput && keyInput.value !== '';
 
     if (isExistingField) {
-        const message = window.t?.('delete_confirm')
-            ?? window.i18n?.delete_confirm
-            ?? 'Êtes-vous sûr de vouloir supprimer ce champ ? Toutes les valeurs déjà saisies dans ce champ seront définitivement supprimées.';
+        const message = window.t('delete_confirm');
         if (!confirm(message)) return;
     }
 

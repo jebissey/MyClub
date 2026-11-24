@@ -22080,10 +22080,22 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (2424,'events.form.update_title','Update event','Mettre à jour l''événement','Aktualizuj wydarzenie'),
  (2425,'events.form.update','Update','Mettre à jour','Aktualizuj'),
  (2426,'events.js.error','Error','Erreur','Błąd'),
- (2427,'events.js.unknown_error','Unknown error','Erreur inconnue','Nieznany błąd');
+ (2427,'events.js.unknown_error','Unknown error','Erreur inconnue','Nieznany błąd'),
+ (2428,'media.manager.edit.save','Save','Enregistrer','Zapisz'),
+ (2429,'person_manager.member_fields.delete_confirm','Are you sure you want to delete this field? All values already entered in this field will be permanently deleted.','Êtes-vous sûr de vouloir supprimer ce champ ? Toutes les valeurs déjà saisies dans ce champ seront définitivement supprimées.','Czy na pewno chcesz usunąć to pole? Wszystkie już wprowadzone wartości w tym polu zostaną trwale usunięte.'),
+ (2430,'loan.calendar.record.loan_date','Loan date','Date d''emprunt','Data wypożyczenia'),
+ (2431,'loan.calendar.record.due_date','Due date','Date de retour','Termin zwrotu'),
+ (2432,'loan.calendar.record.status','Status','Statut','Status'),
+ (2433,'loan.calendar.record.status.active','Active','En cours','Aktywny'),
+ (2434,'loan.calendar.record.status.returned','Returned','Rendu','Zwrócony'),
+ (2435,'loan.calendar.record.status.overdue','Overdue','En retard','Zaległy'),
+ (2436,'loan.calendar.record.status.cancelled','Cancelled','Annulé','Anulowany'),
+ (2437,'loan.calendar.reservation.date','Date','Date','Data'),
+ (2438,'loan.calendar.reservation.start','Start','Début','Początek'),
+ (2439,'loan.calendar.reservation.end','End','Fin','Koniec');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',105,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',106,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

@@ -54,6 +54,18 @@
 {/block}
 
 {block scripts}
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script>
+    window.i18n ??= {};
+    window.i18n['loan.calendar.record.loan_date']           = {='loan.calendar.record.loan_date'|translate};
+    window.i18n['loan.calendar.record.due_date']            = {='loan.calendar.record.due_date'|translate};
+    window.i18n['loan.calendar.record.status']              = {='loan.calendar.record.status'|translate};
+    window.i18n['loan.calendar.record.status.active']       = {='loan.calendar.record.status.active'|translate};
+    window.i18n['loan.calendar.record.status.returned']     = {='loan.calendar.record.status.returned'|translate};
+    window.i18n['loan.calendar.record.status.overdue']      = {='loan.calendar.record.status.overdue'|translate};
+    window.i18n['loan.calendar.record.status.cancelled']    = {='loan.calendar.record.status.cancelled'|translate};
+    window.i18n['loan.calendar.reservation.date']           = {='loan.calendar.reservation.date'|translate};
+    window.i18n['loan.calendar.reservation.start']          = {='loan.calendar.reservation.start'|translate};
+    window.i18n['loan.calendar.reservation.end']            = {='loan.calendar.reservation.end'|translate};
+</script>
 <script type="module" src="{='/app/modules/Loan/js/calendar.js'|version}"></script>
 {/block}

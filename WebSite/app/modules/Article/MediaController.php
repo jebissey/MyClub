@@ -160,6 +160,7 @@ final class MediaController extends AbstractController
                 'deleteSuccess' => ($this->t)('media.manager.delete.success'),
                 'deleteError'   => ($this->t)('media.manager.delete.error'),
                 // mediaEdit.js
+                'editSave'      => ($this->t)('media.manager.edit.save'),
                 'editSaved'     => ($this->t)('media.manager.edit.saved'),
                 'editError'     => ($this->t)('media.manager.edit.error'),
                 'saving'        => ($this->t)('media.manager.edit.saving'),

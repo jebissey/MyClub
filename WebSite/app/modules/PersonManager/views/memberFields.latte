@@ -68,5 +68,9 @@
 {/block}
 
 {block scripts}
+    <script>
+        window.i18n ??= {};
+        window.i18n['delete_confirm'] = {='person_manager.member_fields.delete_confirm'|translate};
+    </script>
     <script type="module" src="{='/app/modules/PersonManager/js/memberFields.js'|version}"></script>
 {/block}

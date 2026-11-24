@@ -28,9 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         events: async (info, successCb, failureCb) => {
             const start = info.startStr.slice(0, 10);
             const end   = info.endStr.slice(0, 10);
-
             const json = await api.get(`/api/loan/calendar?start=${start}&end=${end}`);
-
             if (json.success) {
                 successCb(json.data);
             } else {
@@ -40,9 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         eventClick: (info) => {
             const props = info.event.extendedProps;
             const ev    = info.event;
-
             detailTitle.textContent = ev.title;
-
             let html = '';
             if (props.type === 'loan') {
                 const start = ev.startStr;
@@ -50,11 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? new Date(ev.end.getTime() - 86400000).toISOString().slice(0, 10)
                     : start;
                 html = `
-                    <p class="mb-1"><strong>${window.t('record.loan_date')} :</strong> ${start}</p>
-                    <p class="mb-1"><strong>${window.t('record.due_date')} :</strong> ${endDate}</p>
-                    <p class="mb-0"><strong>${window.t('record.status')} :</strong>
+                    <p class="mb-1"><strong>${window.t('loan.calendar.record.loan_date')} :</strong> ${start}</p>
+                    <p class="mb-1"><strong>${window.t('loan.calendar.record.due_date')} :</strong> ${endDate}</p>
+                    <p class="mb-0"><strong>${window.t('loan.calendar.record.status')} :</strong>
                         <span class="badge ${badgeClass(props.status)}">
-                            ${window.t('record.status.' + props.status)}
+                            ${window.t('loan.calendar.record.status.' + props.status)}
                         </span>
                     </p>`;
             } else {
@@ -62,9 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const s = ev.startStr.slice(11, 16);
                 const e = ev.endStr ? ev.endStr.slice(11, 16) : '';
                 html = `
-                    <p class="mb-1"><strong>${window.t('reservation.date')} :</strong> ${d}</p>
-                    <p class="mb-1"><strong>${window.t('reservation.start')} :</strong> ${s}</p>
-                    <p class="mb-0"><strong>${window.t('reservation.end')} :</strong> ${e}</p>`;
+                    <p class="mb-1"><strong>${window.t('loan.calendar.reservation.date')} :</strong> ${d}</p>
+                    <p class="mb-1"><strong>${window.t('loan.calendar.reservation.start')} :</strong> ${s}</p>
+                    <p class="mb-0"><strong>${window.t('loan.calendar.reservation.end')} :</strong> ${e}</p>`;
             }
             detailBody.innerHTML = html;
             modal.show();
