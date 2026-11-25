@@ -52,11 +52,11 @@ final readonly class ErrorManager
             while (ob_get_level() > 0) {
                 ob_end_clean();
             }
-            $this->application->getFlight()->response()
-                ->clearBody()
-                ->status($code->value)
-                ->write($message)
-                ->send();
+            $response = $this->application->getFlight()->response();
+            $response->clearBody();
+            $response->status($code->value);
+            $response->write($message);
+            $response->send();
             exit;
         }
         $translation = $this->languagesDataHelper->translate('Error' . $code->value);
