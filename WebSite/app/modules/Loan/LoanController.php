@@ -37,7 +37,6 @@ final class LoanController extends AbstractController
         }
 
         $viewModel = new LoanCalendarViewModel(
-            i18n: $this->doTranslations(),
             activeTab: 'calendar',
             layoutParams: $this->getAllParams([]),
         );
@@ -55,7 +54,6 @@ final class LoanController extends AbstractController
 
         $viewModel = new LoanDesignerViewModel(
             items: $this->loanItemDataHelper->getAllItems(),
-            i18n: $this->doTranslations(),
             activeTab: 'designer',
             layoutParams: $this->getAllParams([]),
         );
@@ -95,7 +93,6 @@ final class LoanController extends AbstractController
             loans: $this->loanRecordDataHelper->getAllLoans(),
             loanItems: $this->loanItemDataHelper->getActiveItems('loan'),
             persons: $this->personDataHelper->getMemberOptions(),
-            i18n: $this->doTranslations(),
             activeTab: 'manager',
             layoutParams: $this->getAllParams([]),
         );
@@ -118,79 +115,10 @@ final class LoanController extends AbstractController
             persons: $this->personDataHelper->getMemberOptions(),
             isManager: $user->isLoanManager(),
             currentUserId: $userId,
-            i18n: $this->doTranslations(),
             activeTab: 'user',
             layoutParams: $this->getAllParams([]),
         );
 
         $this->views->render('Loan/views/user.latte', $viewModel);
-    }
-
-    #region Private methods
-    /**
-     * @return array<string, string>
-     */
-    private function doTranslations(): array
-    {
-        $keys = [
-            'nav.designer',
-            'nav.manager',
-            'nav.user',
-            'nav.calendar',
-            'item.title',
-            'item.add',
-            'item.edit',
-            'item.name',
-            'item.description',
-            'item.type',
-            'item.type.loan',
-            'item.type.reservation',
-            'item.type.both',
-            'item.quantity',
-            'item.active',
-            'item.delete_confirm',
-            'item.no_items',
-            'record.title',
-            'record.add',
-            'record.item',
-            'record.borrower',
-            'record.lender',
-            'record.loan_date',
-            'record.due_date',
-            'record.return_date',
-            'record.returned_to',
-            'record.quantity',
-            'record.notes',
-            'record.status',
-            'record.status.active',
-            'record.status.returned',
-            'record.status.overdue',
-            'record.status.cancelled',
-            'record.return_action',
-            'record.no_records',
-            'reservation.title',
-            'reservation.add',
-            'reservation.item',
-            'reservation.date',
-            'reservation.start',
-            'reservation.end',
-            'reservation.quantity',
-            'reservation.notes',
-            'reservation.status',
-            'reservation.status.active',
-            'reservation.status.cancelled',
-            'reservation.cancel_confirm',
-            'reservation.no_reservations',
-            'calendar.title',
-            'calendar.loans',
-            'calendar.reservations',
-            'msg.saved',
-            'msg.deleted',
-            'msg.returned',
-            'msg.cancelled',
-            'msg.error',
-            'msg.qty_exceeded',
-        ];
-        return $this->translations($keys, 'loan.');
     }
 }

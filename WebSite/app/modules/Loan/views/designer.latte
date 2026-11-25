@@ -84,7 +84,12 @@
 
 {block scripts}
 <script>
-    Object.assign(window.i18n, {=$i18n});
+    window.i18n ??= {};
+    window.i18n['loan.msg.error']           = {='loan.msg.error'|translate};
+    window.i18n['loan.item.add']            = {='loan.item.add'|translate};
+    window.i18n['loan.item.edit']           = {='loan.item.edit'|translate};
+    window.i18n['loan.item.delete_confirm'] = {='loan.item.delete_confirm'|translate};
+    window.i18n['loan.msg.deleted']         = {='loan.msg.deleted'|translate};
 </script>
 <script type="module" src="{='/app/modules/Loan/js/designer.js'|version}"></script>
 {/block}

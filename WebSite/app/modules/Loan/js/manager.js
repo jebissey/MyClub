@@ -1,3 +1,4 @@
+import { t } from '/app/modules/Common/js/i18n.js';
 /**
  * manager.js – gestion des prêts à emporter (LoanManager)
  */
@@ -19,7 +20,7 @@ async function api(url, method = 'GET', body = null) {
     if (body) opts.body = JSON.stringify(body);
     const res  = await fetch(url, opts);
     const json = await res.json();
-    if (!json.success) throw new Error(json.message ?? window.t('msg.error'));
+    if (!json.success) throw new Error(json.message ?? t('loan.msg.error'));
     return json.data;
 }
 
@@ -37,7 +38,7 @@ async function checkAvailability() {
         let url = `/api/loan/availability/${itemId}?type=loan&date=${date}&dueDate=${due}`;
         if (excludeId) url += `&excludeId=${excludeId}`;
         const data = await api(url);
-        el.textContent = `${window.t('availability.available')} : ${data.available}`;
+        el.textContent = `${t('loan.availability.available')} : ${data.available}`;
         el.className   = `form-text ${data.available > 0 ? 'text-success' : 'text-danger'}`;
     } catch (_) { el.textContent = ''; }
 }
@@ -49,7 +50,7 @@ async function checkAvailability() {
 // ── Modal nouveau prêt ─────────────────────────────────────────────────────
 
 function openAddLoan() {
-    document.getElementById('modalLoanLabel').textContent = window.t('record.add');
+    document.getElementById('modalLoanLabel').textContent = t('loan.record.add');
     document.getElementById('loanId').value       = '';
     document.getElementById('loanItem').value     = '';
     document.getElementById('loanQty').value      = 1;
@@ -65,7 +66,7 @@ function openAddLoan() {
 async function openEditLoan(id) {
     try {
         const loan = await api(`/api/loan/record/${id}`);
-        document.getElementById('modalLoanLabel').textContent = window.t('record.title');
+        document.getElementById('modalLoanLabel').textContent = t('loan.record.title');
         document.getElementById('loanId').value       = loan.Id;
         document.getElementById('loanItem').value     = loan.ItemId;
         document.getElementById('loanQty').value      = loan.QuantityLent;
@@ -138,7 +139,7 @@ document.getElementById('btnConfirmReturn').addEventListener('click', async () =
     try {
         await api(`/api/loan/record/return/${id}`, 'POST', { returnDate, returnedToId: returnedTo });
         modalReturn.hide();
-        showAlert(window.t('msg.returned'), 'success');
+        showAlert(t('loan.msg.returned'), 'success');
         location.reload();
     } catch (e) {
         showAlert(e.message);
@@ -153,7 +154,7 @@ async function cancelLoan(id) {
     if (!confirm('Annuler ce prêt ?')) return;
     try {
         await api(`/api/loan/record/cancel/${id}`, 'POST');
-        showAlert(window.t('msg.cancelled'), 'success');
+        showAlert(t('loan.msg.cancelled'), 'success');
         location.reload();
     } catch (e) {
         showAlert(e.message);

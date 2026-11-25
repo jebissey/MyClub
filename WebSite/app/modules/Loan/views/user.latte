@@ -166,7 +166,13 @@
     window.isManager      = {=json_encode($isLoanManager)|noescape};
     window.currentUserId  = {$currentUserId};
 
-    Object.assign(window.i18n, {=$i18n});
+    window.i18n ??= {};
+    window.i18n['loan.msg.error']                  = {='loan.msg.error'|translate};
+    window.i18n['loan.availability.available']     = {='loan.availability.available'|translate};
+    window.i18n['loan.reservation.add']            = {='loan.reservation.add'|translate};
+    window.i18n['loan.reservation.title']          = {='loan.reservation.title'|translate};
+    window.i18n['loan.reservation.cancel_confirm'] = {='loan.reservation.cancel_confirm'|translate};
+    window.i18n['loan.msg.cancelled']              = {='loan.msg.cancelled'|translate};
 </script>
 <script type="module" src="{='/app/modules/Loan/js/user.js'|version}"></script>
 {/block}

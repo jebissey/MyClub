@@ -1,3 +1,4 @@
+import { t } from '/app/modules/Common/js/i18n.js';
 /**
  * user.js – réservations sur place (tout utilisateur connecté)
  */
@@ -18,7 +19,7 @@ async function api(url, method = 'GET', body = null) {
     if (body) opts.body = JSON.stringify(body);
     const res  = await fetch(url, opts);
     const json = await res.json();
-    if (!json.success) throw new Error(json.message ?? window.t('msg.error'));
+    if (!json.success) throw new Error(json.message ?? t('loan.msg.error'));
     return json.data;
 }
 
@@ -37,7 +38,7 @@ async function checkResAvailability() {
         let url = `/api/loan/availability/${itemId}?type=reservation&date=${date}&start=${start}&end=${end}`;
         if (excludeId) url += `&excludeId=${excludeId}`;
         const data = await api(url);
-        el.textContent = `${window.t('availability.available')} : ${data.available}`;
+        el.textContent = `${t('loan.availability.available')} : ${data.available}`;
         el.className   = `form-text ${data.available > 0 ? 'text-success' : 'text-danger'}`;
     } catch (_) { el.textContent = ''; }
 }
@@ -49,7 +50,7 @@ async function checkResAvailability() {
 // ── Ouverture modal ────────────────────────────────────────────────────────
 
 function openAdd() {
-    document.getElementById('modalResLabel').textContent = window.t('reservation.add');
+    document.getElementById('modalResLabel').textContent = t('loan.reservation.add');
     document.getElementById('resId').value    = '';
     document.getElementById('resItem').value  = '';
     document.getElementById('resQty').value   = 1;
@@ -69,7 +70,7 @@ function openAdd() {
 async function openEdit(id) {
     try {
         const res = await api(`/api/loan/reservation/${id}`);
-        document.getElementById('modalResLabel').textContent = window.t('reservation.title');
+        document.getElementById('modalResLabel').textContent = t('loan.reservation.title');
         document.getElementById('resId').value    = res.Id;
         document.getElementById('resItem').value  = res.ItemId;
         document.getElementById('resQty').value   = res.QuantityReserved;
@@ -137,10 +138,10 @@ document.getElementById('btnSaveRes').addEventListener('click', async () => {
 // ── Annulation ─────────────────────────────────────────────────────────────
 
 async function cancelReservation(id) {
-    if (!confirm(window.t('reservation.cancel_confirm'))) return;
+    if (!confirm(t('loan.reservation.cancel_confirm'))) return;
     try {
         await api(`/api/loan/reservation/cancel/${id}`, 'POST');
-        showAlert(window.t('msg.cancelled'), 'success');
+        showAlert(t('loan.msg.cancelled'), 'success');
         location.reload();
     } catch (e) {
         showAlert(e.message);

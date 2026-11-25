@@ -15,7 +15,6 @@ final readonly class LoanUserViewModel extends LayoutViewModel
      * @param list<LoanReservationRow> $reservations
      * @param list<LoanItemRow> $reservationItems
      * @param list<PersonOptionRow> $persons
-     * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
@@ -24,7 +23,6 @@ final readonly class LoanUserViewModel extends LayoutViewModel
         public array $persons,
         public bool $isManager,
         public int $currentUserId,
-        public array $i18n,
         public string $activeTab,
         array $layoutParams = []
     ) {

@@ -1,3 +1,4 @@
+import { t } from '/app/modules/Common/js/i18n.js';
 /**
  * designer.js – gestion du catalogue matériel (LoanDesigner)
  */
@@ -18,14 +19,14 @@ async function api(url, method = 'GET', body = null) {
     if (body) opts.body = JSON.stringify(body);
     const res  = await fetch(url, opts);
     const json = await res.json();
-    if (!json.success) throw new Error(json.message ?? window.t('msg.error'));
+    if (!json.success) throw new Error(json.message ?? t('loan.msg.error'));
     return json.data;
 }
 
 // ── Ouverture modal ────────────────────────────────────────────────────────
 
 function openAdd() {
-    document.getElementById('modalItemLabel').textContent = window.t('item.add');
+    document.getElementById('modalItemLabel').textContent = t('loan.item.add');
     document.getElementById('itemId').value          = '';
     document.getElementById('itemName').value        = '';
     document.getElementById('itemDescription').value = '';
@@ -38,7 +39,7 @@ function openAdd() {
 async function openEdit(id) {
     try {
         const item = await api(`/api/loan/item/${id}`);
-        document.getElementById('modalItemLabel').textContent = window.t('item.edit');
+        document.getElementById('modalItemLabel').textContent = t('loan.item.edit');
         document.getElementById('itemId').value          = item.Id;
         document.getElementById('itemName').value        = item.Name;
         document.getElementById('itemDescription').value = item.Description;
@@ -81,11 +82,11 @@ document.getElementById('btnSaveItem').addEventListener('click', async () => {
 // ── Suppression ────────────────────────────────────────────────────────────
 
 async function deleteItem(id, name) {
-    if (!confirm(`${window.t('item.delete_confirm')}\n« ${name} »`)) return;
+    if (!confirm(`${t('loan.item.delete_confirm')}\n« ${name} »`)) return;
     try {
         await api(`/api/loan/item/delete/${id}`, 'POST');
         document.querySelector(`tr[data-id="${id}"]`)?.remove();
-        showAlert(window.t('msg.deleted'), 'success');
+        showAlert(t('loan.msg.deleted'), 'success');
     } catch (e) {
         showAlert(e.message);
     }

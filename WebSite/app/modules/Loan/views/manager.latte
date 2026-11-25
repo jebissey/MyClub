@@ -225,7 +225,13 @@
 
 {block scripts}
     <script>
-        Object.assign(window.i18n, {=$i18n});
+        window.i18n ??= {};
+        window.i18n['loan.msg.error']              = {='loan.msg.error'|translate};
+        window.i18n['loan.availability.available'] = {='loan.availability.available'|translate};
+        window.i18n['loan.record.add']             = {='loan.record.add'|translate};
+        window.i18n['loan.record.title']           = {='loan.record.title'|translate};
+        window.i18n['loan.msg.returned']           = {='loan.msg.returned'|translate};
+        window.i18n['loan.msg.cancelled']          = {='loan.msg.cancelled'|translate};
     </script>
 
     <script type="module" src="{='/app/modules/Loan/js/manager.js'|version}"></script>

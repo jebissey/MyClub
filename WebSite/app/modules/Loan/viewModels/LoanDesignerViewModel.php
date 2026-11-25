@@ -11,12 +11,10 @@ final readonly class LoanDesignerViewModel extends LayoutViewModel
 {
     /**
      * @param list<LoanItemRow> $items
-     * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
         public array $items,
-        public array $i18n,
         public string $activeTab,
         array $layoutParams = []
     ) {
