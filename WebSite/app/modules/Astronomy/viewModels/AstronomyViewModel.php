@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace app\modules\Astronomy\viewModels;
 
-use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Games\viewModels\GameLayoutViewModel;
 
-final readonly class AstronomyViewModel extends LayoutViewModel
+final readonly class AstronomyViewModel extends GameLayoutViewModel
 {
     /**
      * @param array<int, mixed> $navItems
@@ -14,20 +14,19 @@ final readonly class AstronomyViewModel extends LayoutViewModel
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(
-        public readonly float $latitude,
-        public readonly float $longitude,
-        public readonly string $locationName,
-        public readonly ?bool $locationSaved,
-        public readonly string $currentDate,
-        public readonly array $navItems,
-        public readonly array $i18n,
-        public readonly array $layoutParams,
+        public float $latitude,
+        public float $longitude,
+        public string $locationName,
+        public ?bool $locationSaved,
+        public string $currentDate,
+        public array $navItems,
+        public array $i18n,
+        public array $layoutParams,
     ) {
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
-            btnHistoryBack: true,
-            btnParent: "/games",
-            btnPlus: false,
+            layoutParams: $layoutParams,
+            category: 'other', // Astronomy lives under "Other games" in the sidebar
+            btnParent: '/games',
         );
     }
 }
