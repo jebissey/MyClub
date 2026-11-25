@@ -18,7 +18,7 @@
                 <ul class="nav flex-column ms-3 collapse collapse-submenu {if $category === 'arcade'}show{/if}"
                     id="submenuArcade">
                     <li class="nav-item">
-                        <a class="nav-link" href="/game/leapfrog">
+                        <a class="nav-link{if $activeItem === 'leapfrog'} active{/if}" href="/game/leapfrog">
                             {='gameManager.sidebar.arcade.leapfrog'|translate}
                         </a>
                     </li>
@@ -38,7 +38,7 @@
                 <ul class="nav flex-column ms-3 collapse collapse-submenu {if $category === 'puzzle'}show{/if}"
                     id="submenuPuzzle">
                     <li class="nav-item">
-                        <a class="nav-link" href="/game/makethetarget">
+                        <a class="nav-link{if $activeItem === 'makethetarget'} active{/if}" href="/game/makethetarget">
                             {='gameManager.sidebar.puzzle.makethetarget'|translate}
                         </a>
                     </li>
@@ -58,8 +58,13 @@
                 <ul class="nav flex-column ms-3 collapse collapse-submenu {if $category === 'other'}show{/if}"
                     id="submenuOther">
                     <li class="nav-item">
-                        <a class="nav-link" href="/astronomy">
+                        <a class="nav-link{if $activeItem === 'astronomy'} active{/if}" href="/astronomy">
                             {='gameManager.sidebar.other.astronomy'|translate}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link{if $activeItem === 'exercises'} active{/if}" href="/exercises">
+                            {='gameManager.sidebar.other.exercises'|translate}
                         </a>
                     </li>
                 </ul>

@@ -8,13 +8,13 @@ use app\modules\Common\valueObjects\DataTableTypes;
 use app\modules\Common\valueObjects\MenuItemWithParentRow;
 use app\modules\Common\valueObjects\Person;
 use app\modules\Common\valueObjects\TableRow;
-use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Games\viewModels\GameLayoutViewModel;
 
 /**
  * @phpstan-import-type TableColumn from DataTableTypes
  * @phpstan-import-type TableFilter from DataTableTypes
  */
-final readonly class ExercisesIndexViewModel extends LayoutViewModel
+final readonly class ExercisesIndexViewModel extends GameLayoutViewModel
 {
     /**
      * @param list<TableRow> $exercises
@@ -34,16 +34,15 @@ final readonly class ExercisesIndexViewModel extends LayoutViewModel
         public array $columns,
         public string $resetUrl,
         public Person|false $userConnected,
-        public string $layout,
         public array $navItems,
         public array $extraParams,
         array $layoutParams,
     ) {
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
-            btnHistoryBack: true,
+            layoutParams: $layoutParams,
+            category: 'other',
             btnParent: '/designer',
-            btnPlus: false,
+            activeItem: 'exercises',
         );
     }
 }

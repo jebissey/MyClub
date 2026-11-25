@@ -114,7 +114,8 @@ function initSidebar() {
 
     document.querySelectorAll('.collapse-submenu').forEach(submenu => {
         if (submenu.querySelector('.nav-link.active')) {
-            new bootstrap.Collapse(submenu, { toggle: true });
+            // Make sure the submenu is open without toggling it: the server may already have rendered it with "show"
+            bootstrap.Collapse.getOrCreateInstance(submenu, { toggle: false }).show();
         }
     });
 }

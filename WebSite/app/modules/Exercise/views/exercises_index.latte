@@ -1,4 +1,4 @@
-{extends $layout}
+{extends ../../Games/views/gameManager.latte}
 
 {block title}Exercises{/block}
 
@@ -134,5 +134,5 @@
 {/block}
 
 {block scripts}
-    <script src="{='/app/modules/Exercise/js/exercises.js'|version}"></script>
+    <script type="module" src="{='/app/modules/Exercise/js/editor.js'|version}"></script>
 {/block}

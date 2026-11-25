@@ -25,8 +25,9 @@ final readonly class AstronomyViewModel extends GameLayoutViewModel
     ) {
         parent::__construct(
             layoutParams: $layoutParams,
-            category: 'other', // Astronomy lives under "Other games" in the sidebar
+            category: 'other',
             btnParent: '/games',
+            activeItem: 'astronomy',
         );
     }
 }

@@ -107,7 +107,6 @@ final class ExerciseController extends TableController
             columns: $columns,
             resetUrl: '/exercises',
             userConnected: $connectedUser->person ?? false,
-            layout: $this->getLayout(),
             navItems: $this->getNavItems($connectedUser->person?->email),
             extraParams: [],
             layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),

@@ -22080,10 +22080,11 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (2462,'messages','Messages','Messages','Wiadomości'),
  (2463,'auth.forgot_password.email.subject','Password reset request','Demande de réinitialisation du mot de passe','Prośba o zresetowanie hasła'),
  (2464,'auth.forgot_password.email.body','To reset your password, click the following link:','Pour réinitialiser votre mot de passe, cliquez sur le lien suivant :','Aby zresetować hasło, kliknij poniższy link:'),
- (2465,'events.calendar.welcome.block','<p>Welcome to the events calendar. Here you can view scheduled events and their details.</p>','<p>Bienvenue dans le calendrier des événements. Vous pouvez consulter ici les événements programmés et leurs détails.</p>','<p>Witamy w kalendarzu wydarzeń. Możesz tutaj przeglądać zaplanowane wydarzenia i ich szczegóły.</p>');
+ (2465,'events.calendar.welcome.block','<p>Welcome to the events calendar. Here you can view scheduled events and their details.</p>','<p>Bienvenue dans le calendrier des événements. Vous pouvez consulter ici les événements programmés et leurs détails.</p>','<p>Witamy w kalendarzu wydarzeń. Możesz tutaj przeglądać zaplanowane wydarzenia i ich szczegóły.</p>'),
+ (2466,'gameManager.sidebar.other.exercises','Exercises','Exercices','Ćwiczenia');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',107,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',109,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),
