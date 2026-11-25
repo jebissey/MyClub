@@ -122,5 +122,9 @@
 {/block}
 
 {block scripts}
+    <script>
+        window.i18n ??= {};
+        window.i18n['article.index.spotlight_date_required'] = {='article.index.spotlight_date_required'|translate};
+    </script>
     <script src="{='/app/modules/Article/js/articles.js'|version}"></script>
 {/block}

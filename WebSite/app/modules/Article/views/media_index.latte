@@ -186,7 +186,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 
 <script>
-Object.assign(window.i18n, {=$i18n});
+    window.i18n ??= {};
+    window.i18n['media.manager.share.url_copied']    = {='media.manager.share.url_copied'|translate};
+    window.i18n['media.manager.share.link_copied']   = {='media.manager.share.link_copied'|translate};
+    window.i18n['media.manager.share.created']       = {='media.manager.share.created'|translate};
+    window.i18n['media.manager.share.deleted']       = {='media.manager.share.deleted'|translate};
+    window.i18n['media.manager.share.error']         = {='media.manager.share.error'|translate};
+    window.i18n['media.manager.delete.confirm']      = {='media.manager.delete.confirm'|translate};
+    window.i18n['media.manager.delete.success']      = {='media.manager.delete.success'|translate};
+    window.i18n['media.manager.delete.error']        = {='media.manager.delete.error'|translate};
+    window.i18n['media.manager.edit.save']           = {='media.manager.edit.save'|translate};
+    window.i18n['media.manager.edit.saved']          = {='media.manager.edit.saved'|translate};
+    window.i18n['media.manager.edit.error']          = {='media.manager.edit.error'|translate};
+    window.i18n['media.manager.edit.saving']         = {='media.manager.edit.saving'|translate};
 </script>
 <script type="module" src="{='/app/modules/Article/js/mediaShare.js'|version}"></script>
 <script type="module" src="{='/app/modules/Article/js/mediaEdit.js'|version}"></script>

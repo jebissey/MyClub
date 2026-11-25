@@ -149,22 +149,6 @@ final class MediaController extends AbstractController
             unusedOnly: $criteria->unusedOnly,
             baseUrl: WebApp::getBaseUrl(),
             groups: $this->getActiveGroups(),
-            i18n: [
-                // mediaShare.js
-                'urlCopied'     => ($this->t)('media.manager.share.url_copied'),
-                'linkCopied'    => ($this->t)('media.manager.share.link_copied'),
-                'shareCreated'  => ($this->t)('media.manager.share.created'),
-                'shareDeleted'  => ($this->t)('media.manager.share.deleted'),
-                'shareError'    => ($this->t)('media.manager.share.error'),
-                'deleteConfirm' => ($this->t)('media.manager.delete.confirm'),
-                'deleteSuccess' => ($this->t)('media.manager.delete.success'),
-                'deleteError'   => ($this->t)('media.manager.delete.error'),
-                // mediaEdit.js
-                'editSave'      => ($this->t)('media.manager.edit.save'),
-                'editSaved'     => ($this->t)('media.manager.edit.saved'),
-                'editError'     => ($this->t)('media.manager.edit.error'),
-                'saving'        => ($this->t)('media.manager.edit.saving'),
-            ],
             layoutParams: $this->getAllParams([
                 'page' => $connectedUser->getPage(),
                 'isEditor' => $connectedUser->isEditor(),

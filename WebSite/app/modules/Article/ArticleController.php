@@ -195,11 +195,6 @@ final class ArticleController extends ArticleAccessController
             navItems: $this->getNavItems($connectedUser->person->email),
             publishedBy: $this->publisherName($article->publishedBy, $article->createdBy),
             carouselItems: $this->carouselDataHelper->getCarouselItems($id),
-            i18n: [
-                'editorNotReady' => ($this->t)('article.edit.error.editor_not_ready'),
-                'titleRequired' => ($this->t)('article.edit.error.title_required'),
-                'contentRequired' => ($this->t)('article.edit.error.content_required'),
-            ],
             layoutParams: $this->getAllParams([]),
         );
 

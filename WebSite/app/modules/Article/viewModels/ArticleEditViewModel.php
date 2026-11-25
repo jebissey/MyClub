@@ -19,7 +19,6 @@ final readonly class ArticleEditViewModel extends LayoutViewModel
      * @param object|null $hasOrder
      * @param list<MenuItemWithParentRow> $navItems
      * @param list<CarouselItemRow> $carouselItems
-     * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
     public function __construct(
@@ -32,7 +31,6 @@ final readonly class ArticleEditViewModel extends LayoutViewModel
         public array $navItems,
         public ?string $publishedBy,
         public array $carouselItems,
-        public array $i18n,
         array $layoutParams
     ) {
         parent::__construct(

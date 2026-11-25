@@ -32,7 +32,7 @@ function initializeModalFeatures() {
         form.addEventListener('submit', function (e) {
             if (spotlightCheckbox.checked && !spotlightedUntilInput.value) {
                 e.preventDefault();
-                alert(window.i18n.spotlightDateRequired);
+                alert(window.t('article.index.spotlight_date_required'));
             }
         });
     }

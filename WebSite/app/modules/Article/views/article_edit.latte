@@ -116,7 +116,10 @@
         const ARTICLE_ID = {$article->id};
         const isEditor = {$isEditor};
 
-        Object.assign(window.i18n, {=$i18n});
+        window.i18n ??= {};
+        window.i18n['article.edit.error.editor_not_ready'] = {='article.edit.error.editor_not_ready'|translate};
+        window.i18n['article.edit.error.title_required']   = {='article.edit.error.title_required'|translate};
+        window.i18n['article.edit.error.content_required'] = {='article.edit.error.content_required'|translate};
     </script>
     <script type="module" src="{='/app/modules/Article/js/edit.js'|version}"></script>
 {/block}

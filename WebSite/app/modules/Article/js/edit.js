@@ -1,8 +1,8 @@
+import { t } from '/app/modules/Common/js/i18n.js';
 import { initTinyMCE } from '/app/modules/Common/js/tinymce-config.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    const t = window.t;
 
     // =========================
     // TinyMCE
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!editor) {
             e.preventDefault();
-            appendAlert(t('editorNotReady'), 'warning');
+            appendAlert(t('article.edit.error.editor_not_ready'), 'warning');
             return;
         }
 
@@ -44,13 +44,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!title) {
             e.preventDefault();
-            appendAlert(t('titleRequired'), 'danger');
+            appendAlert(t('article.edit.error.title_required'), 'danger');
             return;
         }
 
         if (!content || content === '<p><br></p>') {
             e.preventDefault();
-            appendAlert(t('contentRequired'), 'danger');
+            appendAlert(t('article.edit.error.content_required'), 'danger');
             return;
         }
 

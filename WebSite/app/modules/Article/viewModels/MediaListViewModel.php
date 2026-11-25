@@ -27,7 +27,6 @@ final readonly class MediaListViewModel extends LayoutViewModel
      * @param list<string> $months
      * @param list<string> $fileExtensions
      * @param list<IdNameRow> $groups
-     * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams
      */
     public function __construct(
@@ -44,7 +43,6 @@ final readonly class MediaListViewModel extends LayoutViewModel
         public bool $unusedOnly,
         public string $baseUrl,
         public array $groups,
-        public array $i18n,
         array $layoutParams = []
     ) {
         parent::__construct(

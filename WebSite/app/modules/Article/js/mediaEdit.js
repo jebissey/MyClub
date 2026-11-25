@@ -107,7 +107,7 @@ saveEditBtn.addEventListener('click', async () => {
     const quality = mime === 'image/jpeg' ? 0.92 : undefined;
     const imageData = canvas.toDataURL(mime, quality);
     saveEditBtn.disabled = true;
-    saveEditBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + t('saving');
+    saveEditBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + t('media.manager.edit.saving');
     try {
         const response = await api.post('/api/media/editImage', {
             path: currentEditPath,
@@ -115,10 +115,10 @@ saveEditBtn.addEventListener('click', async () => {
             maxSize: maxPx,
         });
         if (response.success === false) {
-            setEditStatus(t('editError'), 'danger');
+            setEditStatus(t('media.manager.edit.error'), 'danger');
             return;
         }
-        setEditStatus(t('editSaved'), 'success');
+        setEditStatus(t('media.manager.edit.saved'), 'success');
         // Refresh the thumbnail in the table row
         const row = document.querySelector(`tr .edit-image-btn[data-path="${CSS.escape(currentEditPath)}"]`)?.closest('tr');
         if (row) {
@@ -128,6 +128,6 @@ saveEditBtn.addEventListener('click', async () => {
         setTimeout(() => editModal.hide(), 1200);
     } finally {
         saveEditBtn.disabled = false;
-        saveEditBtn.innerHTML = '<i class="bi bi-floppy me-1"></i>' + t('editSave');
+        saveEditBtn.innerHTML = '<i class="bi bi-floppy me-1"></i>' + t('media.manager.edit.save');
     }
 });
