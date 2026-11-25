@@ -47,9 +47,17 @@ final readonly class ErrorManager
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
         $ua = is_string($ua) ? $ua : '';
         if (stripos($ua, 'TestDevice') !== false) {
-            $this->application->getFlight()->response()->status($code->value);
-            $this->application->getFlight()->response()->write($message);
-            return;
+            // Flight wraps routes in an output buffer: discard it, otherwise the
+            // body would be echoed into the buffer after the headers were sent.
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+            $this->application->getFlight()->response()
+                ->clearBody()
+                ->status($code->value)
+                ->write($message)
+                ->send();
+            exit;
         }
         $translation = $this->languagesDataHelper->translate('Error' . $code->value);
         $result = '';
