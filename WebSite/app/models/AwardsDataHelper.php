@@ -7,9 +7,9 @@ namespace app\models;
 use PDOException;
 use app\helpers\Application;
 use app\helpers\To;
-use app\modules\Arwards\valueObjects\CounterPersonRow;
+use app\modules\Awards\valueObjects\CounterPersonRow;
 
-final class ArwardsDataHelper extends Data
+final class AwardsDataHelper extends Data
 {
     public function __construct(Application $application)
     {

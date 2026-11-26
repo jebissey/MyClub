@@ -12,7 +12,7 @@ class MenuItemControllerTest extends DataHelperTestCase
     {
         $pdo = $this->openDatabaseCopyOrSkip();
 
-        // index() / showArwards()
+        // index() / showAwards()
         $this->assertColumnsExist($pdo, 'Group', [
             'Id',
             'Name',

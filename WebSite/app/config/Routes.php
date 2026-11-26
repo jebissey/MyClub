@@ -11,7 +11,7 @@ use app\config\routes\Article;
 use app\config\routes\ArticleApi;
 use app\config\routes\ArticleList;
 use app\config\routes\ArticleStatistics;
-use app\config\routes\Arward;
+use app\config\routes\Award;
 use app\config\routes\Astronomy;
 use app\config\routes\Backup as BackupAllData;
 use app\config\routes\CarouselApi;
@@ -267,7 +267,7 @@ final class Routes
             new ArticleApi($this->apiFactory),
             new ArticleList($this->controllerFactory),
             new ArticleStatistics($this->controllerFactory),
-            new Arward($this->controllerFactory),
+            new Award($this->controllerFactory),
             new Astronomy($this->controllerFactory),
             new BackupAllData($this->controllerFactory),
             new CarouselApi($this->apiFactory),

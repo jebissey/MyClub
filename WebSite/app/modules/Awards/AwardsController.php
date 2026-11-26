@@ -2,47 +2,47 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Arwards;
+namespace app\modules\Awards;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\WebApp;
-use app\models\ArwardsDataHelper;
+use app\models\AwardsDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\Arwards\viewModels\ArwardsViewModel;
+use app\modules\Awards\viewModels\AwardsViewModel;
 
-final class ArwardsController extends AbstractController
+final class AwardsController extends AbstractController
 {
     public function __construct(Application $application)
     {
         parent::__construct($application);
     }
 
-    public function seeArwards(): void
+    public function seeAwards(): void
     {
         if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isHomeDesigner(), __FILE__, __LINE__)) {
             return;
         }
 
-        $arwardsDataHelper = new ArwardsDataHelper($this->application);
-        $counterNames = $arwardsDataHelper->getCounterNames();
+        $awardsDataHelper = new AwardsDataHelper($this->application);
+        $counterNames = $awardsDataHelper->getCounterNames();
 
-        $i18n = $this->translations(['network_error', 'load_persons_error', 'name_required'], 'arwards.js.');
-        $i18n['choose_person'] = $this->translate('arwards.form.choose_person');
+        $i18n = $this->translations(['network_error', 'load_persons_error', 'name_required'], 'awards.js.');
+        $i18n['choose_person'] = $this->translate('awards.form.choose_person');
 
-        $viewModel = new ArwardsViewModel(
+        $viewModel = new AwardsViewModel(
             counterNames: $counterNames,
-            data: $arwardsDataHelper->getData($counterNames),
+            data: $awardsDataHelper->getData($counterNames),
             groups: $this->getActiveGroups(),
             i18n: $i18n,
             navItems: $this->getNavItems($this->application->getConnectedUser(true)->person->email),
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Arwards/views/arwards.latte', $viewModel);
+        $this->views->render('Awards/views/awards.latte', $viewModel);
     }
 
-    public function setArward(): void
+    public function setAward(): void
     {
         if (!$this->application->getConnectedUser()->isHomeDesigner()) {
             $this->errors->forbidden(__FILE__, __LINE__);
@@ -71,7 +71,7 @@ final class ArwardsController extends AbstractController
             || $idPerson === null || $idPerson <= 0
             || $idGroup === null || $idGroup <= 0
         ) {
-            $this->redirect('/arwards?error=invalid_data');
+            $this->redirect('/awards?error=invalid_data');
         } else {
             $this->dataHelper->set('Counter', [
                 'Name' => $name,
@@ -80,7 +80,7 @@ final class ArwardsController extends AbstractController
                 'IdPerson' => $idPerson,
                 'IdGroup' => $idGroup
             ]);
-            $this->redirect('/arwards?success=true');
+            $this->redirect('/awards?success=true');
         }
     }
 }

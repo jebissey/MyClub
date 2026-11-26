@@ -29,7 +29,7 @@ final class MenuItem implements RouteInterface
 
         $this->routes[] = new Route('GET /menu', $menuItemController, 'index');
         $this->routes[] = new Route('GET /menu/show/article/@id:[0-9]+', $menuItemController, 'showArticle');
-        $this->routes[] = new Route('GET /menu/show/arwards', $menuItemController, 'showArwards');
+        $this->routes[] = new Route('GET /menu/show/awards', $menuItemController, 'showAwards');
 
         return $this->routes;
     }

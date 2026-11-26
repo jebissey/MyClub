@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const i18n = window.arwardsConfig.i18n;
+    const i18n = window.awardsConfig.i18n;
 
     const counterNameSelect = document.getElementById('counterName');
     const newNameContainer = document.getElementById('newNameContainer');

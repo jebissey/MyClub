@@ -6,7 +6,7 @@ namespace tests\models;
 
 use PDOStatement;
 
-class ArwardsDataHelperTest extends DataHelperTestCase
+class AwardsDataHelperTest extends DataHelperTestCase
 {
     public function testQueriedColumnsExistInDatabaseSchema(): void
     {

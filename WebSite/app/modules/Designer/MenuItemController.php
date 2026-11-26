@@ -9,9 +9,9 @@ use app\enums\MenuItemTab;
 use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\To;
-use app\models\ArwardsDataHelper;
+use app\models\AwardsDataHelper;
 use app\models\CarouselDataHelper;
-use app\modules\Arwards\viewModels\ArwardsViewModel;
+use app\modules\Awards\viewModels\AwardsViewModel;
 use app\modules\Common\AbstractController;
 use app\modules\Designer\viewModels\MenuArticleViewModel;
 use app\modules\Designer\viewModels\MenuItemViewModel;
@@ -98,24 +98,24 @@ final class MenuItemController extends AbstractController
         }
     }
 
-    public function showArwards(): void
+    public function showAwards(): void
     {
         $connectedUser = $this->application->getConnectedUser();
         $person = $connectedUser->person;
-        if ($person !== null && $this->menuItemDataHelper->authorizedUser('/menuitem/show/arwards', $person)) {
-            $arwardsDataHelper = new ArwardsDataHelper($this->application);
-            $counterNames = $arwardsDataHelper->getCounterNames();
+        if ($person !== null && $this->menuItemDataHelper->authorizedUser('/menuitem/show/awards', $person)) {
+            $awardsDataHelper = new AwardsDataHelper($this->application);
+            $counterNames = $awardsDataHelper->getCounterNames();
 
-            $viewModel = new ArwardsViewModel(
+            $viewModel = new AwardsViewModel(
                 counterNames: $counterNames,
-                data: $arwardsDataHelper->getData($counterNames),
+                data: $awardsDataHelper->getData($counterNames),
                 groups: $this->getActiveGroups(),
                 navItems: $this->getNavItems($person->email),
                 i18n: array_map(fn(string $key): string => $this->translate($key), self::I18N_KEYS),
                 layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
             );
 
-            $this->views->render('Arwards/views/arwards.latte', $viewModel);
+            $this->views->render('Awards/views/awards.latte', $viewModel);
         } else {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,

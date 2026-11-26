@@ -8261,7 +8261,7 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </div>
 </div>'),
- (2017,'designer.routes.help.ArwardsController.setArward','<div class="container mt-4" style="max-width: 720px;">
+ (2017,'designer.routes.help.AwardsController.setAward','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
       <i class="bi bi-info-circle fs-4"></i>
@@ -8310,7 +8310,7 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </div>
 </div>'),
- (2018,'designer.routes.help.ArwardsController.seeArwards','<div class="container mt-4" style="max-width: 720px;">
+ (2018,'designer.routes.help.AwardsController.seeAwards','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
       <i class="bi bi-info-circle fs-4"></i>
@@ -12671,7 +12671,7 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
     </div>
   </div>
 </div>'),
- (2119,'designer.routes.help.MenuItemController.showArwards','<div class="container mt-4" style="max-width: 720px;">
+ (2119,'designer.routes.help.MenuItemController.showAwards','<div class="container mt-4" style="max-width: 720px;">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
       <i class="bi bi-info-circle fs-4"></i>
@@ -22082,30 +22082,45 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (2464,'auth.forgot_password.email.body','To reset your password, click the following link:','Pour réinitialiser votre mot de passe, cliquez sur le lien suivant :','Aby zresetować hasło, kliknij poniższy link:'),
  (2465,'events.calendar.welcome.block','<p>Welcome to the events calendar. Here you can view scheduled events and their details.</p>','<p>Bienvenue dans le calendrier des événements. Vous pouvez consulter ici les événements programmés et leurs détails.</p>','<p>Witamy w kalendarzu wydarzeń. Możesz tutaj przeglądać zaplanowane wydarzenia i ich szczegóły.</p>'),
  (2466,'gameManager.sidebar.other.exercises','Exercises','Exercices','Ćwiczenia'),
- (2467,'gameManager.sidebar.other.arwards','Awards','Récompenses','Nagrody'),
- (2468,'arwards.title','Counters per person','Tableau des compteurs par personne','Liczniki według osób'),
- (2469,'arwards.add_counter','Add a counter','Ajouter un compteur','Dodaj licznik'),
- (2470,'arwards.column.person','Person name','Nom de la personne','Imię i nazwisko'),
- (2471,'arwards.column.total','Total','Total','Razem'),
- (2472,'arwards.scoring_legend','(video call = 1 pt, action = 1 pt, bug = 2 pts, suggestion = 3 pts, bonus = 5 pts, content = 10 pts)','(visio = 1pt, action = 1pt, bug = 2pts, suggestion = 3pts, bonus = 5pts, contenu = 10pts)','(wideokonferencja = 1 pkt, akcja = 1 pkt, błąd = 2 pkt, sugestia = 3 pkt, bonus = 5 pkt, treść = 10 pkt)'),
- (2473,'arwards.form.counter_name','Counter name','Nom du compteur','Nazwa licznika'),
- (2474,'arwards.form.choose_counter_name','Choose a counter name','Choisir un nom de compteur','Wybierz nazwę licznika'),
- (2475,'arwards.form.new_name','New name...','Nouveau nom...','Nowa nazwa...'),
- (2476,'arwards.form.new_name_placeholder','Enter a new name','Entrez un nouveau nom','Wpisz nową nazwę'),
- (2477,'arwards.form.detail','Detail','Détail','Szczegóły'),
- (2478,'arwards.form.value','Value','Valeur','Wartość'),
- (2479,'arwards.form.group','Group','Groupe','Grupa'),
- (2480,'arwards.form.choose_group','Choose a group','Choisir un groupe','Wybierz grupę'),
- (2481,'arwards.form.person','Person','Personne','Osoba'),
- (2482,'arwards.form.choose_person','Choose a person','Choisir une personne','Wybierz osobę'),
- (2483,'arwards.form.cancel','Cancel','Annuler','Anuluj'),
- (2484,'arwards.form.save','Save','Enregistrer','Zapisz'),
- (2485,'arwards.js.network_error','Network or server error','Erreur réseau ou serveur','Błąd sieci lub serwera'),
- (2486,'arwards.js.load_persons_error','Error while loading persons:','Erreur lors du chargement des personnes :','Błąd podczas ładowania osób:'),
- (2487,'arwards.js.name_required','Please enter a name for the counter','Veuillez entrer un nom pour le compteur','Wpisz nazwę licznika');
+ (2467,'gameManager.sidebar.other.awards','Awards','Récompenses','Nagrody'),
+ (2468,'awards.title','Counters per person','Tableau des compteurs par personne','Liczniki według osób'),
+ (2469,'awards.add_counter','Add a counter','Ajouter un compteur','Dodaj licznik'),
+ (2470,'awards.column.person','Person name','Nom de la personne','Imię i nazwisko'),
+ (2471,'awards.column.total','Total','Total','Razem'),
+ (2472,'awards.scoring_legend','(video call = 1 pt, action = 1 pt, bug = 2 pts, suggestion = 3 pts, bonus = 5 pts, content = 10 pts)','(visio = 1pt, action = 1pt, bug = 2pts, suggestion = 3pts, bonus = 5pts, contenu = 10pts)','(wideokonferencja = 1 pkt, akcja = 1 pkt, błąd = 2 pkt, sugestia = 3 pkt, bonus = 5 pkt, treść = 10 pkt)'),
+ (2473,'awards.form.counter_name','Counter name','Nom du compteur','Nazwa licznika'),
+ (2474,'awards.form.choose_counter_name','Choose a counter name','Choisir un nom de compteur','Wybierz nazwę licznika'),
+ (2475,'awards.form.new_name','New name...','Nouveau nom...','Nowa nazwa...'),
+ (2476,'awards.form.new_name_placeholder','Enter a new name','Entrez un nouveau nom','Wpisz nową nazwę'),
+ (2477,'awards.form.detail','Detail','Détail','Szczegóły'),
+ (2478,'awards.form.value','Value','Valeur','Wartość'),
+ (2479,'awards.form.group','Group','Groupe','Grupa'),
+ (2480,'awards.form.choose_group','Choose a group','Choisir un groupe','Wybierz grupę'),
+ (2481,'awards.form.person','Person','Personne','Osoba'),
+ (2482,'awards.form.choose_person','Choose a person','Choisir une personne','Wybierz osobę'),
+ (2483,'awards.form.cancel','Cancel','Annuler','Anuluj'),
+ (2484,'awards.form.save','Save','Enregistrer','Zapisz'),
+ (2485,'awards.js.network_error','Network or server error','Erreur réseau ou serveur','Błąd sieci lub serwera'),
+ (2486,'awards.js.load_persons_error','Error while loading persons:','Erreur lors du chargement des personnes :','Błąd podczas ładowania osób:'),
+ (2487,'awards.js.name_required','Please enter a name for the counter','Veuillez entrer un nom pour le compteur','Wpisz nazwę licznika'),
+ (2488,'design.create.title','Add a new design','Ajouter un nouveau design','Dodaj nowy projekt'),
+ (2489,'design.create.name','Design name','Nom du design','Nazwa projektu'),
+ (2490,'design.create.detail','Details','Détails','Szczegóły'),
+ (2491,'design.create.navbar','Navbar','NavBar','Pasek nawigacji'),
+ (2492,'design.create.navbar.choose','Select a navbar','Sélectionnez une NavBar','Wybierz pasek nawigacji'),
+ (2493,'design.create.navbar.article','Article','Article','Artykuł'),
+ (2494,'design.create.navbar.award','Counter','Compteur','Licznik'),
+ (2495,'design.create.navbar.get_emails','Get emails','GetEmails','Pobierz e-maile'),
+ (2496,'design.create.audience','Who is it for?','Pour qui ?','Dla kogo?'),
+ (2497,'design.create.audience.all','Everyone (All)','Pour tous (All)','Dla wszystkich (All)'),
+ (2498,'design.create.audience.members','Members only (Members)','Pour les membres uniquement (Members)','Tylko dla członków (Members)'),
+ (2499,'design.create.audience.group','A specific group','Pour un groupe spécifique','Dla wybranej grupy'),
+ (2500,'design.create.group.choose','Select a group','Sélectionnez un groupe','Wybierz grupę'),
+ (2501,'design.create.cancel','Cancel','Annuler','Anuluj'),
+ (2502,'design.create.save','Save','Enregistrer','Zapisz');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',110,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',111,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),
