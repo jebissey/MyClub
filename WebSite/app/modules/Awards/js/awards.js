@@ -1,3 +1,5 @@
+import { t } from "/app/modules/Common/js/i18n.js";
+
 document.addEventListener('DOMContentLoaded', function () {
     const i18n = window.awardsConfig.i18n;
 
@@ -25,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
         placeholder.value = '';
         placeholder.selected = true;
         placeholder.disabled = true;
-        placeholder.textContent = i18n.choose_person;
+        placeholder.textContent = t('awards.form.choose_person');
         personSelect.appendChild(placeholder);
         personSelect.disabled = true;
     };
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch(`/api/personsInGroup/${groupId}`)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(i18n.network_error);
+                    throw new Error(t('awards.js.network_error'));
                 }
                 return response.json();
             })
@@ -54,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 personSelect.disabled = false;
             })
             .catch(error => {
-                appendAlert(`${i18n.load_persons_error} ${error.message}`, 'danger');
+                appendAlert(`${t('awards.js.load_persons_error')} ${error.message}`, 'danger');
                 personSelect.disabled = true;
             });
     });
@@ -65,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (counterNameSelect.value === 'new') {
             const newName = newCounterNameInput.value.trim();
             if (!newName) {
-                appendAlert(i18n.name_required, 'danger');
+                appendAlert(t('awards.js.name_required'), 'danger');
                 return;
             }
             let customNameInput = addCounterForm.querySelector('input[name="customName"]');

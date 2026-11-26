@@ -34,7 +34,6 @@ final class AwardsController extends AbstractController
             counterNames: $counterNames,
             data: $awardsDataHelper->getData($counterNames),
             groups: $this->getActiveGroups(),
-            i18n: $i18n,
             navItems: $this->getNavItems($this->application->getConnectedUser(true)->person->email),
             layoutParams: $this->getAllParams([]),
         );

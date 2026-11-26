@@ -14,7 +14,6 @@ final readonly class BackupViewModel extends LayoutViewModel
      */
     public function __construct(
         public string $defaultFileName,
-        public string $layout,
         public ?string $lastBackupDate,
         public array $lastBackups,
         array $layoutParams = []

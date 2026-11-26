@@ -111,7 +111,6 @@ final class MenuItemController extends AbstractController
                 data: $awardsDataHelper->getData($counterNames),
                 groups: $this->getActiveGroups(),
                 navItems: $this->getNavItems($person->email),
-                i18n: array_map(fn(string $key): string => $this->translate($key), self::I18N_KEYS),
                 layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
             );
 

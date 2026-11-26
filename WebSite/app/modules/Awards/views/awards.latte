@@ -102,8 +102,12 @@
 {/block}
 
 {block scripts}
-  <script>
-    window.awardsConfig = { i18n: {=$i18n} };
-  </script>
-  <script src="{='/app/modules/Awards/js/awards.js'|version}"></script>
+<script>
+    window.i18n ??= {};
+    window.i18n['awards.form.choose_person'] = {='awards.form.choose_person'|translate};
+    window.i18n['awards.js.network_error'] = {='awards.js.network_error'|translate};
+    window.i18n['awards.js.load_persons_error'] = {='awards.js.load_persons_error'|translate};
+    window.i18n['awards.js.name_required'] = {='awards.js.name_required'|translate};
+</script>
+<script type="module" src="{='/app/modules/Awards/js/awards.js'|version}"></script>
 {/block}

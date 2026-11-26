@@ -15,7 +15,6 @@ final readonly class AwardsViewModel extends GameLayoutViewModel
      * @param list<string> $counterNames
      * @param list<CounterPersonRow> $data
      * @param list<IdNameRow> $groups
-     * @param array<string, string> $i18n Texts used by awards.js
      * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
@@ -23,7 +22,6 @@ final readonly class AwardsViewModel extends GameLayoutViewModel
         public array $counterNames,
         public array $data,
         public array $groups,
-        public array $i18n,
         public array $navItems,
         array $layoutParams = []
     ) {

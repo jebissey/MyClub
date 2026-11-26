@@ -52,7 +52,6 @@ final class BackupController extends AbstractController
                 defaultFileName: $this->defaultFileName(),
                 lastBackupDate: $lastDate !== null ? MyClubDateTime::formatDateFromUTC($lastDate) : null,
                 lastBackups: $lastBackups,
-                layout: $this->getLayout(),
                 layoutParams: $this->getAllParams([
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),
