@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Webmaster;
+namespace app\modules\Arwards;
 
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\WebApp;
 use app\models\ArwardsDataHelper;
 use app\modules\Common\AbstractController;
-use app\modules\Webmaster\viewModels\ArwardsViewModel;
+use app\modules\Arwards\viewModels\ArwardsViewModel;
 
 final class ArwardsController extends AbstractController
 {
@@ -27,16 +27,19 @@ final class ArwardsController extends AbstractController
         $arwardsDataHelper = new ArwardsDataHelper($this->application);
         $counterNames = $arwardsDataHelper->getCounterNames();
 
+        $i18n = $this->translations(['network_error', 'load_persons_error', 'name_required'], 'arwards.js.');
+        $i18n['choose_person'] = $this->translate('arwards.form.choose_person');
+
         $viewModel = new ArwardsViewModel(
             counterNames: $counterNames,
             data: $arwardsDataHelper->getData($counterNames),
             groups: $this->getActiveGroups(),
-            layout: $this->getLayout(),
+            i18n: $i18n,
             navItems: $this->getNavItems($this->application->getConnectedUser(true)->person->email),
             layoutParams: $this->getAllParams([]),
         );
 
-        $this->views->render('Webmaster/views/arwards.latte', $viewModel);
+        $this->views->render('Arwards/views/arwards.latte', $viewModel);
     }
 
     public function setArward(): void

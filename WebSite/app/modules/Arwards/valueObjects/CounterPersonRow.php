@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Webmaster\valueObjects;
+namespace app\modules\Arwards\valueObjects;
 
 final readonly class CounterPersonRow
 {

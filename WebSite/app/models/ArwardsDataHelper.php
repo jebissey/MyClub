@@ -7,7 +7,7 @@ namespace app\models;
 use PDOException;
 use app\helpers\Application;
 use app\helpers\To;
-use app\modules\Webmaster\valueObjects\CounterPersonRow;
+use app\modules\Arwards\valueObjects\CounterPersonRow;
 
 final class ArwardsDataHelper extends Data
 {

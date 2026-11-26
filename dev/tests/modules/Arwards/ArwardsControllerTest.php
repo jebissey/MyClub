@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace tests\modules\Webmaster;
+namespace tests\modules\Arwards;
 
 use tests\models\DataHelperTestCase;
 

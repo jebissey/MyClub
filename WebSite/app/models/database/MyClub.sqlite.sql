@@ -22081,10 +22081,31 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (2463,'auth.forgot_password.email.subject','Password reset request','Demande de réinitialisation du mot de passe','Prośba o zresetowanie hasła'),
  (2464,'auth.forgot_password.email.body','To reset your password, click the following link:','Pour réinitialiser votre mot de passe, cliquez sur le lien suivant :','Aby zresetować hasło, kliknij poniższy link:'),
  (2465,'events.calendar.welcome.block','<p>Welcome to the events calendar. Here you can view scheduled events and their details.</p>','<p>Bienvenue dans le calendrier des événements. Vous pouvez consulter ici les événements programmés et leurs détails.</p>','<p>Witamy w kalendarzu wydarzeń. Możesz tutaj przeglądać zaplanowane wydarzenia i ich szczegóły.</p>'),
- (2466,'gameManager.sidebar.other.exercises','Exercises','Exercices','Ćwiczenia');
+ (2466,'gameManager.sidebar.other.exercises','Exercises','Exercices','Ćwiczenia'),
+ (2467,'gameManager.sidebar.other.arwards','Awards','Récompenses','Nagrody'),
+ (2468,'arwards.title','Counters per person','Tableau des compteurs par personne','Liczniki według osób'),
+ (2469,'arwards.add_counter','Add a counter','Ajouter un compteur','Dodaj licznik'),
+ (2470,'arwards.column.person','Person name','Nom de la personne','Imię i nazwisko'),
+ (2471,'arwards.column.total','Total','Total','Razem'),
+ (2472,'arwards.scoring_legend','(video call = 1 pt, action = 1 pt, bug = 2 pts, suggestion = 3 pts, bonus = 5 pts, content = 10 pts)','(visio = 1pt, action = 1pt, bug = 2pts, suggestion = 3pts, bonus = 5pts, contenu = 10pts)','(wideokonferencja = 1 pkt, akcja = 1 pkt, błąd = 2 pkt, sugestia = 3 pkt, bonus = 5 pkt, treść = 10 pkt)'),
+ (2473,'arwards.form.counter_name','Counter name','Nom du compteur','Nazwa licznika'),
+ (2474,'arwards.form.choose_counter_name','Choose a counter name','Choisir un nom de compteur','Wybierz nazwę licznika'),
+ (2475,'arwards.form.new_name','New name...','Nouveau nom...','Nowa nazwa...'),
+ (2476,'arwards.form.new_name_placeholder','Enter a new name','Entrez un nouveau nom','Wpisz nową nazwę'),
+ (2477,'arwards.form.detail','Detail','Détail','Szczegóły'),
+ (2478,'arwards.form.value','Value','Valeur','Wartość'),
+ (2479,'arwards.form.group','Group','Groupe','Grupa'),
+ (2480,'arwards.form.choose_group','Choose a group','Choisir un groupe','Wybierz grupę'),
+ (2481,'arwards.form.person','Person','Personne','Osoba'),
+ (2482,'arwards.form.choose_person','Choose a person','Choisir une personne','Wybierz osobę'),
+ (2483,'arwards.form.cancel','Cancel','Annuler','Anuluj'),
+ (2484,'arwards.form.save','Save','Enregistrer','Zapisz'),
+ (2485,'arwards.js.network_error','Network or server error','Erreur réseau ou serveur','Błąd sieci lub serwera'),
+ (2486,'arwards.js.load_persons_error','Error while loading persons:','Erreur lors du chargement des personnes :','Błąd podczas ładowania osób:'),
+ (2487,'arwards.js.name_required','Please enter a name for the counter','Veuillez entrer un nom pour le compteur','Wpisz nazwę licznika');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',109,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',110,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

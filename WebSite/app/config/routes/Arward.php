@@ -7,7 +7,7 @@ namespace app\config\routes;
 use app\config\ControllerFactory;
 use app\modules\Common\interfaces\RouteInterface;
 use app\modules\Common\valueObjects\Route;
-use app\modules\Webmaster\ArwardsController;
+use app\modules\Arwards\ArwardsController;
 
 final class Arward implements RouteInterface
 {

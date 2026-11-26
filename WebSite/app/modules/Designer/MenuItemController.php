@@ -11,10 +11,10 @@ use app\helpers\Application;
 use app\helpers\To;
 use app\models\ArwardsDataHelper;
 use app\models\CarouselDataHelper;
+use app\modules\Arwards\viewModels\ArwardsViewModel;
 use app\modules\Common\AbstractController;
 use app\modules\Designer\viewModels\MenuArticleViewModel;
 use app\modules\Designer\viewModels\MenuItemViewModel;
-use app\modules\Webmaster\viewModels\ArwardsViewModel;
 
 final class MenuItemController extends AbstractController
 {
@@ -110,12 +110,12 @@ final class MenuItemController extends AbstractController
                 counterNames: $counterNames,
                 data: $arwardsDataHelper->getData($counterNames),
                 groups: $this->getActiveGroups(),
-                layout: $this->getLayout(),
                 navItems: $this->getNavItems($person->email),
+                i18n: array_map(fn(string $key): string => $this->translate($key), self::I18N_KEYS),
                 layoutParams: $this->getAllParams(['page' => $connectedUser->getPage()]),
             );
 
-            $this->views->render('Webmaster/views/arwards.latte', $viewModel);
+            $this->views->render('Arwards/views/arwards.latte', $viewModel);
         } else {
             $this->application->getErrorManager()->raise(
                 ApplicationError::Forbidden,

@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace app\modules\Webmaster\viewModels;
+namespace app\modules\Arwards\viewModels;
 
-use app\modules\Common\viewModels\LayoutViewModel;
+use app\modules\Arwards\valueObjects\CounterPersonRow;
 use app\modules\Common\valueObjects\IdNameRow;
 use app\modules\Common\valueObjects\MenuItemWithParentRow;
-use app\modules\Webmaster\valueObjects\CounterPersonRow;
+use app\modules\Games\viewModels\GameLayoutViewModel;
 
-final readonly class ArwardsViewModel extends LayoutViewModel
+final readonly class ArwardsViewModel extends GameLayoutViewModel
 {
     /**
      * @param list<string> $counterNames
      * @param list<CounterPersonRow> $data
      * @param list<IdNameRow> $groups
+     * @param array<string, string> $i18n Texts used by arwards.js
      * @param list<MenuItemWithParentRow> $navItems
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      */
@@ -22,15 +23,15 @@ final readonly class ArwardsViewModel extends LayoutViewModel
         public array $counterNames,
         public array $data,
         public array $groups,
-        public string $layout,
+        public array $i18n,
         public array $navItems,
         array $layoutParams = []
     ) {
         parent::__construct(
-            ...self::baseArgsFrom($layoutParams),
-            btnHistoryBack: true,
-            btnParent: '/admin',
-            btnPlus: false,
+            layoutParams: $layoutParams,
+            category: 'other', // Arwards live under "Other games" in the sidebar
+            btnParent: '/games',
+            activeItem: 'arwards',
         );
     }
 }

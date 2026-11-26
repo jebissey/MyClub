@@ -67,6 +67,13 @@
                             {='gameManager.sidebar.other.exercises'|translate}
                         </a>
                     </li>
+                    {if $isHomeDesigner}
+                    <li class="nav-item">
+                        <a class="nav-link{if $activeItem === 'arwards'} active{/if}" href="/arwards">
+                            {='gameManager.sidebar.other.arwards'|translate}
+                        </a>
+                    </li>
+                    {/if}                    
                 </ul>
             </li>
         </ul>
