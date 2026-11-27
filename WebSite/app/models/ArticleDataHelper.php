@@ -12,6 +12,7 @@ use app\helpers\To;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
 use app\modules\Article\valueObjects\ArticleAuthorRow;
+use app\modules\Article\valueObjects\ArticleNewsRow;
 use app\modules\Article\valueObjects\ArticleSitemapRow;
 use app\modules\Article\valueObjects\ArticleSummaryRow;
 use app\modules\Common\valueObjects\ArticleRow;
@@ -20,6 +21,7 @@ use app\modules\Common\interfaces\NewsProviderInterface;
 
 /**
  * @phpstan-import-type ArticleRowShape from ArticleRow
+ * @phpstan-import-type ArticleNewsRowShape from ArticleNewsRow
  * @phpstan-import-type NewsFeedItem from NewsProviderInterface
  */
 final class ArticleDataHelper extends Data implements NewsProviderInterface
@@ -202,12 +204,20 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         }
 
         $sql = "
-            SELECT Article.*, 
-                Individual.FirstName, 
-                Individual.LastName, 
+            SELECT
+                Article.Id,
+                Article.Title,
+                Article.Content,
+                Article.LastUpdate,
+                Article.Timestamp,
+                Article.CreatedBy,
+                Article.PublishedBy,
+                Article.IdGroup,
+                Article.OnlyForMembers,
+                Individual.FirstName,
+                Individual.LastName,
                 Individual.NickName,
-                \"Group\".Name AS GroupName,
-                Article.CreatedBy
+                \"Group\".Name AS GroupName
             FROM Article
             LEFT JOIN Individual ON Individual.Id = Article.CreatedBy
             LEFT JOIN \"Group\" ON Article.IdGroup = \"Group\".Id
@@ -267,25 +277,27 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':searchFrom' => $searchFrom]);
-        /** @var list<object{Id: int|string, Title: string, LastUpdate: string, CreatedBy: int|string, PublishedBy: int|string|null, IdGroup: int|string|null, OnlyForMembers: int|bool|null}> $articles */
-        $articles = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        /** @var list<ArticleNewsRowShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $news = [];
-        foreach ($articles as $article) {
+        foreach ($rows as $row) {
+            $article = ArticleNewsRow::fromStdClass($row);
             $authorization = new ArticleAuthorizationRow(
-                id: (int) $article->Id,
-                createdBy: (int) $article->CreatedBy,
-                publishedBy: $article->PublishedBy === null ? null : (int) $article->PublishedBy,
-                idGroup: $article->IdGroup === null ? null : (int) $article->IdGroup,
-                onlyForMembers: (bool) $article->OnlyForMembers,
+                id: $article->id,
+                createdBy: $article->createdBy,
+                publishedBy: $article->publishedBy,
+                idGroup: $article->idGroup,
+                onlyForMembers: To::bool($article->onlyForMembers),
             );
             if ($this->authorizationService->canRead($authorization, $connectedUser)) {
                 $news[] = [
                     'type'  => 'article',
-                    'id'    => (int) $article->Id,
-                    'title' => $article->Title,
-                    'date'  => $article->LastUpdate,
-                    'url'   => '/article/' . $article->Id,
+                    'id'    => $article->id,
+                    'title' => $article->title,
+                    'date'  => $article->lastUpdate,
+                    'url'   => '/article/' . $article->id,
                 ];
             }
         }
@@ -345,7 +357,19 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
     public function getWithAuthor(int $id): ArticleRow|false
     {
         $sql = "
-            SELECT a.*, i.FirstName, i.LastName, i.NickName
+            SELECT
+                a.Id,
+                a.Title,
+                a.Content,
+                a.LastUpdate,
+                a.Timestamp,
+                a.CreatedBy,
+                a.PublishedBy,
+                a.IdGroup,
+                a.OnlyForMembers,
+                i.FirstName,
+                i.LastName,
+                i.NickName
             FROM Article a
             LEFT JOIN Individual i ON a.CreatedBy = i.Id
             WHERE a.Id = :id

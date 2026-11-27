@@ -1,15 +1,15 @@
+import { t } from '/app/modules/Common/js/i18n.js';
 import ApiClient from '/app/modules/Common/js/ApiClient.js';
 
 const api = new ApiClient();
 
 /**
  * Make the Target – front-end
- * All displayed strings come from window.makeTheTargetConfig.i18n
+ * All displayed strings come from window.i18n, read through t()
  */
 export default class MakeTheTargetManager {
     #config = window.makeTheTargetConfig ?? {};
     #sessionId = this.#config.sessionId ?? 'no-session';
-    #i18n = this.#config.i18n ?? {};
 
     // Game state
     #target = 0;
@@ -103,17 +103,17 @@ export default class MakeTheTargetManager {
     #renderTiles() {
         this.#tilesCont.innerHTML = '';
 
-        this.#tiles.forEach(t => {
+        this.#tiles.forEach(tile => {
             const div = document.createElement('div');
             div.className = 'tile';
-            if (t.used) div.classList.add('used');
-            if (this.#selectedIds.includes(t.id)) div.classList.add('selected');
-            if (t.id >= 100) div.classList.add('result-tile');
-            div.dataset.id = t.id;
-            div.textContent = t.value;
+            if (tile.used) div.classList.add('used');
+            if (this.#selectedIds.includes(tile.id)) div.classList.add('selected');
+            if (tile.id >= 100) div.classList.add('result-tile');
+            div.dataset.id = tile.id;
+            div.textContent = tile.value;
 
-            if (!t.used && this.#gameActive) {
-                div.addEventListener('click', () => this.#onTileClick(t.id));
+            if (!tile.used && this.#gameActive) {
+                div.addEventListener('click', () => this.#onTileClick(tile.id));
             }
             this.#tilesCont.appendChild(div);
         });
@@ -162,8 +162,8 @@ export default class MakeTheTargetManager {
     #tryCompute() {
         if (this.#selectedIds.length !== 2 || !this.#selectedOp) return;
 
-        const a = this.#tiles.find(t => t.id === this.#selectedIds[0]);
-        const b = this.#tiles.find(t => t.id === this.#selectedIds[1]);
+        const a = this.#tiles.find(tile => tile.id === this.#selectedIds[0]);
+        const b = this.#tiles.find(tile => tile.id === this.#selectedIds[1]);
         if (!a || !b || a.used || b.used) return;
 
         const op = this.#selectedOp;
@@ -228,7 +228,7 @@ export default class MakeTheTargetManager {
 
     #renderHistory() {
         if (this.#history.length === 0) {
-            this.#historyBox.innerHTML = `<em class="text-muted">${this.#i18n.noOperationYet}</em>`;
+            this.#historyBox.innerHTML = `<em class="text-muted">${t('makethetarget.no_operation_yet')}</em>`;
             return;
         }
 
@@ -242,22 +242,22 @@ export default class MakeTheTargetManager {
     }
 
     #updateCounter() {
-        const template = this.#moves <= 1 ? this.#i18n.operationCount : this.#i18n.operationsCount;
-        this.#moveCounter.textContent = template.replace('%d', String(this.#moves));
+        const key = this.#moves <= 1 ? 'makethetarget.operation_count' : 'makethetarget.operations_count';
+        this.#moveCounter.textContent = t(key).replace('%d', String(this.#moves));
     }
 
     #showWin() {
         this.#endMessage.style.display = 'block';
-        const obtained = this.#i18n.obtainedIn
+        const obtained = t('makethetarget.obtained_in')
             .replace('%1', `<strong>${this.#target}</strong>`)
             .replace('%2', String(this.#moves));
 
         this.#endMessage.innerHTML = `
         <div class="alert alert-success">
-            <h3>🎉 ${this.#i18n.targetReached}</h3>
+            <h3>🎉 ${t('makethetarget.target_reached')}</h3>
             <p>${obtained}</p>
             <button class="btn btn-primary" onclick="location.reload()">
-                ${this.#i18n.newGame}
+                ${t('makethetarget.new_game')}
             </button>
         </div>`;
 
@@ -270,19 +270,19 @@ export default class MakeTheTargetManager {
         if (!this.#gameActive && !this.#foundExact) return;
 
         const original = this.#tiles
-            .filter(t => t.id < 100)
-            .map(t => t.value);
+            .filter(tile => tile.id < 100)
+            .map(tile => tile.value);
 
         const solution = this.#findSolution(original, this.#target);
 
         this.#solutionBox.style.display = 'block';
         if (solution.found) {
             this.#solutionBox.innerHTML =
-                `<strong>💡 ${this.#i18n.solutionFound}</strong>\n\n${solution.steps.join('\n')}`;
+                `<strong>💡 ${t('makethetarget.solution_found')}</strong>\n\n${solution.steps.join('\n')}`;
         } else {
             this.#solutionBox.innerHTML =
-                `<strong>💡 ${this.#i18n.bestResult}</strong> ${solution.best}\n\n` +
-                (solution.steps.length ? solution.steps.join('\n') : this.#i18n.noCombination);
+                `<strong>💡 ${t('makethetarget.best_result')}</strong> ${solution.best}\n\n` +
+                (solution.steps.length ? solution.steps.join('\n') : t('makethetarget.no_combination'));
         }
 
         this.#log(`Solution requested – found: ${solution.found}, best: ${solution.best}`);
@@ -365,8 +365,8 @@ export default class MakeTheTargetManager {
 
     #onReset() {
         const original = this.#tiles
-            .filter(t => t.id < 100)
-            .map(t => ({ id: t.id, value: t.value, used: false }));
+            .filter(tile => tile.id < 100)
+            .map(tile => ({ id: tile.id, value: tile.value, used: false }));
 
         this.#tiles = original;
         this.#selectedIds = [];

@@ -65,17 +65,19 @@ final class ExportController extends AbstractController
 
     public function showExportForm(): void
     {
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $viewModel = new UsersExportViewModel(
-                defaultFileName: $this->defaultFileName(),
-                layout: $this->getLayout(),
-                layoutParams: $this->getAllParams([
-                    'page' => $this->application->getConnectedUser()->getPage(),
-                ]),
-            );
-
-            $this->views->render('PersonManager/views/users_export.latte', $viewModel);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
+            return;
         }
+
+        $viewModel = new UsersExportViewModel(
+            defaultFileName: $this->defaultFileName(),
+            layout: $this->getLayout('personManager'),
+            layoutParams: $this->getAllParams([
+                'page' => $this->application->getConnectedUser()->getPage(),
+            ]),
+        );
+
+        $this->views->render('PersonManager/views/users_export.latte', $viewModel);
     }
 
     #region Private functions

@@ -8,9 +8,6 @@ use app\modules\Common\valueObjects\AbstractValueObject;
 use app\enums\SurveyVisibility;
 
 /**
- * Ligne Survey enrichie du créateur de l'article associé,
- * telle que retournée par SurveyDataHelper::getWithCreator().
- *
  * @phpstan-type SurveyWithCreatorRowShape object{
  *     Id: int|string,
  *     Question: string,
@@ -18,7 +15,7 @@ use app\enums\SurveyVisibility;
  *     IdArticle: int|string,
  *     ClosingDate: string,
  *     Visibility: string,
- *     CreatedBy: int|string
+ *     CreatedBy: int|string,
  * }
  */
 final readonly class SurveyWithCreatorRow extends AbstractValueObject

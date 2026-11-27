@@ -6,6 +6,7 @@ namespace app\modules\Article;
 
 use app\enums\ArticleAccess;
 use app\enums\FilterInputRule;
+use app\exceptions\EmailException;
 use app\exceptions\IntegrityException;
 use app\exceptions\QueryException;
 use app\helpers\Application;
@@ -227,7 +228,14 @@ final class ArticleController extends ArticleAccessController
 
         $alert = $this->articleAlertService->prepare($idArticle, $articleCreator->Email, $this->t);
 
-        if ($this->emailService->send($alert->message)) {
+        try {
+            $sent = $this->emailService->send($alert->message);
+        } catch (EmailException) {
+            // The service already logged the technical reason (SMTP error or quota)
+            $sent = false;
+        }
+
+        if ($sent) {
             MessageService::set(($this->t)('article.success.email_sent') . ' (' . $alert->recipientCount . ')');
         } else {
             MessageService::set(($this->t)('article.error.email_failed'), 'danger');

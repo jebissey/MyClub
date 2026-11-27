@@ -22117,10 +22117,17 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (2499,'design.create.audience.group','A specific group','Pour un groupe spécifique','Dla wybranej grupy'),
  (2500,'design.create.group.choose','Select a group','Sélectionnez un groupe','Wybierz grupę'),
  (2501,'design.create.cancel','Cancel','Annuler','Anuluj'),
- (2502,'design.create.save','Save','Enregistrer','Zapisz');
+ (2502,'design.create.save','Save','Enregistrer','Zapisz'),
+ (2503,'person_manager.group.create.title','Create a group','Créer un groupe','Utwórz grupę'),
+ (2504,'person_manager.group.create.name','Name','Nom','Nazwa'),
+ (2505,'person_manager.group.create.self_registration','Self-registration allowed','Auto-inscription autorisée','Samodzielna rejestracja dozwolona'),
+ (2506,'person_manager.group.create.authorizations','Authorizations','Autorisations','Uprawnienia'),
+ (2507,'person_manager.group.create.no_authorization','No authorization available','Aucune autorisation disponible','Brak dostępnych uprawnień'),
+ (2508,'person_manager.group.create.cancel','Cancel','Annuler','Anuluj'),
+ (2509,'person_manager.group.create.save','Save','Enregistrer','Zapisz');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
-INSERT INTO "Metadata" VALUES (1,'MyClub',111,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
+INSERT INTO "Metadata" VALUES (1,'MyClub',112,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);
 INSERT INTO "Settings" VALUES (1,'Title','title'),
  (2,'LegalNotices','LegalNotices'),
  (3,'SpotlightArticle',''),

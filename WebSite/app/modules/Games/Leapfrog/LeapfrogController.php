@@ -50,15 +50,15 @@ final class LeapfrogController extends TableController
             return;
         }
 
-        $connectedUser = $this->application->getConnectedUser(true);
+        $connectedUser = $this->application->getConnectedUser();
         $gameId = bin2hex(random_bytes(8));
 
         $viewModel = new LeapfrogViewModel(
-            navItems: $this->getNavItems($connectedUser->person->email),
+            navItems: $this->getNavItems($connectedUser->person?->email),
             sessionId: session_id() . '_' . $gameId,
             i18n: array_map(fn(string $key): string => $this->translate($key), self::I18N_KEYS),
             layoutParams: $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
+                'page' => $connectedUser->getPage(),
             ]),
         );
 

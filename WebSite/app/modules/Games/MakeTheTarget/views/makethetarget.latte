@@ -1,6 +1,6 @@
 {layout '../../../Common/views/layout.latte'}
 
-{block title}{$i18n['title']}{/block}
+{block title}{='makethetarget.title'|translate}{/block}
 
 {block head}
 <style>
@@ -125,44 +125,44 @@
 
 {block content}
 <div class="container mt-3">
-    <h1 class="text-center mb-3">🔢 {$i18n['title']|upper} 🔢</h1>
+    <h1 class="text-center mb-3">🔢 {='makethetarget.title'|translate|upper} 🔢</h1>
 
     <div class="bg-light rounded p-3 mb-4">
-        <h4>{$i18n['rules']}</h4>
+        <h4>{='makethetarget.rules'|translate}</h4>
         <ul class="mb-0">
-            <li>{$i18n['rule1']}</li>
-            <li>{$i18n['rule2']|noescape}</li>
-            <li>{$i18n['rule3']}</li>
-            <li>{$i18n['rule4']}</li>
-            <li>{$i18n['rule5']}</li>
+            <li>{='makethetarget.rule1'|translate}</li>
+            <li>{='makethetarget.rule2'|translate|noescape}</li>
+            <li>{='makethetarget.rule3'|translate}</li>
+            <li>{='makethetarget.rule4'|translate}</li>
+            <li>{='makethetarget.rule5'|translate}</li>
         </ul>
     </div>
 
     <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
         <button id="btn-draw" class="btn btn-primary btn-lg btn-action">
-            🎲 {$i18n['drawTiles']}
+            🎲 {='makethetarget.draw_tiles'|translate}
         </button>
         <button id="btn-solution" class="btn btn-warning btn-lg btn-action" disabled>
-            💡 {$i18n['solution']}
+            💡 {='makethetarget.solution'|translate}
         </button>
         <button id="btn-reset" class="btn btn-outline-secondary btn-lg btn-action" disabled>
-            ↺ {$i18n['restart']}
+            ↺ {='makethetarget.restart'|translate}
         </button>
     </div>
 
     <div class="text-center mb-4">
-        <div class="text-muted">{$i18n['target']}</div>
+        <div class="text-muted">{='makethetarget.target'|translate}</div>
         <div id="target-display">—</div>
     </div>
 
     <div class="text-center mb-3">
-        <h5>{$i18n['tiles']}</h5>
+        <h5>{='makethetarget.tiles'|translate}</h5>
         <div id="tiles-container" class="d-flex flex-wrap justify-content-center">
         </div>
     </div>
 
     <div class="text-center mb-4">
-        <h5>{$i18n['operation']}</h5>
+        <h5>{='makethetarget.operation'|translate}</h5>
         <div id="ops-container">
             <button class="op-btn" data-op="+" disabled>+</button>
             <button class="op-btn" data-op="-" disabled>−</button>
@@ -173,11 +173,11 @@
 
     <div class="card mb-4">
         <div class="card-header">
-            <strong>{$i18n['history']}</strong>
-            <span id="move-counter" class="badge bg-secondary float-end">{$i18n['operationCount']|replace:'%d','0'}</span>
+            <strong>{='makethetarget.history'|translate}</strong>
+            <span id="move-counter" class="badge bg-secondary float-end">{='makethetarget.operation_count'|translate|replace:'%d','0'}</span>
         </div>
         <div class="card-body" id="history-box">
-            <em class="text-muted">{$i18n['noOperationYet']}</em>
+            <em class="text-muted">{='makethetarget.no_operation_yet'|translate}</em>
         </div>
     </div>
 
@@ -189,10 +189,20 @@
 
 {block scripts}
 <script>
-window.makeTheTargetConfig = {
-    sessionId: {$sessionId},
-    i18n: {=$i18n}
-};
+    window.i18n ??= {};
+    window.i18n['makethetarget.no_operation_yet'] = {='makethetarget.no_operation_yet'|translate};
+    window.i18n['makethetarget.operation_count'] = {='makethetarget.operation_count'|translate};
+    window.i18n['makethetarget.operations_count'] = {='makethetarget.operations_count'|translate};
+    window.i18n['makethetarget.target_reached'] = {='makethetarget.target_reached'|translate};
+    window.i18n['makethetarget.obtained_in'] = {='makethetarget.obtained_in'|translate};
+    window.i18n['makethetarget.new_game'] = {='makethetarget.new_game'|translate};
+    window.i18n['makethetarget.solution_found'] = {='makethetarget.solution_found'|translate};
+    window.i18n['makethetarget.best_result'] = {='makethetarget.best_result'|translate};
+    window.i18n['makethetarget.no_combination'] = {='makethetarget.no_combination'|translate};
+
+    window.makeTheTargetConfig = {
+        sessionId: {$sessionId}
+    };
 </script>
 <script type="module" src="{='/app/modules/Games/MakeTheTarget/js/main.js'|version}"></script>
 {/block}

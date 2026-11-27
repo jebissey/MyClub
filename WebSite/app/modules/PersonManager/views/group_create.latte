@@ -1,13 +1,13 @@
 {layout $layout}
 
-{block title}Créer un groupe{/block}
+{block title}{='person_manager.group.create.title'|translate}{/block}
 
 {block content}
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title h5 m-0">Créer un groupe</h2>
+                    <h2 class="card-title h5 m-0">{='person_manager.group.create.title'|translate}</h2>
                 </div>
                 <div class="card-body">
                     {if isset($error)}
@@ -19,25 +19,25 @@
 
                     <form method="POST">
                         <div class="mb-3">
-                            <label for="name" class="form-label">Nom</label>
+                            <label for="name" class="form-label">{='person_manager.group.create.name'|translate}</label>
                             <input type="text" class="form-control {if isset($error)}is-invalid{/if}"
                                 id="name" name="name" required>
-                            <div class="invalid-feedback">Le nom du groupe est requis</div>
+                            <div class="invalid-feedback">{='person_manager.group.name_required'|translate}</div>
                         </div>
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="selfRegistration"
                                 name="selfRegistration" value="1">
-                            <label class="form-check-label" for="selfRegistration">Auto-inscription autorisée</label>
+                            <label class="form-check-label" for="selfRegistration">{='person_manager.group.create.self_registration'|translate}</label>
                         </div>
                         {if $isWebmaster}
                         <div class="mb-3">
-                            <label class="form-label">Autorisations</label>
+                            <label class="form-label">{='person_manager.group.create.authorizations'|translate}</label>
                             {if $availableAuthorizations}
                                 {foreach $availableAuthorizations as $authorization}
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" 
-                                            id="auth_{$authorization->Id}" 
-                                            name="authorizations[]" 
+                                        <input class="form-check-input" type="checkbox"
+                                            id="auth_{$authorization->Id}"
+                                            name="authorizations[]"
                                             value="{$authorization->Id}">
                                         <label class="form-check-label" for="auth_{$authorization->Id}">
                                         {$authorization->Name}
@@ -45,13 +45,13 @@
                                     </div>
                                 {/foreach}
                             {else}
-                                <p>Aucune autorisation disponible</p>
+                                <p>{='person_manager.group.create.no_authorization'|translate}</p>
                             {/if}
                         </div>
                         {/if}
                         <div class="d-flex justify-content-between">
-                            <a href="/groups" class="btn btn-secondary">Annuler</a>
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <a href="/groups" class="btn btn-secondary">{='person_manager.group.create.cancel'|translate}</a>
+                            <button type="submit" class="btn btn-primary">{='person_manager.group.create.save'|translate}</button>
                         </div>
                     </form>
                 </div>
@@ -63,10 +63,11 @@
 {block scripts}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const nameRequiredMessage = {='person_manager.group.name_required'|translate};
         const nameInput = document.getElementById("name");
 
         nameInput.addEventListener("invalid", function () {
-            this.setCustomValidity("Le nom du groupe est requis");
+            this.setCustomValidity(nameRequiredMessage);
         });
 
         nameInput.addEventListener("input", function () {

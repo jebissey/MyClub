@@ -206,8 +206,16 @@ INSERT INTO "Article" VALUES (2,'Title 2','Content 2',4,'2026-10-01 18:41:29',4,
 INSERT INTO "Attribute" VALUES (1,'Attribute name','Attribute detail','#2d2a2a');
 INSERT INTO "Attribute" VALUES (2,'Attribute deletable','Attribute detail','#2d2a2a');
 INSERT INTO "Design" (Id, IdPerson) VALUES (1,1);
-INSERT INTO "Event" VALUES (1,'Event summary','Event description','Event location','2026-12-31T08:30:00',3600,1,1,0,'ClubMembersOnly','2026-10-02 08:23:45',0);
-INSERT INTO "Event" VALUES (2,'Event summary','Event deletable','Event location','2026-12-31T08:30:00',3600,1,1,0,'ClubMembersOnly','2026-10-02 08:23:45',0);
+
+INSERT INTO "Event"
+  (Id, Summary, Description, Location, StartTime, Duration,
+   IdEventType, CreatedBy, MaxParticipants, Audience, LastUpdate, Canceled)
+VALUES
+  (1,'Event summary','Event description','Event location','2026-12-31T08:30:00',3600,
+   1,1,0,'ClubMembersOnly','2026-10-02 08:23:45',0),
+  (2,'Event summary','Event deletable','Event location','2026-12-31T08:30:00',3600,
+   1,1,0,'ClubMembersOnly','2026-10-02 08:23:45',0);
+
 INSERT INTO "EventAttribute" VALUES (1,1,1);
 INSERT INTO "EventType" VALUES (1,'EventType1',0,NULL);
 INSERT INTO "EventTypeAttribute" VALUES (1,1,1);

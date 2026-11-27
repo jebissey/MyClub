@@ -23,6 +23,9 @@ use app\modules\Event\valueObjects\EventExternalRow;
 use app\modules\Event\valueObjects\EventFullRow;
 use app\modules\Event\valueObjects\RegistrationEventInfo;
 
+/**
+ * @phpstan-import-type EventExternalRowShape from EventExternalRow
+ */
 final class EventDataHelper extends Data
 {
     public function __construct(
@@ -70,7 +73,7 @@ final class EventDataHelper extends Data
                 'Audience'        => $eventRow->audience
             ];
             $newEventId = $this->set('Event', $newEvent);
-            $attributes = $this->gets('EventAttribute', ['IdEvent' => $id], '*');
+            $attributes = $this->gets('EventAttribute', ['IdEvent' => $id], 'IdAttribute');
             foreach ($attributes as $attr) {
                 $this->set('EventAttribute', [
                     'IdEvent'     => $newEventId,
@@ -160,7 +163,7 @@ final class EventDataHelper extends Data
             ':eventId' => $eventId,
             ':today'   => (new DateTime())->format('Y-m-d\TH:i:s'),
         ]);
-        /** @var object{Id: int|string, Summary: string, Description: string|null, Location: string|null, StartTime: string, Audience: string|null}|false $result */
+        /** @var EventExternalRowShape|false $result */
         $result = $stmt->fetch(PDO::FETCH_OBJ);
         if ($result === false) {
             return null;
@@ -193,10 +196,10 @@ final class EventDataHelper extends Data
     /** @return array<int, mixed> */
     public function removeParticipant(int $id, int $personId): array
     {
-        if (!$this->get('Event', ['Id' => $id, 'CreatedBy' => $personId], '*')) {
+        if (!$this->get('Event', ['Id' => $id, 'CreatedBy' => $personId], 'Id')) {
             return [['success' => false, 'message' => 'User not allowed'], ApplicationError::Forbidden->value];
         }
-        if ($this->gets('Participant', ['IdEvent' => $id], '*')) {
+        if ($this->gets('Participant', ['IdEvent' => $id], 'Id')) {
             $this->set('Event', ['Canceled' => 1], ['Id' => $id]);
             return [['success' => true, 'message' => 'Evénement annulé'], ApplicationError::Unauthorized->value];
         }

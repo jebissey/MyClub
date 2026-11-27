@@ -11,15 +11,12 @@ final readonly class MakeTheTargetViewModel extends LayoutViewModel
 {
     /**
      * @param list<MenuItemWithParentRow> $navItems
-     * @param array<string, string> $i18n
-     * @param array<string, mixed> $layoutParams
+     * @param array<string, mixed> $layoutParams Full output of Params::getAll()
      */
     public function __construct(
         public array $navItems,
-        public array $i18n,
         public string $sessionId,
         public array $layoutParams,
-        public string $layout,
     ) {
         parent::__construct(
             ...self::baseArgsFrom($layoutParams),

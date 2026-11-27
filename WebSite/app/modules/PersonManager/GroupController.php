@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\PersonManager;
 
+use stdClass;
 use Throwable;
 use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
@@ -25,6 +26,9 @@ use app\modules\PersonManager\viewModels\GroupIndexViewModel;
 
 final class GroupController extends AbstractController
 {
+    /** Authorization that can never be given to a group. */
+    private const RESERVED_AUTHORIZATION_ID = 1;
+
     public function __construct(
         Application $application,
         private readonly GroupDataHelper $groupDataHelper,
@@ -39,8 +43,8 @@ final class GroupController extends AbstractController
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
             $viewModel = new GroupCreateViewModel(
-                availableAuthorizations: array_values($this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*', 'Name')),
-                layout: $this->getLayout(),
+                availableAuthorizations: $this->getAssignableAuthorizations(),
+                layout: $this->getLayout('personManager'),
                 navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 layoutParams: $this->getAllParams([]),
             );
@@ -52,7 +56,6 @@ final class GroupController extends AbstractController
     public function groupCreateSave(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
-            $availableAuthorizations = $this->dataHelper->gets('Authorization', ['Id <> 1' => null], '*');
             $schema = [
                 'name' => FilterInputRule::HtmlSafeName->value,
                 'selfRegistration' => FilterInputRule::Int->value,
@@ -64,10 +67,10 @@ final class GroupController extends AbstractController
             $selfRegistration = $input['selfRegistration'] ?? 0;
             if ($name === '???') {
                 $viewModel = new GroupCreateViewModel(
-                    availableAuthorizations: array_values($availableAuthorizations),
-                    layout: $this->getLayout(),
+                    availableAuthorizations: $this->getAssignableAuthorizations(),
+                    layout: $this->getLayout('personManager'),
                     navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
-                    error: 'Le nom du groupe est requis',
+                    error: $this->translate('person_manager.group.name_required'),
                     layoutParams: $this->getAllParams([]),
                 );
 
@@ -116,7 +119,7 @@ final class GroupController extends AbstractController
                 group: GroupEditRow::fromStdClass($group),
                 availableAuthorizations: $this->getAvailableAuthorizations(),
                 currentAuthorizations: $this->getGroupAuthorizationIds($id),
-                layout: $this->getLayout(),
+                layout: $this->getLayout('personManager'),
                 layoutParams: $this->getAllParams([]),
             );
 
@@ -154,7 +157,7 @@ final class GroupController extends AbstractController
                     group: GroupEditRow::fromStdClass($group),
                     availableAuthorizations: $this->getAvailableAuthorizations(),
                     currentAuthorizations: $this->getGroupAuthorizationIds($id),
-                    layout: $this->getLayout(),
+                    layout: $this->getLayout('personManager'),
                     error: $this->translate('person_manager.group.name_required'),
                     layoutParams: $this->getAllParams([]),
                 );
@@ -174,10 +177,10 @@ final class GroupController extends AbstractController
 
             $viewModel = new GroupIndexViewModel(
                 groups: $this->groupDataHelper->getGroupsWithAuthorizations($connectedUser),
-                layout: $this->getLayout(),
+                layout: $this->getLayout('personManager'),
                 navItems: $this->getNavItems($connectedUser->person?->email),
                 layoutParams: $this->getAllParams([
-                    'page' => $this->application->getConnectedUser()->getPage(),
+                    'page' => $connectedUser->getPage(),
                 ]),
             );
 
@@ -193,7 +196,7 @@ final class GroupController extends AbstractController
 
         $group = $this->dataHelper->get('Group', ['Id' => $groupId], 'Id, Name');
         if (!$group) {
-            $this->errors->badRequest("Le groupe {$groupId} n'existe pas", __FILE__, __LINE__);
+            $this->errors->badRequest("Unknown group {$groupId}", __FILE__, __LINE__);
             return;
         }
         $connectedUser = $this->application->getConnectedUser();
@@ -222,16 +225,28 @@ final class GroupController extends AbstractController
 
     #region Privates functions
     /**
-     * Authorizations a group can be given (the first one is reserved).
+     * Authorizations a group can be given, sorted by name.
+     * The reserved one is removed here because Data::gets() only accepts plain column names as conditions.
      *
+     * @return list<stdClass>
+     */
+    private function getAssignableAuthorizations(): array
+    {
+        return array_values(array_filter(
+            $this->dataHelper->gets('Authorization', [], 'Id, Name', 'Name'),
+            static fn(stdClass $row): bool => To::int($row->Id) !== self::RESERVED_AUTHORIZATION_ID
+        ));
+    }
+
+    /**
      * @return list<IdNameRow>
      */
     private function getAvailableAuthorizations(): array
     {
-        return array_values(array_map(
-            static fn(object $row): IdNameRow => IdNameRow::fromStdClass($row),
-            $this->dataHelper->gets('Authorization', ['Id <> 1' => null], 'Id, Name', 'Name')
-        ));
+        return array_map(
+            static fn(stdClass $row): IdNameRow => IdNameRow::fromStdClass($row),
+            $this->getAssignableAuthorizations()
+        );
     }
 
     /**
@@ -244,4 +259,5 @@ final class GroupController extends AbstractController
             $this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $groupId], 'IdAuthorization')
         ));
     }
+    #endregion
 }

@@ -8,7 +8,11 @@ use PDO;
 use Throwable;
 use app\enums\KanbanStatusChange;
 use app\helpers\Application;
+use app\modules\Kanban\valueObjects\KanbanProjectCardRow;
 
+/**
+ * @phpstan-import-type KanbanProjectCardRowShape from KanbanProjectCardRow
+ */
 final class KanbanDataHelper extends Data
 {
     public function __construct(Application $application)
@@ -232,7 +236,7 @@ final class KanbanDataHelper extends Data
     }
 
     /**
-     * @return list<object{Id: int, Title: string, Detail: string, IdKanbanCardType: int, Label: string, CurrentStatus: string}>
+     * @return list<KanbanProjectCardRow>
      */
     public function getProjectCards(int $idProject, ?int $filterCT, ?string $filterTitle, ?string $filterDetail): array
     {
@@ -253,7 +257,10 @@ final class KanbanDataHelper extends Data
         $sql = "
             WITH LastStatus AS (
                 SELECT
-                    kcs.*,
+                    kcs.Id,
+                    kcs.IdKanbanCard,
+                    kcs.What,
+                    kcs.LastUpdate,
                     ROW_NUMBER() OVER (
                     PARTITION BY kcs.IdKanbanCard
                         ORDER BY kcs.Id DESC
@@ -283,10 +290,10 @@ final class KanbanDataHelper extends Data
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
-        /** @var list<object{Id: int, Title: string, Detail: string, IdKanbanCardType: int, Label: string, CurrentStatus: string}> $rows */
+        /** @var list<KanbanProjectCardRowShape> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        return $rows;
+        return array_map(KanbanProjectCardRow::fromStdClass(...), $rows);
     }
 
     public function updateKanbanProject(int $id, string $title, string $detail, int $idPerson): bool

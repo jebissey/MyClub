@@ -19,6 +19,8 @@ use app\modules\Common\valueObjects\PendingSurveyRow;
 
 /**
  * @phpstan-import-type SurveyNewsRowShape from SurveyNewsRow
+ * @phpstan-import-type SurveyWithCreatorRowShape from SurveyWithCreatorRow
+ * @phpstan-import-type PendingSurveyRowShape from PendingSurveyRow
  * @phpstan-import-type NewsFeedItem from NewsProviderInterface
  */
 final class SurveyDataHelper extends Data implements NewsProviderInterface
@@ -37,7 +39,13 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
     public function articleHasSurveyNotClosed(int $articleId): object|bool
     {
         $sql = "
-            SELECT Survey.*
+            SELECT
+                Survey.Id,
+                Survey.Question,
+                Survey.Options,
+                Survey.IdArticle,
+                Survey.ClosingDate,
+                Survey.Visibility
             FROM Survey
             JOIN Article ON Survey.IdArticle = Article.Id
             WHERE Survey.IdArticle = :articleId
@@ -79,17 +87,7 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':articleId' => $articleId]);
 
-        /**
-         * @var object{
-         *     Id: int|string,
-         *     Question: string,
-         *     Options: string,
-         *     IdArticle: int|string,
-         *     ClosingDate: string,
-         *     Visibility: string,
-         *     CreatedBy: int|string
-         * }|false $result
-         */
+        /** @var SurveyWithCreatorRowShape|false $result */
         $result = $stmt->fetch(PDO::FETCH_OBJ);
 
         if ($result === false) {
@@ -179,17 +177,7 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
             throw new QueryException('getPendingSurveyResponses query failed');
         }
 
-        /**
-         * @var list<object{
-         *     PersonId: int|string,
-         *     Email: string,
-         *     ArticleId: int|string,
-         *     ArticleTitle: string,
-         *     SurveyId: int|string,
-         *     SurveyQuestion: string,
-         *     ClosingDate: string
-         * }> $rows
-         */
+        /** @var list<PendingSurveyRowShape> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $responses = [];

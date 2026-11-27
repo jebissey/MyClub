@@ -14,38 +14,6 @@ use app\modules\Games\viewModels\GameStatisticsViewModel;
 
 final class MakeTheTargetController extends TableController
 {
-    /**
-     * Key used by the template and the JavaScript => translation key.
-     *
-     * @var array<string, string>
-     */
-    private const I18N_KEYS = [
-        'title'           => 'makethetarget.title',
-        'rules'           => 'makethetarget.rules',
-        'rule1'           => 'makethetarget.rule1',
-        'rule2'           => 'makethetarget.rule2',
-        'rule3'           => 'makethetarget.rule3',
-        'rule4'           => 'makethetarget.rule4',
-        'rule5'           => 'makethetarget.rule5',
-        'drawTiles'       => 'makethetarget.draw_tiles',
-        'solution'        => 'makethetarget.solution',
-        'restart'         => 'makethetarget.restart',
-        'target'          => 'makethetarget.target',
-        'tiles'           => 'makethetarget.tiles',
-        'operation'       => 'makethetarget.operation',
-        'history'         => 'makethetarget.history',
-        'noOperationYet'  => 'makethetarget.no_operation_yet',
-        'operationCount'  => 'makethetarget.operation_count',
-        'operationsCount' => 'makethetarget.operations_count',
-        'targetReached'   => 'makethetarget.target_reached',
-        'obtainedIn'      => 'makethetarget.obtained_in',
-        'newGame'         => 'makethetarget.new_game',
-        'solutionFound'   => 'makethetarget.solution_found',
-        'bestResult'      => 'makethetarget.best_result',
-        'noCombination'   => 'makethetarget.no_combination',
-        'statisticsTitle' => 'makethetarget.statistics_title',
-    ];
-
     public function __construct(
         Application $application,
         private readonly TableControllerDataHelper $tableControllerDataHelper,
@@ -59,17 +27,15 @@ final class MakeTheTargetController extends TableController
             return;
         }
 
-        $connectedUser = $this->application->getConnectedUser(true);
+        $connectedUser = $this->application->getConnectedUser();
         $gameId = bin2hex(random_bytes(8));
 
         $viewModel = new MakeTheTargetViewModel(
-            navItems: $this->getNavItems($connectedUser->person->email),
-            i18n: array_map(fn(string $key): string => $this->translate($key), self::I18N_KEYS),
+            navItems: $this->getNavItems($connectedUser->person?->email),
             sessionId: session_id() . '_' . $gameId,
             layoutParams: $this->getAllParams([
-                'page' => $this->application->getConnectedUser()->getPage(),
+                'page' => $connectedUser->getPage(),
             ]),
-            layout: $this->getLayout(),
         );
 
         $this->views->render('Games/MakeTheTarget/views/makethetarget.latte', $viewModel);

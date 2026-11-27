@@ -13,8 +13,12 @@ use app\models\AuthorizationDataHelper;
 use app\models\DataHelper;
 use app\models\MetadataDataHelper;
 use app\modules\Common\valueObjects\ConnectedUser as ConnectedUserVO;
+use app\modules\Common\valueObjects\IndividualBasicRow;
 use app\modules\Common\valueObjects\Person;
 
+/**
+ * @phpstan-import-type IndividualBasicRowShape from IndividualBasicRow
+ */
 final class ConnectedUser
 {
     public ?ConnectedUserVO $user = null;
@@ -49,7 +53,7 @@ final class ConnectedUser
 
         $member = false;
         if ($individual !== false) {
-            /** @var object{Id: int, Email: string, FirstName: ?string, LastName: ?string, NickName: ?string, Avatar: ?string} $individual */
+            /** @var IndividualBasicRowShape $individual */
             $member = $this->dataHelper->get(
                 'Member',
                 ['Id' => $individual->Id],
