@@ -1,0 +1,11 @@
+.git
+.github
+dev
+doc
+
+WebSite/vendor/
+WebSite/data/
+WebSite/backup/
+WebSite/var/
+
+**/.DS_Store

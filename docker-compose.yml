@@ -1,0 +1,18 @@
+services:
+  myclub:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: myclub:local
+    ports:
+      - "127.0.0.1:8080:80"
+    restart: unless-stopped
+    volumes:
+      - myclub_data:/var/www/html/data
+      - myclub_backup:/var/www/html/backup
+      - myclub_var:/var/www/html/var
+
+volumes:
+  myclub_data:
+  myclub_backup:
+  myclub_var:
