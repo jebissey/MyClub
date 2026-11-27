@@ -247,7 +247,7 @@ final class PersonController extends TableController
     public function home(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $_SESSION['navbar'] = 'personManager';
+            $this->setNavbar('personManager');
 
             $viewModel = new PersonManagerHomeViewModel(
                 content: '',

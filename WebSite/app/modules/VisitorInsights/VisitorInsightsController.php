@@ -155,7 +155,7 @@ final class VisitorInsightsController extends TableController
             return;
         }
 
-        $_SESSION['navbar'] = 'visitorInsights';
+        $this->setNavbar('visitorInsights');
 
         $viewModel = new VisitorInsightsHomeViewModel(
             content: '',

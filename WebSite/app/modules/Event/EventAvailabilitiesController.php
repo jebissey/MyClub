@@ -35,6 +35,7 @@ final class EventAvailabilitiesController extends AbstractController
         if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isEventManager(), __FILE__, __LINE__)) {
             return;
         }
+        $this->setNavbar('eventManager');
 
         $stats = $this->availabilityDataHelper->getAvailabilityStats();
 

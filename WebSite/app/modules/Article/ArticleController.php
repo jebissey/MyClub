@@ -244,7 +244,7 @@ final class ArticleController extends ArticleAccessController
     public function home(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isRedactor(), __FILE__, __LINE__)) {
-            $_SESSION['navbar'] = 'redactor';
+            $this->setNavbar('redactor');
             $viewModel = new RedactorHomeViewModel(
                 content: '',
                 layoutParams: $this->getAllParams([

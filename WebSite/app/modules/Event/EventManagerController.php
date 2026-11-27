@@ -37,7 +37,7 @@ final class EventManagerController extends AbstractController
             return;
         }
 
-        $_SESSION['navbar'] = 'eventManager';
+        $this->setNavbar('eventManager');
 
         $viewModel = new EventManagerHomeViewModel(
             content: '',

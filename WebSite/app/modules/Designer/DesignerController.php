@@ -25,7 +25,7 @@ final class DesignerController extends TableController
     public function homeDesigner(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isDesigner(), __FILE__, __LINE__)) {
-            $_SESSION['navbar'] = 'designer';
+            $this->setNavbar('designer');
 
             $viewModel = new DesignerHomeViewModel(
                 content: '',

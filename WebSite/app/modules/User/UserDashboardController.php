@@ -25,7 +25,7 @@ final class UserDashboardController extends AbstractController
         if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isConnected(), __FILE__, __LINE__)) {
             return;
         }
-        $_SESSION['navbar'] = 'user';
+        $this->setNavbar('user');
 
         $viewModel = new UserDashboardViewModel(
             content: ($this->t)('User'),

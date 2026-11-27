@@ -25,7 +25,7 @@ final class GameManagerController extends AbstractController
         if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isAnybody(), __FILE__, __LINE__)) {
             return;
         }
-        $_SESSION['navbar'] = 'games';
+        $this->setNavbar('games');
 
         $viewModel = new GameManagerViewModel(
             content: ($this->t)('Games'),

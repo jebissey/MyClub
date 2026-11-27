@@ -370,4 +370,9 @@ abstract class AbstractController
             'placeholder' => $this->translate('table.value.all'),
         ];
     }
+
+    protected function setNavbar(string $navbar): void
+    {
+        $_SESSION['navbar'] = $navbar;
+    }
 }

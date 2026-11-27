@@ -43,7 +43,7 @@ final class HomeController extends AbstractController
             return;
         }
 
-        $_SESSION['navbar'] = '';
+        $this->setNavbar('');
         $userEmail = is_string($_SESSION['user'] ?? null) ? $_SESSION['user'] : '';
         $lang = TranslationManager::getCurrentLanguage();
         $connectedUser = $this->application->getConnectedUser();

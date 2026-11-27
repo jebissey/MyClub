@@ -118,7 +118,7 @@ final class WebmasterController extends TableController
     public function homeWebmaster(): void
     {
         if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
-            $_SESSION['navbar'] = 'webmaster';
+            $this->setNavbar('webmaster');
 
             $viewModel = new WebmasterHomeViewModel(
                 newVersion: $this->versionChecker->getNewVersionMessage(),
@@ -257,7 +257,7 @@ final class WebmasterController extends TableController
     private function redirectToSingleAuthorizationHome(ConnectedUser $user): void
     {
         if ($user->isRedactor()) {
-            $_SESSION['navbar'] = 'redactor';
+            $this->setNavbar('redactor');
             $this->redirect('/articles');
             return;
         }
