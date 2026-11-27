@@ -40,6 +40,7 @@ final readonly class DbBrowserTableViewModel extends LayoutViewModel
             btnHistoryBack: true,
             btnParent: '/dbbrowser',
             btnPlus: true,
+            btnPlusUrl: '/dbbrowser/' . $table . '/create',
         );
     }
 }

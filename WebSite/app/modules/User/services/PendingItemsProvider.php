@@ -6,14 +6,10 @@ namespace app\modules\User\services;
 
 use app\helpers\ConnectedUser;
 use app\helpers\News;
-use app\helpers\To;
 use app\models\DesignDataHelper;
 use app\models\SurveyDataHelper;
 use app\modules\User\valueObjects\PendingItems;
 
-/**
- * @phpstan-import-type PendingDesign from PendingItems
- */
 final class PendingItemsProvider
 {
     public function __construct(
@@ -33,10 +29,9 @@ final class PendingItemsProvider
             static fn($item) => strcasecmp($item->email, $userEmail) === 0
         ));
 
-        /** @var list<PendingDesign> $designs */
         $designs = array_values(array_filter(
             $this->designDataHelper->getPendingDesignResponses(),
-            static fn($item) => strcasecmp(To::str($item->Email), $userEmail) === 0
+            static fn($item) => strcasecmp($item->email, $userEmail) === 0
         ));
 
         return new PendingItems(

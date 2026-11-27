@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use PDO;
 use PDOException;
 use stdClass;
 use app\helpers\Application;
 use app\helpers\To;
+use app\modules\Common\valueObjects\PendingDesignRow;
 use app\modules\Designer\valueObjects\DesignRow;
 
 final class DesignDataHelper extends Data
@@ -94,30 +96,45 @@ final class DesignDataHelper extends Data
     }
 
     /**
-     * @return array<int, stdClass>
+     * @return array<int, PendingDesignRow>
      */
     public function getPendingDesignResponses(): array
     {
         $query = "
-        SELECT 
-            i.Id AS PersonId, 
-            i.Email, 
-            d.Id AS DesignId, 
-            d.Name AS DesignName,
-            d.Detail AS DesignDetail
-        FROM Individual i
-        INNER JOIN Member m ON m.Id = i.Id
-        CROSS JOIN Design d
-        LEFT JOIN DesignVote dv ON dv.IdDesign = d.Id AND dv.IdPerson = i.Id
-        WHERE m.Inactivated = 0
-            AND d.Status = 'UnderReview'
-            AND dv.Id IS NULL
-        ORDER BY d.LastUpdate";
+            SELECT
+                i.Id AS PersonId,
+                i.Email,
+                d.Name AS DesignName,
+                d.Detail AS DesignDetail
+            FROM Individual i
+            INNER JOIN Member m ON m.Id = i.Id
+            CROSS JOIN Design d
+            LEFT JOIN DesignVote dv ON dv.IdDesign = d.Id AND dv.IdPerson = i.Id
+            WHERE m.Inactivated = 0
+                AND d.Status = 'UnderReview'
+                AND dv.Id IS NULL
+            ORDER BY d.LastUpdate";
 
         $stmt = $this->pdo->query($query);
         if ($stmt === false) {
             throw new PDOException('Échec de la requête getPendingDesignResponses');
         }
-        return $this->fetchObjects($stmt);
+
+        /**
+         * @var list<object{
+         *     PersonId: int|string,
+         *     Email: string,
+         *     DesignName: string,
+         *     DesignDetail: string
+         * }> $rows
+         */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $responses = [];
+        foreach ($rows as $row) {
+            $responses[] = PendingDesignRow::fromStdClass($row);
+        }
+
+        return $responses;
     }
 }

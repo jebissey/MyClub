@@ -42,7 +42,6 @@ Debugger::enable(
     $isLocalAccess && !$isTestDevice ? Debugger::Development : Debugger::Production,
     $logDir
 );
-Debugger::enable(Debugger::Production, $logDir);
 
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $application = Application::init();

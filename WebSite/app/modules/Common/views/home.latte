@@ -18,7 +18,7 @@
 {/block}
 
 {block sidebar_toggle}
-    {if $sidebarMenu !== []}
+    {if $sidebarMenu !== [] }
         {include 'partials/sidebarToggle.latte'}
     {/if}
 {/block}
@@ -38,52 +38,50 @@
 {block sidebar}
     <nav id="sidebar" class="d-flex flex-column flex-shrink-0 py-2">
         <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
-        {if $sidebarMenu !== []}
-            {foreach $sidebarMenu as $item}
-                {if $item->type === 'heading'}
-                    <li class="sidebar-heading fw-bold">{$item->label}</li>
-                {elseif $item->type === 'divider'}
-                    <li><hr class="my-2 mx-3"
-                            style="border-color: var(--sidebar-link-color-muted); opacity:.5;"></li>
-                {elseif $item->type === 'link'}
-                    <li class="nav-item">
-                        <a href="{$item->url}"
-                           class="nav-link fw-bold{if $currentPath === $item->url} active{/if}">
-                            <i class="bi {$item->icon ?? 'bi-circle'}"></i>
+        {foreach $sidebarMenu as $item}
+            {if $item->type === 'heading'}
+                <li class="sidebar-heading fw-bold">{$item->label}</li>
+            {elseif $item->type === 'divider'}
+                <li><hr class="my-2 mx-3"
+                        style="border-color: var(--sidebar-link-color-muted); opacity:.5;"></li>
+            {elseif $item->type === 'link'}
+                <li class="nav-item">
+                    <a href="{$item->url}"
+                        class="nav-link fw-bold{if $currentPath === $item->url} active{/if}">
+                        <i class="bi {$item->icon ?? 'bi-circle'}"></i>
+                        {$item->label}
+                    </a>
+                </li>
+            {elseif $item->type === 'submenu'}
+                {var $submenuId = 'submenu-' . $iterator->counter}
+                <li class="nav-item">
+                    <a class="nav-link fw-bold d-flex align-items-center justify-content-between"
+                        data-bs-toggle="collapse"
+                        href="#{$submenuId}"
+                        role="button"
+                        aria-expanded="false">
+                        <span>
+                            <i class="bi {$item->icon ?? 'bi-folder'}"></i>
                             {$item->label}
-                        </a>
-                    </li>
-                {elseif $item->type === 'submenu'}
-                    {var $submenuId = 'submenu-' . $iterator->counter}
-                    <li class="nav-item">
-                        <a class="nav-link fw-bold d-flex align-items-center justify-content-between"
-                           data-bs-toggle="collapse"
-                           href="#{$submenuId}"
-                           role="button"
-                           aria-expanded="false">
-                            <span>
-                                <i class="bi {$item->icon ?? 'bi-folder'}"></i>
-                                {$item->label}
-                            </span>
-                            <i class="bi bi-chevron-down small ms-1" style="transition:transform .2s"></i>
-                        </a>
-                        <div class="collapse collapse-submenu" id="{$submenuId}">
-                            <ul class="nav flex-column ms-3 gap-1 mt-1">
-                                {foreach $item->children as $child}
-                                    <li>
-                                        <a href="{$child->url}"
-                                           class="nav-link fw-bold py-1{if $currentPath === $child->url} active{/if}">
-                                            <i class="bi bi-dash"></i>
-                                            {$child->label}
-                                        </a>
-                                    </li>
-                                {/foreach}
-                            </ul>
-                        </div>
-                    </li>
-                {/if}
-            {/foreach}
-        {/if}
+                        </span>
+                        <i class="bi bi-chevron-down small ms-1" style="transition:transform .2s"></i>
+                    </a>
+                    <div class="collapse collapse-submenu" id="{$submenuId}">
+                        <ul class="nav flex-column ms-3 gap-1 mt-1">
+                            {foreach $item->children as $child}
+                                <li>
+                                    <a href="{$child->url}"
+                                        class="nav-link fw-bold py-1{if $currentPath === $child->url} active{/if}">
+                                        <i class="bi bi-dash"></i>
+                                        {$child->label}
+                                    </a>
+                                </li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </li>
+            {/if}
+        {/foreach}
         </ul>
     </nav>
 {/block}

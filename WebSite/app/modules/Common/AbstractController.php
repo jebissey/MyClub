@@ -80,9 +80,12 @@ abstract class AbstractController
         return Params::getAll($specificParams, $this->prodSiteUrl, null, $this->navbarColors);
     }
 
-    protected function getLayout(): string
+    /**
+     * @param string|null $navbar Section whose layout to use; defaults to the one stored in the session
+     */
+    protected function getLayout(?string $navbar = null): string
     {
-        $navbar = To::str($_SESSION['navbar'] ?? '');
+        $navbar ??= To::str($_SESSION['navbar'] ?? '');
 
         return match ($navbar) {
             'designer'        => '../../Designer/views/designer.latte',

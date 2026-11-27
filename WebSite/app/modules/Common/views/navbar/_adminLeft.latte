@@ -1,15 +1,15 @@
-<div class="container-fluid">    
+{default $btnPlusUrl = null}
+<div class="container-fluid">
     <div class="d-flex align-items-center">
-        
     {include '_userLeft.latte'}
 
     {if $btnPlus}
-        <a class="btn btn-success fs-4 me-2" href="{$btnPlus}">
+        <a class="btn btn-success fs-4 me-2" href="{$btnPlusUrl ?? $btnPlus}">
             <i class="bi bi-plus-circle"></i>
         </a>
     {/if}
-
     </div>
+
     <button class="navbar-toggler" type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarNav">

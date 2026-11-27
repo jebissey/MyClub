@@ -11,11 +11,11 @@ use app\helpers\ConnectedUser;
 use app\modules\Common\interfaces\NewsProviderInterface;
 use app\modules\Article\services\ArticleAuthorizationService;
 use app\modules\Article\valueObjects\ArticleAuthorizationRow;
-use app\modules\Article\valueObjects\PendingSurveyRow;
 use app\modules\Article\valueObjects\ReplyRow;
 use app\modules\Article\valueObjects\SurveyNewsRow;
 use app\modules\Article\valueObjects\SurveyWithCreatorRow;
 use app\modules\Common\valueObjects\ClosingVisibilityRow;
+use app\modules\Common\valueObjects\PendingSurveyRow;
 
 /**
  * @phpstan-import-type SurveyNewsRowShape from SurveyNewsRow

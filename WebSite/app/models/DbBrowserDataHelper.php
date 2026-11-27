@@ -29,16 +29,36 @@ final class DbBrowserDataHelper extends Data
         $this->validateTableName($table);
         $columns = $this->getTableColumns($table);
         $data = [];
+
         foreach ($columns as $column) {
-            if (isset($input[$column]) && is_scalar($input[$column])) {
-                $data[$column] = $input[$column];
+            if (!array_key_exists($column, $input)) {
+                continue;
+            }
+
+            $value = $input[$column];
+            if ($value === '' || $value === null) {
+                continue;
+            }
+            if (in_array(strtolower(To::str($value)), ['current_timestamp', 'current_date', 'current_time'], true)) {
+                continue;
+            }
+            if (is_scalar($value)) {
+                $data[$column] = $value;
             }
         }
+
+        if (empty($data)) {
+            $query = "INSERT INTO " . $this->quoteName($table) . " DEFAULT VALUES";
+            $this->pdo->exec($query);
+            return;
+        }
+
         $columnsList = implode(', ', array_map([$this, 'quoteName'], array_keys($data)));
-        $placeholders = implode(', ', array_map(function ($key) {
-            return ':' . $key;
-        }, array_keys($data)));
-        $query = "INSERT INTO " . $this->quoteName($table) . " (" . $columnsList . ") VALUES (" . $placeholders . ")";
+        $placeholders = implode(', ', array_map(fn($key) => ':' . $key, array_keys($data)));
+
+        $query = "INSERT INTO " . $this->quoteName($table)
+            . " (" . $columnsList . ") VALUES (" . $placeholders . ")";
+
         $stmt = $this->pdo->prepare($query);
         foreach ($data as $key => $value) {
             $stmt->bindValue(':' . $key, $value);

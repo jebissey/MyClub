@@ -17,7 +17,6 @@ final readonly class MaintenanceService
 
     public function checkIfSiteIsUnderMaintenance(): bool
     {
-        error_log("\n\n" . json_encode('---###---', JSON_PRETTY_PRINT) . "\n");
         $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 
         if (is_string($requestUri) && strpos($requestUri, self::MAINTENANCE_UNSET) !== false) {

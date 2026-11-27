@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace app\modules\User\valueObjects;
 
-/**
- * @phpstan-type PendingSurvey object{articleTitle: string, closingDate: string, surveyQuestion: string, articleId: int}
- * @phpstan-type PendingDesign object{designName: string, designDetail: string}
- */
+use app\modules\Common\valueObjects\PendingDesignRow;
+use app\modules\Common\valueObjects\PendingSurveyRow;
+
 final readonly class PendingItems
 {
     /**
-     * @param list<PendingSurvey> $surveys
-     * @param list<PendingDesign> $designs
+     * @param list<PendingSurveyRow> $surveys
+     * @param list<PendingDesignRow> $designs
      */
     public function __construct(
         public array $surveys,

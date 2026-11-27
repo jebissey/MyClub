@@ -60,7 +60,9 @@ abstract readonly class LayoutViewModel
         public array $supportedLanguages = [],
         public string $flag = '',
         public bool $isMyclubWebSite = false,
-        public array $allParams = []
+        public array $allParams = [],
+        // Overrides the default target of the [+] button (e.g. a table-specific URL)
+        public ?string $btnPlusUrl = null
     ) {
     }
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\modules\Webmaster;
 
 use app\helpers\Application;
-use app\helpers\WebApp;
 use app\models\DbBrowserDataHelper;
 use app\modules\Common\TableController;
 use app\modules\Webmaster\viewModels\DbBrowserCreateViewModel;
