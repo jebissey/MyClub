@@ -54,17 +54,22 @@ final class WebmasterApi extends AbstractApi
 
     public function sendNotification(): void
     {
+        // Only webmasters may broadcast a push notification, and only with POST.
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isWebmaster(), __FILE__, __LINE__)) {
+            return;
+        }
         if (empty($this->vapid['publicKey']) || empty($this->vapid['privateKey'])) {
             $this->renderJson(
-                ['message' => 'Les clés VAPID ne sont pas encore configurées.'],
+                ['message' => $this->languagesDataHelper->translate('webmaster.notification.vapid_not_configured')],
                 false,
-                ApplicationError::InvalidSetting->value
+                ApplicationError::ServiceUnavailable->value
             );
             return;
         }
         $request = $this->getJsonInput();
-        $title = $request['title'] ?? 'Nouveau message';
-        $body  = $request['body']  ?? 'Cliquez pour voir !';
+        $title = $request['title'] ?? $this->languagesDataHelper->translate('webmaster.notification.default_title');
+        $body  = $request['body']  ?? $this->languagesDataHelper->translate('webmaster.notification.default_body');
+
         $webPush = new WebPush($this->vapid);
         $subscriptions = $this->dataHelper->gets('PushSubscription', [], 'EndPoint, P256dh, Auth');
         $sent = 0;

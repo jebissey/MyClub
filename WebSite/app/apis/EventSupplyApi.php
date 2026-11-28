@@ -60,7 +60,7 @@ final class EventSupplyApi extends AbstractApi
                 ]
             );
         } catch (Throwable $e) {
-            http_response_code(500);
+            http_response_code(ApplicationError::Error->value);
             echo "<div class='alert alert-danger'>"
                 . htmlspecialchars($this->languagesDataHelper->translate('common.error_prefix') . ' ' . $e->getMessage())
                 . '</div>';

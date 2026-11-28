@@ -1,0 +1,11 @@
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "Credential" (
+	"Id"	INTEGER,
+	"Service"	TEXT NOT NULL,
+	"Name"	TEXT NOT NULL,
+	"Value"	TEXT NOT NULL,
+	"UpdatedAt"	TEXT,
+	PRIMARY KEY("Id"),
+	UNIQUE("Service","Name")
+);
+COMMIT;
