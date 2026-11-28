@@ -7,7 +7,6 @@ namespace app\modules\Article;
 use BackedEnum;
 use DateTime;
 use app\enums\FilterInputRule;
-use app\exceptions\IntegrityException;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\helpers\WebApp;
@@ -127,8 +126,11 @@ abstract class ClosableFormController extends AbstractController
             'options'     => FilterInputRule::ArrayString->value,
         ];
         $input = WebApp::filterInput($schema, $this->flight->request()->data->getData());
-        /** @var int $articleId */
-        $articleId = $input['article_id'] ?? throw new IntegrityException('Fatal error in file ' . __FILE__ . ' at line ' . __LINE__);
+        $articleId = $input['article_id'] ?? null;
+        if (!is_int($articleId)) {
+            $this->errors->badRequest('Missing or invalid article_id', __FILE__, __LINE__);
+            return;
+        }
 
         $article = $this->articleDataHelper->getLatestArticle([$articleId]);
         if ($article === null) {

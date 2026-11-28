@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const useGravatarCheckbox = document.getElementById("useGravatar");
     const emojiSelectorWrapper = document.getElementById("emojiSelectorWrapper");
 
-    // Gravatar toggle
+    // Gravatar toggle: hide the emoji selector when Gravatar is used
     if (useGravatarCheckbox && emojiSelectorWrapper) {
         function toggleEmojiSelector() {
             emojiSelectorWrapper.style.display = useGravatarCheckbox.checked ? "none" : "block";
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
         useGravatarCheckbox.addEventListener("change", toggleEmojiSelector);
     }
 
-    // Clics sur les emojis de la liste prédéfinie
+    // Clicks on the emojis of the predefined list
     const avatarInput = document.getElementById("avatar");
     const userAvatar = document.getElementById("userAvatar");
 
@@ -29,6 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Initialisation du picker collage
+    // Initialize the paste picker
     initEmojiPicker();
 });

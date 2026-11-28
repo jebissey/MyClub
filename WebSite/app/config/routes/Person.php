@@ -35,6 +35,7 @@ final class Person implements RouteInterface
 
         $this->routes[] = new Route('GET  /person/edit/@id:[0-9]+', $personController, 'edit');
         $this->routes[] = new Route('POST /person/edit/@id:[0-9]+', $personController, 'editSave');
+        $this->routes[] = new Route('GET  /person/edit/help', $personController, 'editHelp');
 
         $this->routes[] = new Route('GET  /person/delete/@id:[0-9]+', $personController, 'delete');
 

@@ -60,7 +60,7 @@ final class RegistrationController extends TableController
                 filters: $filterConfig,
                 columns: $columns,
                 resetUrl: '/registration',
-                layout: $this->getLayout(),
+                layout: $this->resolveLayout(),
                 navItems: $this->getNavItems($this->application->getConnectedUser()->person?->email),
                 i18n: [
                     'errorLoadGroups' => ($this->t)('person_manager.registration.error.load_groups'),
@@ -99,5 +99,22 @@ final class RegistrationController extends TableController
                 echo "<div class='alert alert-danger'>Erreur : " . htmlspecialchars($e->getMessage()) . "</div>";
             }
         }
+    }
+
+    /**
+     * The page is reachable from the webmaster menu and from the person manager menu.
+     * When the session remembers the menu the user came from, it is kept; on a direct access
+     * (no menu in the session) the menu is inferred from the user's rights.
+     */
+    private function resolveLayout(): string
+    {
+        $navbar = $_SESSION['navbar'] ?? '';
+        if (is_string($navbar) && $navbar !== '') {
+            return $this->getLayout();
+        }
+
+        return $this->getLayout(
+            $this->application->getConnectedUser()->isPersonManager() ? 'personManager' : 'webmaster'
+        );
     }
 }

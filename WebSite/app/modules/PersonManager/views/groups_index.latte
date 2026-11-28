@@ -38,7 +38,7 @@
                                 </td>
                                 <td>{$group->authorizations}</td>
                                 <td class="text-nowrap">
-                                    {if $group->id !== 1}
+                                    {if !$group->isReserved()}
                                         <a href="/group/edit/{$group->id}" class="btn btn-sm btn-primary">
                                             <i class="bi bi-pencil"></i>
                                         </a>

@@ -29,6 +29,7 @@ final class UserAccount implements RouteInterface
 
         $this->routes[] = new Route('GET  /user/account', $userAccountController, 'account');
         $this->routes[] = new Route('POST /user/account', $userAccountController, 'accountSave');
+        $this->routes[] = new Route('GET  /user/account/help', $userAccountController, 'help');
 
         return $this->routes;
     }

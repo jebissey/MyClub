@@ -41,7 +41,7 @@ final readonly class ExercisesIndexViewModel extends GameLayoutViewModel
         parent::__construct(
             layoutParams: $layoutParams,
             category: 'other',
-            btnParent: '/designer',
+            btnParent: null,
             activeItem: 'exercises',
         );
     }

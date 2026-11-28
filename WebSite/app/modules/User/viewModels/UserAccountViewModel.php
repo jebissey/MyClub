@@ -12,7 +12,6 @@ final readonly class UserAccountViewModel extends LayoutViewModel
     /**
      * @param list<MenuItemWithParentRow> $navItems
      * @param list<string> $emojis
-     * @param array<string, string> $i18n
      * @param array<string, mixed> $layoutParams Full output of Params::getAll().
      * @param list<array{key: string, label: string, inputType: string, value: string}> $customFields
      */
@@ -27,7 +26,6 @@ final readonly class UserAccountViewModel extends LayoutViewModel
         public string $useGravatar,
         public array $emojis,
         public bool $isSelfEdit,
-        public array $i18n,
         public string $layout,
         public ?string $alert = null,
         public ?string $memberInfo = null,

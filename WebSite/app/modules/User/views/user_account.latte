@@ -2,36 +2,22 @@
 
 {block content}
     {if $readOnly}
-        {if $layout === '../../PersonManager/views/personManager.latte'}
-            <div class="alert alert-success alert-dismissible">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                <h4>{='account.form.imported.title'|translate}</h4>
-                <p>{='account.form.imported.webmaster_message'|translate}</p>
-            </div>
-        {else}
-            <div class="alert alert-success alert-dismissible">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                <h4>{='account.form.imported.title'|translate}</h4>
-                <p>{='account.form.imported.readonly_message'|translate}</p>
-            </div>
-        {/if}
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{='common.close'|translate}"></button>
+            <h4>{='account.form.imported.title'|translate}</h4>
+            <p>{if $isSelfEdit}{='account.form.imported.readonly_message'|translate}{else}{='account.form.imported.webmaster_message'|translate}{/if}</p>
+        </div>
     {/if}
+    {* An administrator can always change the email, the person herself only when the record is not imported *}
+    {var $emailReadOnly = $isSelfEdit && $readOnly}
     <form method="POST" class="needs-validation" data-form="account">
         <div class="row justify-content-center">
             <div class="col-12 col-md-6 col-lg-4">
-                {if $layout === '../../PersonManager/views/personManager.latte'}
                 <div class="mb-3">
                     <label for="email" class="form-label">{='account.form.email.label'|translate}</label>
-                    <input type="email" class="form-control" id="email" name="email" value="{$email}" required>
+                    <input type="email" class="form-control {if $emailReadOnly}bg-light text-muted{/if}" id="email" name="email" value="{$email}" {if $emailReadOnly}readonly{else}required{/if}>
                     <div class="invalid-feedback">{='account.form.email.invalid'|translate}</div>
                 </div>
-                {else}
-                <div class="mb-3">
-                    <label for="email" class="form-label">{='account.form.email.label'|translate}</label>
-                    <input type="email" class="form-control {if $readOnly}bg-light text-muted{/if}" id="email" name="email" value="{$email}" {if $readOnly}readonly{else}required{/if}>
-                    <div class="invalid-feedback">{='account.form.email.invalid'|translate}</div>
-                </div>
-                {/if}
 
                 <div class="mb-3">
                     <label for="firstName" class="form-label">{='account.form.firstname.label'|translate}</label>
@@ -111,17 +97,17 @@
                     <label for="memberInfo" class="form-label">{='account.form.member_info.label'|translate}</label>
                     <textarea class="form-control" id="memberInfo" name="memberInfo" rows="3">{$memberInfo}</textarea>
                 </div>
-                    {foreach $customFields as $field}
+                {foreach $customFields as $field}
                 <div class="mb-3">
                     <label for="custom_{$field['key']}" class="form-label">{$field['label']}</label>
                     <input type="{$field['inputType']}" class="form-control" id="custom_{$field['key']}"
                         name="custom[{$field['key']}]" value="{$field['value']}"
                         {if $field['inputType'] === 'number'}step="any"{/if}>
                 </div>
-                    {/foreach}
+                {/foreach}
                 {/if}
 
-                <button class="btn btn-secondary" onclick="history.back()">{='account.form.cancel'|translate}</button>
+                <button type="button" class="btn btn-secondary" onclick="history.back()">{='account.form.cancel'|translate}</button>
                 <button type="submit" class="btn btn-primary">{='account.form.submit'|translate}</button>
             </div>
         </div>
@@ -130,7 +116,11 @@
 
 {block scripts}
     <script>
-    Object.assign(window.i18n, {=$i18n});
+        window.i18n ??= {};
+        window.i18n['account.form.emoji.select_label'] = {='account.form.emoji.select_label'|translate};
+        window.i18n['account.form.emoji.missing_elements'] = {='account.form.emoji.missing_elements'|translate};
+        window.i18n['account.form.emoji.none_detected'] = {='account.form.emoji.none_detected'|translate};
+        window.i18n['account.form.emoji.selected'] = {='account.form.emoji.selected'|translate};
     </script>
     <script type="module" src="{='/app/modules/User/js/account.js'|version}"></script>
 {/block}

@@ -97,9 +97,9 @@ Security is based on **groups**. There are three types:
 
 ## 🧪 Automated Route Testing  
 
-- **320+ routes** are automatically discovered.
-- **5500+ routes** are simuled to test each route with each authorization.
-- For routes with parameters (`@`), the **JsonGetParameters** column must exist in the test database.  
+- **330+ routes** are automatically discovered.
+- **6500+ routes** are simuled to test each route with each authorization.
+- All routes must have a row in the test database.  
 - For **POST** routes, the **JsonPostParameters** column must be filled.  
 - **Authentication** can be simulated via the **JsonConnectedUser** column.  
 - Results can be validated with **Query** and **QueryExpectedResponse**.  
@@ -114,6 +114,9 @@ Security is based on **groups**. There are three types:
 
 👉 **Nordic Walking club website**  
 [BNW – Burgundy Nordic Walking](https://bnw-dijon.fr/)
+
+👉 **Beekeeping association website**  
+[ADA21 – Amis des Abeilles de Côte-d'Or](https://ada21.fr/)
 
 👉 **Static website (artist portfolio)**  
 [Paintings by an artist 😉](https://peinturesbribri.alwaysdata.net/navbar/show/article/3)

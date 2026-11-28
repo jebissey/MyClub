@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace app\modules\PersonManager;
 
-use app\enums\ApplicationError;
 use app\enums\FilterInputRule;
 use app\enums\PersonStatus;
-use app\exceptions\QueryException;
 use app\helpers\Application;
 use app\helpers\MemberCustomFields;
 use app\helpers\MyClubDateTime;
+use app\helpers\ReservedIds;
 use app\helpers\WebApp;
 use app\models\PersonDataHelper;
 use app\models\TableControllerDataHelper;
@@ -48,13 +47,16 @@ final class PersonController extends TableController
 
     public function delete(int $id): void
     {
-        if ($id === 1) {
-            throw new QueryException("Person (1) can't be inactivated", ApplicationError::BadRequest->value);
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
+            return;
         }
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isPersonManager(), __FILE__, __LINE__)) {
-            $this->dataHelper->set('Member', ['Inactivated' => 1], ['Id' => $id]);
-            $this->redirect('/persons');
+        if ($id === ReservedIds::WEBMASTER_PERSON) {
+            $this->errors->badRequest("Person ({$id}) can't be inactivated", __FILE__, __LINE__);
+            return;
         }
+
+        $this->dataHelper->set('Member', ['Inactivated' => 1], ['Id' => $id]);
+        $this->redirect('/persons');
     }
 
     public function edit(int $id): void
@@ -92,13 +94,7 @@ final class PersonController extends TableController
                 useGravatar: '',
                 emojis: [],
                 isSelfEdit: false,
-                i18n: [
-                    'account.form.emoji.select_label'     => ($this->t)('account.form.emoji.select_label'),
-                    'account.form.emoji.missing_elements' => ($this->t)('account.form.emoji.missing_elements'),
-                    'account.form.emoji.none_detected'    => ($this->t)('account.form.emoji.none_detected'),
-                    'account.form.emoji.selected'         => ($this->t)('account.form.emoji.selected'),
-                ],
-                layout: $this->getLayout(),
+                layout: $this->getLayout('personManager'),
                 alert: $member->Alert ?? '',
                 memberInfo: $member->MemberInfo ?? '',
                 customFields: MemberCustomFields::toFormFields(
@@ -237,6 +233,11 @@ final class PersonController extends TableController
 
             $this->redirect('/persons');
         }
+    }
+
+    public function editHelp(): void
+    {
+        $this->renderHelp('Help_PersonEdit', fn($u) => $u->isPersonManager(), __FILE__, __LINE__);
     }
 
     public function help(): void

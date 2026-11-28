@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\modules\Common\viewModels;
 
 use app\helpers\To;
+use app\modules\Common\valueObjects\SidebarMenuItem;
 
 /**
  * Base ViewModel carrying every parameter produced by Params::getAll(),
@@ -15,6 +16,7 @@ abstract readonly class LayoutViewModel
     /**
      * @param list<string> $supportedLanguages
      * @param array<string, mixed> $allParams Anything not yet promoted to a typed property.
+     * @param list<SidebarMenuItem> $sidebarMenu Only the home page provides one; every other page falls back to an empty menu.
      */
     public function __construct(
         // Navigation buttons
@@ -62,7 +64,9 @@ abstract readonly class LayoutViewModel
         public bool $isMyclubWebSite = false,
         public array $allParams = [],
         // Overrides the default target of the [+] button (e.g. a table-specific URL)
-        public ?string $btnPlusUrl = null
+        public ?string $btnPlusUrl = null,
+        // Sidebar entries; layouts such as home.latte read it, so it must exist on every page
+        public array $sidebarMenu = [],
     ) {
     }
 

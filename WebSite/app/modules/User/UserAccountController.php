@@ -43,12 +43,6 @@ final class UserAccountController extends AbstractController
             ),
             emojis: Application::EMOJI_LIST,
             isSelfEdit: true,
-            i18n: [
-                'account.form.emoji.select_label'     => ($this->t)('account.form.emoji.select_label'),
-                'account.form.emoji.missing_elements' => ($this->t)('account.form.emoji.missing_elements'),
-                'account.form.emoji.none_detected'    => ($this->t)('account.form.emoji.none_detected'),
-                'account.form.emoji.selected'         => ($this->t)('account.form.emoji.selected'),
-            ],
             layout: $this->getLayout(),
             layoutParams: $this->getAllParams([]),
         );
@@ -91,5 +85,10 @@ final class UserAccountController extends AbstractController
             $_SESSION['user'] = $email;
         }
         $this->redirect('/user');
+    }
+
+    public function help(): void
+    {
+        $this->renderHelp('Help_UserAccount', fn($u) => $u->isConnected(), __FILE__, __LINE__);
     }
 }

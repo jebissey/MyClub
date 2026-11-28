@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\PersonManager\valueObjects;
 
+use app\helpers\ReservedIds;
 use app\helpers\To;
 
 /**
@@ -30,5 +31,11 @@ final readonly class GroupRow
             selfRegistration: To::int($row->SelfRegistration) !== 0,
             authorizations: To::str($row->Authorizations),
         );
+    }
+
+    /** The reserved group can be neither edited nor deleted. */
+    public function isReserved(): bool
+    {
+        return $this->id === ReservedIds::WEBMASTER_GROUP;
     }
 }

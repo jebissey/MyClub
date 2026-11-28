@@ -9,6 +9,7 @@ use Throwable;
 use app\enums\FilterInputRule;
 use app\exceptions\QueryException;
 use app\helpers\Application;
+use app\helpers\ReservedIds;
 use app\helpers\To;
 use app\helpers\WebApp;
 use app\models\ChatMessageDataHelper;
@@ -26,9 +27,6 @@ use app\modules\PersonManager\viewModels\GroupIndexViewModel;
 
 final class GroupController extends AbstractController
 {
-    /** Authorization that can never be given to a group. */
-    private const RESERVED_AUTHORIZATION_ID = 1;
-
     public function __construct(
         Application $application,
         private readonly GroupDataHelper $groupDataHelper,
@@ -77,7 +75,7 @@ final class GroupController extends AbstractController
                 $this->views->render('PersonManager/views/group_create.latte', $viewModel);
                 return;
             }
-            $selectedAuthorizations = $input['authorizations'] ?? [];
+            $selectedAuthorizations = $this->withoutReservedAuthorization($input['authorizations'] ?? []);
             $this->groupDataHelper->insert($name, $selfRegistration, $selectedAuthorizations);
             $this->redirect('/groups');
         }
@@ -85,52 +83,56 @@ final class GroupController extends AbstractController
 
     public function groupDelete(int $id): void
     {
-        if ($id === 1) {
+        if (!$this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
+            return;
+        }
+        if ($id === ReservedIds::WEBMASTER_GROUP) {
             $this->errors->badRequest("Group {$id} can't be deleted", __FILE__, __LINE__);
             return;
         }
-        if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
-            try {
-                $this->groupDataHelper->inactive($id);
-                $this->redirect('/groups');
-            } catch (QueryException $e) {
-                $this->errors->badRequest("Error {$e->getMessage()}", $e->getFile(), $e->getLine());
-            } catch (Throwable $e) {
-                $this->errors->error($e->getMessage(), $e->getFile(), $e->getLine());
-            }
+
+        try {
+            $this->groupDataHelper->inactive($id);
+            $this->redirect('/groups');
+        } catch (QueryException $e) {
+            $this->errors->badRequest("Error {$e->getMessage()}", $e->getFile(), $e->getLine());
+        } catch (Throwable $e) {
+            $this->errors->error($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
 
     public function groupEdit(int $id): void
     {
-        if ($id === 1) {
+        if (!$this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
+            return;
+        }
+        if ($id === ReservedIds::WEBMASTER_GROUP) {
             $this->errors->badRequest("Group ({$id}) can't be edited", __FILE__, __LINE__);
             return;
         }
-        if ($this->userIsAllowedAndMethodIsGood('GET', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
-            $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
-            if ($group === false) {
-                $this->errors->badRequest("Unknown group {$id}", __FILE__, __LINE__);
-                return;
-            }
-            /** @var object{Name: mixed, SelfRegistration: mixed} $group */
 
-            $viewModel = new GroupEditViewModel(
-                group: GroupEditRow::fromStdClass($group),
-                availableAuthorizations: $this->getAvailableAuthorizations(),
-                currentAuthorizations: $this->getGroupAuthorizationIds($id),
-                layout: $this->getLayout('personManager'),
-                layoutParams: $this->getAllParams([]),
-            );
-
-            $this->views->render('PersonManager/views/group_edit.latte', $viewModel);
+        $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
+        if ($group === false) {
+            $this->errors->badRequest("Unknown group {$id}", __FILE__, __LINE__);
+            return;
         }
+        /** @var object{Name: mixed, SelfRegistration: mixed} $group */
+
+        $viewModel = new GroupEditViewModel(
+            group: GroupEditRow::fromStdClass($group),
+            availableAuthorizations: $this->getAvailableAuthorizations(),
+            currentAuthorizations: $this->getGroupAuthorizationIds($id),
+            layout: $this->getLayout('personManager'),
+            layoutParams: $this->getAllParams([]),
+        );
+
+        $this->views->render('PersonManager/views/group_edit.latte', $viewModel);
     }
 
     public function groupEditSave(int $id): void
     {
         if ($this->userIsAllowedAndMethodIsGood('POST', fn($u) => $u->isGroupManager(), __FILE__, __LINE__)) {
-            if ($id === 1) {
+            if ($id === ReservedIds::WEBMASTER_GROUP) {
                 $this->errors->badRequest("Group {$id} can't be updated", __FILE__, __LINE__);
                 return;
             }
@@ -143,7 +145,7 @@ final class GroupController extends AbstractController
             /** @var array{name?: string, selfRegistration?: int, authorizations?: array<int, int>} $input */
             $name = $input['name'] ?? '???';
             $selfRegistration = $input['selfRegistration'] ?? 0;
-            $selectedAuthorizations = $input['authorizations'] ?? [];
+            $selectedAuthorizations = $this->withoutReservedAuthorization($input['authorizations'] ?? []);
 
             if (empty($name)) {
                 $group = $this->dataHelper->get('Group', ['Id' => $id], 'Name, SelfRegistration');
@@ -234,7 +236,7 @@ final class GroupController extends AbstractController
     {
         return array_values(array_filter(
             $this->dataHelper->gets('Authorization', [], 'Id, Name', 'Name'),
-            static fn(stdClass $row): bool => To::int($row->Id) !== self::RESERVED_AUTHORIZATION_ID
+            static fn(stdClass $row): bool => To::int($row->Id) !== ReservedIds::WEBMASTER_AUTHORIZATION
         ));
     }
 
@@ -257,6 +259,21 @@ final class GroupController extends AbstractController
         return array_values(array_map(
             static fn($row) => To::int($row->IdAuthorization),
             $this->dataHelper->gets('GroupAuthorization', ['IdGroup' => $groupId], 'IdAuthorization')
+        ));
+    }
+
+    /**
+     * Drops the reserved authorization from a submitted list: it can never be given to a group,
+     * even if a crafted request sends it (the form does not offer it).
+     *
+     * @param array<int, int> $authorizationIds
+     * @return list<int>
+     */
+    private function withoutReservedAuthorization(array $authorizationIds): array
+    {
+        return array_values(array_filter(
+            $authorizationIds,
+            static fn(int $id): bool => $id !== ReservedIds::WEBMASTER_AUTHORIZATION
         ));
     }
     #endregion

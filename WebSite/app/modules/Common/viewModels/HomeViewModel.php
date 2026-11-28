@@ -27,7 +27,7 @@ final readonly class HomeViewModel extends LayoutViewModel
         public string $homeHeader,
         public string $homeFooter,
         public array $navItems,
-        public array $sidebarMenu,
+        array $sidebarMenu,
         public string $publishedBy,
         public bool $latestArticleHasSurvey,
         public array $pendingSurveys,
@@ -43,6 +43,7 @@ final readonly class HomeViewModel extends LayoutViewModel
             btnHistoryBack: false,
             btnPlus: false,
             btnParent: null,
+            sidebarMenu: $sidebarMenu,
         );
     }
 }
