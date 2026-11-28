@@ -22,6 +22,7 @@ use app\modules\Common\interfaces\NewsProviderInterface;
 /**
  * @phpstan-import-type ArticleRowShape from ArticleRow
  * @phpstan-import-type ArticleNewsRowShape from ArticleNewsRow
+ * @phpstan-import-type ArticleRssRowShape from ArticleRssRow
  * @phpstan-import-type NewsFeedItem from NewsProviderInterface
  */
 final class ArticleDataHelper extends Data implements NewsProviderInterface
@@ -120,7 +121,7 @@ final class ArticleDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
 
-        /** @var list<object{Id: int|string, Title: string, Content: string, LastUpdate: string, CreationDate: string}> $rows */
+        /** @var list<ArticleRssRowShape> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return array_map(ArticleRssRow::fromStdClass(...), $rows);

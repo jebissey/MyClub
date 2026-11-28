@@ -18,6 +18,7 @@ use app\modules\Common\valueObjects\ClosingVisibilityRow;
 use app\modules\Common\valueObjects\PendingSurveyRow;
 
 /**
+ * @phpstan-import-type ReplyRowShape from ReplyRow
  * @phpstan-import-type SurveyNewsRowShape from SurveyNewsRow
  * @phpstan-import-type SurveyWithCreatorRowShape from SurveyWithCreatorRow
  * @phpstan-import-type PendingSurveyRowShape from PendingSurveyRow
@@ -119,15 +120,7 @@ final class SurveyDataHelper extends Data implements NewsProviderInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':surveyId' => $surveyId]);
 
-        /**
-         * @var list<object{
-         *     Id: int|string,
-         *     IdPerson: int|string,
-         *     IdSurvey: int|string,
-         *     Answers: string,
-         *     LastUpdate: string
-         * }> $rows
-         */
+        /** @var list<ReplyRowShape> $rows */
         $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $replies = [];

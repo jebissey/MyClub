@@ -6,6 +6,7 @@ namespace app\models;
 
 use PDO;
 use app\helpers\Application;
+use app\modules\Common\valueObjects\EventParticipationRow;
 use app\modules\Common\valueObjects\Person;
 
 /**
@@ -53,8 +54,8 @@ use app\modules\Common\valueObjects\Person;
  *     participantSupplies: PercentageStat,
  *     participantMessages: ParticipantMessageStat
  * }
+ * @phpstan-import-type EventParticipationRowShape from EventParticipationRow
  */
-
 final class PersonStatisticsDataHelper extends Data
 {
     public function __construct(Application $application)
@@ -71,7 +72,7 @@ final class PersonStatisticsDataHelper extends Data
      */
     public function getStats(Person $person, string $seasonStart, string $seasonEnd): array
     {
-        $stats = [
+        return [
             'person'               => $person,
             'seasonStart'          => $seasonStart,
             'seasonEnd'            => $seasonEnd,
@@ -85,8 +86,6 @@ final class PersonStatisticsDataHelper extends Data
             'participantSupplies'  => $this->getParticipantSupplyStats($person->id, $seasonStart, $seasonEnd),
             'participantMessages'  => $this->getParticipantMessageStats($person->id, $seasonStart, $seasonEnd),
         ];
-
-        return $stats;
     }
 
     /**
@@ -463,17 +462,19 @@ final class PersonStatisticsDataHelper extends Data
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$personId, $seasonStart, $seasonEnd]);
-        /** @var list<object{IdEventType: int|string, typeName: string, user_count: int|string, total_users_count: int|string, event_count: int|string}> $results */
-        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<EventParticipationRowShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        foreach ($results as $result) {
-            $stats[$result->IdEventType] = [
-                'typeName'   => $result->typeName,
-                'events'     => (int) $result->event_count,
-                'user'       => (int) $result->user_count,
-                'total'      => (int) $result->total_users_count,
-                'percentage' => $result->total_users_count > 0
-                    ? round(((int) $result->user_count / (int) $result->total_users_count) * 100, 2)
+        foreach ($rows as $row) {
+            $participation = EventParticipationRow::fromStdClass($row);
+
+            $stats[$participation->idEventType] = [
+                'typeName'   => $participation->typeName,
+                'events'     => $participation->eventCount,
+                'user'       => $participation->userCount,
+                'total'      => $participation->totalUsersCount,
+                'percentage' => $participation->totalUsersCount > 0
+                    ? round(($participation->userCount / $participation->totalUsersCount) * 100, 2)
                     : 0
             ];
         }

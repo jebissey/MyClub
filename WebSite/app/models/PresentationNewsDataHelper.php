@@ -8,9 +8,11 @@ use PDO;
 use app\helpers\Application;
 use app\helpers\ConnectedUser;
 use app\modules\Common\interfaces\NewsProviderInterface;
+use app\modules\Common\valueObjects\PresentationNewsRow;
 
 /**
  * @phpstan-import-type NewsFeedItem from NewsProviderInterface
+ * @phpstan-import-type PresentationNewsRowShape from PresentationNewsRow
  */
 final class PresentationNewsDataHelper extends Data implements NewsProviderInterface
 {
@@ -47,20 +49,22 @@ final class PresentationNewsDataHelper extends Data implements NewsProviderInter
             ':email'      => $connectedUser->person->email
         ]);
 
-        /** @var array<int, object{Id: int, Email: string, FirstName: string, LastName: string, PresentationLastUpdate: string}> $presentations */
-        $presentations = $stmt->fetchAll(PDO::FETCH_OBJ);
+        /** @var list<PresentationNewsRowShape> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        foreach ($presentations as $presentation) {
-            $fullName = trim($presentation->FirstName . ' ' . $presentation->LastName);
+        foreach ($rows as $row) {
+            $presentation = PresentationNewsRow::fromStdClass($row);
+
+            $fullName = trim($presentation->firstName . ' ' . $presentation->lastName);
             if (empty($fullName)) {
-                $fullName = $presentation->Email;
+                $fullName = $presentation->email;
             }
             $news[] = [
                 'type'  => 'presentation',
-                'id'    => $presentation->Id,
+                'id'    => $presentation->id,
                 'title' => 'Présentation de ' . $fullName,
-                'date'  => $presentation->PresentationLastUpdate,
-                'url'   => '/user/presentation/' . $presentation->Id
+                'date'  => $presentation->presentationLastUpdate,
+                'url'   => '/user/presentation/' . $presentation->id
             ];
         }
         return $news;

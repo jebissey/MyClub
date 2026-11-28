@@ -11,7 +11,11 @@ use stdClass;
 use app\enums\FilterInputRule;
 use app\helpers\Application;
 use app\helpers\To;
+use app\modules\Common\valueObjects\ColumnInfoRow;
 
+/**
+ * @phpstan-import-type ColumnInfoRowShape from ColumnInfoRow
+ */
 final class DbBrowserDataHelper extends Data
 {
     public function __construct(Application $application)
@@ -139,12 +143,14 @@ final class DbBrowserDataHelper extends Data
         $stmt->execute();
         $columnTypes = [];
         while ($row = $stmt->fetch(PDO::FETCH_OBJ)) {
-            /** @var object{name: string, type: string, notnull: int, dflt_value: mixed, pk: int} $row */
-            $columnTypes[$row->name] = [
-                'type' => $row->type,
-                'notnull' => $row->notnull,
-                'dflt_value' => $row->dflt_value,
-                'pk' => $row->pk
+            /** @var ColumnInfoRowShape $row */
+            $column = ColumnInfoRow::fromStdClass($row);
+
+            $columnTypes[$column->name] = [
+                'type' => $column->type,
+                'notnull' => $column->notnull,
+                'dflt_value' => $column->defaultValue,
+                'pk' => $column->pk,
             ];
         }
         return $columnTypes;
