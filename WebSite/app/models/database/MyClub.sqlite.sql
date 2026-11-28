@@ -22044,7 +22044,6 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (2426,'events.js.error','Error','Erreur','Błąd'),
  (2427,'events.js.unknown_error','Unknown error','Erreur inconnue','Nieznany błąd'),
  (2428,'media.manager.edit.save','Save','Enregistrer','Zapisz'),
- (2429,'person_manager.member_fields.delete_confirm','Are you sure you want to delete this field? All values already entered in this field will be permanently deleted.','Êtes-vous sûr de vouloir supprimer ce champ ? Toutes les valeurs déjà saisies dans ce champ seront définitivement supprimées.','Czy na pewno chcesz usunąć to pole? Wszystkie już wprowadzone wartości w tym polu zostaną trwale usunięte.'),
  (2430,'loan.calendar.record.loan_date','Loan date','Date d''emprunt','Data wypożyczenia'),
  (2431,'loan.calendar.record.due_date','Due date','Date de retour','Termin zwrotu'),
  (2432,'loan.calendar.record.status','Status','Statut','Status'),
@@ -22123,8 +22122,9 @@ Jeśli konto istnieje, ale jest wyłączone, możesz je po prostu
  (2505,'person_manager.group.create.self_registration','Self-registration allowed','Auto-inscription autorisée','Samodzielna rejestracja dozwolona'),
  (2506,'person_manager.group.create.authorizations','Authorizations','Autorisations','Uprawnienia'),
  (2507,'person_manager.group.create.no_authorization','No authorization available','Aucune autorisation disponible','Brak dostępnych uprawnień'),
- (2508,'person_manager.group.create.cancel','Cancel','Annuler','Anuluj'),
- (2509,'person_manager.group.create.save','Save','Enregistrer','Zapisz');
+ (2510,'person_manager.group.js.no_users','No user in this group.','Aucun utilisateur dans ce groupe.','Brak użytkowników w tej grupie.'),
+ (2511,'person_manager.group.js.unexpected_response','Unexpected response.','Réponse inattendue.','Nieoczekiwana odpowiedź.'),
+ (2512,'person_manager.group.js.load_error','Loading error.','Erreur de chargement.','Błąd ładowania.');
 INSERT INTO "Member" VALUES (1,'e427c26faca947919b18b797bc143a35100e4de48c34b70b26202d3a7d8e51f7',NULL,NULL,'no',NULL,NULL,NULL,0,0,NULL,'2025-01-01',0,NULL,NULL,NULL,NULL,NULL,0,0,'',NULL,NULL,'{}');
 INSERT INTO "MemberGroup" VALUES (1,1,1);
 INSERT INTO "Metadata" VALUES (1,'MyClub',112,0,NULL,10,36,6,1000000,NULL,0,NULL,NULL);

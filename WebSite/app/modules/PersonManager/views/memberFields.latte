@@ -18,8 +18,8 @@
                             </div>
                             <div class="col-4">
                                 <select class="form-select" name="fields[{$i}][type]">
-                                    {foreach $types as $t}
-                                        <option value="{$t['value']}" {if $field['type'] === $t['value']}selected{/if}>{$t['label']}</option>
+                                    {foreach $types as $type}
+                                        <option value="{$type['value']}" {if $field['type'] === $type['value']}selected{/if}>{$type['labelKey']|translate}</option>
                                     {/foreach}
                                 </select>
                             </div>
@@ -41,8 +41,8 @@
                         </div>
                         <div class="col-4">
                             <select class="form-select" name="fields[__INDEX__][type]">
-                                {foreach $types as $t}
-                                    <option value="{$t['value']}">{$t['label']}</option>
+                                {foreach $types as $type}
+                                    <option value="{$type['value']}">{$type['labelKey']|translate}</option>
                                 {/foreach}
                             </select>
                         </div>
@@ -59,8 +59,8 @@
                 </button>
 
                 <div>
-                    <button type="button" class="btn btn-secondary" onclick="history.back()">{='account.form.cancel'|translate}</button>
-                    <button type="submit" class="btn btn-primary">{='account.form.submit'|translate}</button>
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">{='cancel'|translate}</button>
+                    <button type="submit" class="btn btn-primary">{='save'|translate}</button>
                 </div>
             </div>
         </div>
@@ -68,9 +68,9 @@
 {/block}
 
 {block scripts}
-    <script>
-        window.i18n ??= {};
-        window.i18n['delete_confirm'] = {='person_manager.member_fields.delete_confirm'|translate};
-    </script>
-    <script type="module" src="{='/app/modules/PersonManager/js/memberFields.js'|version}"></script>
+<script>
+    window.i18n ??= {};
+    window.i18n['custom_fields.delete_confirm'] = {='custom_fields.delete_confirm'|translate};
+</script>
+<script type="module" src="{='/app/modules/PersonManager/js/memberFields.js'|version}"></script>
 {/block}

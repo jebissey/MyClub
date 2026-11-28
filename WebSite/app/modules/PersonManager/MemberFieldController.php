@@ -27,13 +27,10 @@ final class MemberFieldController extends AbstractController
                     $this->loadDefinitions()
                 ),
                 types: array_map(
-                    fn(CustomFieldType $t) => ['value' => $t->value, 'label' => ($this->t)($t->translationKey())],
+                    static fn(CustomFieldType $t) => ['value' => $t->value, 'labelKey' => $t->translationKey()],
                     CustomFieldType::cases()
                 ),
-                i18n: [
-                    'delete_confirm' => ($this->t)('custom_fields.delete_confirm'),
-                ],
-                layout: $this->getLayout(),
+                layout: $this->getLayout('personManager'),
                 layoutParams: $this->getAllParams([
                     'page' => $this->application->getConnectedUser()->getPage(),
                 ]),

@@ -125,7 +125,7 @@ final class ImportController extends AbstractController
         $viewModel = new UsersImportViewModel(
             importSettings: $this->importSettings,
             results: $results,
-            layout: $this->getLayout(),
+            layout: $this->getLayout('personManager'),
             customFields: $this->customFieldsForView(),
             layoutParams: $this->getAllParams([
                 'page' => $this->application->getConnectedUser()->getPage(),

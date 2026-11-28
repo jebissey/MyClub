@@ -1,4 +1,4 @@
-{layout $layout}
+{extends $layout}
 
 {block title}{='person_manager.group.create.title'|translate}{/block}
 
@@ -13,7 +13,7 @@
                     {if isset($error)}
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {$error}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{='common.close'|translate}"></button>
                     </div>
                     {/if}
 
@@ -50,8 +50,8 @@
                         </div>
                         {/if}
                         <div class="d-flex justify-content-between">
-                            <a href="/groups" class="btn btn-secondary">{='person_manager.group.create.cancel'|translate}</a>
-                            <button type="submit" class="btn btn-primary">{='person_manager.group.create.save'|translate}</button>
+                            <a href="/groups" class="btn btn-secondary">{='cancel'|translate}</a>
+                            <button type="submit" class="btn btn-primary">{='save'|translate}</button>
                         </div>
                     </form>
                 </div>
@@ -62,33 +62,8 @@
 
 {block scripts}
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const nameRequiredMessage = {='person_manager.group.name_required'|translate};
-        const nameInput = document.getElementById("name");
-
-        nameInput.addEventListener("invalid", function () {
-            this.setCustomValidity(nameRequiredMessage);
-        });
-
-        nameInput.addEventListener("input", function () {
-            this.setCustomValidity("");
-        });
-
-        const selfRegistrationCheckbox = document.getElementById('selfRegistration');
-        const authorizationCheckboxes = document.querySelectorAll('input[name="authorizations[]"]');
-
-        selfRegistrationCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                authorizationCheckboxes.forEach(function(checkbox) {
-                    checkbox.checked = false;
-                    checkbox.disabled = true;
-                });
-            } else {
-                authorizationCheckboxes.forEach(function(checkbox) {
-                    checkbox.disabled = false;
-                });
-            }
-        });
-    });
+    window.i18n ??= {};
+    window.i18n['person_manager.group.name_required'] = {='person_manager.group.name_required'|translate};
 </script>
+<script type="module" src="{='/app/modules/PersonManager/js/groupForm.js'|version}"></script>
 {/block}

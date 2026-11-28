@@ -56,35 +56,11 @@
     </div>
 </div>
 {/block}
+
 {block scripts}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const nameInput = document.getElementById("name");
-    const nameRequired = {='person_manager.group.name_required'|translate};
-
-    nameInput.addEventListener("invalid", function () {
-        this.setCustomValidity(nameRequired);
-    });
-
-    nameInput.addEventListener("input", function () {
-        this.setCustomValidity("");
-    });
-
-    const selfRegistrationCheckbox = document.getElementById('selfRegistration');
-    const authorizationCheckboxes = document.querySelectorAll('input[name="authorizations[]"]');
-
-    selfRegistrationCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            authorizationCheckboxes.forEach(function(checkbox) {
-                checkbox.checked = false;
-                checkbox.disabled = true;
-            });
-        } else {
-            authorizationCheckboxes.forEach(function(checkbox) {
-                checkbox.disabled = false;
-            });
-        }
-    });
-});
+    window.i18n ??= {};
+    window.i18n['person_manager.group.name_required'] = {='person_manager.group.name_required'|translate};
 </script>
+<script type="module" src="{='/app/modules/PersonManager/js/groupForm.js'|version}"></script>
 {/block}

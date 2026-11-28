@@ -1,3 +1,5 @@
+import { t } from "/app/modules/Common/js/i18n.js";
+
 const list = document.getElementById('fieldList');
 const template = document.getElementById('fieldRowTemplate');
 let nextIndex = list.querySelectorAll('.field-row').length;
@@ -15,8 +17,7 @@ list.addEventListener('click', (event) => {
     const isExistingField = keyInput && keyInput.value !== '';
 
     if (isExistingField) {
-        const message = window.t('delete_confirm');
-        if (!confirm(message)) return;
+        if (!confirm(t('custom_fields.delete_confirm'))) return;
     }
 
     row.remove();

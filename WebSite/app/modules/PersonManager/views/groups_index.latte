@@ -88,5 +88,12 @@
 {/block}
 
 {block scripts}
+<script>
+    window.i18n ??= {};
+    window.i18n['person_manager.group.loading'] = {='person_manager.group.loading'|translate};
+    window.i18n['person_manager.group.js.no_users'] = {='person_manager.group.js.no_users'|translate};
+    window.i18n['person_manager.group.js.unexpected_response'] = {='person_manager.group.js.unexpected_response'|translate};
+    window.i18n['person_manager.group.js.load_error'] = {='person_manager.group.js.load_error'|translate};
+</script>
 <script type="module" src="{='/app/modules/PersonManager/js/groupsIndex.js'|version}"></script>
 {/block}
